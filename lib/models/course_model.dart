@@ -163,6 +163,7 @@ class Course {
   final String iconName;
   final List<CourseModule> modules;
   final List<CourseQuiz> quizzes;
+  final DateTime? createdAt;
 
   /// Set client-side after loading — how much of this course's quizzes
   /// the current student has completed. Not stored on the shared course
@@ -183,9 +184,11 @@ class Course {
     required this.iconName,
     required this.modules,
     required this.quizzes,
+    this.createdAt,
   });
 
   factory Course.fromMap(String id, Map<String, dynamic> data) {
+    final ts = data['createdAt'];
     return Course(
       id: id,
       title: data['title']?.toString() ?? '',
@@ -212,6 +215,7 @@ class Course {
             ),
           )
           .toList(),
+      createdAt: ts is Timestamp ? ts.toDate() : null,
     );
   }
 
@@ -225,6 +229,7 @@ class Course {
         'iconName': iconName,
         'modules': modules.map((m) => m.toMap()).toList(),
         'quizzes': quizzes.map((q) => q.toMap()).toList(),
+        'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
       };
 }
 

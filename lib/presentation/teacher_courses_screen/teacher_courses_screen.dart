@@ -336,6 +336,7 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
               iconName: course.iconName,
               modules: course.modules,
               quizzes: course.quizzes,
+              createdAt: course.createdAt ?? DateTime.now(),
             );
             await context.read<CourseService>().updateCourse(updatedCourse);
             if (ctx.mounted) Navigator.of(ctx).pop();
@@ -446,6 +447,7 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
               iconName: 'science',
               modules: [],
               quizzes: [],
+              createdAt: DateTime.now(),
             );
             await context.read<CourseService>().createCourse(newCourse);
             if (ctx.mounted) Navigator.of(ctx).pop();
@@ -482,6 +484,7 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
               iconName: course.iconName,
               modules: course.modules,
               quizzes: course.quizzes,
+              createdAt: course.createdAt ?? DateTime.now(),
             );
             await context.read<CourseService>().updateCourse(updatedCourse);
             if (ctx.mounted) Navigator.of(ctx).pop();

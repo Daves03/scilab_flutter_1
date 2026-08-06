@@ -182,6 +182,19 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
       
       for (var doc in cSnap.docs) {
         final course = Course.fromMap(doc.id, doc.data());
+
+        // Course Created
+        if (course.createdAt != null) {
+           notifications.add({
+             'title': 'New Course Added',
+             'desc': '${course.teacherName} created the course ${course.title}.',
+             'icon': 'school',
+             'color': const Color(0xFF7C3AED),
+             'timeStr': _formatNotificationTime(course.createdAt),
+             'timestamp': course.createdAt!,
+           });
+        }
+
         
         // Modules
         for (var m in course.modules) {
