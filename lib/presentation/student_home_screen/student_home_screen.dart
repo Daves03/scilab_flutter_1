@@ -24,13 +24,13 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
   late AnimationController _entranceController;
   late Timer _timer;
   late DateTime _philippinesTime;
-  late Future<List<Map<String, dynamic>>> _notificationsFuture;
+  late Stream<List<Map<String, dynamic>>> _notificationsStream;
   late Future<Map<String, dynamic>> _progressFuture;
 
   @override
   void initState() {
     super.initState();
-    _notificationsFuture = _fetchDynamicNotifications();
+    _notificationsStream = _streamDynamicNotifications();
     _progressFuture = _fetchProgressStats();
     _entranceController = AnimationController(
       vsync: this,
@@ -170,16 +170,13 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     return '${diff.inDays} days ago';
   }
 
-  Future<List<Map<String, dynamic>>> _fetchDynamicNotifications() async {
-    List<Map<String, dynamic>> notifications = [];
-    try {
-      final user = context.read<AuthService>().currentUser;
-      if (user == null) return [];
-      
-      final db = FirebaseFirestore.instance;
-      // Get courses matching user's grade
-      final cSnap = await db.collection('courses').where('grade', isEqualTo: user.role?.label).get();
-      
+  Stream<List<Map<String, dynamic>>> _streamDynamicNotifications() {
+    final user = context.read<AuthService>().currentUser;
+    if (user == null) return Stream.value([]);
+    
+    final db = FirebaseFirestore.instance;
+    return db.collection('courses').where('grade', isEqualTo: user.role?.label).snapshots().map((cSnap) {
+      List<Map<String, dynamic>> notifications = [];
       for (var doc in cSnap.docs) {
         final course = Course.fromMap(doc.id, doc.data());
 
@@ -194,7 +191,6 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
              'timestamp': course.createdAt!,
            });
         }
-
         
         // Modules
         for (var m in course.modules) {
@@ -223,11 +219,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
       
       notifications.sort((a, b) => (b['timestamp'] as DateTime).compareTo(a['timestamp'] as DateTime));
       if (notifications.length > 5) notifications = notifications.sublist(0, 5);
-      
-    } catch (e) {
-      print('Error fetching notifications: $e');
-    }
-    return notifications;
+      return notifications;
+    });
   }
 
 
@@ -253,8 +246,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                 ),
               ],
             ),
-            child: FutureBuilder<List<Map<String, dynamic>>>(
-              future: _fetchDynamicNotifications(),
+            child: StreamBuilder<List<Map<String, dynamic>>>(
+              stream: _streamDynamicNotifications(),
               builder: (ctx, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const SizedBox(
@@ -443,8 +436,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
             ),
           ),
           const SizedBox(height: 12),
-          FutureBuilder<List<Map<String, dynamic>>>(
-            future: _notificationsFuture,
+          StreamBuilder<List<Map<String, dynamic>>>(
+            stream: _notificationsStream,
             builder: (ctx, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
