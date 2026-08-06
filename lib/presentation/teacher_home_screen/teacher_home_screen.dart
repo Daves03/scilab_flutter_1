@@ -4,6 +4,10 @@ import 'dart:ui';
 import 'package:go_router/go_router.dart';
 import '../../core/app_export.dart';
 import '../../widgets/custom_icon_widget.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../models/user_model.dart';
+import '../../models/course_model.dart';
+import '../../models/activity_model.dart';
 import '../teacher_profile_screen/teacher_profile_screen.dart';
 
 // ── Reuse data models from teacher_progress_screen ────────────────────────────
@@ -368,6 +372,59 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     );
   }
 
+
+  String _formatNotificationTime(DateTime? dt) {
+    if (dt == null) return '';
+    final diff = DateTime.now().difference(dt);
+    if (diff.inMinutes < 60) return '${diff.inMinutes} mins ago';
+    if (diff.inHours < 24) return '${diff.inHours} hrs ago';
+    return '${diff.inDays} days ago';
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchDynamicNotifications() async {
+    List<Map<String, dynamic>> notifications = [];
+    try {
+      final db = FirebaseFirestore.instance;
+      // Get 5 recent quizzes
+      final qSnap = await db.collection('quiz_attempts').orderBy('submittedAt', descending: true).limit(5).get();
+      for (var doc in qSnap.docs) {
+         final data = doc.data();
+         final studentId = data['studentId'] as String? ?? '';
+         final title = data['quizTitle'] as String? ?? '';
+         final ts = data['submittedAt'] as Timestamp?;
+         
+         // Fetch student name
+         String name = 'A student';
+         if (studentId.isNotEmpty) {
+           final sDoc = await db.collection('users').doc(studentId).get();
+           if (sDoc.exists) name = sDoc.data()?['name'] ?? name;
+         }
+
+         notifications.add({
+           'title': 'Quiz Submitted',
+           'desc': '$name submitted $title.',
+           'icon': 'assignment_turned_in',
+           'color': const Color(0xFF00D4FF),
+           'timeStr': _formatNotificationTime(ts?.toDate()),
+           'timestamp': ts?.toDate() ?? DateTime.now(),
+         });
+      }
+      
+      // Since fetching recent activities across all subcollections requires collectionGroup,
+      // we'll use collectionGroup('experiment_activity') if indexing allows, 
+      // otherwise this is a prototype so we'll just query global recent quiz attempts for now.
+      
+      // Sort by timestamp
+      notifications.sort((a, b) => (b['timestamp'] as DateTime).compareTo(a['timestamp'] as DateTime));
+      if (notifications.length > 5) notifications = notifications.sublist(0, 5);
+      
+    } catch (e) {
+      print('Error fetching notifications: $e');
+    }
+    return notifications;
+  }
+
+
   void _showNotificationsDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -390,65 +447,76 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                 ),
               ],
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: FutureBuilder<List<Map<String, dynamic>>>(
+              future: _fetchDynamicNotifications(),
+              builder: (ctx, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const SizedBox(
+                    height: 200,
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                
+                final notifs = snapshot.data ?? [];
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const CustomIconWidget(iconName: 'notifications', color: Color(0xFF7C3AED), size: 24),
-                        const SizedBox(width: 10),
-                        Text(
-                          'Notifications',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                        Row(
+                          children: [
+                            const CustomIconWidget(iconName: 'notifications', color: Color(0xFF7C3AED), size: 24),
+                            const SizedBox(width: 10),
+                            Text(
+                              'Notifications',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade200,
+                              shape: BoxShape.circle,
+                            ),
+                            child: CustomIconWidget(iconName: 'close', color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, size: 16),
                           ),
                         ),
                       ],
                     ),
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade200,
-                          shape: BoxShape.circle,
+                    const SizedBox(height: 20),
+                    if (notifs.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 20),
+                        child: Text(
+                          'No recent activity.',
+                          style: TextStyle(color: Colors.grey),
                         ),
-                        child: CustomIconWidget(iconName: 'close', color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, size: 16),
-                      ),
-                    ),
+                      )
+                    else
+                      ...notifs.map((n) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _buildNotificationItem(
+                            n['title'] as String,
+                            n['desc'] as String,
+                            n['icon'] as String,
+                            n['color'] as Color,
+                            n['timeStr'] as String,
+                          ),
+                        );
+                      }).toList(),
                   ],
-                ),
-                const SizedBox(height: 20),
-                _buildNotificationItem(
-                  'Quiz Submitted',
-                  'Maria Santos submitted Chemistry Quiz 3.',
-                  'assignment_turned_in',
-                  const Color(0xFF00D4FF),
-                  '10 mins ago',
-                ),
-                const SizedBox(height: 12),
-                _buildNotificationItem(
-                  'Quiz Submitted',
-                  'Juan dela Cruz submitted Physics Lab Experiment.',
-                  'assignment_turned_in',
-                  const Color(0xFF00D4FF),
-                  '1 hr ago',
-                ),
-                const SizedBox(height: 12),
-                _buildNotificationItem(
-                  'AR Session Completed',
-                  'Ana Reyes completed the Biology AR Simulation.',
-                  'biotech',
-                  const Color(0xFF7C3AED),
-                  '2 hrs ago',
-                ),
-              ],
+                );
+              },
             ),
           ),
         );

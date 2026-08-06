@@ -915,6 +915,7 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
       id: widget.existingQuiz?.id ?? 'tq_${DateTime.now().millisecondsSinceEpoch}',
       title: _titleCtrl.text.trim(),
       questions: validQuestions,
+      createdAt: widget.existingQuiz?.createdAt ?? DateTime.now(),
     );
 
     widget.onSave(quiz);

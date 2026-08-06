@@ -1,4 +1,10 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../models/user_model.dart';
+import '../../models/course_model.dart';
+import '../../models/ar_experiment_model.dart';
+import '../../models/activity_model.dart';
+
 
 import '../../core/app_export.dart';
 
@@ -48,191 +54,6 @@ class ArLabRecord {
   });
 }
 
-// ── Mock data ─────────────────────────────────────────────────────────────────
-
-List<StudentProgress> _buildMockData(List<String> sections) {
-  final sectionList = sections.isNotEmpty
-      ? sections
-      : ['9-Rizal', '9-Bonifacio', '10-Luna'];
-
-  return [
-    StudentProgress(
-      name: 'Maria Santos',
-      section: sectionList[0],
-      quizResults: const [
-        QuizResult(
-          quizTitle: 'Quiz 1: Carbon Bonding',
-          score: 9,
-          total: 10,
-          date: 'Tuesday, Jul 15, 2025 at 09:30 AM',
-        ),
-        QuizResult(
-          quizTitle: 'Quiz 2: Periodic Trends',
-          score: 7,
-          total: 10,
-          date: 'Tuesday, Jul 22, 2025 at 08:50 AM',
-        ),
-      ],
-      arLabRecords: const [
-        ArLabRecord(
-          experimentName: 'Acid-Base Titration',
-          attempts: 3,
-          rubricScore: 88.0,
-          lastAttemptDate: 'Sunday, Jul 20, 2025 at 10:45 AM',
-        ),
-        ArLabRecord(
-          experimentName: 'Molecular Bonding',
-          attempts: 2,
-          rubricScore: 92.0,
-          lastAttemptDate: 'Thursday, Jul 24, 2025 at 04:00 PM',
-        ),
-      ],
-    ),
-    StudentProgress(
-      name: 'Juan dela Cruz',
-      section: sectionList[0],
-      quizResults: const [
-        QuizResult(
-          quizTitle: 'Quiz 1: Carbon Bonding',
-          score: 6,
-          total: 10,
-          date: 'Tuesday, Jul 15, 2025 at 09:30 AM',
-        ),
-        QuizResult(
-          quizTitle: 'Quiz 2: Periodic Trends',
-          score: 8,
-          total: 10,
-          date: 'Tuesday, Jul 22, 2025 at 08:50 AM',
-        ),
-      ],
-      arLabRecords: const [
-        ArLabRecord(
-          experimentName: 'Acid-Base Titration',
-          attempts: 5,
-          rubricScore: 74.0,
-          lastAttemptDate: 'Monday, Jul 21, 2025 at 03:10 PM',
-        ),
-        ArLabRecord(
-          experimentName: 'Molecular Bonding',
-          attempts: 1,
-          rubricScore: 80.0,
-          lastAttemptDate: 'Friday, Jul 25, 2025 at 11:45 AM',
-        ),
-      ],
-    ),
-    StudentProgress(
-      name: 'Ana Reyes',
-      section: sectionList.length > 1 ? sectionList[1] : sectionList[0],
-      quizResults: const [
-        QuizResult(
-          quizTitle: 'Quiz 1: Carbon Bonding',
-          score: 10,
-          total: 10,
-          date: 'Tuesday, Jul 15, 2025 at 09:30 AM',
-        ),
-      ],
-      arLabRecords: const [
-        ArLabRecord(
-          experimentName: 'Acid-Base Titration',
-          attempts: 2,
-          rubricScore: 95.0,
-          lastAttemptDate: 'Saturday, Jul 19, 2025 at 02:20 PM',
-        ),
-        ArLabRecord(
-          experimentName: 'Photosynthesis AR',
-          attempts: 4,
-          rubricScore: 87.5,
-          lastAttemptDate: 'Saturday, Jul 26, 2025 at 10:05 AM',
-        ),
-      ],
-    ),
-    StudentProgress(
-      name: 'Carlos Mendoza',
-      section: sectionList.length > 1 ? sectionList[1] : sectionList[0],
-      quizResults: const [
-        QuizResult(
-          quizTitle: 'Quiz 1: Carbon Bonding',
-          score: 5,
-          total: 10,
-          date: 'Tuesday, Jul 15, 2025 at 09:30 AM',
-        ),
-        QuizResult(
-          quizTitle: 'Quiz 2: Periodic Trends',
-          score: 4,
-          total: 10,
-          date: 'Tuesday, Jul 22, 2025 at 08:50 AM',
-        ),
-      ],
-      arLabRecords: const [
-        ArLabRecord(
-          experimentName: 'Molecular Bonding',
-          attempts: 6,
-          rubricScore: 65.0,
-          lastAttemptDate: 'Wednesday, Jul 23, 2025 at 01:30 PM',
-        ),
-      ],
-    ),
-    StudentProgress(
-      name: 'Liza Flores',
-      section: sectionList.length > 2 ? sectionList[2] : sectionList[0],
-      quizResults: const [
-        QuizResult(
-          quizTitle: 'Quiz 2: Periodic Trends',
-          score: 9,
-          total: 10,
-          date: 'Tuesday, Jul 22, 2025 at 08:50 AM',
-        ),
-      ],
-      arLabRecords: const [
-        ArLabRecord(
-          experimentName: 'Acid-Base Titration',
-          attempts: 1,
-          rubricScore: 90.0,
-          lastAttemptDate: 'Friday, Jul 18, 2025 at 11:15 AM',
-        ),
-        ArLabRecord(
-          experimentName: 'Photosynthesis AR',
-          attempts: 3,
-          rubricScore: 83.0,
-          lastAttemptDate: 'Sunday, Jul 27, 2025 at 02:40 PM',
-        ),
-      ],
-    ),
-    StudentProgress(
-      name: 'Ramon Villanueva',
-      section: sectionList.length > 2 ? sectionList[2] : sectionList[0],
-      quizResults: const [
-        QuizResult(
-          quizTitle: 'Quiz 1: Carbon Bonding',
-          score: 7,
-          total: 10,
-          date: 'Tuesday, Jul 15, 2025 at 09:30 AM',
-        ),
-        QuizResult(
-          quizTitle: 'Quiz 2: Periodic Trends',
-          score: 6,
-          total: 10,
-          date: 'Tuesday, Jul 22, 2025 at 08:50 AM',
-        ),
-      ],
-      arLabRecords: const [
-        ArLabRecord(
-          experimentName: 'Molecular Bonding',
-          attempts: 2,
-          rubricScore: 78.0,
-          lastAttemptDate: 'Thursday, Jul 24, 2025 at 04:00 PM',
-        ),
-        ArLabRecord(
-          experimentName: 'Photosynthesis AR',
-          attempts: 2,
-          rubricScore: 82.0,
-          lastAttemptDate: 'Saturday, Jul 26, 2025 at 10:05 AM',
-        ),
-      ],
-    ),
-  ];
-}
-
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 class TeacherProgressScreen extends StatefulWidget {
@@ -266,14 +87,92 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
     super.dispose();
   }
 
+  String _formatDate(DateTime? dt) {
+    if (dt == null) return '';
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    String pad(int n) => n.toString().padLeft(2, '0');
+    final hour = dt.hour > 12 ? dt.hour - 12 : (dt.hour == 0 ? 12 : dt.hour);
+    final ampm = dt.hour >= 12 ? 'PM' : 'AM';
+    return '${months[dt.month - 1]} ${dt.day}, ${dt.year} at ${pad(hour)}:${pad(dt.minute)} $ampm';
+  }
+
   Future<void> _loadData() async {
     final prefs = await SharedPreferences.getInstance();
     final sections = prefs.getStringList('teacher_sections') ?? [];
     setState(() {
       _teacherSections = sections;
-      _allStudents = _buildMockData(sections);
-      _loading = false;
+      _loading = true;
     });
+
+    try {
+      final db = FirebaseFirestore.instance;
+
+      // 1. Fetch real students
+      final studentsSnap = await db
+          .collection('users')
+          .where('role', whereIn: [UserRole.grade9.id, UserRole.grade10.id])
+          .where('status', isEqualTo: VerificationStatus.approved.id)
+          .get();
+          
+      final users = studentsSnap.docs.map((d) => AppUser.fromMap(d.id, d.data())).toList();
+
+      // 2. Fetch all quiz attempts
+      final attemptsSnap = await db.collection('quiz_attempts').get();
+      final allAttempts = attemptsSnap.docs.map((d) => QuizAttempt.fromMap(d.id, d.data())).toList();
+
+      // 3. Fetch AR experiments to map IDs to titles
+      final arSnap = await db.collection('ar_experiments').get();
+      final arExps = arSnap.docs.map((d) => ArExperimentModel.fromMap(d.id, d.data())).toList();
+      final arExpMap = { for (var e in arExps) e.id : e.title };
+
+      // 4. Build StudentProgress objects
+      List<StudentProgress> dynamicStudents = [];
+      for (var u in users) {
+         // get quiz results for u.id
+         final uAttempts = allAttempts.where((a) => a.studentId == u.id).toList();
+         final quizResults = uAttempts.map((a) => QuizResult(
+           quizTitle: a.quizTitle,
+           score: a.score,
+           total: a.totalQuestions,
+           date: _formatDate(a.submittedAt),
+         )).toList();
+
+         // get AR records for u.id
+         List<ArLabRecord> uArRecords = [];
+         try {
+           final uArSnap = await db.collection('users').doc(u.id).collection('experiment_activity').get();
+           uArRecords = uArSnap.docs.map((d) {
+             final expId = d.id;
+             final act = ExperimentActivity.fromMap(expId, d.data());
+             return ArLabRecord(
+               experimentName: arExpMap[expId] ?? 'Unknown Experiment',
+               attempts: 1, 
+               rubricScore: act.completed ? 100.0 : 0.0,
+               lastAttemptDate: _formatDate(act.completedAt ?? act.launchedAt),
+             );
+           }).toList();
+         } catch (e) {
+           print('Permission denied or error fetching AR records for ${u.id}: $e');
+         }
+
+         final section = u.sections.isNotEmpty ? u.sections.first : 'No Section';
+
+         dynamicStudents.add(StudentProgress(
+           name: u.name,
+           section: section,
+           quizResults: quizResults,
+           arLabRecords: uArRecords,
+         ));
+      }
+
+      setState(() {
+        _allStudents = dynamicStudents;
+        _loading = false;
+      });
+    } catch (e) {
+      print('Error loading dynamic progress: $e');
+      setState(() { _loading = false; });
+    }
   }
 
   List<String> get _sectionOptions {

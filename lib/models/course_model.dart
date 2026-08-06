@@ -112,28 +112,39 @@ class CourseQuiz {
   final String id;
   final String title;
   final List<CourseQuestion> questions;
+  final DateTime? createdAt;
 
-  CourseQuiz({required this.id, required this.title, required this.questions});
+  CourseQuiz({
+    required this.id,
+    required this.title,
+    required this.questions,
+    this.createdAt,
+  });
 
   int get totalQuestions => questions.length;
 
-  factory CourseQuiz.fromMap(Map<String, dynamic> data) => CourseQuiz(
-        id: data['id']?.toString() ?? '',
-        title: data['title']?.toString() ?? '',
-        questions: ((data['questions'] as List<dynamic>?) ?? const [])
-            .whereType<Map<dynamic, dynamic>>()
-            .map(
-              (q) => CourseQuestion.fromMap(
-                Map<String, dynamic>.from(q as Map),
-              ),
-            )
-            .toList(),
-      );
+  factory CourseQuiz.fromMap(Map<String, dynamic> data) {
+    final ts = data['createdAt'];
+    return CourseQuiz(
+      id: data['id']?.toString() ?? '',
+      title: data['title']?.toString() ?? '',
+      questions: ((data['questions'] as List<dynamic>?) ?? const [])
+          .whereType<Map<dynamic, dynamic>>()
+          .map(
+            (q) => CourseQuestion.fromMap(
+              Map<String, dynamic>.from(q as Map),
+            ),
+          )
+          .toList(),
+      createdAt: ts is Timestamp ? ts.toDate() : null,
+    );
+  }
 
   Map<String, dynamic> toMap() => {
         'id': id,
         'title': title,
         'questions': questions.map((q) => q.toMap()).toList(),
+        'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
       };
 }
 

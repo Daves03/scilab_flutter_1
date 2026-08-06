@@ -1,5 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../models/user_model.dart';
+import '../../models/course_model.dart';
+import '../../models/activity_model.dart';
+import 'package:provider/provider.dart';
+import '../../services/auth_service.dart';
+
 import '../../core/app_export.dart';
 import '../../routes/app_routes.dart';
 import '../../widgets/custom_icon_widget.dart';
@@ -17,10 +24,14 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
   late AnimationController _entranceController;
   late Timer _timer;
   late DateTime _philippinesTime;
+  late Future<List<Map<String, dynamic>>> _notificationsFuture;
+  late Future<Map<String, dynamic>> _progressFuture;
 
   @override
   void initState() {
     super.initState();
+    _notificationsFuture = _fetchDynamicNotifications();
+    _progressFuture = _fetchProgressStats();
     _entranceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -150,6 +161,63 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     );
   }
 
+
+  String _formatNotificationTime(DateTime? dt) {
+    if (dt == null) return '';
+    final diff = DateTime.now().difference(dt);
+    if (diff.inMinutes < 60) return '${diff.inMinutes} mins ago';
+    if (diff.inHours < 24) return '${diff.inHours} hrs ago';
+    return '${diff.inDays} days ago';
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchDynamicNotifications() async {
+    List<Map<String, dynamic>> notifications = [];
+    try {
+      final user = context.read<AuthService>().currentUser;
+      if (user == null) return [];
+      
+      final db = FirebaseFirestore.instance;
+      // Get courses matching user's grade
+      final cSnap = await db.collection('courses').where('grade', isEqualTo: user.role?.label).get();
+      
+      for (var doc in cSnap.docs) {
+        final course = Course.fromMap(doc.id, doc.data());
+        
+        // Modules
+        for (var m in course.modules) {
+           notifications.add({
+             'title': 'New Module Uploaded',
+             'desc': '${course.teacherName} uploaded ${m.title} in ${course.title}.',
+             'icon': 'view_in_ar',
+             'color': const Color(0xFF00D4FF),
+             'timeStr': _formatNotificationTime(m.uploadedAt),
+             'timestamp': m.uploadedAt ?? DateTime.now().subtract(const Duration(days: 365)),
+           });
+        }
+        
+        // Quizzes
+        for (var q in course.quizzes) {
+           notifications.add({
+             'title': 'New Quiz Available',
+             'desc': '${course.teacherName} posted ${q.title} in ${course.title}.',
+             'icon': 'quiz',
+             'color': const Color(0xFFFFB300),
+             'timeStr': _formatNotificationTime(q.createdAt),
+             'timestamp': q.createdAt ?? DateTime.now().subtract(const Duration(days: 365)),
+           });
+        }
+      }
+      
+      notifications.sort((a, b) => (b['timestamp'] as DateTime).compareTo(a['timestamp'] as DateTime));
+      if (notifications.length > 5) notifications = notifications.sublist(0, 5);
+      
+    } catch (e) {
+      print('Error fetching notifications: $e');
+    }
+    return notifications;
+  }
+
+
   void _showNotificationsDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -172,65 +240,76 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                 ),
               ],
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: FutureBuilder<List<Map<String, dynamic>>>(
+              future: _fetchDynamicNotifications(),
+              builder: (ctx, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const SizedBox(
+                    height: 200,
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                
+                final notifs = snapshot.data ?? [];
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const CustomIconWidget(iconName: 'notifications', color: Color(0xFF00D4FF), size: 24),
-                        SizedBox(width: 10),
-                        Text(
-                          'Notifications',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                        Row(
+                          children: [
+                            const CustomIconWidget(iconName: 'notifications', color: Color(0xFF00D4FF), size: 24),
+                            const SizedBox(width: 10),
+                            Text(
+                              'Notifications',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade200,
+                              shape: BoxShape.circle,
+                            ),
+                            child: CustomIconWidget(iconName: 'close', color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700, size: 16),
                           ),
                         ),
                       ],
                     ),
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade200,
-                          shape: BoxShape.circle,
+                    const SizedBox(height: 20),
+                    if (notifs.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 20),
+                        child: Text(
+                          'No recent activity.',
+                          style: TextStyle(color: Colors.grey),
                         ),
-                        child: CustomIconWidget(iconName: 'close', color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700, size: 16),
-                      ),
-                    ),
+                      )
+                    else
+                      ...notifs.map((n) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _buildNotificationItem(
+                            n['title'] as String,
+                            n['desc'] as String,
+                            n['icon'] as String,
+                            n['color'] as Color,
+                            n['timeStr'] as String,
+                          ),
+                        );
+                      }).toList(),
                   ],
-                ),
-                const SizedBox(height: 20),
-                _buildNotificationItem(
-                  'New Module Uploaded',
-                  'Teacher uploaded a new AR module: Human Anatomy in Biology.',
-                  'view_in_ar',
-                  const Color(0xFF00D4FF),
-                  '2 hrs ago',
-                ),
-                const SizedBox(height: 12),
-                _buildNotificationItem(
-                  'New Attachment Added',
-                  'Teacher added a PDF attachment to Advanced Physics course.',
-                  'picture_as_pdf',
-                  const Color(0xFF7C3AED),
-                  '5 hrs ago',
-                ),
-                const SizedBox(height: 12),
-                _buildNotificationItem(
-                  'Course Update',
-                  'New lecture video is available for Chemistry 101.',
-                  'play_circle',
-                  const Color(0xFFFFB300),
-                  '1 day ago',
-                ),
-              ],
+                );
+              },
             ),
           ),
         );
@@ -335,6 +414,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     );
   }
 
+
   Widget _buildNotificationsSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -342,7 +422,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Urgent Deadlines',
+            'Recent Course Content',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -350,18 +430,35 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
             ),
           ),
           const SizedBox(height: 12),
-          _buildAlertCard(
-            title: 'Chemistry Quiz 3 Due!',
-            subtitle: 'Must be completed by tonight 11:59 PM',
-            icon: 'warning_amber',
-            color: const Color(0xFFFF4757),
-          ),
-          const SizedBox(height: 10),
-          _buildAlertCard(
-            title: 'Physics Lab Experiment',
-            subtitle: 'Teacher assigned deadline: Tomorrow 5:00 PM',
-            icon: 'science',
-            color: const Color(0xFFFFB300),
+          FutureBuilder<List<Map<String, dynamic>>>(
+            future: _notificationsFuture,
+            builder: (ctx, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              final notifs = snapshot.data ?? [];
+              if (notifs.isEmpty) {
+                 return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    child: Text('No new content.', style: TextStyle(color: Colors.grey)),
+                 );
+              }
+              // take top 2
+              final top2 = notifs.take(2).toList();
+              return Column(
+                children: top2.map((n) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: _buildAlertCard(
+                      title: n['title'] as String,
+                      subtitle: n['desc'] as String,
+                      icon: n['icon'] as String,
+                      color: n['color'] as Color,
+                    ),
+                  );
+                }).toList(),
+              );
+            },
           ),
         ],
       ),
@@ -415,6 +512,36 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     );
   }
 
+
+  Future<Map<String, dynamic>> _fetchProgressStats() async {
+    final user = context.read<AuthService>().currentUser;
+    if (user == null) return {'avgQuiz': '0%', 'labs': '0'};
+    final db = FirebaseFirestore.instance;
+    
+    // fetch quizzes
+    final qSnap = await db.collection('quiz_attempts').where('studentId', isEqualTo: user.id).get();
+    double totalScore = 0;
+    int quizCount = 0;
+    for (var doc in qSnap.docs) {
+       final data = doc.data();
+       final s = (data['score'] as num?)?.toInt() ?? 0;
+       final t = (data['totalQuestions'] as num?)?.toInt() ?? 1;
+       if (t > 0) {
+         totalScore += (s / t);
+         quizCount++;
+       }
+    }
+    final avg = quizCount > 0 ? (totalScore / quizCount) * 100 : 0.0;
+    
+    // fetch labs
+    final lSnap = await db.collection('users').doc(user.id).collection('experiment_activity').where('completedAt', isNotEqualTo: null).get();
+    
+    return {
+       'avgQuiz': '${avg.toStringAsFixed(0)}%',
+       'labs': '${lSnap.docs.length}',
+    };
+  }
+
   Widget _buildProgressSummarySection() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -430,15 +557,22 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
             ),
           ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(child: _buildSummaryCard('Avg Quiz Score', '92%', 'quiz', const Color(0xFF00D4FF))),
-              const SizedBox(width: 12),
-              Expanded(child: _buildSummaryCard('Completed Labs', '14', 'biotech', const Color(0xFF7C3AED))),
-            ],
+          FutureBuilder<Map<String, dynamic>>(
+            future: _progressFuture,
+            builder: (ctx, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              final stats = snapshot.data ?? {'avgQuiz': '0%', 'labs': '0'};
+              return Row(
+                children: [
+                  Expanded(child: _buildSummaryCard('Avg Quiz Score', stats['avgQuiz'] as String, 'quiz', const Color(0xFF00D4FF))),
+                  const SizedBox(width: 12),
+                  Expanded(child: _buildSummaryCard('Completed Labs', stats['labs'] as String, 'biotech', const Color(0xFF7C3AED))),
+                ],
+              );
+            },
           ),
-          const SizedBox(height: 12),
-          _buildSummaryCard('Overall Attendance', '98%', 'check_circle', const Color(0xFF00FF88), isWide: true),
         ],
       ),
     );
