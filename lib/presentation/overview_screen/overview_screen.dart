@@ -126,8 +126,6 @@ class _OverviewScreenState extends State<OverviewScreen>
                         const SizedBox(height: 32),
                         _buildFeaturesSection(),
                         const SizedBox(height: 32),
-                        _buildSampleCourses(),
-                        const SizedBox(height: 32),
                         _buildCTASection(),
                         const SizedBox(height: 40),
                       ],
@@ -521,77 +519,6 @@ class _OverviewScreenState extends State<OverviewScreen>
     );
   }
 
-  Widget _buildSampleCourses() {
-    final courses = [
-      {
-        'title': 'Organic Chemistry Fundamentals',
-        'grade': 'Grade 10',
-        'chapters': '8 chapters',
-        'icon': 'biotech',
-        'color': AppTheme.accentCyan,
-        'progress': 0.75,
-      },
-      {
-        'title': 'Inorganic Chemistry Basics',
-        'grade': 'Grade 9',
-        'chapters': '6 chapters',
-        'icon': 'hub',
-        'color': AppTheme.accentPurple,
-        'progress': 0.40,
-      },
-      {
-        'title': 'Physical Chemistry: Thermodynamics',
-        'grade': 'Grade 10',
-        'chapters': '10 chapters',
-        'icon': 'thermostat',
-        'color': AppTheme.accentGreen,
-        'progress': 0.20,
-      },
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Row(
-            children: [
-              Text(
-                'Sample Courses',
-                style: GoogleFonts.manrope(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.textPrimary,
-                  letterSpacing: -0.3,
-                ),
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: AppTheme.accentCyan.withAlpha(26),
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: Text(
-                  'Preview only',
-                  style: GoogleFonts.manrope(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.accentCyan,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 14),
-        ...courses.map((c) => _SampleCourseRow(course: c)),
-      ],
-    );
-  }
 
   Widget _buildCTASection() {
     return Padding(
@@ -881,122 +808,6 @@ class _FeatureCard extends StatelessWidget {
   }
 }
 
-// ── Sample course row ─────────────────────────────────────────────────────────
-
-class _SampleCourseRow extends StatelessWidget {
-  final Map<String, dynamic> course;
-
-  const _SampleCourseRow({required this.course});
-
-  @override
-  Widget build(BuildContext context) {
-    final color = course['color'] as Color;
-    final progress = course['progress'] as double;
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceCard,
-        borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: color.withAlpha(38), width: 1),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: color.withAlpha(31),
-              borderRadius: BorderRadius.circular(12.0),
-            ),
-            child: Icon(
-              _iconData(course['icon'] as String),
-              color: color,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  course['title'] as String,
-                  style: GoogleFonts.manrope(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.textPrimary,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 3),
-                Row(
-                  children: [
-                    Text(
-                      course['grade'] as String,
-                      style: GoogleFonts.manrope(
-                        fontSize: 11,
-                        color: AppTheme.textMuted,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Container(
-                      width: 3,
-                      height: 3,
-                      decoration: const BoxDecoration(
-                        color: AppTheme.textCaption,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      course['chapters'] as String,
-                      style: GoogleFonts.manrope(
-                        fontSize: 11,
-                        color: AppTheme.textMuted,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(3.0),
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    backgroundColor: color.withAlpha(31),
-                    valueColor: AlwaysStoppedAnimation<Color>(color),
-                    minHeight: 3,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 10),
-          Icon(
-            Icons.lock_outline_rounded,
-            color: AppTheme.textCaption,
-            size: 16,
-          ),
-        ],
-      ),
-    );
-  }
-
-  IconData _iconData(String name) {
-    switch (name) {
-      case 'biotech':
-        return Icons.biotech_rounded;
-      case 'hub':
-        return Icons.hub_rounded;
-      case 'thermostat':
-        return Icons.thermostat_rounded;
-      default:
-        return Icons.science_rounded;
-    }
-  }
-}
 
 // ── Animated background painter ───────────────────────────────────────────────
 

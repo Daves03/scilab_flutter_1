@@ -161,6 +161,7 @@ class Course {
   final String teacherName;
   final int accentColorValue;
   final String iconName;
+  final List<String> sections;
   final List<CourseModule> modules;
   final List<CourseQuiz> quizzes;
   final DateTime? createdAt;
@@ -182,6 +183,7 @@ class Course {
     required this.teacherName,
     required this.accentColorValue,
     required this.iconName,
+    required this.sections,
     required this.modules,
     required this.quizzes,
     this.createdAt,
@@ -199,6 +201,7 @@ class Course {
       accentColorValue:
           (data['accentColorValue'] as num?)?.toInt() ?? 0xFF00D4FF,
       iconName: data['iconName']?.toString() ?? 'science',
+      sections: (data['sections'] as List?)?.map((e) => e.toString()).toList() ?? const [],
       modules: ((data['modules'] as List<dynamic>?) ?? const [])
           .whereType<Map<dynamic, dynamic>>()
           .map(
@@ -227,6 +230,7 @@ class Course {
         'teacherName': teacherName,
         'accentColorValue': accentColorValue,
         'iconName': iconName,
+        'sections': sections,
         'modules': modules.map((m) => m.toMap()).toList(),
         'quizzes': quizzes.map((q) => q.toMap()).toList(),
         'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,

@@ -676,14 +676,14 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
             ),
-            child: Column(
-              children: [
-                _buildCalendarItem('12', 'Nov', 'Advanced Physics Quiz', '8:00 AM', true),
-                Divider(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade200, height: 1),
-                _buildCalendarItem('15', 'Nov', 'Biology AR Simulation', '11:59 PM', false),
-                Divider(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade200, height: 1),
-                _buildCalendarItem('18', 'Nov', 'Chemistry Midterm', '10:00 AM', false),
-              ],
+            child: const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+              child: Center(
+                child: Text(
+                  'No upcoming due dates',
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+              ),
             ),
           )
         ],

@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../models/course_model.dart';
 import '../../services/auth_service.dart';
 import '../../services/course_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
@@ -314,6 +316,7 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
     final subjectCtrl = TextEditingController(text: course.subject);
     final gradeCtrl = TextEditingController(text: course.grade);
     final formKey = GlobalKey<FormState>();
+    final List<String> selectedSections = List.from(course.sections);
 
     showDialog(
       context: context,
@@ -322,6 +325,7 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
         titleCtrl: titleCtrl,
         subjectCtrl: subjectCtrl,
         gradeCtrl: gradeCtrl,
+        selectedSections: selectedSections,
         formKey: formKey,
         onSave: () async {
           if (formKey.currentState!.validate()) {
@@ -334,6 +338,7 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
               teacherName: course.teacherName,
               accentColorValue: course.accentColorValue,
               iconName: course.iconName,
+              sections: selectedSections,
               modules: course.modules,
               quizzes: course.quizzes,
               createdAt: course.createdAt ?? DateTime.now(),
@@ -424,6 +429,7 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
     final subjectCtrl = TextEditingController();
     final gradeCtrl = TextEditingController();
     final formKey = GlobalKey<FormState>();
+    final List<String> selectedSections = [];
 
     showDialog(
       context: context,
@@ -432,6 +438,7 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
         titleCtrl: titleCtrl,
         subjectCtrl: subjectCtrl,
         gradeCtrl: gradeCtrl,
+        selectedSections: selectedSections,
         formKey: formKey,
         onSave: () async {
           if (formKey.currentState!.validate()) {
@@ -445,6 +452,7 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
               teacherName: user.name,
               accentColorValue: 0xFF00D4FF,
               iconName: 'science',
+              sections: selectedSections,
               modules: [],
               quizzes: [],
               createdAt: DateTime.now(),
@@ -462,6 +470,7 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
     final subjectCtrl = TextEditingController(text: course.subject);
     final gradeCtrl = TextEditingController(text: course.grade);
     final formKey = GlobalKey<FormState>();
+    final List<String> selectedSections = List.from(course.sections);
 
     showDialog(
       context: context,
@@ -470,6 +479,7 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
         titleCtrl: titleCtrl,
         subjectCtrl: subjectCtrl,
         gradeCtrl: gradeCtrl,
+        selectedSections: selectedSections,
         formKey: formKey,
         onSave: () async {
           if (formKey.currentState!.validate()) {
@@ -482,6 +492,7 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
               teacherName: course.teacherName,
               accentColorValue: course.accentColorValue,
               iconName: course.iconName,
+              sections: selectedSections,
               modules: course.modules,
               quizzes: course.quizzes,
               createdAt: course.createdAt ?? DateTime.now(),
@@ -1136,11 +1147,12 @@ class _InfoChip extends StatelessWidget {
 
 // ── Course Form Dialog ────────────────────────────────────────────────────────
 
-class _CourseFormDialog extends StatelessWidget {
+class _CourseFormDialog extends StatefulWidget {
   final String title;
   final TextEditingController titleCtrl;
   final TextEditingController subjectCtrl;
   final TextEditingController gradeCtrl;
+  final List<String> selectedSections;
   final GlobalKey<FormState> formKey;
   final VoidCallback onSave;
 
@@ -1149,9 +1161,66 @@ class _CourseFormDialog extends StatelessWidget {
     required this.titleCtrl,
     required this.subjectCtrl,
     required this.gradeCtrl,
+    required this.selectedSections,
     required this.formKey,
     required this.onSave,
   });
+
+  @override
+  State<_CourseFormDialog> createState() => _CourseFormDialogState();
+}
+
+class _CourseFormDialogState extends State<_CourseFormDialog> {
+  List<Map<String, dynamic>> _allSections = [];
+  List<String> _teacherSections = [];
+  bool _isLoadingSections = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSections();
+  }
+
+  Future<void> _fetchSections() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      _teacherSections = prefs.getStringList('teacher_sections') ?? [];
+      
+      final snapshot = await FirebaseFirestore.instance.collection('sections').get();
+      if (mounted) {
+        setState(() {
+          _allSections = snapshot.docs.map((d) => d.data()).toList();
+          _isLoadingSections = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error fetching sections: $e');
+      if (mounted) {
+        setState(() => _isLoadingSections = false);
+      }
+    }
+  }
+
+  List<String> get _availableGrades {
+    final grades = <String>{};
+    for (var s in _allSections) {
+      if (_teacherSections.contains(s['name'])) {
+        if (s['grade'] != null) grades.add(s['grade']);
+      }
+    }
+    final sorted = grades.toList()..sort();
+    return sorted.isEmpty ? ['Grade 9', 'Grade 10'] : sorted;
+  }
+
+  List<String> get _availableSectionsForGrade {
+    final sections = <String>[];
+    for (var s in _allSections) {
+      if (s['grade'] == widget.gradeCtrl.text && _teacherSections.contains(s['name'])) {
+        sections.add(s['name'] as String);
+      }
+    }
+    return sections;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1159,7 +1228,7 @@ class _CourseFormDialog extends StatelessWidget {
       backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       title: Text(
-        title,
+        widget.title,
         style: TextStyle(
           color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
           fontWeight: FontWeight.w700,
@@ -1167,14 +1236,15 @@ class _CourseFormDialog extends StatelessWidget {
         ),
       ),
       content: Form(
-        key: formKey,
+        key: widget.formKey,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildField(
                 context,
-                controller: subjectCtrl,
+                controller: widget.subjectCtrl,
                 label: 'Subject',
                 hint: 'e.g. Chemistry',
                 validator: (v) => (v == null || v.trim().isEmpty)
@@ -1184,7 +1254,7 @@ class _CourseFormDialog extends StatelessWidget {
               const SizedBox(height: 14),
               _buildField(
                 context,
-                controller: titleCtrl,
+                controller: widget.titleCtrl,
                 label: 'Topic',
                 hint: 'e.g. Organic Chemistry Fundamentals',
                 validator: (v) => (v == null || v.trim().isEmpty)
@@ -1192,57 +1262,129 @@ class _CourseFormDialog extends StatelessWidget {
                     : null,
               ),
               const SizedBox(height: 14),
-              DropdownButtonFormField<String>(
-                value: gradeCtrl.text.isNotEmpty ? gradeCtrl.text : null,
-                items: [
-                  if (gradeCtrl.text.isNotEmpty && !['Grade 9', 'Grade 10'].contains(gradeCtrl.text)) gradeCtrl.text,
-                  'Grade 9',
-                  'Grade 10',
-                ].map((String val) {
-                  return DropdownMenuItem<String>(
-                    value: val,
-                    child: Text(val),
-                  );
-                }).toList(),
-                onChanged: (val) {
-                  if (val != null) {
-                    gradeCtrl.text = val;
-                  }
-                },
-                style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87, fontSize: 14),
-                dropdownColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
-                decoration: InputDecoration(
-                  labelText: 'Grade',
-                  hintText: 'Select Grade',
-                  labelStyle: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 13),
-                  hintStyle: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x668BA3C0) : Colors.grey.shade400, fontSize: 13),
-                  filled: true,
-                  fillColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade100,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: const BorderSide(color: Color(0x3300FF88)),
+              _isLoadingSections
+                  ? const Center(child: CircularProgressIndicator())
+                  : DropdownButtonFormField<String>(
+                      value: widget.gradeCtrl.text.isNotEmpty && _availableGrades.contains(widget.gradeCtrl.text) 
+                          ? widget.gradeCtrl.text 
+                          : null,
+                      items: _availableGrades.map((String val) {
+                        return DropdownMenuItem<String>(
+                          value: val,
+                          child: Text(val),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        if (val != null) {
+                          setState(() {
+                            widget.gradeCtrl.text = val;
+                            // Clean up selected sections that don't belong to this grade
+                            widget.selectedSections.removeWhere((s) => !_availableSectionsForGrade.contains(s));
+                          });
+                        }
+                      },
+                      style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87, fontSize: 14),
+                      dropdownColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+                      decoration: InputDecoration(
+                        labelText: 'Grade',
+                        hintText: 'Select Grade',
+                        labelStyle: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 13),
+                        hintStyle: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x668BA3C0) : Colors.grey.shade400, fontSize: 13),
+                        filled: true,
+                        fillColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade100,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: const BorderSide(color: Color(0x3300FF88)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: const BorderSide(color: Color(0x3300FF88)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: const BorderSide(color: Color(0xFF00FF88), width: 1.5),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: const BorderSide(color: Color(0xFFFF4757)),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: const BorderSide(color: Color(0xFFFF4757), width: 1.5),
+                        ),
+                        errorStyle: const TextStyle(color: Color(0xFFFF4757), fontSize: 11),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      ),
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Grade is required' : null,
+                    ),
+              if (!_isLoadingSections && widget.gradeCtrl.text.isNotEmpty) ...[
+                const SizedBox(height: 14),
+                DropdownButtonFormField<String>(
+                  value: null, // It's a multi-select, so the dropdown itself just acts as an "Add" button
+                  hint: Text(
+                    _availableSectionsForGrade.every((s) => widget.selectedSections.contains(s)) 
+                        ? 'All sections added' 
+                        : 'Select section to add',
+                    style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x668BA3C0) : Colors.grey.shade400, fontSize: 13),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: const BorderSide(color: Color(0x3300FF88)),
+                  items: _availableSectionsForGrade
+                      .where((s) => !widget.selectedSections.contains(s))
+                      .map((String val) {
+                    return DropdownMenuItem<String>(
+                      value: val,
+                      child: Text(val),
+                    );
+                  }).toList(),
+                  onChanged: (val) {
+                    if (val != null) {
+                      setState(() {
+                        widget.selectedSections.add(val);
+                      });
+                    }
+                  },
+                  style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87, fontSize: 14),
+                  dropdownColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+                  decoration: InputDecoration(
+                    labelText: 'Sections',
+                    labelStyle: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 13),
+                    filled: true,
+                    fillColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade100,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      borderSide: const BorderSide(color: Color(0x3300FF88)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      borderSide: const BorderSide(color: Color(0x3300FF88)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      borderSide: const BorderSide(color: Color(0xFF00FF88), width: 1.5),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: const BorderSide(color: Color(0xFF00FF88), width: 1.5),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: const BorderSide(color: Color(0xFFFF4757)),
-                  ),
-                  focusedErrorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: const BorderSide(color: Color(0xFFFF4757), width: 1.5),
-                  ),
-                  errorStyle: const TextStyle(color: Color(0xFFFF4757), fontSize: 11),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 ),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Grade is required' : null,
-              ),
+                if (widget.selectedSections.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: widget.selectedSections.map((s) {
+                      return Chip(
+                        label: Text(s, style: TextStyle(fontSize: 12, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87)),
+                        backgroundColor: const Color(0x2200FF88),
+                        deleteIconColor: const Color(0xFF00FF88),
+                        onDeleted: () {
+                          setState(() {
+                            widget.selectedSections.remove(s);
+                          });
+                        },
+                        side: const BorderSide(color: Color(0xFF00FF88)),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ],
             ],
           ),
         ),
@@ -1263,7 +1405,17 @@ class _CourseFormDialog extends StatelessWidget {
               borderRadius: BorderRadius.circular(10.0),
             ),
           ),
-          onPressed: onSave,
+          onPressed: () {
+            if (widget.formKey.currentState!.validate()) {
+              if (widget.selectedSections.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please select at least one section.'), backgroundColor: Colors.red),
+                );
+                return;
+              }
+              widget.onSave();
+            }
+          },
           child: const Text(
             'Save',
             style: TextStyle(fontWeight: FontWeight.w700),

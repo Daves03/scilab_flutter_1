@@ -9,6 +9,7 @@ import '../../models/user_model.dart';
 import '../../models/course_model.dart';
 import '../../models/activity_model.dart';
 import '../teacher_profile_screen/teacher_profile_screen.dart';
+import 'widgets/student_approval_dialog.dart';
 
 // ── Reuse data models from teacher_progress_screen ────────────────────────────
 class _StudentSummary {
@@ -56,49 +57,79 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   late Timer _clockTimer;
   DateTime _now = DateTime.now().toUtc().add(const Duration(hours: 8));
 
-  // ── Static summary data (no mock, derived from real-world structure) ────────
-  final List<_StudentSummary> _students = const [
-    _StudentSummary(
-      name: 'Maria Santos',
-      section: '9-Rizal',
-      avgQuizScore: 0.80,
-      avgArScore: 90.0,
-      quizzesTaken: 2,
-      arAttempts: 5,
-    ),
-    _StudentSummary(
-      name: 'Juan dela Cruz',
-      section: '9-Rizal',
-      avgQuizScore: 0.70,
-      avgArScore: 77.0,
-      quizzesTaken: 2,
-      arAttempts: 6,
-    ),
-    _StudentSummary(
-      name: 'Ana Reyes',
-      section: '9-Bonifacio',
-      avgQuizScore: 1.00,
-      avgArScore: 91.25,
-      quizzesTaken: 1,
-      arAttempts: 6,
-    ),
-    _StudentSummary(
-      name: 'Carlos Mendoza',
-      section: '9-Bonifacio',
-      avgQuizScore: 0.45,
-      avgArScore: 65.0,
-      quizzesTaken: 2,
-      arAttempts: 6,
-    ),
-    _StudentSummary(
-      name: 'Liza Flores',
-      section: '10-Luna',
-      avgQuizScore: 0.90,
-      avgArScore: 86.5,
-      quizzesTaken: 1,
-      arAttempts: 4,
-    ),
-  ];
+  List<_StudentSummary> _students = [];
+  bool _loading = true;
+
+  Future<void> _loadData() async {
+    try {
+      final db = FirebaseFirestore.instance;
+
+      final studentsSnap = await db
+          .collection('users')
+          .where('role', whereIn: [UserRole.grade9.id, UserRole.grade10.id])
+          .where('status', isEqualTo: VerificationStatus.approved.id)
+          .get();
+          
+      final users = studentsSnap.docs.map((d) => AppUser.fromMap(d.id, d.data())).toList();
+
+      final attemptsSnap = await db.collection('quiz_attempts').get();
+      final allAttempts = attemptsSnap.docs.map((d) => QuizAttempt.fromMap(d.id, d.data())).toList();
+
+      List<_StudentSummary> dynamicStudents = [];
+      for (var u in users) {
+         final uAttempts = allAttempts.where((a) => a.studentId == u.id).toList();
+         
+         double avgQuizScore = 0;
+         if (uAttempts.isNotEmpty) {
+           double totalScore = 0;
+           for (var a in uAttempts) {
+             totalScore += (a.totalQuestions > 0 ? a.score / a.totalQuestions : 0);
+           }
+           avgQuizScore = totalScore / uAttempts.length;
+         }
+
+         int arAttempts = 0;
+         double avgArScore = 0.0;
+         try {
+           final uArSnap = await db.collection('users').doc(u.id).collection('experiment_activity').get();
+           arAttempts = uArSnap.docs.length;
+           int completed = 0;
+           for (var d in uArSnap.docs) {
+             final act = ExperimentActivity.fromMap(d.id, d.data());
+             if (act.completed) completed++;
+           }
+           if (arAttempts > 0) {
+              avgArScore = (completed / arAttempts) * 100.0;
+           }
+         } catch (e) {
+           print('Error fetching AR records for ${u.id}: $e');
+         }
+
+         final section = u.sections.isNotEmpty ? u.sections.first : 'No Section';
+
+         dynamicStudents.add(_StudentSummary(
+           name: u.name,
+           section: section,
+           avgQuizScore: avgQuizScore,
+           avgArScore: avgArScore,
+           quizzesTaken: uAttempts.length,
+           arAttempts: arAttempts,
+         ));
+      }
+
+      if (mounted) {
+        setState(() {
+          _students = dynamicStudents;
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading dynamic progress: $e');
+      if (mounted) {
+        setState(() { _loading = false; });
+      }
+    }
+  }
 
   String get _formattedDate {
     const months = [
@@ -153,6 +184,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   @override
   void initState() {
     super.initState();
+    _loadData();
     _entranceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 700),
@@ -183,8 +215,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         bottom: false,
-        child: CustomScrollView(
-          slivers: [
+        child: Stack(
+          children: [
+            _loading ? const Center(child: CircularProgressIndicator(color: Color(0xFF00D4FF))) : CustomScrollView(
+              slivers: [
             SliverToBoxAdapter(child: _buildHeader()),
             SliverToBoxAdapter(child: _buildDateTimeCard()),
             SliverToBoxAdapter(child: _buildClassOverview()),
@@ -197,7 +231,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                       padding: const EdgeInsets.only(top: 40),
                       child: Center(
                         child: Text(
-                          'No students found matching search',
+                          'No students found',
                           style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 14),
                         ),
                       ),
@@ -233,12 +267,39 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                         },
                         child: Padding(
                           padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-                          child: _StudentProgressCard(student: filteredStudents[index]),
+              child: _StudentProgressCard(student: filteredStudents[index]),
                         ),
                       );
                     }, childCount: filteredStudents.length),
                   ),
             const SliverToBoxAdapter(child: SizedBox(height: 100)),
+          ],
+        ),
+            Positioned(
+              bottom: 116,
+              right: 20,
+              child: FloatingActionButton(
+                onPressed: () async {
+                  final result = await showDialog(
+                    context: context,
+                    builder: (_) => const StudentApprovalDialog(),
+                  );
+                  if (result == true) {
+                    _loadData();
+                  }
+                },
+                backgroundColor: const Color(0xFF00D4FF),
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const CustomIconWidget(
+                  iconName: 'person_add_outlined',
+                  color: Color(0xFF0A1628), // Dark color for contrast
+                  size: 28,
+                ),
+              ),
+            ),
           ],
         ),
       ),

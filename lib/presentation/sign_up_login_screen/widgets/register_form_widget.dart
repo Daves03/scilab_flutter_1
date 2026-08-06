@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/app_export.dart';
@@ -20,73 +21,107 @@ class _RegisterFormWidgetState extends State<RegisterFormWidget> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _sectionController = TextEditingController();
-  final _sectionCountController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
+  bool _isLoadingSections = true;
   String _selectedRole = 'student';
   String _selectedGrade = 'Grade 9';
-  int _teacherSectionCount = 0;
-  List<TextEditingController> _teacherSectionControllers = [];
+  String? _selectedStudentSection;
+  String _teacherSelectedGrade = 'Grade 9';
+  List<String> _teacherSelectedSections = [];
+  List<Map<String, dynamic>> _allSections = [];
 
   static const _grades = ['Grade 9', 'Grade 10'];
+  static const _teacherGrades = ['Grade 9', 'Grade 10', 'Both'];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSections();
+  }
+
+  Future<void> _fetchSections() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance.collection('sections').get();
+      if (mounted) {
+        setState(() {
+          _allSections = snapshot.docs.map((d) => d.data()).toList();
+          _isLoadingSections = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error fetching sections: $e');
+      if (mounted) {
+        setState(() => _isLoadingSections = false);
+      }
+    }
+  }
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
-    _sectionController.dispose();
-    _sectionCountController.dispose();
-    for (final c in _teacherSectionControllers) {
-      c.dispose();
-    }
     super.dispose();
   }
 
-  void _updateSectionCount(String value) {
-    final count = int.tryParse(value) ?? 0;
-    final clamped = count.clamp(0, 10);
-    if (clamped == _teacherSectionCount) return;
-
-    // Dispose extra controllers if shrinking
-    if (clamped < _teacherSectionControllers.length) {
-      for (int i = clamped; i < _teacherSectionControllers.length; i++) {
-        _teacherSectionControllers[i].dispose();
-      }
-      _teacherSectionControllers = _teacherSectionControllers.sublist(
-        0,
-        clamped,
-      );
-    } else {
-      // Add new controllers if growing
-      while (_teacherSectionControllers.length < clamped) {
-        _teacherSectionControllers.add(TextEditingController());
+  List<String> get _availableTeacherSections {
+    List<String> validSections = [];
+    for (var section in _allSections) {
+      final name = section['name'] as String?;
+      final grade = section['grade'] as String?;
+      if (name == null || grade == null) continue;
+      
+      if (_teacherSelectedGrade == 'Both') {
+        validSections.add(name);
+      } else if (grade == _teacherSelectedGrade) {
+        validSections.add(name);
       }
     }
+    return validSections;
+  }
 
-    setState(() {
-      _teacherSectionCount = clamped;
-    });
+  List<String> get _availableStudentSections {
+    List<String> validSections = [];
+    for (var section in _allSections) {
+      final name = section['name'] as String?;
+      final grade = section['grade'] as String?;
+      if (name == null || grade == null) continue;
+      
+      if (grade == _selectedGrade) {
+        validSections.add(name);
+      }
+    }
+    return validSections;
   }
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (_selectedRole == 'teacher' && _teacherSelectedSections.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select at least one section.'), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
     try {
       UserRole? finalRole;
       List<String> finalSections = [];
 
       if (_selectedRole == 'student') {
+        if (_selectedStudentSection == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please select a section.'), backgroundColor: Colors.red),
+          );
+          return;
+        }
         finalRole = _selectedGrade == 'Grade 9' ? UserRole.grade9 : UserRole.grade10;
-        final gradeNum = _selectedGrade.replaceAll('Grade ', '');
-        finalSections = ['$gradeNum-${_sectionController.text.trim()}'];
+        finalSections = [_selectedStudentSection!];
       } else {
         finalRole = UserRole.teacher;
-        finalSections = _teacherSectionControllers
-            .map((c) => c.text.trim())
-            .where((s) => s.isNotEmpty)
-            .toList();
+        finalSections = List.from(_teacherSelectedSections);
       }
 
       await context.read<AuthService>().signUp(
@@ -106,12 +141,12 @@ class _RegisterFormWidgetState extends State<RegisterFormWidget> {
       if (_selectedRole == 'student') {
         await prefs.setString('student_name', _nameController.text.trim());
         await prefs.setString('student_grade', _selectedGrade);
-        await prefs.setString('student_section', _sectionController.text.trim());
+        await prefs.setString('student_section', _selectedStudentSection ?? '');
       } else {
         await prefs.setString('teacher_name', _nameController.text.trim());
         await prefs.setString('teacher_email', _emailController.text.trim());
         await prefs.setStringList('teacher_sections', finalSections);
-        await prefs.setInt('teacher_section_count', _teacherSectionCount);
+        await prefs.setInt('teacher_section_count', finalSections.length);
       }
 
       widget.onSuccess();
@@ -226,68 +261,41 @@ class _RegisterFormWidgetState extends State<RegisterFormWidget> {
               style: TextStyle(fontSize: 13, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700),
             ),
             const SizedBox(height: 8),
-            _buildGlassField(
-              controller: _sectionController,
-              label: 'Section',
-              hint: 'e.g. Section A, Rizal, Einstein',
-              icon: 'group_outlined',
-            ),
+            _buildStudentSectionSelector(),
           ],
           if (_selectedRole == 'teacher') ...[
             const SizedBox(height: 16),
             Text(
-              'How Many Sections Are You Teaching?',
+              'Grade Level',
               style: TextStyle(fontSize: 13, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 8),
+            _buildTeacherGradeSelector(),
+            const SizedBox(height: 14),
             Text(
-              'Enter number of sections (max 10)',
-              style: TextStyle(fontSize: 11, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF5A7A9A) : Colors.grey.shade600),
+              'Select Sections',
+              style: TextStyle(fontSize: 13, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700),
             ),
             const SizedBox(height: 8),
-            _buildGlassField(
-              controller: _sectionCountController,
-              label: 'Number of Sections',
-              hint: 'e.g. 3',
-              icon: 'format_list_numbered',
-              keyboardType: TextInputType.number,
-              onChanged: _updateSectionCount,
-              validator: (v) {
-                if (v == null || v.isEmpty) {
-                  return 'Please enter number of sections';
-                }
-                final n = int.tryParse(v);
-                if (n == null || n < 1) return 'Enter a valid number (min 1)';
-                if (n > 10) return 'Maximum 10 sections allowed';
-                return null;
-              },
-            ),
-            if (_teacherSectionCount > 0) ...[
-              const SizedBox(height: 16),
-              Text(
-                'Grade & Section',
-                style: TextStyle(fontSize: 13, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Enter grade and section name (e.g. 9-Rizal, 10-Bonifacio)',
-                style: TextStyle(fontSize: 11, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF5A7A9A) : Colors.grey.shade600),
-              ),
-              const SizedBox(height: 8),
-              ...List.generate(
-                _teacherSectionCount,
-                (index) => Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: _buildGlassField(
-                    controller: _teacherSectionControllers[index],
-                    label: 'Section ${index + 1}',
-                    hint: 'e.g. 9-Rizal, 10-Bonifacio',
-                    icon: 'group_outlined',
-                    validator: (v) => (v == null || v.isEmpty)
-                        ? 'Grade & section is required'
-                        : null,
-                  ),
-                ),
+            _buildTeacherSectionSelector(),
+            if (_teacherSelectedSections.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: _teacherSelectedSections.map((s) {
+                  return Chip(
+                    label: Text(s, style: TextStyle(fontSize: 12, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87)),
+                    backgroundColor: const Color(0x2200D4FF),
+                    deleteIconColor: const Color(0xFF00D4FF),
+                    onDeleted: () {
+                      setState(() {
+                        _teacherSelectedSections.remove(s);
+                      });
+                    },
+                    side: const BorderSide(color: Color(0xFF00D4FF)),
+                  );
+                }).toList(),
               ),
             ],
           ],
@@ -397,7 +405,144 @@ class _RegisterFormWidgetState extends State<RegisterFormWidget> {
           items: _grades
               .map((g) => DropdownMenuItem(value: g, child: Text(g)))
               .toList(),
-          onChanged: (v) => setState(() => _selectedGrade = v!),
+          onChanged: (v) => setState(() {
+            _selectedGrade = v!;
+            _selectedStudentSection = null;
+          }),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStudentSectionSelector() {
+    if (_isLoadingSections) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 8),
+        child: Center(
+          child: SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
+      );
+    }
+    
+    final available = _availableStudentSections;
+    if (!available.contains(_selectedStudentSection)) {
+      _selectedStudentSection = null;
+    }
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: const Color(0x1400D4FF),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0x2900D4FF), width: 1),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          hint: Text(available.isEmpty ? 'No sections available' : 'Select a section', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 14)),
+          value: _selectedStudentSection,
+          isExpanded: true,
+          dropdownColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0F1E35) : Colors.white,
+          icon: CustomIconWidget(
+            iconName: 'expand_more',
+            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+            size: 20,
+          ),
+          style: TextStyle(fontSize: 14, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87),
+          items: available
+              .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+              .toList(),
+          onChanged: available.isEmpty ? null : (v) {
+            setState(() {
+              _selectedStudentSection = v;
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTeacherGradeSelector() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: const Color(0x1400D4FF),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0x2900D4FF), width: 1),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: _teacherSelectedGrade,
+          isExpanded: true,
+          dropdownColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0F1E35) : Colors.white,
+          icon: CustomIconWidget(
+            iconName: 'expand_more',
+            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+            size: 20,
+          ),
+          style: TextStyle(fontSize: 14, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87),
+          items: _teacherGrades
+              .map((g) => DropdownMenuItem(value: g, child: Text(g)))
+              .toList(),
+          onChanged: (v) {
+            setState(() {
+              _teacherSelectedGrade = v!;
+              _teacherSelectedSections.removeWhere((s) => !_availableTeacherSections.contains(s));
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTeacherSectionSelector() {
+    if (_isLoadingSections) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 8),
+        child: Center(
+          child: SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
+      );
+    }
+
+    final available = _availableTeacherSections.where((s) => !_teacherSelectedSections.contains(s)).toList();
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: const Color(0x1400D4FF),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0x2900D4FF), width: 1),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          hint: Text(available.isEmpty ? 'All sections added' : 'Select a section to add', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 14)),
+          value: null,
+          isExpanded: true,
+          dropdownColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0F1E35) : Colors.white,
+          icon: CustomIconWidget(
+            iconName: 'add',
+            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+            size: 20,
+          ),
+          style: TextStyle(fontSize: 14, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87),
+          items: available
+              .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+              .toList(),
+          onChanged: available.isEmpty ? null : (v) {
+            if (v != null) {
+              setState(() {
+                _teacherSelectedSections.add(v);
+              });
+            }
+          },
         ),
       ),
     );
