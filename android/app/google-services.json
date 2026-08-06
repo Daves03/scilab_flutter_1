@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "324252227250",
+    "project_id": "scilab-ar",
+    "storage_bucket": "scilab-ar.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:324252227250:android:c4d36d8aa38a21df029bab",
+        "android_client_info": {
+          "package_name": "com.scilab_ar.scilab_flutter_1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "324252227250-9av8lq891d6v77ppds2oc7knlfrpk9ra.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.scilab_ar.scilab_flutter_1",
+            "certificate_hash": "480c1a6702e2ccfc55a2d7cf63267dc6040fe2c5"
+          }
+        },
+        {
+          "client_id": "324252227250-7sppgh00la5ogg2clvjf5pc7mr611vnb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCeinjW5zeoFs6wmm2BCQJU2gkbsMWd-U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "324252227250-7sppgh00la5ogg2clvjf5pc7mr611vnb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

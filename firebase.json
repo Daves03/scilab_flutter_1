@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"android":{"default":{"projectId":"scilab-ar","appId":"1:324252227250:android:c4d36d8aa38a21df029bab","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"scilab-ar","configurations":{"android":"1:324252227250:android:c4d36d8aa38a21df029bab","web":"1:324252227250:web:469938306e2ea2e2029bab"}}}}}}

@@ -1,0 +1,859 @@
+import '../../../core/app_export.dart';
+import '../../../services/course_service.dart';
+import '../teacher_courses_screen.dart';
+
+class TeacherModulesManagerWidget extends StatefulWidget {
+  final TeacherCourse course;
+  final VoidCallback onUpdated;
+
+  const TeacherModulesManagerWidget({
+    required this.course,
+    required this.onUpdated,
+    super.key,
+  });
+
+  @override
+  State<TeacherModulesManagerWidget> createState() =>
+      _TeacherModulesManagerWidgetState();
+}
+
+class _TeacherModulesManagerWidgetState
+    extends State<TeacherModulesManagerWidget> {
+  void _addModule() {
+    _showModuleDialog(null);
+  }
+
+  void _editModule(TeacherModule module) {
+    _showModuleDialog(module);
+  }
+
+  void _deleteModule(TeacherModule module) {
+    showDialog(
+      context: context,
+      builder: (ctx) => _ConfirmDeleteDialog(
+        title: 'Remove Module',
+        message: 'Remove "${module.title}" from this course?',
+        onConfirm: () {
+          setState(() {
+            widget.course.modules.removeWhere((m) => m.id == module.id);
+          });
+          CourseService().removeModule(widget.course.id, module.id);
+          widget.onUpdated();
+        },
+      ),
+    );
+  }
+
+  void _showModuleDialog(TeacherModule? existing) {
+    final titleCtrl = TextEditingController(text: existing?.title ?? '');
+    final descCtrl = TextEditingController(text: existing?.description ?? '');
+    final sizeCtrl = TextEditingController(text: existing?.fileSize ?? '');
+    String selectedType = existing?.fileType ?? 'pdf';
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx2, setDialogState) => _GlassDialog(
+          title: existing == null ? 'Attach Module / File' : 'Edit Module',
+          accentColor: widget.course.accentColor,
+          scrollable: true,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _GlassTextField(
+                controller: titleCtrl,
+                label: 'Module Title',
+                hint: 'e.g. Introduction to Organic Compounds',
+              ),
+              const SizedBox(height: 14),
+              _GlassTextField(
+                controller: descCtrl,
+                label: 'Description',
+                hint: 'Brief description of this module',
+                maxLines: 3,
+              ),
+              const SizedBox(height: 14),
+              Text(
+                'File Type',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF8BA3C0),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: ['pdf', 'video', 'ppt', 'doc'].map((type) {
+                  final isSelected = selectedType == type;
+                  final info = _fileTypeInfo(type);
+                  return GestureDetector(
+                    onTap: () => setDialogState(() => selectedType = type),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? info['color'].withAlpha(30)
+                            : const Color(0xFF142240),
+                        borderRadius: BorderRadius.circular(10.0),
+                        border: Border.all(
+                          color: isSelected
+                              ? info['color']
+                              : const Color(0xFF1E3A5F),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CustomIconWidget(
+                            iconName: info['icon'],
+                            color: isSelected
+                                ? info['color']
+                                : const Color(0xFF8BA3C0),
+                            size: 16,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            type.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: isSelected
+                                  ? info['color']
+                                  : const Color(0xFF8BA3C0),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 14),
+              _GlassTextField(
+                controller: sizeCtrl,
+                label: 'File Size (optional)',
+                hint: 'e.g. 2.4 MB',
+              ),
+              const SizedBox(height: 12),
+              // Simulated upload area
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF142240),
+                  borderRadius: BorderRadius.circular(12.0),
+                  border: Border.all(
+                    color: widget.course.accentColor.withAlpha(50),
+                    width: 1,
+                    style: BorderStyle.solid,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    CustomIconWidget(
+                      iconName: 'cloud_upload',
+                      color: widget.course.accentColor,
+                      size: 28,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Tap to attach file',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: widget.course.accentColor,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    const Text(
+                      'PDF, Video, PPT, DOC supported',
+                      style: TextStyle(fontSize: 11, color: Color(0xFF8BA3C0)),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          onSave: () {
+            if (titleCtrl.text.trim().isEmpty) return;
+            final now = DateTime.now();
+            final dateStr = '${_monthName(now.month)} ${now.day}, ${now.year}';
+            late final TeacherModule savedModule;
+            setState(() {
+              if (existing == null) {
+                savedModule = TeacherModule(
+                  id: 'tm_${now.millisecondsSinceEpoch}',
+                  title: titleCtrl.text.trim(),
+                  description: descCtrl.text.trim(),
+                  fileType: selectedType,
+                  uploadedDate: dateStr,
+                  fileSize: sizeCtrl.text.trim().isEmpty
+                      ? '—'
+                      : sizeCtrl.text.trim(),
+                  uploadedAtRaw: now,
+                );
+                widget.course.modules.add(savedModule);
+              } else {
+                existing.title = titleCtrl.text.trim();
+                existing.description = descCtrl.text.trim();
+                existing.fileType = selectedType;
+                existing.fileSize = sizeCtrl.text.trim().isEmpty
+                    ? '—'
+                    : sizeCtrl.text.trim();
+                savedModule = existing;
+              }
+            });
+            if (existing == null) {
+              CourseService().addModule(widget.course.id, savedModule.toCourseModuleModel());
+            } else {
+              CourseService().updateModule(widget.course.id, savedModule.toCourseModuleModel());
+            }
+            widget.onUpdated();
+            Navigator.pop(ctx2);
+          },
+          onCancel: () => Navigator.pop(ctx2),
+        ),
+      ),
+    );
+  }
+
+  String _monthName(int month) {
+    const months = [
+      '',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return months[month];
+  }
+
+  Map<String, dynamic> _fileTypeInfo(String type) {
+    switch (type) {
+      case 'pdf':
+        return {'icon': 'picture_as_pdf', 'color': const Color(0xFFFF4757)};
+      case 'video':
+        return {
+          'icon': 'play_circle_outline',
+          'color': const Color(0xFF00D4FF),
+        };
+      case 'ppt':
+        return {'icon': 'slideshow', 'color': const Color(0xFFFFB800)};
+      case 'doc':
+        return {'icon': 'description', 'color': const Color(0xFF7C5CBF)};
+      default:
+        return {'icon': 'insert_drive_file', 'color': const Color(0xFF8BA3C0)};
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final modules = widget.course.modules;
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+          child: SizedBox(
+            width: double.infinity,
+            child: _AddButton(
+              label: 'Attach Module / File',
+              icon: 'cloud_upload',
+              color: widget.course.accentColor,
+              onTap: _addModule,
+            ),
+          ),
+        ),
+        Expanded(
+          child: modules.isEmpty
+              ? _EmptyState(
+                  icon: 'folder_open',
+                  message:
+                      'No modules yet.\nTap "Attach Module / File" to upload.',
+                  color: widget.course.accentColor,
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                  itemCount: modules.length,
+                  itemBuilder: (context, index) {
+                    final module = modules[index];
+                    final info = _fileTypeInfo(module.fileType);
+                    return _ModuleCard(
+                      module: module,
+                      typeColor: info['color'],
+                      typeIcon: info['icon'],
+                      onEdit: () => _editModule(module),
+                      onDelete: () => _deleteModule(module),
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Module card ───────────────────────────────────────────────────────────────
+
+class _ModuleCard extends StatelessWidget {
+  final TeacherModule module;
+  final Color typeColor;
+  final String typeIcon;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  const _ModuleCard({
+    required this.module,
+    required this.typeColor,
+    required this.typeIcon,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFF142240),
+        borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(color: typeColor.withAlpha(40), width: 1),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: typeColor.withAlpha(20),
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+            child: Center(
+              child: CustomIconWidget(
+                iconName: typeIcon,
+                color: typeColor,
+                size: 22,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  module.title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  module.description,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF8BA3C0),
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    _MetaTag(
+                      icon: 'calendar_today',
+                      label: module.uploadedDate,
+                      color: const Color(0xFF8BA3C0),
+                    ),
+                    const SizedBox(width: 8),
+                    _MetaTag(
+                      icon: 'storage',
+                      label: module.fileSize,
+                      color: typeColor,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Column(
+            children: [
+              _ActionIconBtn(
+                icon: 'edit',
+                color: const Color(0xFFFFB800),
+                onTap: onEdit,
+              ),
+              const SizedBox(height: 6),
+              _ActionIconBtn(
+                icon: 'delete_outline',
+                color: const Color(0xFFFF4757),
+                onTap: onDelete,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MetaTag extends StatelessWidget {
+  final String icon;
+  final String label;
+  final Color color;
+
+  const _MetaTag({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CustomIconWidget(iconName: icon, color: color, size: 11),
+        const SizedBox(width: 3),
+        Text(label, style: TextStyle(fontSize: 11, color: color)),
+      ],
+    );
+  }
+}
+
+// ── Shared helpers ────────────────────────────────────────────────────────────
+
+class _AddButton extends StatelessWidget {
+  final String label;
+  final String icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _AddButton({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 13),
+        decoration: BoxDecoration(
+          color: color.withAlpha(20),
+          borderRadius: BorderRadius.circular(14.0),
+          border: Border.all(color: color.withAlpha(70), width: 1.5),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CustomIconWidget(iconName: icon, color: color, size: 18),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GlassDialog extends StatelessWidget {
+  final String title;
+  final Color accentColor;
+  final Widget content;
+  final VoidCallback onSave;
+  final VoidCallback onCancel;
+  final bool scrollable;
+
+  const _GlassDialog({
+    required this.title,
+    required this.accentColor,
+    required this.content,
+    required this.onSave,
+    required this.onCancel,
+    this.scrollable = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 480),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0F1E35),
+          borderRadius: BorderRadius.circular(20.0),
+          border: Border.all(color: accentColor.withAlpha(60), width: 1),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 16, 12, 16),
+              decoration: BoxDecoration(
+                color: accentColor.withAlpha(15),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
+                ),
+                border: Border(
+                  bottom: BorderSide(
+                    color: accentColor.withAlpha(40),
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: Row(
+                children: [
+                  CustomIconWidget(
+                    iconName: 'cloud_upload',
+                    color: accentColor,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: onCancel,
+                    child: const CustomIconWidget(
+                      iconName: 'close',
+                      color: Color(0xFF8BA3C0),
+                      size: 20,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            scrollable
+                ? ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.55,
+                    ),
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(20),
+                      child: content,
+                    ),
+                  )
+                : Padding(padding: const EdgeInsets.all(20), child: content),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: onCancel,
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(
+                          color: Color(0xFF3A5A7A),
+                          width: 1,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: Color(0xFF8BA3C0),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: onSave,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: accentColor,
+                        foregroundColor: const Color(0xFF0A1628),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        'Save',
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GlassTextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String label;
+  final String hint;
+  final int maxLines;
+
+  const _GlassTextField({
+    required this.controller,
+    required this.label,
+    required this.hint,
+    this.maxLines = 1,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF8BA3C0),
+          ),
+        ),
+        const SizedBox(height: 6),
+        TextField(
+          controller: controller,
+          maxLines: maxLines,
+          style: const TextStyle(fontSize: 13, color: Colors.white),
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF4A6A8A)),
+            filled: true,
+            fillColor: const Color(0xFF142240),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 12,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: const BorderSide(color: Color(0xFF1E3A5F), width: 1),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: const BorderSide(color: Color(0xFF1E3A5F), width: 1),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: const BorderSide(
+                color: Color(0xFF00D4FF),
+                width: 1.5,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ConfirmDeleteDialog extends StatelessWidget {
+  final String title;
+  final String message;
+  final VoidCallback onConfirm;
+
+  const _ConfirmDeleteDialog({
+    required this.title,
+    required this.message,
+    required this.onConfirm,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 360),
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0F1E35),
+          borderRadius: BorderRadius.circular(20.0),
+          border: Border.all(color: const Color(0x44FF4757), width: 1),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CustomIconWidget(
+              iconName: 'warning_amber',
+              color: Color(0xFFFF4757),
+              size: 40,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              style: const TextStyle(fontSize: 13, color: Color(0xFF8BA3C0)),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(
+                        color: Color(0xFF3A5A7A),
+                        width: 1,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(
+                        color: Color(0xFF8BA3C0),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      onConfirm();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF4757),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      'Delete',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionIconBtn extends StatelessWidget {
+  final String icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ActionIconBtn({
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 30,
+        height: 30,
+        decoration: BoxDecoration(
+          color: color.withAlpha(20),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: Center(
+          child: CustomIconWidget(iconName: icon, color: color, size: 15),
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  final String icon;
+  final String message;
+  final Color color;
+
+  const _EmptyState({
+    required this.icon,
+    required this.message,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CustomIconWidget(
+            iconName: icon,
+            color: color.withAlpha(80),
+            size: 48,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            message,
+            style: const TextStyle(fontSize: 13, color: Color(0xFF8BA3C0)),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}

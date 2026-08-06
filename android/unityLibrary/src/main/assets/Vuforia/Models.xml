@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig>
+  <Tracking>
+    <ImageTarget name="food-colourings-tn" size="0.190000 0.190000" />
+    <ImageTarget name="bottle-of-surf" size="0.190000 0.126667" />
+  </Tracking>
+</QCARConfig>
