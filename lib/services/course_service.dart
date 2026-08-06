@@ -77,6 +77,8 @@ class CourseService {
       'grade': course.grade,
       'accentColorValue': course.accentColorValue,
       'iconName': course.iconName,
+      'modules': course.modules.map((m) => m.toMap()).toList(),
+      'quizzes': course.quizzes.map((q) => q.toMap()).toList(),
     });
   }
 
