@@ -257,10 +257,11 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                 }
                 
                 final notifs = snapshot.data ?? [];
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                return SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -314,6 +315,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                         );
                       }).toList(),
                   ],
+                  ),
                 );
               },
             ),
