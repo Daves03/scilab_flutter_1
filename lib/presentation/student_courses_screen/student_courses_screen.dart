@@ -7,7 +7,8 @@ import '../../services/course_service.dart';
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 class StudentCoursesScreen extends StatefulWidget {
-  const StudentCoursesScreen({super.key});
+  final Course? initialCourse;
+  const StudentCoursesScreen({this.initialCourse, super.key});
 
   @override
   State<StudentCoursesScreen> createState() => _StudentCoursesScreenState();
@@ -23,6 +24,7 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
   @override
   void initState() {
     super.initState();
+    if (widget.initialCourse != null) _selectedCourse = widget.initialCourse;
     _entranceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../models/user_model.dart';
+import '../models/course_model.dart';
 import '../services/auth_service.dart';
 import '../presentation/teacher_ar_and_video_lesson_screen/teacher_ar_and_video_lesson_screen.dart';
 import '../presentation/student_ar_and_video_lesson_screen/student_ar_and_video_lesson_screen.dart';
@@ -188,9 +189,11 @@ final GoRouter appRouter = GoRouter(
           routes: [
             GoRoute(
               path: AppRoutes.studentCoursesScreen,
-              pageBuilder: (context, state) => CustomTransitionPage(
+              pageBuilder: (context, state) {
+                final course = state.extra as Course?;
+                return CustomTransitionPage(
                 key: state.pageKey,
-                child: const StudentCoursesScreen(),
+                child: StudentCoursesScreen(initialCourse: course),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
                       return SlideTransition(
@@ -208,7 +211,8 @@ final GoRouter appRouter = GoRouter(
                       );
                     },
                 transitionDuration: const Duration(milliseconds: 280),
-              ),
+              );
+              },
             ),
             GoRoute(
               path: AppRoutes.teacherCoursesScreen,

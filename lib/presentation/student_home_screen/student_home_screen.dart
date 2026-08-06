@@ -189,6 +189,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
              'color': const Color(0xFF7C3AED),
              'timeStr': _formatNotificationTime(course.createdAt),
              'timestamp': course.createdAt!,
+             'course': course,
            });
         }
         
@@ -201,6 +202,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
              'color': const Color(0xFF00D4FF),
              'timeStr': _formatNotificationTime(m.uploadedAt),
              'timestamp': m.uploadedAt ?? DateTime.now().subtract(const Duration(days: 365)),
+             'course': course,
            });
         }
         
@@ -213,6 +215,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
              'color': const Color(0xFFFFB300),
              'timeStr': _formatNotificationTime(q.createdAt),
              'timestamp': q.createdAt ?? DateTime.now().subtract(const Duration(days: 365)),
+             'course': course,
            });
         }
       }
@@ -257,11 +260,10 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                 }
                 
                 final notifs = snapshot.data ?? [];
-                return SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -293,29 +295,44 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                       ],
                     ),
                     const SizedBox(height: 20),
-                    if (notifs.isEmpty)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 20),
-                        child: Text(
-                          'No recent activity.',
-                          style: TextStyle(color: Colors.grey),
+                    Flexible(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (notifs.isEmpty)
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 20),
+                                child: Text(
+                                  'No recent activity.',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              )
+                            else
+                              ...notifs.map((n) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: _buildNotificationItem(
+                                    n['title'] as String,
+                                    n['desc'] as String,
+                                    n['icon'] as String,
+                                    n['color'] as Color,
+                                    n['timeStr'] as String,
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      if (n['course'] != null) {
+                                        context.go(AppRoutes.studentCoursesScreen, extra: n['course']);
+                                      }
+                                    },
+                                  ),
+                                );
+                              }).toList(),
+                          ],
                         ),
-                      )
-                    else
-                      ...notifs.map((n) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: _buildNotificationItem(
-                            n['title'] as String,
-                            n['desc'] as String,
-                            n['icon'] as String,
-                            n['color'] as Color,
-                            n['timeStr'] as String,
-                          ),
-                        );
-                      }).toList(),
+                      ),
+                    ),
                   ],
-                  ),
                 );
               },
             ),
@@ -325,9 +342,11 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     );
   }
 
-  Widget _buildNotificationItem(String title, String desc, String icon, Color color, String time) {
-    return Container(
-      padding: const EdgeInsets.all(16),
+  Widget _buildNotificationItem(String title, String desc, String icon, Color color, String time, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade50,
         borderRadius: BorderRadius.circular(16),
@@ -385,7 +404,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildDateTimeSection() {
@@ -475,7 +494,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
 
   Widget _buildAlertCard({required String title, required String subtitle, required String icon, required Color color}) {
     return Container(
-      padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color.withAlpha(20),
         borderRadius: BorderRadius.circular(16),
@@ -588,7 +607,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
 
   Widget _buildSummaryCard(String title, String value, String icon, Color color, {bool isWide = false}) {
     return Container(
-      padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
         borderRadius: BorderRadius.circular(16),
