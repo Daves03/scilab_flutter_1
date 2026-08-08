@@ -1,7 +1,10 @@
+import 'dart:typed_data';
+import 'package:file_selector/file_selector.dart';
 import '../../../core/app_export.dart';
 import '../../../models/course_model.dart';
 import '../../../services/course_service.dart';
 import '../../../services/auth_service.dart';
+import '../../../services/ai_quiz_generator_service.dart';
 import 'package:provider/provider.dart';
 import '../teacher_courses_screen.dart';
 
@@ -52,6 +55,11 @@ class _CourseModulesManagerWidgetState
     final descCtrl = TextEditingController(text: existing?.description ?? '');
     final sizeCtrl = TextEditingController(text: existing?.friendlySize ?? '');
     String selectedType = existing?.fileType ?? 'pdf';
+    bool autoGenerateQuiz = false;
+    int numQuizzes = 1;
+    int numQuestions = 5;
+    XFile? selectedFile;
+    bool isGenerating = false;
 
     showDialog(
       context: context,
@@ -146,49 +154,186 @@ class _CourseModulesManagerWidgetState
                 hint: 'e.g. 2.4 MB',
               ),
               const SizedBox(height: 12),
-              // Simulated upload area
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF142240),
-                  borderRadius: BorderRadius.circular(12.0),
-                  border: Border.all(
-                    color: widget.course.accentColor.withAlpha(50),
-                    width: 1,
-                    style: BorderStyle.solid,
+              GestureDetector(
+                onTap: () async {
+                  final typeGroup = XTypeGroup(
+                    label: 'Documents',
+                    extensions: ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'mp4'],
+                  );
+                  final XFile? result = await openFile(acceptedTypeGroups: [typeGroup]);
+
+                  if (result != null) {
+                    setDialogState(() {
+                      selectedFile = result;
+                      // Auto-select type based on extension
+                      final lowerName = selectedFile!.name.toLowerCase();
+                      if (lowerName.endsWith('pdf')) selectedType = 'pdf';
+                      else if (lowerName.endsWith('mp4')) selectedType = 'video';
+                      else if (lowerName.endsWith('doc') || lowerName.endsWith('docx')) selectedType = 'doc';
+                      else if (lowerName.endsWith('ppt') || lowerName.endsWith('pptx')) selectedType = 'ppt';
+                    });
+                  }
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF142240),
+                    borderRadius: BorderRadius.circular(12.0),
+                    border: Border.all(
+                      color: widget.course.accentColor.withAlpha(50),
+                      width: 1,
+                      style: BorderStyle.solid,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      CustomIconWidget(
+                        iconName: selectedFile != null ? 'description' : 'cloud_upload',
+                        color: widget.course.accentColor,
+                        size: 28,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        selectedFile != null ? selectedFile!.name : 'Tap to attach file',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: widget.course.accentColor,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      if (selectedFile == null) ...[
+                        const SizedBox(height: 2),
+                        const Text(
+                          'PDF, Video, PPT, DOC supported',
+                          style: TextStyle(fontSize: 11, color: Color(0xFF8BA3C0)),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
-                child: Column(
-                  children: [
-                    CustomIconWidget(
-                      iconName: 'cloud_upload',
-                      color: widget.course.accentColor,
-                      size: 28,
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Tap to attach file',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: widget.course.accentColor,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    const Text(
-                      'PDF, Video, PPT, DOC supported',
-                      style: TextStyle(fontSize: 11, color: Color(0xFF8BA3C0)),
-                    ),
-                  ],
-                ),
               ),
+              if (selectedType == 'pdf' && existing == null) ...[
+                const SizedBox(height: 14),
+                GestureDetector(
+                  onTap: () {
+                    setDialogState(() => autoGenerateQuiz = !autoGenerateQuiz);
+                  },
+                  child: Row(
+                    children: [
+                      Icon(
+                        autoGenerateQuiz ? Icons.check_box : Icons.check_box_outline_blank,
+                        color: autoGenerateQuiz ? const Color(0xFF00D4FF) : Colors.grey,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Auto-generate AI Quiz',
+                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white),
+                            ),
+                            Text(
+                              'Uses AI to read the PDF and create quizzes.',
+                              style: TextStyle(fontSize: 11, color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (autoGenerateQuiz) ...[
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Quizzes: $numQuizzes', style: const TextStyle(fontSize: 12, color: Colors.white)),
+                            Slider(
+                              value: numQuizzes.toDouble(),
+                              min: 1,
+                              max: 5,
+                              divisions: 4,
+                              activeColor: const Color(0xFF00D4FF),
+                              onChanged: (val) => setDialogState(() => numQuizzes = val.toInt()),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Questions/Quiz: $numQuestions', style: const TextStyle(fontSize: 12, color: Colors.white)),
+                            Slider(
+                              value: numQuestions.toDouble(),
+                              min: 1,
+                              max: 20,
+                              divisions: 19,
+                              activeColor: const Color(0xFF00D4FF),
+                              onChanged: (val) => setDialogState(() => numQuestions = val.toInt()),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+              if (isGenerating) ...[
+                const SizedBox(height: 16),
+                const Center(
+                  child: Column(
+                    children: [
+                      CircularProgressIndicator(color: Color(0xFF00D4FF)),
+                      SizedBox(height: 8),
+                      Text('AI is reading document...', style: TextStyle(color: Colors.white, fontSize: 12)),
+                    ],
+                  ),
+                ),
+              ],
             ],
           ),
-          onSave: () {
+          onSave: () async {
             if (titleCtrl.text.trim().isEmpty) return;
+            if (isGenerating) return;
+
             final now = DateTime.now();
             final dateStr = '${_monthName(now.month)} ${now.day}, ${now.year}';
+            
+            if (autoGenerateQuiz && selectedFile != null) {
+              setDialogState(() => isGenerating = true);
+              
+              final bytes = await selectedFile!.readAsBytes();
+              final aiService = AiQuizGeneratorService();
+              final generatedQuizzes = await aiService.generateQuizzesFromPdf(
+                bytes, 
+                titleCtrl.text.trim(),
+                numQuizzes: numQuizzes,
+                numQuestions: numQuestions,
+              );
+              
+              if (generatedQuizzes != null && generatedQuizzes.isNotEmpty) {
+                widget.course.quizzes.addAll(generatedQuizzes);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('\${generatedQuizzes.length} AI Quiz(zes) generated successfully!')),
+                  );
+                }
+              } else {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('AI Quiz generation failed.')),
+                  );
+                }
+              }
+            }
+
             setState(() {
               if (existing == null) {
                 widget.course.modules.add(
@@ -199,7 +344,7 @@ class _CourseModulesManagerWidgetState
                     fileType: selectedType,
                     uploadedByName: context.read<AuthService>().currentUser?.name ?? 'Teacher',
                     uploadedAt: now,
-                    fileSizeBytes: 0,
+                    fileSizeBytes: 0, // Fallback since XFile doesn't have size directly
                     url: '',
                     storagePath: '',
                   ),
@@ -222,8 +367,10 @@ class _CourseModulesManagerWidgetState
               }
             });
             widget.onUpdated();
-      context.read<CourseService>().updateCourse(widget.course);
-            Navigator.pop(ctx2);
+            context.read<CourseService>().updateCourse(widget.course);
+            if (mounted) {
+              Navigator.pop(ctx2);
+            }
           },
           onCancel: () => Navigator.pop(ctx2),
         ),
@@ -571,10 +718,7 @@ class _GlassDialog extends StatelessWidget {
               ),
             ),
             scrollable
-                ? ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height * 0.55,
-                    ),
+                ? Flexible(
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.all(20),
                       child: content,
