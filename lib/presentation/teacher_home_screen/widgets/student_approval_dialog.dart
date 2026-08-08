@@ -3,7 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../models/user_model.dart';
 import '../../../widgets/custom_icon_widget.dart';
-
+import 'package:provider/provider.dart';
+import '../../../services/auth_service.dart';
 class StudentApprovalDialog extends StatefulWidget {
   const StudentApprovalDialog({super.key});
 
@@ -15,12 +16,13 @@ class _StudentApprovalDialogState extends State<StudentApprovalDialog> with Sing
   late TabController _tabController;
   List<AppUser> _pendingStudents = [];
   List<AppUser> _rejectedStudents = [];
+  List<AppUser> _approvedStudents = [];
   bool _loading = true;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _loadStudents();
   }
 
@@ -33,18 +35,22 @@ class _StudentApprovalDialogState extends State<StudentApprovalDialog> with Sing
   Future<void> _loadStudents() async {
     setState(() => _loading = true);
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final teacherSections = prefs.getStringList('teacher_sections') ?? [];
+      final teacherSections = context.read<AuthService>().currentUser?.sections ?? [];
       
       final db = FirebaseFirestore.instance;
-      // Fetch both pending and rejected students
+      // Fetch both pending, rejected, and approved students
       final snap = await db.collection('users')
           .where('role', whereIn: [UserRole.grade9.id, UserRole.grade10.id])
-          .where('status', whereIn: [VerificationStatus.pending.id, VerificationStatus.rejected.id])
+          .where('status', whereIn: [
+            VerificationStatus.pending.id,
+            VerificationStatus.rejected.id,
+            VerificationStatus.approved.id
+          ])
           .get();
           
       final List<AppUser> pending = [];
       final List<AppUser> rejected = [];
+      final List<AppUser> approved = [];
 
       for (var doc in snap.docs) {
         final user = AppUser.fromMap(doc.id, doc.data());
@@ -55,6 +61,8 @@ class _StudentApprovalDialogState extends State<StudentApprovalDialog> with Sing
             pending.add(user);
           } else if (user.status == VerificationStatus.rejected) {
             rejected.add(user);
+          } else if (user.status == VerificationStatus.approved) {
+            approved.add(user);
           }
         }
       }
@@ -63,6 +71,7 @@ class _StudentApprovalDialogState extends State<StudentApprovalDialog> with Sing
         setState(() {
           _pendingStudents = pending;
           _rejectedStudents = rejected;
+          _approvedStudents = approved;
           _loading = false;
         });
       }
@@ -88,6 +97,42 @@ class _StudentApprovalDialogState extends State<StudentApprovalDialog> with Sing
           const SnackBar(content: Text('Failed to update student status'), backgroundColor: Colors.red),
         );
       }
+    }
+  }
+
+  Future<void> _confirmAndExecute({
+    required String title,
+    required String message,
+    required String confirmText,
+    required Color confirmColor,
+    required AppUser student,
+    required VerificationStatus newStatus,
+  }) async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+        title: Text(title, style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black)),
+        content: Text(message, style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('Cancel', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.grey : Colors.black54)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: confirmColor,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(confirmText),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await _updateStatus(student, newStatus);
     }
   }
 
@@ -121,8 +166,9 @@ class _StudentApprovalDialogState extends State<StudentApprovalDialog> with Sing
                   : TabBarView(
                       controller: _tabController,
                       children: [
-                        _buildStudentList(_pendingStudents, true),
-                        _buildStudentList(_rejectedStudents, false),
+                        _buildStudentList(_pendingStudents, VerificationStatus.pending),
+                        _buildStudentList(_approvedStudents, VerificationStatus.approved),
+                        _buildStudentList(_rejectedStudents, VerificationStatus.rejected),
                       ],
                     ),
             ),
@@ -205,14 +251,41 @@ class _StudentApprovalDialogState extends State<StudentApprovalDialog> with Sing
         unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
         tabs: const [
           Tab(text: 'Pending'),
+          Tab(text: 'Approved'),
           Tab(text: 'Rejected'),
         ],
       ),
     );
   }
 
-  Widget _buildStudentList(List<AppUser> students, bool isPending) {
+  Widget _buildStudentList(List<AppUser> students, VerificationStatus status) {
     if (students.isEmpty) {
+      String iconName;
+      String title;
+      String subtitle;
+      
+      switch (status) {
+        case VerificationStatus.pending:
+          iconName = 'task_alt';
+          title = 'All Caught Up!';
+          subtitle = 'No pending student approvals at the moment.';
+          break;
+        case VerificationStatus.approved:
+          iconName = 'check_circle_outline';
+          title = 'No Approvals Yet';
+          subtitle = 'You haven\'t approved any students.';
+          break;
+        case VerificationStatus.rejected:
+          iconName = 'delete_outline';
+          title = 'Trash is Empty';
+          subtitle = 'No rejected students found.';
+          break;
+        default:
+          iconName = 'info_outline';
+          title = 'Nothing here';
+          subtitle = 'No students found.';
+      }
+
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -224,14 +297,14 @@ class _StudentApprovalDialogState extends State<StudentApprovalDialog> with Sing
                 shape: BoxShape.circle,
               ),
               child: CustomIconWidget(
-                iconName: isPending ? 'task_alt' : 'delete_outline',
+                iconName: iconName,
                 color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF3A5070) : Colors.grey.shade400,
                 size: 48,
               ),
             ),
             const SizedBox(height: 24),
             Text(
-              isPending ? 'All Caught Up!' : 'Trash is Empty',
+              title,
               style: TextStyle(
                 color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
                 fontSize: 18,
@@ -240,7 +313,7 @@ class _StudentApprovalDialogState extends State<StudentApprovalDialog> with Sing
             ),
             const SizedBox(height: 8),
             Text(
-              isPending ? 'No pending student approvals at the moment.' : 'No rejected students found.',
+              subtitle,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
@@ -273,9 +346,11 @@ class _StudentApprovalDialogState extends State<StudentApprovalDialog> with Sing
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: isPending 
+                  color: status == VerificationStatus.pending 
                       ? const Color(0xFF7C3AED).withOpacity(0.15)
-                      : const Color(0xFFFF6B6B).withOpacity(0.15),
+                      : (status == VerificationStatus.approved 
+                          ? const Color(0xFF00D4FF).withOpacity(0.15)
+                          : const Color(0xFFFF6B6B).withOpacity(0.15)),
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -284,7 +359,11 @@ class _StudentApprovalDialogState extends State<StudentApprovalDialog> with Sing
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: isPending ? const Color(0xFF7C3AED) : const Color(0xFFFF6B6B),
+                      color: status == VerificationStatus.pending 
+                          ? const Color(0xFF7C3AED) 
+                          : (status == VerificationStatus.approved 
+                              ? const Color(0xFF00D4FF)
+                              : const Color(0xFFFF6B6B)),
                     ),
                   ),
                 ),
@@ -313,24 +392,59 @@ class _StudentApprovalDialogState extends State<StudentApprovalDialog> with Sing
                   ],
                 ),
               ),
-              if (isPending) ...[
+              if (status == VerificationStatus.pending) ...[
                 _buildActionButton(
                   icon: 'close',
                   color: const Color(0xFFFF6B6B),
-                  onTap: () => _updateStatus(student, VerificationStatus.rejected),
+                  onTap: () => _confirmAndExecute(
+                    title: 'Reject Student',
+                    message: 'Are you sure you want to reject ${student.name}?',
+                    confirmText: 'Reject',
+                    confirmColor: const Color(0xFFFF6B6B),
+                    student: student,
+                    newStatus: VerificationStatus.rejected,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 _buildActionButton(
                   icon: 'check',
                   color: const Color(0xFF00D4FF),
-                  onTap: () => _updateStatus(student, VerificationStatus.approved),
+                  onTap: () => _confirmAndExecute(
+                    title: 'Approve Student',
+                    message: 'Are you sure you want to approve ${student.name}?',
+                    confirmText: 'Approve',
+                    confirmColor: const Color(0xFF00D4FF),
+                    student: student,
+                    newStatus: VerificationStatus.approved,
+                  ),
                 ),
-              ] else ...[
+              ] else if (status == VerificationStatus.rejected) ...[
                 _buildActionButton(
                   icon: 'restore',
                   color: const Color(0xFF00D4FF),
-                  onTap: () => _updateStatus(student, VerificationStatus.approved),
+                  onTap: () => _confirmAndExecute(
+                    title: 'Restore & Approve',
+                    message: 'Are you sure you want to restore and approve ${student.name}?',
+                    confirmText: 'Restore',
+                    confirmColor: const Color(0xFF00D4FF),
+                    student: student,
+                    newStatus: VerificationStatus.approved,
+                  ),
                   tooltip: 'Approve & Restore',
+                ),
+              ] else if (status == VerificationStatus.approved) ...[
+                _buildActionButton(
+                  icon: 'close',
+                  color: const Color(0xFFFF6B6B),
+                  onTap: () => _confirmAndExecute(
+                    title: 'Revoke Approval',
+                    message: 'Are you sure you want to revoke approval for ${student.name}? They will be moved to the Rejected list.',
+                    confirmText: 'Revoke',
+                    confirmColor: const Color(0xFFFF6B6B),
+                    student: student,
+                    newStatus: VerificationStatus.rejected,
+                  ),
+                  tooltip: 'Revoke & Reject',
                 ),
               ],
             ],

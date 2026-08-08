@@ -130,11 +130,11 @@ class AuthService extends ChangeNotifier {
           id: fbUser.uid,
           name: fbUser.displayName ?? '',
           email: fbUser.email ?? '',
-          role: null,
+          role: null, // Keeps role null so we know it's a new google user
           status: VerificationStatus.pending,
         );
         await docRef.set(newUser.toMap());
-        userRoleStr = 'student';
+        userRoleStr = null; // Return null so router redirects to complete profile
       } else {
         // Update name to match Google account if it exists
         if (fbUser.displayName != null && fbUser.displayName!.isNotEmpty) {
@@ -150,6 +150,35 @@ class AuthService extends ChangeNotifier {
       return userRoleStr;
     } on fb.FirebaseAuthException catch (e) {
       throw AuthFailure(_friendlyAuthError(e));
+    } finally {
+      loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> completeGoogleProfile({
+    required String name,
+    required String role,
+    required List<String> sections,
+  }) async {
+    final user = _auth.currentUser;
+    if (user == null) throw AuthFailure('Not logged in');
+
+    loading = true;
+    notifyListeners();
+    try {
+      final docRef = _db.collection('users').doc(user.uid);
+      await docRef.set({
+        'name': name,
+        'role': role,
+        'sections': sections,
+      }, SetOptions(merge: true));
+      if (currentUser != null) {
+        currentUser!.role = UserRoleX.fromId(role);
+        currentUser!.sections = sections;
+      }
+    } catch (e) {
+      throw AuthFailure('Failed to complete profile: $e');
     } finally {
       loading = false;
       notifyListeners();

@@ -1,5 +1,7 @@
 import '../../core/app_export.dart';
 import '../../routes/app_routes.dart';
+import '../../services/auth_service.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import './widgets/auth_hero_widget.dart';
 import './widgets/login_form_widget.dart';
@@ -16,7 +18,6 @@ class SignUpLoginScreen extends StatefulWidget {
 class _SignUpLoginScreenState extends State<SignUpLoginScreen>
     with SingleTickerProviderStateMixin {
   bool _isLogin = true;
-  bool _isPendingApproval = false;
   late AnimationController _switchController;
   late Animation<double> _fadeAnimation;
 
@@ -44,7 +45,6 @@ class _SignUpLoginScreenState extends State<SignUpLoginScreen>
     _switchController.reverse().then((_) {
       setState(() {
         _isLogin = !_isLogin;
-        _isPendingApproval = false;
       });
       _switchController.forward();
     });
@@ -63,7 +63,7 @@ class _SignUpLoginScreenState extends State<SignUpLoginScreen>
   }
 
   void _onRegisterSuccess() {
-    setState(() => _isPendingApproval = true);
+    // GoRouter will automatically redirect based on auth state changes
   }
 
   @override
@@ -138,15 +138,12 @@ class _SignUpLoginScreenState extends State<SignUpLoginScreen>
           children: [
             _buildTabToggle(),
             const SizedBox(height: 28),
-            if (_isPendingApproval)
-              _buildPendingApprovalCard()
-            else
-              FadeTransition(
-                opacity: _fadeAnimation,
-                child: _isLogin
-                    ? LoginFormWidget(onSuccess: _onLoginSuccess)
-                    : RegisterFormWidget(onSuccess: _onRegisterSuccess),
-              ),
+            FadeTransition(
+              opacity: _fadeAnimation,
+              child: _isLogin
+                  ? LoginFormWidget(onSuccess: _onLoginSuccess)
+                  : RegisterFormWidget(onSuccess: _onRegisterSuccess),
+            ),
             const SizedBox(height: 24),
             _buildToggleLink(),
           ],
@@ -200,66 +197,6 @@ class _SignUpLoginScreenState extends State<SignUpLoginScreen>
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildPendingApprovalCard() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF2E2010) : const Color(0xFFFFF8E1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: const Color(0xFFFFB800).withAlpha(102),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        children: [
-          CustomIconWidget(
-            iconName: 'hourglass_top',
-            color: const Color(0xFFFFB800),
-            size: 48,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Account Pending Approval',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Your account has been submitted for review. An admin will approve your registration and assign your role shortly.',
-            style: TextStyle(fontSize: 14, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
-              onPressed: () => setState(() => _isPendingApproval = false),
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Color(0xFFFFB800), width: 1),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-              ),
-              child: const Text(
-                'Back to Sign In',
-                style: TextStyle(
-                  color: Color(0xFFFFB800),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

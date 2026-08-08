@@ -7,7 +7,8 @@ import '../../models/activity_model.dart';
 
 
 import '../../core/app_export.dart';
-
+import 'package:provider/provider.dart';
+import '../../services/auth_service.dart';
 // ── Data models ───────────────────────────────────────────────────────────────
 
 class StudentProgress {
@@ -97,8 +98,7 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
   }
 
   Future<void> _loadData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final sections = prefs.getStringList('teacher_sections') ?? [];
+    final sections = context.read<AuthService>().currentUser?.sections ?? [];
     setState(() {
       _teacherSections = sections;
       _loading = true;

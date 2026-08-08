@@ -10,6 +10,8 @@ import '../presentation/student_home_screen/student_home_screen.dart';
 import '../presentation/teacher_home_screen/teacher_home_screen.dart';
 import '../presentation/overview_screen/overview_screen.dart';
 import '../presentation/sign_up_login_screen/sign_up_login_screen.dart';
+import '../presentation/sign_up_login_screen/google_complete_profile_screen.dart';
+import '../presentation/pending_approval_screen/pending_approval_screen.dart';
 import '../presentation/student_courses_screen/student_courses_screen.dart';
 import '../presentation/teacher_courses_screen/teacher_courses_screen.dart';
 import '../presentation/teacher_progress_screen/teacher_progress_screen.dart';
@@ -22,7 +24,9 @@ import '../widgets/app_scaffold.dart';
 class AppRoutes {
   static const String initial = '/';
   static const String overviewScreen = '/overview';
-  static const String signUpLoginScreen = '/sign-up-login-screen';
+  static const String signUpLoginScreen = '/auth';
+  static const String googleCompleteProfileScreen = '/google-complete-profile';
+  static const String pendingApprovalScreen = '/pending-approval';
   static const String studentHomeScreen = '/student-home-screen';
   static const String teacherHomeScreen = '/teacher-home-screen';
   static const String teacherArAndVideoLessonScreen =
@@ -40,11 +44,12 @@ class AppRoutes {
   static GoRouter get router => appRouter;
 }
 
-/// Routes reachable without a fully authenticated + approved user.
 const _publicRoutes = {
   AppRoutes.initial,
   AppRoutes.overviewScreen,
   AppRoutes.signUpLoginScreen,
+  AppRoutes.googleCompleteProfileScreen,
+  AppRoutes.pendingApprovalScreen,
 };
 
 final GoRouter appRouter = GoRouter(
@@ -59,7 +64,10 @@ final GoRouter appRouter = GoRouter(
     }
 
     if (!auth.isApproved) {
-      return path == AppRoutes.signUpLoginScreen ? null : AppRoutes.signUpLoginScreen;
+      if (auth.currentUser?.role == null) {
+        return path == AppRoutes.googleCompleteProfileScreen ? null : AppRoutes.googleCompleteProfileScreen;
+      }
+      return path == AppRoutes.pendingApprovalScreen ? null : AppRoutes.pendingApprovalScreen;
     }
 
     final isTeacher = auth.currentUser?.role == UserRole.teacher;
@@ -112,6 +120,40 @@ final GoRouter appRouter = GoRouter(
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
         child: const SignUpLoginScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+            ),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 280),
+      ),
+    ),
+    GoRoute(
+      path: AppRoutes.pendingApprovalScreen,
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: const PendingApprovalScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+            ),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 280),
+      ),
+    ),
+    GoRoute(
+      path: AppRoutes.googleCompleteProfileScreen,
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: const GoogleCompleteProfileScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(
             opacity: CurvedAnimation(

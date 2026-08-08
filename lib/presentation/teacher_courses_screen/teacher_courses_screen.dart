@@ -1183,8 +1183,7 @@ class _CourseFormDialogState extends State<_CourseFormDialog> {
 
   Future<void> _fetchSections() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      _teacherSections = prefs.getStringList('teacher_sections') ?? [];
+      _teacherSections = context.read<AuthService>().currentUser?.sections ?? [];
       
       final snapshot = await FirebaseFirestore.instance.collection('sections').get();
       if (mounted) {
