@@ -53,7 +53,6 @@ class _CourseModulesManagerWidgetState
   void _showModuleDialog(CourseModule? existing) {
     final titleCtrl = TextEditingController(text: existing?.title ?? '');
     final descCtrl = TextEditingController(text: existing?.description ?? '');
-    final sizeCtrl = TextEditingController(text: existing?.friendlySize ?? '');
     String selectedType = existing?.fileType ?? 'pdf';
     bool autoGenerateQuiz = false;
     int numQuizzes = 1;
@@ -85,80 +84,12 @@ class _CourseModulesManagerWidgetState
                 maxLines: 3,
               ),
               const SizedBox(height: 14),
-              Text(
-                'File Type',
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF8BA3C0),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: ['pdf', 'video', 'ppt', 'doc'].map((type) {
-                  final isSelected = selectedType == type;
-                  final info = _fileTypeInfo(type);
-                  return GestureDetector(
-                    onTap: () => setDialogState(() => selectedType = type),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 180),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? info['color'].withAlpha(30)
-                            : const Color(0xFF142240),
-                        borderRadius: BorderRadius.circular(10.0),
-                        border: Border.all(
-                          color: isSelected
-                              ? info['color']
-                              : const Color(0xFF1E3A5F),
-                          width: 1.5,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CustomIconWidget(
-                            iconName: info['icon'],
-                            color: isSelected
-                                ? info['color']
-                                : const Color(0xFF8BA3C0),
-                            size: 16,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            type.toUpperCase(),
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: isSelected
-                                  ? info['color']
-                                  : const Color(0xFF8BA3C0),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 14),
-              _GlassTextField(
-                controller: sizeCtrl,
-                label: 'File Size (optional)',
-                hint: 'e.g. 2.4 MB',
-              ),
               const SizedBox(height: 12),
               GestureDetector(
                 onTap: () async {
                   final typeGroup = XTypeGroup(
                     label: 'Documents',
-                    extensions: ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'mp4'],
+                    extensions: ['pdf', 'doc', 'docx', 'ppt', 'pptx'],
                   );
                   final XFile? result = await openFile(acceptedTypeGroups: [typeGroup]);
 
@@ -168,7 +99,6 @@ class _CourseModulesManagerWidgetState
                       // Auto-select type based on extension
                       final lowerName = selectedFile!.name.toLowerCase();
                       if (lowerName.endsWith('pdf')) selectedType = 'pdf';
-                      else if (lowerName.endsWith('mp4')) selectedType = 'video';
                       else if (lowerName.endsWith('doc') || lowerName.endsWith('docx')) selectedType = 'doc';
                       else if (lowerName.endsWith('ppt') || lowerName.endsWith('pptx')) selectedType = 'ppt';
                     });
@@ -206,7 +136,7 @@ class _CourseModulesManagerWidgetState
                       if (selectedFile == null) ...[
                         const SizedBox(height: 2),
                         const Text(
-                          'PDF, Video, PPT, DOC supported',
+                          'PDF, DOC, PPT supported',
                           style: TextStyle(fontSize: 11, color: Color(0xFF8BA3C0)),
                         ),
                       ],

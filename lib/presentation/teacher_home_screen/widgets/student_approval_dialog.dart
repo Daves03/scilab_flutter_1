@@ -225,8 +225,8 @@ class _StudentApprovalDialogState extends State<StudentApprovalDialog> with Sing
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(14),
+        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0D1623) : Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(16),
       ),
       child: TabBar(
         controller: _tabController,
@@ -234,8 +234,8 @@ class _StudentApprovalDialogState extends State<StudentApprovalDialog> with Sing
         indicatorSize: TabBarIndicatorSize.tab,
         padding: const EdgeInsets.all(4),
         indicator: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF243E5C) : Colors.white,
           boxShadow: [
             if (Theme.of(context).brightness == Brightness.light)
               BoxShadow(
@@ -246,13 +246,56 @@ class _StudentApprovalDialogState extends State<StudentApprovalDialog> with Sing
           ],
         ),
         labelColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF0A1628),
-        unselectedLabelColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade500,
-        labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-        tabs: const [
-          Tab(text: 'Pending'),
-          Tab(text: 'Approved'),
-          Tab(text: 'Rejected'),
+        unselectedLabelColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFA1B4CC) : Colors.grey.shade500,
+        labelPadding: EdgeInsets.zero,
+        labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, letterSpacing: 0.2),
+        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13, letterSpacing: 0.2),
+        tabs: [
+          Tab(
+            height: 44,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(color: Color(0xFFF39C12), shape: BoxShape.circle),
+                ),
+                const SizedBox(width: 4),
+                const Flexible(child: Text('Pending', overflow: TextOverflow.ellipsis)),
+              ],
+            ),
+          ),
+          Tab(
+            height: 44,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(color: Color(0xFF2ECC71), shape: BoxShape.circle),
+                ),
+                const SizedBox(width: 4),
+                const Flexible(child: Text('Approved', overflow: TextOverflow.ellipsis)),
+              ],
+            ),
+          ),
+          Tab(
+            height: 44,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(color: Color(0xFFE74C3C), shape: BoxShape.circle),
+                ),
+                const SizedBox(width: 4),
+                const Flexible(child: Text('Rejected', overflow: TextOverflow.ellipsis)),
+              ],
+            ),
+          ),
         ],
       ),
     );

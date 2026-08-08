@@ -49,6 +49,7 @@ class _StudentArAndVideoLessonScreenState
   @override
   void initState() {
     super.initState();
+    _loadLockStates();
     _entranceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -60,7 +61,11 @@ class _StudentArAndVideoLessonScreenState
   Future<void> _loadLockStates() async {
     final prefs = await SharedPreferences.getInstance();
     final states = <String, bool>{};
-    // _experiments has been removed. Lock states can be fetched separately if needed.
+    for (final key in prefs.getKeys()) {
+      if (key.startsWith('locked_ar_')) {
+        states[key.replaceFirst('locked_ar_', '')] = prefs.getBool(key) ?? false;
+      }
+    }
     if (mounted) {
       setState(() => _lockedStates = states);
     }

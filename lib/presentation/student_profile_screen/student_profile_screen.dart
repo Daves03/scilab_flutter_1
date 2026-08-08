@@ -10,7 +10,7 @@ import '../../core/app_export.dart';
 import '../../core/theme_provider.dart';
 import '../../routes/app_routes.dart';
 import '../../services/auth_service.dart';
-
+import '../../models/user_model.dart';
 import '../../core/gallery_saver_web.dart'
     if (dart.library.io) '../../core/gallery_saver_mobile.dart';
 
@@ -37,11 +37,13 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
   }
 
   Future<void> _loadStudentData() async {
-    final prefs = await SharedPreferences.getInstance();
+    final user = context.read<AuthService>().currentUser;
     setState(() {
-      _studentName = context.read<AuthService>().currentUser?.name ?? 'Student';
-      _gradeLevel = prefs.getString('student_grade') ?? 'Grade 10';
-      _schoolSection = prefs.getString('student_section') ?? 'Section A';
+      _studentName = user?.name ?? 'Student';
+      _gradeLevel = user?.role?.label ?? 'Grade 10';
+      _schoolSection = (user?.sections != null && user!.sections.isNotEmpty) 
+          ? user.sections.first 
+          : 'Section A';
     });
   }
 
