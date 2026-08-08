@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 import '../../../core/app_export.dart';
 import '../../../models/course_model.dart';
+import '../../../services/auth_service.dart';
 
 class QuizSectionWidget extends StatefulWidget {
   final Course course;
@@ -17,10 +20,24 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
   final Map<String, int> _selectedAnswers = {};
   // Track if quiz was submitted
   bool _quizSubmitted = false;
-  // Track completed quizzes: quizId -> score
-  final Map<String, int> _completedQuizzes = {};
-  // Track saved answers for completed quizzes
-  final Map<String, Map<String, int>> _savedAnswers = {};
+  Stream<QuerySnapshot>? _attemptsStream;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = context.read<AuthService>().currentUser;
+      if (user != null && mounted) {
+        setState(() {
+          _attemptsStream = FirebaseFirestore.instance
+              .collection('quiz_attempts')
+              .where('courseId', isEqualTo: widget.course.id)
+              .where('studentId', isEqualTo: user.id)
+              .snapshots();
+        });
+      }
+    });
+  }
 
   void _startQuiz(CourseQuiz quiz) {
     setState(() {
@@ -35,26 +52,42 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
     setState(() => _selectedAnswers[questionId] = index);
   }
 
-  void _submitQuiz() {
+  Future<void> _submitQuiz() async {
     if (_activeQuiz == null) return;
     int score = 0;
     for (final q in _activeQuiz!.questions) {
       if (_selectedAnswers[q.id] == q.correctIndex) score++;
     }
+
+    final user = context.read<AuthService>().currentUser;
+    if (user != null) {
+      final attempt = QuizAttempt(
+        id: FirebaseFirestore.instance.collection('quiz_attempts').doc().id,
+        courseId: widget.course.id,
+        quizId: _activeQuiz!.id,
+        quizTitle: _activeQuiz!.title,
+        studentId: user.id,
+        selectedAnswers: _activeQuiz!.questions.map((q) => _selectedAnswers[q.id] ?? -1).toList(),
+        score: score,
+        totalQuestions: _activeQuiz!.questions.length,
+      );
+      
+      await FirebaseFirestore.instance
+          .collection('quiz_attempts')
+          .doc(attempt.id)
+          .set(attempt.toMap());
+    }
+
     setState(() {
       _quizSubmitted = true;
-      _completedQuizzes[_activeQuiz!.id] = score;
-      _savedAnswers[_activeQuiz!.id] = Map.from(_selectedAnswers);
     });
   }
 
-  void _viewQuiz(CourseQuiz quiz) {
+  void _viewQuiz(CourseQuiz quiz, Map<String, int> answers) {
     setState(() {
       _activeQuiz = quiz;
       _selectedAnswers.clear();
-      if (_savedAnswers.containsKey(quiz.id)) {
-        _selectedAnswers.addAll(_savedAnswers[quiz.id]!);
-      }
+      _selectedAnswers.addAll(answers);
       _quizSubmitted = true;
     });
   }
@@ -193,27 +226,60 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
         ),
       );
     }
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
-      itemCount: quizzes.length,
-      itemBuilder: (context, index) {
-        final quiz = quizzes[index];
-        final isDone = _completedQuizzes.containsKey(quiz.id);
-        final score = _completedQuizzes[quiz.id];
-        final pct = isDone ? (score! / quiz.totalQuestions) : null;
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: _QuizCard(
-            quiz: quiz,
-            isDone: isDone,
-            score: score,
-            percentage: pct,
-            accentColor: widget.course.accentColor,
-            onStart: () => _startQuiz(quiz),
-            onRetake: () => _viewQuiz(quiz),
-          ),
+    return StreamBuilder<QuerySnapshot>(
+      stream: _attemptsStream,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        
+        final completedQuizzes = <String, int>{};
+        final savedAnswers = <String, Map<String, int>>{};
+        
+        if (snapshot.hasData) {
+          for (var doc in snapshot.data!.docs) {
+            final attempt = QuizAttempt.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+            completedQuizzes[attempt.quizId] = attempt.score;
+            
+            final quiz = quizzes.firstWhere((q) => q.id == attempt.quizId, orElse: () => CourseQuiz(id: '', title: '', questions: []));
+            if (quiz.id.isNotEmpty) {
+               Map<String, int> answersMap = {};
+               for (int i = 0; i < attempt.selectedAnswers.length; i++) {
+                 if (i < quiz.questions.length) {
+                   answersMap[quiz.questions[i].id] = attempt.selectedAnswers[i];
+                 }
+               }
+               savedAnswers[attempt.quizId] = answersMap;
+            }
+          }
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
+          itemCount: quizzes.length,
+          itemBuilder: (context, index) {
+            final quiz = quizzes[index];
+            final isDone = completedQuizzes.containsKey(quiz.id);
+            final score = completedQuizzes[quiz.id];
+            final pct = isDone ? (score! / quiz.totalQuestions) : null;
+            final isMissed = !isDone && quiz.dueDate != null && quiz.dueDate!.isBefore(DateTime.now());
+            
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _QuizCard(
+                quiz: quiz,
+                isDone: isDone,
+                isMissed: isMissed,
+                score: score,
+                percentage: pct,
+                accentColor: widget.course.accentColor,
+                onStart: () => _startQuiz(quiz),
+                onRetake: () => _viewQuiz(quiz, savedAnswers[quiz.id] ?? {}),
+              ),
+            );
+          },
         );
-      },
+      }
     );
   }
 
@@ -368,7 +434,10 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
   }
 
   Widget _buildScoreBanner(CourseQuiz quiz) {
-    final score = _completedQuizzes[quiz.id] ?? 0;
+    int score = 0;
+    for (final q in quiz.questions) {
+      if (_selectedAnswers[q.id] == q.correctIndex) score++;
+    }
     final total = quiz.totalQuestions;
     final pct = score / total;
     final Color color;
@@ -443,6 +512,7 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
 class _QuizCard extends StatelessWidget {
   final CourseQuiz quiz;
   final bool isDone;
+  final bool isMissed;
   final int? score;
   final double? percentage;
   final Color accentColor;
@@ -452,6 +522,7 @@ class _QuizCard extends StatelessWidget {
   const _QuizCard({
     required this.quiz,
     required this.isDone,
+    required this.isMissed,
     required this.score,
     required this.percentage,
     required this.accentColor,
@@ -467,7 +538,9 @@ class _QuizCard extends StatelessWidget {
               : percentage! >= 0.6
               ? const Color(0xFFFFB800)
               : const Color(0xFFFF4757))
-        : accentColor;
+        : isMissed
+            ? const Color(0xFFFF4757) // Red for missed
+            : accentColor;
 
     return Container(
       decoration: BoxDecoration(
@@ -490,7 +563,7 @@ class _QuizCard extends StatelessWidget {
                 ),
                 child: Center(
                   child: CustomIconWidget(
-                    iconName: isDone ? 'check_circle' : 'quiz',
+                    iconName: isDone ? 'check_circle' : (isMissed ? 'lock' : 'quiz'),
                     color: statusColor,
                     size: 20,
                   ),
@@ -557,7 +630,7 @@ class _QuizCard extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: isDone ? onRetake : onStart,
+              onPressed: isDone ? onRetake : (isMissed ? null : onStart),
               style: ElevatedButton.styleFrom(
                 backgroundColor: isDone ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1A2D4A) : Colors.grey.shade200) : accentColor,
                 disabledBackgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1A2D4A) : Colors.grey.shade200,
@@ -575,7 +648,7 @@ class _QuizCard extends StatelessWidget {
                 elevation: 0,
               ),
               child: Text(
-                isDone ? 'View Results' : 'Start Quiz',
+                isDone ? 'View Results' : (isMissed ? 'Missed' : 'Start Quiz'),
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,

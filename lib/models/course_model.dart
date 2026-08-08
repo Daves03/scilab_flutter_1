@@ -113,12 +113,14 @@ class CourseQuiz {
   final String title;
   final List<CourseQuestion> questions;
   final DateTime? createdAt;
+  final DateTime? dueDate;
 
   CourseQuiz({
     required this.id,
     required this.title,
     required this.questions,
     this.createdAt,
+    this.dueDate,
   });
 
   int get totalQuestions => questions.length;
@@ -137,6 +139,7 @@ class CourseQuiz {
           )
           .toList(),
       createdAt: ts is Timestamp ? ts.toDate() : null,
+      dueDate: data['dueDate'] is Timestamp ? (data['dueDate'] as Timestamp).toDate() : null,
     );
   }
 
@@ -145,6 +148,7 @@ class CourseQuiz {
         'title': title,
         'questions': questions.map((q) => q.toMap()).toList(),
         'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
+        'dueDate': dueDate != null ? Timestamp.fromDate(dueDate!) : null,
       };
 }
 

@@ -96,8 +96,9 @@ class AuthService extends ChangeNotifier {
     loading = true;
     notifyListeners();
     try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
-      return currentUser?.role == UserRole.teacher ? 'teacher' : 'student';
+      final cred = await _auth.signInWithEmailAndPassword(email: email, password: password);
+      final doc = await _db.collection('users').doc(cred.user!.uid).get();
+      return doc.data()?['role'] == 'teacher' ? 'teacher' : 'student';
     } on fb.FirebaseAuthException catch (e) {
       throw AuthFailure(_friendlyAuthError(e));
     } finally {

@@ -214,6 +214,23 @@ class _QuizCard extends StatelessWidget {
                             color: Color(0xFF8BA3C0),
                           ),
                         ),
+                        if (quiz.dueDate != null) ...[
+                          const SizedBox(height: 2),
+                          Row(
+                            children: [
+                              const CustomIconWidget(iconName: 'schedule', color: Color(0xFF00D4FF), size: 10),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Due: ${quiz.dueDate!.month}/${quiz.dueDate!.day} at ${_formatTimeOnly(quiz.dueDate!)}',
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Color(0xFF00D4FF),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -854,6 +871,7 @@ class _UnifiedQuizEditorDialog extends StatefulWidget {
 class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
   late TextEditingController _titleCtrl;
   late List<_QuestionDraft> _questions;
+  DateTime? _selectedDueDate;
 
   @override
   void initState() {
@@ -866,6 +884,7 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
     } else {
       _questions = [_QuestionDraft.empty()];
     }
+    _selectedDueDate = widget.existingQuiz?.dueDate;
   }
 
   @override
@@ -916,10 +935,77 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
       title: _titleCtrl.text.trim(),
       questions: validQuestions,
       createdAt: widget.existingQuiz?.createdAt ?? DateTime.now(),
+      dueDate: _selectedDueDate,
     );
 
     widget.onSave(quiz);
     Navigator.pop(context);
+  }
+
+  Future<void> _pickDueDate() async {
+    final now = DateTime.now();
+    final d = await showDatePicker(
+      context: context,
+      initialDate: _selectedDueDate ?? now,
+      firstDate: now,
+      lastDate: now.add(const Duration(days: 365)),
+    );
+    if (d == null) return;
+    
+    if (mounted) {
+      final t = await showTimePicker(
+        context: context,
+        initialTime: _selectedDueDate != null 
+          ? TimeOfDay.fromDateTime(_selectedDueDate!) 
+          : const TimeOfDay(hour: 23, minute: 59),
+      );
+      if (t == null) return;
+      
+      setState(() {
+        _selectedDueDate = DateTime(d.year, d.month, d.day, t.hour, t.minute);
+      });
+    }
+  }
+
+  Widget _buildDueDatePicker(BuildContext context) {
+    return GestureDetector(
+      onTap: _pickDueDate,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: const Color(0xFF162544),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: widget.course.accentColor.withAlpha(40),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            CustomIconWidget(iconName: 'calendar_month', color: widget.course.accentColor, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                _selectedDueDate != null 
+                  ? 'Due: ${_selectedDueDate!.month}/${_selectedDueDate!.day}/${_selectedDueDate!.year} at ${_formatTimeOnly(_selectedDueDate!)}'
+                  : 'Set Due Date (Optional)',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: _selectedDueDate != null ? Colors.white : const Color(0xFF8BA3C0),
+                ),
+              ),
+            ),
+            if (_selectedDueDate != null)
+              GestureDetector(
+                onTap: () {
+                  setState(() => _selectedDueDate = null);
+                },
+                child: const CustomIconWidget(iconName: 'close', color: Color(0xFFFF6B6B), size: 18),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -993,6 +1079,8 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
                     label: 'Quiz Title',
                     hint: 'e.g. Quiz 1: Carbon Bonding',
                   ),
+                  const SizedBox(height: 16),
+                  _buildDueDatePicker(context),
                   const SizedBox(height: 24),
                   Row(
                     children: [
@@ -1301,4 +1389,11 @@ class _QuestionEditorCard extends StatelessWidget {
       ),
     );
   }
+}
+
+String _formatTimeOnly(DateTime dt) {
+  final h = dt.hour == 0 ? 12 : (dt.hour > 12 ? dt.hour - 12 : dt.hour);
+  final m = dt.minute.toString().padLeft(2, '0');
+  final ampm = dt.hour >= 12 ? 'PM' : 'AM';
+  return '$h:$m $ampm';
 }

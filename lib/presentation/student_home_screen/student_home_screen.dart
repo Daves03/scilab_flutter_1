@@ -25,12 +25,15 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
   late Timer _timer;
   late DateTime _philippinesTime;
   late Stream<List<Map<String, dynamic>>> _notificationsStream;
+  late Stream<Map<String, List<Map<String, dynamic>>>> _deadlinesStream;
   late Future<Map<String, dynamic>> _progressFuture;
+  bool _hasShownDeadlinePopup = false;
 
   @override
   void initState() {
     super.initState();
     _notificationsStream = _streamDynamicNotifications();
+    _deadlinesStream = _streamUpcomingDeadlines();
     _progressFuture = _fetchProgressStats();
     _entranceController = AnimationController(
       vsync: this,
@@ -39,6 +42,109 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     
     _updateTime();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _updateTime());
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAndShowDeadlinePopup();
+    });
+  }
+
+  Future<void> _checkAndShowDeadlinePopup() async {
+    if (_hasShownDeadlinePopup) return;
+    
+    final firstEvent = await _streamUpcomingDeadlines().first;
+    if (!mounted) return;
+    
+    final upcoming = firstEvent['upcoming'] as List<Map<String, dynamic>>;
+    final now = DateTime.now();
+    final urgentDeadlines = upcoming.where((d) {
+      final dueDate = d['dueDate'] as DateTime;
+      return dueDate.difference(now).inHours <= 48;
+    }).toList();
+    
+    if (urgentDeadlines.isNotEmpty) {
+      _hasShownDeadlinePopup = true;
+      _showUrgentDeadlinesDialog(urgentDeadlines);
+    }
+  }
+
+  void _showUrgentDeadlinesDialog(List<Map<String, dynamic>> deadlines) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: 400,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: const Color(0xFFFF4757).withAlpha(100)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CustomIconWidget(iconName: 'warning', color: Color(0xFFFF4757), size: 48),
+              const SizedBox(height: 16),
+              Text(
+                'Upcoming Deadlines!',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'You have quizzes due in the next 48 hours.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 16),
+              ...deadlines.map((d) {
+                final quiz = d['quiz'] as CourseQuiz;
+                final date = d['dueDate'] as DateTime;
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF4757).withAlpha(15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      const CustomIconWidget(iconName: 'schedule', color: Color(0xFFFF4757), size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(quiz.title, style: const TextStyle(fontWeight: FontWeight.w600)),
+                            Text(
+                              'Due: ${date.month}/${date.day} at ${_formatTimeOnly(date)}',
+                              style: const TextStyle(fontSize: 12, color: Color(0xFFFF4757)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(ctx),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFF4757),
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 45),
+                ),
+                child: const Text('Got it'),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _updateTime() {
@@ -69,6 +175,13 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     final ampm = dt.hour >= 12 ? 'PM' : 'AM';
     
     return '$month $day, $year  •  $h:$m:$s $ampm PHT';
+  }
+
+  String _formatTimeOnly(DateTime dt) {
+    final h = dt.hour == 0 ? 12 : (dt.hour > 12 ? dt.hour - 12 : dt.hour);
+    final m = dt.minute.toString().padLeft(2, '0');
+    final ampm = dt.hour >= 12 ? 'PM' : 'AM';
+    return '$h:$m $ampm';
   }
 
   @override
@@ -217,6 +330,22 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
              'timestamp': q.createdAt ?? DateTime.now().subtract(const Duration(days: 365)),
              'course': course,
            });
+
+           // Upcoming deadlines
+           if (q.dueDate != null && q.dueDate!.isAfter(DateTime.now())) {
+             final diff = q.dueDate!.difference(DateTime.now());
+             if (diff.inHours <= 48) {
+               notifications.add({
+                 'title': 'Quiz Deadline Approaching',
+                 'desc': '${q.title} is due in ${diff.inHours} hours.',
+                 'icon': 'schedule',
+                 'color': const Color(0xFFFF4757),
+                 'timeStr': 'Due soon',
+                 'timestamp': DateTime.now().add(const Duration(hours: 1)),
+                 'course': course,
+               });
+             }
+           }
         }
       }
       
@@ -226,6 +355,40 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     });
   }
 
+  Stream<Map<String, List<Map<String, dynamic>>>> _streamUpcomingDeadlines() {
+    final user = context.read<AuthService>().currentUser;
+    if (user == null) return Stream.value({'upcoming': [], 'missed': []});
+    
+    final db = FirebaseFirestore.instance;
+    return db.collection('courses').where('grade', isEqualTo: user.role?.label).snapshots().map((cSnap) {
+      List<Map<String, dynamic>> upcoming = [];
+      List<Map<String, dynamic>> missed = [];
+      final now = DateTime.now();
+      for (var doc in cSnap.docs) {
+        final course = Course.fromMap(doc.id, doc.data());
+        for (var q in course.quizzes) {
+          if (q.dueDate != null) {
+            if (q.dueDate!.isAfter(now)) {
+              upcoming.add({
+                'course': course,
+                'quiz': q,
+                'dueDate': q.dueDate!,
+              });
+            } else {
+              missed.add({
+                'course': course,
+                'quiz': q,
+                'dueDate': q.dueDate!,
+              });
+            }
+          }
+        }
+      }
+      upcoming.sort((a, b) => (a['dueDate'] as DateTime).compareTo(b['dueDate'] as DateTime));
+      missed.sort((a, b) => (b['dueDate'] as DateTime).compareTo(a['dueDate'] as DateTime));
+      return {'upcoming': upcoming, 'missed': missed};
+    });
+  }
 
   void _showNotificationsDialog(BuildContext context) {
     showDialog(
@@ -670,28 +833,105 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
             ],
           ),
           const SizedBox(height: 12),
-          Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
-            ),
-            child: const Padding(
-              padding: EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-              child: Center(
-                child: Text(
-                  'No upcoming due dates',
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
-                ),
-              ),
-            ),
+          StreamBuilder<Map<String, List<Map<String, dynamic>>>>(
+            stream: _deadlinesStream,
+            builder: (ctx, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              final data = snapshot.data ?? {'upcoming': [], 'missed': []};
+              final upcoming = data['upcoming'] as List<Map<String, dynamic>>;
+              final missed = data['missed'] as List<Map<String, dynamic>>;
+              
+              if (upcoming.isEmpty && missed.isEmpty) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                    child: Center(
+                      child: Text(
+                        'No upcoming due dates',
+                        style: TextStyle(color: Colors.grey, fontSize: 14),
+                      ),
+                    ),
+                  ),
+                );
+              }
+
+              return Column(
+                children: [
+                  if (upcoming.isNotEmpty)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+                      ),
+                      child: Column(
+                        children: upcoming.take(4).map((d) {
+                          final date = d['dueDate'] as DateTime;
+                          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                          final m = months[date.month - 1];
+                          final day = date.day.toString();
+                          final title = (d['quiz'] as CourseQuiz).title;
+                          final time = _formatTimeOnly(date);
+                          final isUpcoming = date.difference(DateTime.now()).inHours <= 48;
+                          
+                          return _buildCalendarItem(day, m, title, time, isUpcoming);
+                        }).toList(),
+                      ),
+                    ),
+                  if (missed.isNotEmpty) ...[
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        CustomIconWidget(iconName: 'warning', color: const Color(0xFFFF4757), size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Missed Deadlines',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFFFF4757),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFFFF4757).withAlpha(100)),
+                      ),
+                      child: Column(
+                        children: missed.take(3).map((d) {
+                          final date = d['dueDate'] as DateTime;
+                          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                          final m = months[date.month - 1];
+                          final day = date.day.toString();
+                          final title = (d['quiz'] as CourseQuiz).title;
+                          final time = _formatTimeOnly(date);
+                          
+                          return _buildCalendarItem(day, m, title, time, false, isMissed: true);
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                ],
+              );
+            },
           )
         ],
       ),
     );
   }
 
-  Widget _buildCalendarItem(String day, String month, String title, String time, bool isUpcoming) {
+  Widget _buildCalendarItem(String day, String month, String title, String time, bool isUpcoming, {bool isMissed = false}) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -700,9 +940,13 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
             width: 50,
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              color: isUpcoming ? const Color(0xFF00D4FF).withAlpha(20) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade50),
+              color: isMissed 
+                  ? const Color(0xFFFF4757).withAlpha(20) 
+                  : (isUpcoming ? const Color(0xFF00D4FF).withAlpha(20) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade50)),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: isUpcoming ? const Color(0xFF00D4FF) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300)),
+              border: Border.all(color: isMissed 
+                  ? const Color(0xFFFF4757) 
+                  : (isUpcoming ? const Color(0xFF00D4FF) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300))),
             ),
             child: Column(
               children: [
@@ -711,7 +955,9 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: isUpcoming ? const Color(0xFF00D4FF) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
+                    color: isMissed
+                        ? const Color(0xFFFF4757)
+                        : (isUpcoming ? const Color(0xFF00D4FF) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600)),
                   ),
                 ),
                 Text(
@@ -719,7 +965,9 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: isUpcoming ? const Color(0xFF00D4FF) : (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87),
+                    color: isMissed
+                        ? const Color(0xFFFF4757)
+                        : (isUpcoming ? const Color(0xFF00D4FF) : (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87)),
                   ),
                 ),
               ],
