@@ -367,21 +367,8 @@ class _ArAndVideoLessonScreenState extends State<ArAndVideoLessonScreen>
         ),
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-            child: const Text(
-              'Video Lessons',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
-            child: const VideoLessonSectionWidget(),
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 100),
+            child: VideoLessonSectionWidget(),
           ),
         ),
       ],

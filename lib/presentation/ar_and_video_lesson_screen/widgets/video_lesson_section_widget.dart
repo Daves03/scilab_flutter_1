@@ -1,4 +1,6 @@
 import '../../../core/app_export.dart';
+import '../../../services/youtube_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class _VideoLesson {
   final String id;
@@ -30,352 +32,186 @@ class VideoLessonSectionWidget extends StatefulWidget {
 
 // TODO: Replace with [Riverpod/Bloc] for production
 class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
-  String? _playingId;
-
-  static const List<Map<String, dynamic>> _lessonMaps = [
-    {
-      'id': 'v1',
-      'title': 'Introduction to Organic Chemistry',
-      'subject': 'Organic Chemistry',
-      'duration': '14:32',
-      'thumbnailUrl':
-          'https://img.rocket.new/generatedImages/rocket_gen_img_11bdf30c8-1784441868031.png',
-      'isCompleted': true,
-      'semanticLabel':
-          'Chemistry laboratory with glassware and colorful chemical solutions',
-    },
-    {
-      'id': 'v2',
-      'title': 'Alkanes, Alkenes & Alkynes',
-      'subject': 'Organic Chemistry',
-      'duration': '22:15',
-      'thumbnailUrl':
-          'https://images.unsplash.com/photo-1645839072940-bb2a4f189ed3',
-      'isCompleted': true,
-      'semanticLabel':
-          'Colorful molecular model with connected atom spheres on dark surface',
-    },
-    {
-      'id': 'v3',
-      'title': 'Acid-Base Equilibrium Explained',
-      'subject': 'Physical Chemistry',
-      'duration': '18:44',
-      'thumbnailUrl':
-          'https://img.rocket.new/generatedImages/rocket_gen_img_1cfa6b0e0-1779860178403.png',
-      'isCompleted': false,
-      'semanticLabel':
-          'Science lab equipment including Erlenmeyer flasks and pipettes',
-    },
-    {
-      'id': 'v4',
-      'title': 'Thermodynamics: First Law',
-      'subject': 'Physical Chemistry',
-      'duration': '26:08',
-      'thumbnailUrl':
-          'https://img.rocket.new/generatedImages/rocket_gen_img_13cc2307a-1782299762315.png',
-      'isCompleted': false,
-      'semanticLabel':
-          'Augmented reality interface with scientific data visualization',
-    },
-  ];
-
   List<_VideoLesson> _lessons = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _lessons = _lessonMaps
-        .map(
-          (m) => _VideoLesson(
-            id: m['id'] as String,
-            title: m['title'] as String,
-            subject: m['subject'] as String,
-            duration: m['duration'] as String,
-            thumbnailUrl: m['thumbnailUrl'] as String,
-            isCompleted: m['isCompleted'] as bool,
-            semanticLabel: m['semanticLabel'] as String,
-          ),
-        )
-        .toList();
+    _fetchYoutubeVideos();
+  }
+
+  Future<void> _fetchYoutubeVideos() async {
+    try {
+      final youtubeService = YoutubeService();
+      final videos = await youtubeService.searchVideos('Chemistry experiments', maxResults: 4);
+      
+      if (mounted) {
+        setState(() {
+          _lessons = videos.map((v) => _VideoLesson(
+            id: v.id,
+            title: v.title,
+            subject: v.channelTitle,
+            duration: '10:00', // Placeholder
+            thumbnailUrl: v.thumbnailUrl,
+            isCompleted: false,
+            semanticLabel: v.title,
+          )).toList();
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching youtube videos: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(20.0),
+          child: CircularProgressIndicator(color: Color(0xFF00D4FF)),
+        ),
+      );
+    }
+
+    if (_lessons.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(20.0),
+          child: Text('No videos found.', style: TextStyle(color: Colors.white)),
+        ),
+      );
+    }
+
     return Column(
-      children: _lessons.map((lesson) => _buildLessonItem(lesson)).toList(),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Video Lessons',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Suggested on YouTube',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                  letterSpacing: 0.2,
+                ),
+              ),
+            ],
+          ),
+        ),
+        ..._lessons.map((lesson) => _buildLessonItem(lesson)),
+      ],
     );
   }
 
   Widget _buildLessonItem(_VideoLesson lesson) {
-    final isPlaying = _playingId == lesson.id;
-
     return GestureDetector(
-      onTap: () => setState(() => _playingId = isPlaying ? null : lesson.id),
+      onTap: () async {
+        final url = Uri.parse('https://www.youtube.com/watch?v=${lesson.id}');
+        if (await canLaunchUrl(url)) {
+          await launchUrl(url);
+        } else {
+          print('Could not launch $url');
+        }
+      },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
           color: const Color(0xFF0F1E35),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isPlaying
-                ? const Color(0xFF00D4FF).withAlpha(102)
-                : const Color(0xFF1E3A5F),
-            width: isPlaying ? 1.5 : 1,
+            color: const Color(0xFF1E3A5F),
+            width: 1,
           ),
         ),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(14),
-              child: Row(
-                children: [
-                  // Thumbnail with play overlay
-                  Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: CustomImageWidget(
-                          imageUrl: lesson.thumbnailUrl,
-                          width: 80,
-                          height: 60,
-                          fit: BoxFit.cover,
-                          semanticLabel: lesson.semanticLabel,
-                        ),
-                      ),
-                      Positioned.fill(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.black.withAlpha(89),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Center(
-                            child: Container(
-                              width: 28,
-                              height: 28,
-                              decoration: BoxDecoration(
-                                color: isPlaying
-                                    ? const Color(0xFF00D4FF)
-                                    : Colors.white.withAlpha(230),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(
-                                child: CustomIconWidget(
-                                  iconName: isPlaying ? 'pause' : 'play_arrow',
-                                  color: const Color(0xFF0A1628),
-                                  size: 16,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          lesson.title,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                            height: 1.3,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          lesson.subject,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Color(0xFF8BA3C0),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            const CustomIconWidget(
-                              iconName: 'access_time',
-                              color: Color(0xFF5A7A9A),
-                              size: 12,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              lesson.duration,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: Color(0xFF5A7A9A),
-                              ),
-                            ),
-                            const Spacer(),
-                            if (lesson.isCompleted)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 3,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: const Color(0x1400FF88),
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: Row(
-                                  children: const [
-                                    CustomIconWidget(
-                                      iconName: 'check_circle',
-                                      color: Color(0xFF00FF88),
-                                      size: 11,
-                                    ),
-                                    SizedBox(width: 3),
-                                    Text(
-                                      'Done',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: Color(0xFF00FF88),
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Expanded player mock
-            if (isPlaying)
-              Container(
-                margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF142240),
-                  borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: CustomImageWidget(
+                  imageUrl: lesson.thumbnailUrl,
+                  width: 80,
+                  height: 60,
+                  fit: BoxFit.cover,
+                  semanticLabel: lesson.semanticLabel,
                 ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Seek bar
-                    Row(
-                      children: [
-                        const Text(
-                          '4:22',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Color(0xFF8BA3C0),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: SliderTheme(
-                            data: SliderThemeData(
-                              trackHeight: 3,
-                              thumbShape: const RoundSliderThumbShape(
-                                enabledThumbRadius: 6,
-                              ),
-                              overlayShape: const RoundSliderOverlayShape(
-                                overlayRadius: 12,
-                              ),
-                              activeTrackColor: const Color(0xFF00D4FF),
-                              inactiveTrackColor: const Color(0xFF1E3A5F),
-                              thumbColor: const Color(0xFF00D4FF),
-                              overlayColor: const Color(
-                                0xFF00D4FF,
-                              ).withAlpha(51),
-                            ),
-                            child: Slider(value: 0.3, onChanged: (_) {}),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          lesson.duration,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Color(0xFF8BA3C0),
-                          ),
-                        ),
-                      ],
+                    Text(
+                      lesson.title,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        height: 1.3,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 10),
-                    // Controls
+                    const SizedBox(height: 6),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildControlBtn('replay_10', 28),
-                        _buildControlBtn('skip_previous', 28),
                         Container(
-                          width: 44,
-                          height: 44,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFF00D4FF),
+                          width: 16,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(3),
                           ),
                           child: const Center(
-                            child: CustomIconWidget(
-                              iconName: 'pause',
-                              color: Color(0xFF0A1628),
-                              size: 22,
+                            child: Icon(
+                              Icons.play_arrow,
+                              color: Colors.white,
+                              size: 10,
                             ),
                           ),
                         ),
-                        _buildControlBtn('skip_next', 28),
-                        _buildControlBtn('forward_10', 28),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            lesson.subject,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Color(0xFF8BA3C0),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                       ],
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 40,
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0x1400FF88),
-                          foregroundColor: const Color(0xFF00FF88),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          elevation: 0,
-                          side: const BorderSide(
-                            color: Color(0x3300FF88),
-                            width: 1,
-                          ),
-                        ),
-                        child: const Text(
-                          'Mark as Complete',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
                     ),
                   ],
                 ),
               ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildControlBtn(String icon, double size) {
-    return Container(
-      width: 36,
-      height: 36,
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E3A5F),
-        shape: BoxShape.circle,
-      ),
-      child: Center(
-        child: CustomIconWidget(
-          iconName: icon,
-          color: const Color(0xFF8BA3C0),
-          size: 18,
+            ],
+          ),
         ),
       ),
     );

@@ -11,7 +11,7 @@ import '../../services/ar_service.dart';
 import '../student_ar_and_video_lesson_screen/widgets/ar_experiment_card_widget.dart';
 import '../student_ar_and_video_lesson_screen/widgets/ar_experiment_detail_widget.dart';
 import '../student_ar_and_video_lesson_screen/widgets/category_filter_widget.dart';
-import '../student_ar_and_video_lesson_screen/widgets/video_lesson_section_widget.dart';
+import '../ar_and_video_lesson_screen/widgets/video_lesson_section_widget.dart';
 
 
 
@@ -186,21 +186,8 @@ class _StudentArAndVideoLessonScreenState
         ),
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-            child: Text(
-              'Video Lessons',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
-              ),
-            ),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
-            child: const VideoLessonSectionWidget(),
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 100),
+            child: VideoLessonSectionWidget(),
           ),
         ),
       ],
