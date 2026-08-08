@@ -214,6 +214,17 @@ class AuthService extends ChangeNotifier {
       .doc(user.id)
       .update({'status': VerificationStatus.approved.id});
 
+  Future<void> markNotificationsAsRead() async {
+    if (currentUser == null) return;
+    try {
+      await _db.collection('users').doc(currentUser!.id).update({
+        'lastNotificationReadAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      debugPrint('Error marking notifications as read: $e');
+    }
+  }
+
   /// For the edge case where role is still null (e.g. first-time Google
   /// sign-in, which doesn't go through the register form) — admin sets
   /// both at once.

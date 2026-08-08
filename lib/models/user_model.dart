@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 /// The role a user selects right after logging in.
 enum UserRole { grade9, grade10, teacher }
 
@@ -69,6 +71,7 @@ class AppUser {
   UserRole? role;
   VerificationStatus status;
   List<String> sections; // teacher's class sections, e.g. ['9-Rizal', '10-Luna']
+  DateTime? lastNotificationReadAt;
 
   AppUser({
     required this.id,
@@ -77,6 +80,7 @@ class AppUser {
     this.role,
     this.status = VerificationStatus.pending,
     this.sections = const [],
+    this.lastNotificationReadAt,
   });
 
   /// Only Teacher accounts require admin sign-off.
@@ -86,6 +90,7 @@ class AppUser {
   bool get isTeacher => role == UserRole.teacher;
 
   factory AppUser.fromMap(String id, Map<String, dynamic> data) {
+    final ts = data['lastNotificationReadAt'];
     return AppUser(
       id: id,
       name: (data['name'] as String?) ?? '',
@@ -93,6 +98,7 @@ class AppUser {
       role: UserRoleX.fromId(data['role'] as String?),
       status: VerificationStatusX.fromId(data['status'] as String?),
       sections: List<String>.from(data['sections'] ?? const []),
+      lastNotificationReadAt: ts is Timestamp ? ts.toDate() : null,
     );
   }
 
@@ -102,5 +108,6 @@ class AppUser {
         'role': role?.id,
         'status': status.id,
         'sections': sections,
+        'lastNotificationReadAt': lastNotificationReadAt != null ? Timestamp.fromDate(lastNotificationReadAt!) : null,
       };
 }

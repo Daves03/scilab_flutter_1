@@ -2,7 +2,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/user_model.dart';
 import '../../models/course_model.dart';
+import '../../widgets/custom_icon_widget.dart';
+import '../../services/ar_service.dart';
 import '../../models/ar_experiment_model.dart';
+import '../../data/dummy_ar_experiments.dart';
 import '../../models/activity_model.dart';
 
 
@@ -120,9 +123,15 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
       final attemptsSnap = await db.collection('quiz_attempts').get();
       final allAttempts = attemptsSnap.docs.map((d) => QuizAttempt.fromMap(d.id, d.data())).toList();
 
-      // 3. Fetch AR experiments to map IDs to titles
-      final arSnap = await db.collection('ar_experiments').get();
-      final arExps = arSnap.docs.map((d) => ArExperimentModel.fromMap(d.id, d.data())).toList();
+      // 3. Fetch AR experiments to map IDs to titles (with fallback if permission denied)
+      List<ArExperimentModel> arExps = [];
+      try {
+        final arSnap = await db.collection('ar_experiments').get();
+        arExps = arSnap.docs.map((d) => ArExperimentModel.fromMap(d.id, d.data())).toList();
+      } catch (e) {
+        print('Using fallback AR experiments due to error: $e');
+        arExps = dummyArExperiments;
+      }
       final arExpMap = { for (var e in arExps) e.id : e.title };
 
       // 4. Build StudentProgress objects

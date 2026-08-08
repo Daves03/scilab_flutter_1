@@ -10,6 +10,9 @@ import '../../models/course_model.dart';
 import '../../models/activity_model.dart';
 import '../teacher_profile_screen/teacher_profile_screen.dart';
 import 'widgets/student_approval_dialog.dart';
+import '../student_home_screen/widgets/user_header_widget.dart';
+import '../../services/auth_service.dart';
+import 'package:provider/provider.dart';
 
 // ── Reuse data models from teacher_progress_screen ────────────────────────────
 class _StudentSummary {
@@ -59,6 +62,17 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
 
   List<_StudentSummary> _students = [];
   bool _loading = true;
+  
+  final StreamController<List<Map<String, dynamic>>> _notifController = StreamController.broadcast();
+  StreamSubscription? _usersSub;
+  StreamSubscription? _quizSub;
+  StreamSubscription? _arSub;
+
+  List<QueryDocumentSnapshot> _pendingUsers = [];
+  List<QueryDocumentSnapshot> _quizAttempts = [];
+  List<QueryDocumentSnapshot> _arAttempts = [];
+  
+  final Map<String, DateTime> _pendingUserTimestamps = {};
 
   Future<void> _loadData() async {
     try {
@@ -194,10 +208,128 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
         _now = DateTime.now().toUtc().add(const Duration(hours: 8));
       });
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initNotificationStreams();
+    });
+  }
+
+  void _initNotificationStreams() {
+    final db = FirebaseFirestore.instance;
+    final user = context.read<AuthService>().currentUser;
+    if (user == null) return;
+    
+    void updateNotifs() async {
+      List<Map<String, dynamic>> notifications = [];
+      final teacherSections = user.sections;
+      
+      // 1. Pending Users
+      for (var doc in _pendingUsers) {
+        final u = AppUser.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+        if (u.sections.any((s) => teacherSections.contains(s))) {
+          if (!_pendingUserTimestamps.containsKey(u.id)) {
+            _pendingUserTimestamps[u.id] = DateTime.now();
+          }
+          notifications.add({
+            'title': 'New Student Approval',
+            'desc': '${u.name} requested to join ${u.sections.first}.',
+            'icon': 'person_add',
+            'color': const Color(0xFF7C3AED),
+            'timestamp': _pendingUserTimestamps[u.id]!,
+            'action': 'approval',
+          });
+        }
+      }
+
+      // 2. Quiz Attempts
+      for (var doc in _quizAttempts) {
+        final data = doc.data() as Map<String, dynamic>;
+        final studentId = data['studentId'] as String? ?? '';
+        final title = data['quizTitle'] as String? ?? '';
+        final ts = data['submittedAt'] as Timestamp?;
+        // We only have the top 10 recent quizzes, so fetching names individually is okay
+        String name = 'A student';
+        if (studentId.isNotEmpty) {
+           final sDoc = await db.collection('users').doc(studentId).get();
+           if (sDoc.exists) name = sDoc.data()?['name'] ?? name;
+        }
+        notifications.add({
+          'title': 'Quiz Submitted',
+          'desc': '$name submitted $title.',
+          'icon': 'assignment_turned_in',
+          'color': const Color(0xFF00D4FF),
+          'timeStr': _formatNotificationTime(ts?.toDate()),
+          'timestamp': ts?.toDate() ?? DateTime.now(),
+        });
+      }
+
+      // 3. AR Results
+      for (var doc in _arAttempts) {
+        final data = doc.data() as Map<String, dynamic>;
+        final title = data['experimentId'] as String? ?? 'Experiment';
+        final ts = data['completedAt'] as Timestamp?;
+        // Parent doc id is the studentId
+        String name = 'A student';
+        final parentRef = doc.reference.parent.parent;
+        if (parentRef != null) {
+           final sDoc = await parentRef.get();
+           if (sDoc.exists) name = sDoc.data()?['name'] ?? name;
+        }
+        notifications.add({
+          'title': 'AR Activity Completed',
+          'desc': '$name completed $title.',
+          'icon': 'view_in_ar',
+          'color': const Color(0xFFFFB300),
+          'timeStr': _formatNotificationTime(ts?.toDate()),
+          'timestamp': ts?.toDate() ?? DateTime.now(),
+        });
+      }
+
+      notifications.sort((a, b) => (b['timestamp'] as DateTime).compareTo(a['timestamp'] as DateTime));
+      _notifController.add(notifications);
+    }
+
+    _usersSub = db.collection('users')
+      .where('role', whereIn: [UserRole.grade9.id, UserRole.grade10.id])
+      .where('status', isEqualTo: VerificationStatus.pending.id)
+      .snapshots().listen((snap) {
+        _pendingUsers = snap.docs;
+        updateNotifs();
+      });
+
+    _quizSub = db.collection('quiz_attempts')
+      .orderBy('submittedAt', descending: true).limit(10)
+      .snapshots().listen((snap) {
+        _quizAttempts = snap.docs;
+        updateNotifs();
+      });
+      
+    // Collection group query might fail if index is missing, so we wrap in try-catch or limit
+    try {
+      _arSub = db.collectionGroup('experiment_activity')
+        .where('completed', isEqualTo: true)
+        // Can't orderBy completedAt easily without composite index, so just listen
+        .snapshots().listen((snap) {
+          final sorted = snap.docs.toList()..sort((a, b) {
+            final ta = (a.data() as Map<String, dynamic>)['completedAt'] as Timestamp?;
+            final tb = (b.data() as Map<String, dynamic>)['completedAt'] as Timestamp?;
+            if (ta == null || tb == null) return 0;
+            return tb.compareTo(ta);
+          });
+          _arAttempts = sorted.take(10).toList();
+          updateNotifs();
+        });
+    } catch (e) {
+      print('AR notification stream failed: $e');
+    }
   }
 
   @override
   void dispose() {
+    _usersSub?.cancel();
+    _quizSub?.cancel();
+    _arSub?.cancel();
+    _notifController.close();
     _searchCtrl.dispose();
     _entranceController.dispose();
     _clockTimer.cancel();
@@ -219,7 +351,9 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
           children: [
             _loading ? const Center(child: CircularProgressIndicator(color: Color(0xFF00D4FF))) : CustomScrollView(
               slivers: [
-            SliverToBoxAdapter(child: _buildHeader()),
+            SliverToBoxAdapter(
+              child: _buildHeader()
+            ),
             SliverToBoxAdapter(child: _buildDateTimeCard()),
             SliverToBoxAdapter(child: _buildClassOverview()),
             SliverToBoxAdapter(
@@ -407,24 +541,54 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                   ),
                 ),
               ),
-              GestureDetector(
-                onTap: () => _showNotificationsDialog(context),
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF142240),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: const Color(0xFF1E3A5F)),
-                  ),
-                  child: Center(
-                    child: CustomIconWidget(
-                      iconName: 'notifications_outlined',
-                      color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
-                      size: 22,
+              StreamBuilder<List<Map<String, dynamic>>>(
+                stream: _notifController.stream,
+                builder: (context, snapshot) {
+                  final user = context.watch<AuthService>().currentUser;
+                  final lastRead = user?.lastNotificationReadAt ?? DateTime(2000);
+                  final notifs = snapshot.data ?? [];
+                  final hasUnread = notifs.any((n) => (n['timestamp'] as DateTime).isAfter(lastRead));
+                  
+                  return GestureDetector(
+                    onTap: () {
+                      context.read<AuthService>().markNotificationsAsRead();
+                      _showNotificationsDialog(context);
+                    },
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF142240),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: const Color(0xFF1E3A5F)),
+                      ),
+                      child: Stack(
+                        children: [
+                          Center(
+                            child: CustomIconWidget(
+                              iconName: 'notifications_outlined',
+                              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                              size: 22,
+                            ),
+                          ),
+                          if (hasUnread)
+                            Positioned(
+                              top: 10,
+                              right: 10,
+                              child: Container(
+                                width: 8,
+                                height: 8,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFF00D4FF),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                }
               ),
             ],
           ),
@@ -432,7 +596,6 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
       ),
     );
   }
-
 
   String _formatNotificationTime(DateTime? dt) {
     if (dt == null) return '';
@@ -442,48 +605,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     return '${diff.inDays} days ago';
   }
 
-  Future<List<Map<String, dynamic>>> _fetchDynamicNotifications() async {
-    List<Map<String, dynamic>> notifications = [];
-    try {
-      final db = FirebaseFirestore.instance;
-      // Get 5 recent quizzes
-      final qSnap = await db.collection('quiz_attempts').orderBy('submittedAt', descending: true).limit(5).get();
-      for (var doc in qSnap.docs) {
-         final data = doc.data();
-         final studentId = data['studentId'] as String? ?? '';
-         final title = data['quizTitle'] as String? ?? '';
-         final ts = data['submittedAt'] as Timestamp?;
-         
-         // Fetch student name
-         String name = 'A student';
-         if (studentId.isNotEmpty) {
-           final sDoc = await db.collection('users').doc(studentId).get();
-           if (sDoc.exists) name = sDoc.data()?['name'] ?? name;
-         }
-
-         notifications.add({
-           'title': 'Quiz Submitted',
-           'desc': '$name submitted $title.',
-           'icon': 'assignment_turned_in',
-           'color': const Color(0xFF00D4FF),
-           'timeStr': _formatNotificationTime(ts?.toDate()),
-           'timestamp': ts?.toDate() ?? DateTime.now(),
-         });
-      }
-      
-      // Since fetching recent activities across all subcollections requires collectionGroup,
-      // we'll use collectionGroup('experiment_activity') if indexing allows, 
-      // otherwise this is a prototype so we'll just query global recent quiz attempts for now.
-      
-      // Sort by timestamp
-      notifications.sort((a, b) => (b['timestamp'] as DateTime).compareTo(a['timestamp'] as DateTime));
-      if (notifications.length > 5) notifications = notifications.sublist(0, 5);
-      
-    } catch (e) {
-      print('Error fetching notifications: $e');
-    }
-    return notifications;
-  }
+  // _fetchDynamicNotifications removed, replaced by Stream
 
 
   void _showNotificationsDialog(BuildContext context) {
@@ -508,8 +630,8 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                 ),
               ],
             ),
-            child: FutureBuilder<List<Map<String, dynamic>>>(
-              future: _fetchDynamicNotifications(),
+            child: StreamBuilder<List<Map<String, dynamic>>>(
+              stream: _notifController.stream,
               builder: (ctx, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const SizedBox(

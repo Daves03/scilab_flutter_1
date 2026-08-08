@@ -8,7 +8,17 @@ import '../../student_profile_screen/student_profile_screen.dart';
 
 class UserHeaderWidget extends StatelessWidget {
   final VoidCallback onNotificationTap;
-  const UserHeaderWidget({required this.onNotificationTap, super.key});
+  final bool hasUnreadNotifications;
+  final String? progressText;
+  final double? progressPercent;
+
+  const UserHeaderWidget({
+    required this.onNotificationTap,
+    this.hasUnreadNotifications = false,
+    this.progressText,
+    this.progressPercent,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -59,46 +69,48 @@ class UserHeaderWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Hello ${context.watch<AuthService>().currentUser?.name ?? 'Student'} 👋',
+                      'Hello ${context.watch<AuthService>().currentUser?.name ?? 'User'} 👋',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        CustomIconWidget(
-                          iconName: 'menu_book',
-                          color: const Color(0xFF00D4FF),
-                          size: 14,
-                        ),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(50),
-                            child: LinearProgressIndicator(
-                              value: 0.62,
-                              backgroundColor: const Color(0xFF1E3A5F),
-                              valueColor: const AlwaysStoppedAnimation<Color>(
-                                Color(0xFF00D4FF),
+                    if (progressText != null && progressPercent != null) ...[
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          CustomIconWidget(
+                            iconName: 'menu_book',
+                            color: const Color(0xFF00D4FF),
+                            size: 14,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(50),
+                              child: LinearProgressIndicator(
+                                value: progressPercent,
+                                backgroundColor: const Color(0xFF1E3A5F),
+                                valueColor: const AlwaysStoppedAnimation<Color>(
+                                  Color(0xFF00D4FF),
+                                ),
+                                minHeight: 6,
                               ),
-                              minHeight: 6,
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 6),
-                        const Text(
-                          '62%',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF00D4FF),
+                          const SizedBox(width: 6),
+                          Text(
+                            progressText!,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF00D4FF),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -125,18 +137,19 @@ class UserHeaderWidget extends StatelessWidget {
                           size: 22,
                         ),
                       ),
-                      Positioned(
-                        top: 10,
-                        right: 10,
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF00D4FF),
-                            shape: BoxShape.circle,
+                      if (hasUnreadNotifications)
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF00D4FF),
+                              shape: BoxShape.circle,
+                            ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                 ),

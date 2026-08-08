@@ -1,5 +1,8 @@
 import 'dart:ui';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 import '../../core/app_export.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/custom_icon_widget.dart';
 
 class _QuizResult {
@@ -7,7 +10,8 @@ class _QuizResult {
   final String date;
   final int score;
   final int total;
-  const _QuizResult(this.title, this.date, this.score, this.total);
+  final DateTime timestamp;
+  const _QuizResult(this.title, this.date, this.score, this.total, this.timestamp);
 }
 
 class _ArExperimentResult {
@@ -28,16 +32,11 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _entranceController;
 
-  final List<_QuizResult> _quizzes = const [
-    _QuizResult('Organic Chemistry Basics', 'Monday, Oct 12, 2026 at 10:30 AM', 8, 10),
-    _QuizResult('Atomic Structure', 'Monday, Oct 05, 2026 at 02:15 PM', 9, 10),
-    _QuizResult('Periodic Table', 'Monday, Sep 28, 2026 at 11:00 AM', 10, 10),
-  ];
-
-  final List<_ArExperimentResult> _arExperiments = const [
-    _ArExperimentResult('Chemical Bonding AR', 'Saturday, Oct 10, 2026 at 04:45 PM', 95.0),
-    _ArExperimentResult('Molecular Geometry', 'Friday, Oct 02, 2026 at 09:20 AM', 88.5),
-  ];
+  bool _loading = true;
+  List<_QuizResult> _quizzes = [];
+  List<_ArExperimentResult> _arExperiments = [];
+  String _avgQuiz = '0%';
+  String _avgAr = '0.0';
 
   @override
   void initState() {
@@ -46,6 +45,89 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
       vsync: this,
       duration: const Duration(milliseconds: 600),
     )..forward();
+    _loadData();
+  }
+
+  String _formatDate(DateTime dt) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final m = months[dt.month - 1];
+    final h = dt.hour == 0 ? 12 : (dt.hour > 12 ? dt.hour - 12 : dt.hour);
+    final min = dt.minute.toString().padLeft(2, '0');
+    final ampm = dt.hour >= 12 ? 'PM' : 'AM';
+    return '$m ${dt.day}, ${dt.year} at $h:$min $ampm';
+  }
+
+  Future<void> _loadData() async {
+    final user = context.read<AuthService>().currentUser;
+    if (user == null) {
+      if (mounted) setState(() => _loading = false);
+      return;
+    }
+
+    try {
+      final db = FirebaseFirestore.instance;
+      
+      // Fetch quizzes
+      final qSnap = await db.collection('quiz_attempts').where('studentId', isEqualTo: user.id).get();
+      List<_QuizResult> quizzes = [];
+      double totalScore = 0;
+      int quizCount = 0;
+
+      for (var doc in qSnap.docs) {
+         final data = doc.data();
+         final s = (data['score'] as num?)?.toInt() ?? 0;
+         final t = (data['totalQuestions'] as num?)?.toInt() ?? 1;
+         final title = data['quizTitle'] as String? ?? 'Quiz';
+         final ts = data['submittedAt'] as Timestamp?;
+         final date = ts != null ? _formatDate(ts.toDate()) : 'Unknown Date';
+         
+         // Store actual timestamp for sorting
+         final timestamp = ts?.toDate() ?? DateTime(2000);
+         quizzes.add(_QuizResult(title, date, s, t, timestamp));
+         if (t > 0) {
+           totalScore += (s / t);
+           quizCount++;
+         }
+      }
+      // Sort quizzes descending by date
+      quizzes.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+
+      final avgQ = quizCount > 0 ? (totalScore / quizCount) * 100 : 0.0;
+
+      // Fetch AR
+      final arSnap = await db.collection('users').doc(user.id).collection('experiment_activity').where('completed', isEqualTo: true).get();
+      List<_ArExperimentResult> ars = [];
+      double totalAr = 0;
+      int arCount = 0;
+
+      for (var doc in arSnap.docs) {
+         final data = doc.data();
+         final title = data['experimentId'] as String? ?? 'Experiment';
+         final ts = data['completedAt'] as Timestamp?;
+         final date = ts != null ? _formatDate(ts.toDate()) : 'Unknown Date';
+         final score = (data['score'] as num?)?.toDouble() ?? 100.0; // Mock score if missing
+         ars.add(_ArExperimentResult(title, date, score));
+         totalAr += score;
+         arCount++;
+      }
+      final avgA = arCount > 0 ? (totalAr / arCount) : 0.0;
+
+      // Sort AR by date descending if completedAt exists
+      ars.sort((a, b) => b.date.compareTo(a.date)); 
+
+      if (mounted) {
+        setState(() {
+          _quizzes = quizzes;
+          _arExperiments = ars;
+          _avgQuiz = '${avgQ.toStringAsFixed(0)}%';
+          _avgAr = avgA.toStringAsFixed(1);
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching progress: $e');
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   @override
@@ -58,7 +140,9 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: CustomScrollView(
+      body: _loading 
+        ? const Center(child: CircularProgressIndicator(color: Color(0xFF00D4FF)))
+        : CustomScrollView(
         slivers: [
           SliverToBoxAdapter(child: _buildHeader()),
           SliverToBoxAdapter(
@@ -73,30 +157,48 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
               child: _buildSectionHeader('Quiz Results', 'quiz'),
             ),
           ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) => _buildAnimatedSection(
-                delay: 200 + (index * 50),
-                child: _buildQuizCard(_quizzes[index]),
-              ),
-              childCount: _quizzes.length,
-            ),
-          ),
+          _quizzes.isEmpty
+              ? SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Center(
+                      child: Text('No quizzes completed yet.', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600)),
+                    ),
+                  ),
+                )
+              : SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => _buildAnimatedSection(
+                      delay: 200 + (index * 50),
+                      child: _buildQuizCard(_quizzes[index]),
+                    ),
+                    childCount: _quizzes.length,
+                  ),
+                ),
           SliverToBoxAdapter(
             child: _buildAnimatedSection(
               delay: 300,
               child: _buildSectionHeader('AR Experiments', 'science'),
             ),
           ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) => _buildAnimatedSection(
-                delay: 400 + (index * 50),
-                child: _buildArExperimentCard(_arExperiments[index]),
-              ),
-              childCount: _arExperiments.length,
-            ),
-          ),
+          _arExperiments.isEmpty
+              ? SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Center(
+                      child: Text('No AR experiments completed yet.', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600)),
+                    ),
+                  ),
+                )
+              : SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => _buildAnimatedSection(
+                      delay: 400 + (index * 50),
+                      child: _buildArExperimentCard(_arExperiments[index]),
+                    ),
+                    childCount: _arExperiments.length,
+                  ),
+                ),
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
       ),
@@ -213,7 +315,7 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
           Expanded(
             child: _buildStatCard(
               title: 'Avg Quiz',
-              value: '90%',
+              value: _avgQuiz,
               icon: 'quiz',
               color: const Color(0xFF00D4FF),
             ),
@@ -222,7 +324,7 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
           Expanded(
             child: _buildStatCard(
               title: 'Avg AR Score',
-              value: '91.7',
+              value: _avgAr,
               icon: 'science',
               color: const Color(0xFF7C3AED),
             ),

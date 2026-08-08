@@ -200,7 +200,37 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
   Widget _buildPhoneLayout() {
     return CustomScrollView(
       slivers: [
-        SliverToBoxAdapter(child: UserHeaderWidget(onNotificationTap: () => _showNotificationsDialog(context))),
+        SliverToBoxAdapter(
+          child: StreamBuilder<List<Map<String, dynamic>>>(
+            stream: _notificationsStream,
+            builder: (context, snapshot) {
+              final user = context.watch<AuthService>().currentUser;
+              final lastRead = user?.lastNotificationReadAt ?? DateTime(2000);
+              final notifs = snapshot.data ?? [];
+              final hasUnread = notifs.any((n) => (n['timestamp'] as DateTime).isAfter(lastRead));
+              return FutureBuilder<Map<String, dynamic>>(
+                future: _progressFuture,
+                builder: (context, progressSnapshot) {
+                  final stats = progressSnapshot.data ?? {'avgQuiz': '0%', 'labs': '0'};
+                  final avgStr = stats['avgQuiz'] as String;
+                  // Extract double from string like "85%"
+                  final doubleVal = double.tryParse(avgStr.replaceAll('%', '')) ?? 0.0;
+                  final double progressPercent = doubleVal / 100.0;
+
+                  return UserHeaderWidget(
+                    hasUnreadNotifications: hasUnread,
+                    progressText: avgStr,
+                    progressPercent: progressPercent,
+                    onNotificationTap: () {
+                      context.read<AuthService>().markNotificationsAsRead();
+                      _showNotificationsDialog(context);
+                    },
+                  );
+                },
+              );
+            }
+          )
+        ),
         SliverToBoxAdapter(child: _buildDateTimeSection()),
         SliverToBoxAdapter(
           child: _buildAnimatedSection(delay: 0, child: _buildNotificationsSection()),
@@ -219,7 +249,36 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
   Widget _buildTabletLayout() {
     return CustomScrollView(
       slivers: [
-        SliverToBoxAdapter(child: UserHeaderWidget(onNotificationTap: () => _showNotificationsDialog(context))),
+        SliverToBoxAdapter(
+          child: StreamBuilder<List<Map<String, dynamic>>>(
+            stream: _notificationsStream,
+            builder: (context, snapshot) {
+              final user = context.watch<AuthService>().currentUser;
+              final lastRead = user?.lastNotificationReadAt ?? DateTime(2000);
+              final notifs = snapshot.data ?? [];
+              final hasUnread = notifs.any((n) => (n['timestamp'] as DateTime).isAfter(lastRead));
+              return FutureBuilder<Map<String, dynamic>>(
+                future: _progressFuture,
+                builder: (context, progressSnapshot) {
+                  final stats = progressSnapshot.data ?? {'avgQuiz': '0%', 'labs': '0'};
+                  final avgStr = stats['avgQuiz'] as String;
+                  final doubleVal = double.tryParse(avgStr.replaceAll('%', '')) ?? 0.0;
+                  final double progressPercent = doubleVal / 100.0;
+
+                  return UserHeaderWidget(
+                    hasUnreadNotifications: hasUnread,
+                    progressText: avgStr,
+                    progressPercent: progressPercent,
+                    onNotificationTap: () {
+                      context.read<AuthService>().markNotificationsAsRead();
+                      _showNotificationsDialog(context);
+                    },
+                  );
+                },
+              );
+            }
+          )
+        ),
         SliverToBoxAdapter(child: _buildDateTimeSection()),
         SliverToBoxAdapter(
           child: Row(
@@ -341,7 +400,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                  'icon': 'schedule',
                  'color': const Color(0xFFFF4757),
                  'timeStr': 'Due soon',
-                 'timestamp': DateTime.now().add(const Duration(hours: 1)),
+                 'timestamp': q.dueDate!.subtract(const Duration(hours: 48)),
                  'course': course,
                });
              }
