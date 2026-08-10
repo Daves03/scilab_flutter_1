@@ -173,7 +173,7 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
                   );
                 }, childCount: filteredCourses.length),
               ),
-        const SliverToBoxAdapter(child: SizedBox(height: 100)),
+        const SliverToBoxAdapter(child: SizedBox(height: 140)),
       ],
     );
   }

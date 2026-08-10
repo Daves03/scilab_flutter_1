@@ -724,7 +724,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 120),
             ],
           ),
         ),

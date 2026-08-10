@@ -24,17 +24,51 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
   late AnimationController _entranceController;
   late Timer _timer;
   late DateTime _philippinesTime;
-  late Stream<List<Map<String, dynamic>>> _notificationsStream;
-  late Stream<Map<String, List<Map<String, dynamic>>>> _deadlinesStream;
-  late Future<Map<String, dynamic>> _progressFuture;
+  List<Map<String, dynamic>> _notifications = [];
+  Map<String, List<Map<String, dynamic>>> _deadlines = {'upcoming': [], 'missed': []};
+  Map<String, dynamic> _progressStats = {'avgQuiz': '0%', 'labs': '0'};
+  bool _isLoadingNotifications = true;
+  bool _isLoadingDeadlines = true;
+  bool _isLoadingProgress = true;
+  StreamSubscription? _notificationsSub;
+  StreamSubscription? _deadlinesSub;
   bool _hasShownDeadlinePopup = false;
 
   @override
   void initState() {
     super.initState();
-    _notificationsStream = _streamDynamicNotifications();
-    _deadlinesStream = _streamUpcomingDeadlines();
-    _progressFuture = _fetchProgressStats();
+    _notificationsSub = _streamDynamicNotifications().listen((data) {
+      if (mounted) {
+        setState(() {
+          _notifications = data;
+          _isLoadingNotifications = false;
+        });
+      }
+    }, onError: (e) {
+      if (mounted) setState(() => _isLoadingNotifications = false);
+    });
+
+    _deadlinesSub = _streamUpcomingDeadlines().listen((data) {
+      if (mounted) {
+        setState(() {
+          _deadlines = data;
+          _isLoadingDeadlines = false;
+        });
+      }
+    }, onError: (e) {
+      if (mounted) setState(() => _isLoadingDeadlines = false);
+    });
+
+    _fetchProgressStats().then((data) {
+      if (mounted) {
+        setState(() {
+          _progressStats = data;
+          _isLoadingProgress = false;
+        });
+      }
+    }).catchError((e) {
+      if (mounted) setState(() => _isLoadingProgress = false);
+    });
     _entranceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -160,6 +194,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
   void dispose() {
     _timer.cancel();
     _entranceController.dispose();
+    _notificationsSub?.cancel();
+    _deadlinesSub?.cancel();
     super.dispose();
   }
 
@@ -201,35 +237,27 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
-          child: StreamBuilder<List<Map<String, dynamic>>>(
-            stream: _notificationsStream,
-            builder: (context, snapshot) {
+          child: Builder(
+            builder: (context) {
               final user = context.watch<AuthService>().currentUser;
               final lastRead = user?.lastNotificationReadAt ?? DateTime(2000);
-              final notifs = snapshot.data ?? [];
-              final hasUnread = notifs.any((n) => (n['timestamp'] as DateTime).isAfter(lastRead));
-              return FutureBuilder<Map<String, dynamic>>(
-                future: _progressFuture,
-                builder: (context, progressSnapshot) {
-                  final stats = progressSnapshot.data ?? {'avgQuiz': '0%', 'labs': '0'};
-                  final avgStr = stats['avgQuiz'] as String;
-                  // Extract double from string like "85%"
-                  final doubleVal = double.tryParse(avgStr.replaceAll('%', '')) ?? 0.0;
-                  final double progressPercent = doubleVal / 100.0;
+              final hasUnread = _notifications.any((n) => (n['timestamp'] as DateTime).isAfter(lastRead));
+              
+              final avgStr = _progressStats['avgQuiz'] as String;
+              final doubleVal = double.tryParse(avgStr.replaceAll('%', '')) ?? 0.0;
+              final double progressPercent = doubleVal / 100.0;
 
-                  return UserHeaderWidget(
-                    hasUnreadNotifications: hasUnread,
-                    progressText: avgStr,
-                    progressPercent: progressPercent,
-                    onNotificationTap: () {
-                      context.read<AuthService>().markNotificationsAsRead();
-                      _showNotificationsDialog(context);
-                    },
-                  );
+              return UserHeaderWidget(
+                hasUnreadNotifications: hasUnread,
+                progressText: avgStr,
+                progressPercent: progressPercent,
+                onNotificationTap: () {
+                  context.read<AuthService>().markNotificationsAsRead();
+                  _showNotificationsDialog(context);
                 },
               );
-            }
-          )
+            },
+          ),
         ),
         SliverToBoxAdapter(child: _buildDateTimeSection()),
         SliverToBoxAdapter(
@@ -241,7 +269,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
         SliverToBoxAdapter(
           child: _buildAnimatedSection(delay: 200, child: _buildCalendarSection()),
         ),
-        const SliverToBoxAdapter(child: SizedBox(height: 100)),
+        const SliverToBoxAdapter(child: SizedBox(height: 140)),
       ],
     );
   }
@@ -250,34 +278,27 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
-          child: StreamBuilder<List<Map<String, dynamic>>>(
-            stream: _notificationsStream,
-            builder: (context, snapshot) {
+          child: Builder(
+            builder: (context) {
               final user = context.watch<AuthService>().currentUser;
               final lastRead = user?.lastNotificationReadAt ?? DateTime(2000);
-              final notifs = snapshot.data ?? [];
-              final hasUnread = notifs.any((n) => (n['timestamp'] as DateTime).isAfter(lastRead));
-              return FutureBuilder<Map<String, dynamic>>(
-                future: _progressFuture,
-                builder: (context, progressSnapshot) {
-                  final stats = progressSnapshot.data ?? {'avgQuiz': '0%', 'labs': '0'};
-                  final avgStr = stats['avgQuiz'] as String;
-                  final doubleVal = double.tryParse(avgStr.replaceAll('%', '')) ?? 0.0;
-                  final double progressPercent = doubleVal / 100.0;
+              final hasUnread = _notifications.any((n) => (n['timestamp'] as DateTime).isAfter(lastRead));
+              
+              final avgStr = _progressStats['avgQuiz'] as String;
+              final doubleVal = double.tryParse(avgStr.replaceAll('%', '')) ?? 0.0;
+              final double progressPercent = doubleVal / 100.0;
 
-                  return UserHeaderWidget(
-                    hasUnreadNotifications: hasUnread,
-                    progressText: avgStr,
-                    progressPercent: progressPercent,
-                    onNotificationTap: () {
-                      context.read<AuthService>().markNotificationsAsRead();
-                      _showNotificationsDialog(context);
-                    },
-                  );
+              return UserHeaderWidget(
+                hasUnreadNotifications: hasUnread,
+                progressText: avgStr,
+                progressPercent: progressPercent,
+                onNotificationTap: () {
+                  context.read<AuthService>().markNotificationsAsRead();
+                  _showNotificationsDialog(context);
                 },
               );
-            }
-          )
+            },
+          ),
         ),
         SliverToBoxAdapter(child: _buildDateTimeSection()),
         SliverToBoxAdapter(
@@ -471,17 +492,16 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                 ),
               ],
             ),
-            child: StreamBuilder<List<Map<String, dynamic>>>(
-              stream: _streamDynamicNotifications(),
-              builder: (ctx, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
+            child: Builder(
+              builder: (ctx) {
+                if (_isLoadingNotifications) {
                   return const SizedBox(
                     height: 200,
                     child: Center(child: CircularProgressIndicator()),
                   );
                 }
                 
-                final notifs = snapshot.data ?? [];
+                final notifs = _notifications;
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -679,13 +699,12 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
             ),
           ),
           const SizedBox(height: 12),
-          StreamBuilder<List<Map<String, dynamic>>>(
-            stream: _notificationsStream,
-            builder: (ctx, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
+          Builder(
+            builder: (ctx) {
+              if (_isLoadingNotifications) {
                 return const Center(child: CircularProgressIndicator());
               }
-              final notifs = snapshot.data ?? [];
+              final notifs = _notifications;
               if (notifs.isEmpty) {
                  return const Padding(
                     padding: EdgeInsets.symmetric(vertical: 20),
@@ -806,13 +825,12 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
             ),
           ),
           const SizedBox(height: 12),
-          FutureBuilder<Map<String, dynamic>>(
-            future: _progressFuture,
-            builder: (ctx, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
+          Builder(
+            builder: (ctx) {
+              if (_isLoadingProgress) {
                 return const Center(child: CircularProgressIndicator());
               }
-              final stats = snapshot.data ?? {'avgQuiz': '0%', 'labs': '0'};
+              final stats = _progressStats;
               return Row(
                 children: [
                   Expanded(child: _buildSummaryCard('Avg Quiz Score', stats['avgQuiz'] as String, 'quiz', const Color(0xFF00D4FF))),
@@ -892,13 +910,12 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
             ],
           ),
           const SizedBox(height: 12),
-          StreamBuilder<Map<String, List<Map<String, dynamic>>>>(
-            stream: _deadlinesStream,
-            builder: (ctx, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
+          Builder(
+            builder: (ctx) {
+              if (_isLoadingDeadlines) {
                 return const Center(child: CircularProgressIndicator());
               }
-              final data = snapshot.data ?? {'upcoming': [], 'missed': []};
+              final data = _deadlines;
               final upcoming = data['upcoming'] as List<Map<String, dynamic>>;
               final missed = data['missed'] as List<Map<String, dynamic>>;
               

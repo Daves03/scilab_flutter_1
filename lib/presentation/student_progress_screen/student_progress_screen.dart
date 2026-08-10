@@ -199,7 +199,7 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
                     childCount: _arExperiments.length,
                   ),
                 ),
-          const SliverToBoxAdapter(child: SizedBox(height: 100)),
+          const SliverToBoxAdapter(child: SizedBox(height: 140)),
         ],
       ),
     );

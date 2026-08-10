@@ -99,7 +99,7 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
                   ),
             if (_selectedCourse == null)
               Positioned(
-                bottom: 116,
+                bottom: 124,
                 right: 20,
                 child: FloatingActionButton(
                   onPressed: _openCrudPanel,
@@ -217,7 +217,7 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
             );
           }, childCount: courses.length),
         ),
-        const SliverToBoxAdapter(child: SizedBox(height: 100)),
+        const SliverToBoxAdapter(child: SizedBox(height: 140)),
       ],
     );
   }

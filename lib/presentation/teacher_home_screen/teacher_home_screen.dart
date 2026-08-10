@@ -406,11 +406,11 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                       );
                     }, childCount: filteredStudents.length),
                   ),
-            const SliverToBoxAdapter(child: SizedBox(height: 100)),
+            const SliverToBoxAdapter(child: SizedBox(height: 140)),
           ],
         ),
             Positioned(
-              bottom: 116,
+              bottom: 124,
               right: 20,
               child: FloatingActionButton(
                 onPressed: () async {
