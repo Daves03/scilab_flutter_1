@@ -17,6 +17,13 @@ const List<Map<String, dynamic>> _experimentMaps = [
         'Qualitative Analysis',
         'Carbonates',
       ],
+      'requiredMaterials': [
+        'Limewater (calcium hydroxide) solution',
+        'Test tubes or flasks',
+        'Delivery tube with stopper',
+        'Source of CO₂ (e.g., dilute acid and carbonate salt)',
+        'Safety goggles',
+      ],
       'thumbnailUrl':
           'https://img.rocket.new/generatedImages/rocket_gen_img_159a809cd-1767041982810.png',
       'iconName': 'bubble_chart',
@@ -39,6 +46,13 @@ const List<Map<String, dynamic>> _experimentMaps = [
         'Qualitative Analysis',
         'Solubility Rules',
         'Silver Compounds',
+      ],
+      'requiredMaterials': [
+        'Silver nitrate solution (AgNO₃, 0.1 M)',
+        'Test tubes and rack',
+        'Droppers or pipettes',
+        'Solutions containing Cl⁻, Br⁻, and I⁻ ions',
+        'Dilute nitric acid (HNO₃)',
       ],
       'thumbnailUrl':
           'https://img.rocket.new/generatedImages/rocket_gen_img_173eec5f9-1784971684687.png',
@@ -63,6 +77,13 @@ const List<Map<String, dynamic>> _experimentMaps = [
         'Free Ions',
         'Metallic Bonding',
       ],
+      'requiredMaterials': [
+        'Conductivity apparatus (battery, wires, light bulb/LED, electrodes)',
+        'Small beakers',
+        'Distilled water',
+        'Various test substances (NaCl, sugar, tap water)',
+        'Stirring rods',
+      ],
       'thumbnailUrl':
           'https://img.rocket.new/generatedImages/rocket_gen_img_14f381e2d-1784971685298.png',
       'iconName': 'bolt',
@@ -85,6 +106,13 @@ const List<Map<String, dynamic>> _experimentMaps = [
         'Closed Systems',
         'Antoine Lavoisier',
         'Mole Concept',
+      ],
+      'requiredMaterials': [
+        'Electronic balance (sensitive to 0.01g)',
+        'Erlenmeyer flask',
+        'Balloon or tight-fitting stopper',
+        'Baking soda (Sodium bicarbonate)',
+        'Vinegar (Dilute acetic acid)',
       ],
       'thumbnailUrl':
           'https://images.pexels.com/photos/3735747/pexels-photo-3735747.jpeg',
@@ -109,6 +137,13 @@ const List<Map<String, dynamic>> _experimentMaps = [
         'Indicators',
         'Hydrogen Ion Concentration',
       ],
+      'requiredMaterials': [
+        'Universal indicator solution or red cabbage juice',
+        'Test tubes or spotting plate',
+        'Droppers',
+        'Various test liquids (lemon juice, vinegar, soapy water, etc.)',
+        'pH color chart',
+      ],
       'thumbnailUrl':
           'https://img.rocket.new/generatedImages/rocket_gen_img_1d0d8b59b-1772367719711.png',
       'iconName': 'colorize',
@@ -132,6 +167,14 @@ const List<Map<String, dynamic>> _experimentMaps = [
         'Hydrogen Peroxide',
         'Oxygen Gas',
       ],
+      'requiredMaterials': [
+        'Hydrogen peroxide (3% or 6%)',
+        'Liquid dish soap',
+        'Food coloring',
+        'Dry yeast dissolved in warm water (or KI solution)',
+        'Graduated cylinder or empty plastic bottle',
+        'Safety tray or tarp (to catch foam)',
+      ],
       'thumbnailUrl':
           'https://img.rocket.new/generatedImages/rocket_gen_img_1ee613807-1784971685914.png',
       'iconName': 'waves',
@@ -154,6 +197,13 @@ const List<Map<String, dynamic>> _experimentMaps = [
         'Photon Emission',
         'Metal Ion Identification',
         'Spectroscopy',
+      ],
+      'requiredMaterials': [
+        'Bunsen burner',
+        'Nichrome wire loops or wooden splints soaked in water',
+        'Dilute hydrochloric acid (for cleaning wire)',
+        'Metal salt solutions (LiCl, NaCl, KCl, CuCl₂, BaCl₂)',
+        'Safety goggles',
       ],
       'thumbnailUrl':
           'https://img.rocket.new/generatedImages/rocket_gen_img_1817773a0-1784320962469.png',

@@ -125,6 +125,22 @@ class CourseQuiz {
 
   int get totalQuestions => questions.length;
 
+  static const _months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+
+  String get dueDateLabel {
+    if (dueDate == null) return '';
+    final d = dueDate!;
+    int hour = d.hour;
+    final ampm = hour >= 12 ? 'PM' : 'AM';
+    if (hour == 0) hour = 12;
+    if (hour > 12) hour -= 12;
+    final min = d.minute.toString().padLeft(2, '0');
+    return '${_months[d.month - 1]} ${d.day}, ${d.year} at $hour:$min $ampm';
+  }
+
   factory CourseQuiz.fromMap(Map<String, dynamic> data) {
     final ts = data['createdAt'];
     return CourseQuiz(

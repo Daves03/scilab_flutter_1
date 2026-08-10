@@ -6,7 +6,7 @@ import 'package:uuid/uuid.dart';
 
 class AiQuizGeneratorService {
   // TODO: Replace with your actual Gemini API Key from Google AI Studio
-  static const String _apiKey = 'AI API';
+  static const String _apiKey = 'ai api here';
 
   Future<List<CourseQuiz>?> generateQuizzesFromPdf(Uint8List pdfBytes, String moduleTitle, {int numQuizzes = 1, int numQuestions = 5}) async {
     if (_apiKey == 'YOUR_GEMINI_API_KEY' || _apiKey.isEmpty) {

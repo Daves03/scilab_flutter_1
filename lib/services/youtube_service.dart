@@ -26,7 +26,7 @@ class YoutubeVideo {
 
 class YoutubeService {
   // TODO: Replace with your actual YouTube Data API v3 Key
-  static const String _apiKey = 'YT API';
+  static const String _apiKey = 'yt api here';
   static const String _baseUrl = 'https://www.googleapis.com/youtube/v3/search';
 
   Future<List<YoutubeVideo>> searchVideos(String query, {int maxResults = 3}) async {

@@ -168,48 +168,7 @@ class _ArExperimentDetailWidgetState extends State<ArExperimentDetailWidget>
                         ],
                       ),
                     ),
-                    if (widget.isTeacher)
-                      GestureDetector(
-                        onTap: () {
-                          if (widget.onToggleLock != null) {
-                            widget.onToggleLock!(!widget.isLocked);
-                          }
-                        },
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          margin: const EdgeInsets.only(right: 8),
-                          decoration: BoxDecoration(
-                            color: widget.isLocked ? const Color(0xFFFF4757).withAlpha(30) : const Color(0xFF00FF88).withAlpha(30),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: widget.isLocked ? const Color(0xFFFF4757).withAlpha(80) : const Color(0xFF00FF88).withAlpha(80)),
-                          ),
-                          child: Center(
-                            child: CustomIconWidget(
-                              iconName: widget.isLocked ? 'lock' : 'lock_open',
-                              color: widget.isLocked ? const Color(0xFFFF4757) : const Color(0xFF00FF88),
-                              size: 18,
-                            ),
-                          ),
-                        ),
-                      )
-                    else if (widget.isLocked)
-                      Container(
-                        width: 36,
-                        height: 36,
-                        margin: const EdgeInsets.only(right: 8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFF4757).withAlpha(30),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: CustomIconWidget(
-                            iconName: 'lock',
-                            color: Color(0xFFFF4757),
-                            size: 18,
-                          ),
-                        ),
-                      ),
+
                     GestureDetector(
                       onTap: _close,
                       child: Container(

@@ -49,6 +49,7 @@ class _TeacherArAndVideoLessonScreenState
   @override
   void initState() {
     super.initState();
+    _loadLockStates();
     _entranceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -60,10 +61,22 @@ class _TeacherArAndVideoLessonScreenState
   Future<void> _loadLockStates() async {
     final prefs = await SharedPreferences.getInstance();
     final states = <String, bool>{};
-    // _experiments has been removed. Lock states can be fetched separately if needed.
+    for (final key in prefs.getKeys()) {
+      if (key.startsWith('locked_ar_')) {
+        states[key.replaceFirst('locked_ar_', '')] = prefs.getBool(key) ?? false;
+      }
+    }
     if (mounted) {
       setState(() => _lockedStates = states);
     }
+  }
+
+  Future<void> _toggleLockState(String experimentId, bool locked) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('locked_ar_$experimentId', locked);
+    setState(() {
+      _lockedStates[experimentId] = locked;
+    });
   }
 
   @override
@@ -114,7 +127,7 @@ class _TeacherArAndVideoLessonScreenState
                       if (_selectedExperiment != null)
                         ArExperimentDetailWidget(
                           experiment: _selectedExperiment!,
-                          isLocked: false,
+                          isLocked: _lockedStates[_selectedExperiment!.id] ?? false,
                           isTeacher: true,
                           onClose: _onCloseDetail,
                           onRunAR: () => _onRunAR(_selectedExperiment!),
@@ -177,6 +190,7 @@ class _TeacherArAndVideoLessonScreenState
                   experiment: exp,
                   isLocked: _lockedStates[exp.id] ?? false,
                   isTeacher: true,
+                  onToggleLock: (locked) => _toggleLockState(exp.id, locked),
                   onTap: () => _onExperimentTap(exp),
                   onRun: () => _onRunAR(exp),
                 ),
@@ -209,7 +223,7 @@ class _TeacherArAndVideoLessonScreenState
               ),
               child: ArExperimentDetailWidget(
                 experiment: _selectedExperiment!,
-                isLocked: false,
+                isLocked: _lockedStates[_selectedExperiment!.id] ?? false,
                 isTeacher: true,
                 onClose: _onCloseDetail,
                 onRunAR: () => _onRunAR(_selectedExperiment!),
@@ -251,14 +265,14 @@ class _TeacherArAndVideoLessonScreenState
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0D2E3F) : const Color(0xFFE8F9FD),
+              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0D3F2E) : const Color(0xFFE8FDF3),
               borderRadius: BorderRadius.circular(12.0),
-              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x3300D4FF) : const Color(0xFF00D4FF).withOpacity(0.3), width: 1),
+              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x3300FF88) : const Color(0xFF00FF88).withOpacity(0.3), width: 1),
             ),
             child: const Center(
               child: CustomIconWidget(
                 iconName: 'view_in_ar',
-                color: Color(0xFF00D4FF),
+                color: Color(0xFF00FF88),
                 size: 20,
               ),
             ),
@@ -276,9 +290,9 @@ class _TeacherArAndVideoLessonScreenState
                     color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
                   ),
                 ),
-                Text(
-                  'Student Dashboard',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF00D4FF)),
+                const Text(
+                  'Teacher Dashboard',
+                  style: TextStyle(fontSize: 12, color: Color(0xFF00FF88)),
                 ),
               ],
             ),
@@ -286,25 +300,25 @@ class _TeacherArAndVideoLessonScreenState
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: const Color(0x2200D4FF),
+              color: const Color(0x2200FF88),
               borderRadius: BorderRadius.circular(50.0),
-              border: Border.all(color: const Color(0x5500D4FF), width: 1),
+              border: Border.all(color: const Color(0x5500FF88), width: 1),
             ),
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 CustomIconWidget(
-                  iconName: 'school',
-                  color: Color(0xFF00D4FF),
+                  iconName: 'verified',
+                  color: Color(0xFF00FF88),
                   size: 13,
                 ),
                 SizedBox(width: 4),
                 Text(
-                  'Student',
+                  'Teacher',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF00D4FF),
+                    color: Color(0xFF00FF88),
                   ),
                 ),
               ],

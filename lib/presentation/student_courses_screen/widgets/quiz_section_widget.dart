@@ -584,7 +584,7 @@ class _QuizCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${quiz.totalQuestions} questions',
+                      '${quiz.totalQuestions} questions${quiz.dueDate != null ? (isMissed ? ' • Missed: ${quiz.dueDateLabel}' : ' • Due: ${quiz.dueDateLabel}') : ' • No Due Date'}',
                       style: TextStyle(
                         fontSize: 12,
                         color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
