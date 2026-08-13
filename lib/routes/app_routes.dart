@@ -20,6 +20,7 @@ import '../presentation/teacher_profile_screen/teacher_profile_screen.dart';
 import '../presentation/student_profile_screen/student_profile_screen.dart';
 import '../presentation/unity_ar_screen/unity_ar_screen.dart';
 import '../widgets/app_scaffold.dart';
+import '../presentation/terms_screen/terms_screen.dart';
 
 class AppRoutes {
   static const String initial = '/';
@@ -40,6 +41,7 @@ class AppRoutes {
   static const String teacherProgressScreen = '/teacher-progress-screen';
   static const String studentProgressScreen = '/student-progress-screen';
   static const String unityArScreen = '/unity-ar';
+  static const String termsScreen = '/terms-and-conditions';
 
   static GoRouter get router => appRouter;
 }
@@ -63,10 +65,15 @@ final GoRouter appRouter = GoRouter(
       return _publicRoutes.contains(path) ? null : AppRoutes.overviewScreen;
     }
 
+    if (auth.currentUser?.role == null) {
+      return path == AppRoutes.googleCompleteProfileScreen ? null : AppRoutes.googleCompleteProfileScreen;
+    }
+
+    if (auth.currentUser?.hasAcceptedTerms != true) {
+      return path == AppRoutes.termsScreen ? null : AppRoutes.termsScreen;
+    }
+
     if (!auth.isApproved) {
-      if (auth.currentUser?.role == null) {
-        return path == AppRoutes.googleCompleteProfileScreen ? null : AppRoutes.googleCompleteProfileScreen;
-      }
       return path == AppRoutes.pendingApprovalScreen ? null : AppRoutes.pendingApprovalScreen;
     }
 
@@ -74,7 +81,7 @@ final GoRouter appRouter = GoRouter(
 
     // Fully approved: bounce away from the pre-auth screens into the
     // right role's home.
-    if (_publicRoutes.contains(path)) {
+    if (_publicRoutes.contains(path) || path == AppRoutes.termsScreen) {
       return isTeacher ? AppRoutes.teacherHomeScreen : AppRoutes.studentHomeScreen;
     }
 
@@ -154,6 +161,23 @@ final GoRouter appRouter = GoRouter(
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
         child: const GoogleCompleteProfileScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+            ),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 280),
+      ),
+    ),
+    GoRoute(
+      path: AppRoutes.termsScreen,
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: const TermsScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(
             opacity: CurvedAnimation(

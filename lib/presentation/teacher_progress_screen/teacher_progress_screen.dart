@@ -566,106 +566,214 @@ class _QuizResultsTab extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, i) {
         final student = students[i];
-        return Container(
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: borderColor),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Student header
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0x2200D4FF) : const Color(0xFF00D4FF).withOpacity(0.1),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: isDark ? const Color(0x5500D4FF) : const Color(0xFF00D4FF).withOpacity(0.3)),
-                      ),
-                      child: Center(
-                        child: Text(
-                          student.name.isNotEmpty ? student.name[0] : '?',
-                          style: const TextStyle(
-                            color: Color(0xFF00D4FF),
-                            fontWeight: FontWeight.w700,
-                            fontSize: 15,
+        final displayedQuizzes = student.quizResults.take(3).toList();
+        final hasMore = student.quizResults.length > 3;
+
+        return GestureDetector(
+          onTap: () => _showQuizDialog(context, student),
+          child: Container(
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: borderColor),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Student header
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0x2200D4FF) : const Color(0xFF00D4FF).withOpacity(0.1),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: isDark ? const Color(0x5500D4FF) : const Color(0xFF00D4FF).withOpacity(0.3)),
+                        ),
+                        child: Center(
+                          child: Text(
+                            student.name.isNotEmpty ? student.name[0] : '?',
+                            style: const TextStyle(
+                              color: Color(0xFF00D4FF),
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            student.name,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              student.name,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
+                            Text(
+                              student.section,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: subTextColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0x22FFB800) : const Color(0xFFFFB800).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: isDark ? const Color(0x55FFB800) : const Color(0xFFFFB800).withOpacity(0.3)),
+                        ),
+                        child: Text(
+                          '${student.quizResults.length} Quiz${student.quizResults.length != 1 ? 'zes' : ''}',
+                          style: const TextStyle(
+                            color: Color(0xFFFFB800),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showQuizDialog(BuildContext context, StudentProgress student) {
+    if (student.quizResults.isEmpty) return;
+    showDialog(
+      context: context,
+      builder: (context) {
+        final scrollController = ScrollController();
+        int currentPage = 0;
+        const int itemsPerPage = 6;
+        final totalItems = student.quizResults.length;
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            final startIndex = currentPage * itemsPerPage;
+            final endIndex = (startIndex + itemsPerPage < totalItems) ? startIndex + itemsPerPage : totalItems;
+            final currentItems = student.quizResults.sublist(startIndex, endIndex);
+
+            return Dialog(
+              backgroundColor: cardColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: borderColor),
+              ),
+              insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '${student.name}\'s Quizzes',
+                            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                             overflow: TextOverflow.ellipsis,
                           ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.close, color: subTextColor),
+                          onPressed: () => Navigator.pop(context),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(height: 1, color: borderColor),
+                  Flexible(
+                    child: RawScrollbar(
+                      controller: scrollController,
+                      thumbColor: Colors.white.withOpacity(0.8),
+                      radius: const Radius.circular(4),
+                      thickness: 4,
+                      thumbVisibility: true,
+                      child: ListView.separated(
+                        controller: scrollController,
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.all(16),
+                        itemCount: currentItems.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          return _QuizResultRow(
+                            quiz: currentItems[index],
+                            subTextColor: subTextColor,
+                            scoreColor: scoreColor,
+                            isDark: isDark,
+                            theme: theme,
+                            borderColor: borderColor,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  if (totalItems > itemsPerPage) ...[
+                    Divider(height: 1, color: borderColor),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Visibility(
+                            visible: currentPage > 0,
+                            maintainSize: true,
+                            maintainAnimation: true,
+                            maintainState: true,
+                            child: TextButton(
+                              onPressed: () => setState(() {
+                                currentPage--;
+                                scrollController.jumpTo(0);
+                              }),
+                              child: Text('Previous', style: TextStyle(color: subTextColor)),
+                            ),
+                          ),
                           Text(
-                            student.section,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: subTextColor,
+                            'Page ${currentPage + 1} of ${(totalItems / itemsPerPage).ceil()}',
+                            style: TextStyle(color: subTextColor, fontSize: 12),
+                          ),
+                          Visibility(
+                            visible: endIndex < totalItems,
+                            maintainSize: true,
+                            maintainAnimation: true,
+                            maintainState: true,
+                            child: TextButton(
+                              onPressed: () => setState(() {
+                                currentPage++;
+                                scrollController.jumpTo(0);
+                              }),
+                              child: Text('Next', style: TextStyle(color: isDark ? const Color(0xFF00FF88) : Colors.green)),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0x22FFB800) : const Color(0xFFFFB800).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: isDark ? const Color(0x55FFB800) : const Color(0xFFFFB800).withOpacity(0.3)),
-                      ),
-                      child: Text(
-                        '${student.quizResults.length} Quiz${student.quizResults.length != 1 ? 'zes' : ''}',
-                        style: const TextStyle(
-                          color: Color(0xFFFFB800),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
                   ],
-                ),
+                ],
               ),
-              Divider(height: 1, color: borderColor),
-              if (student.quizResults.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Text(
-                    'No quiz results yet.',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: subTextColor,
-                    ),
-                  ),
-                )
-              else
-                ...student.quizResults.map(
-                  (q) => _QuizResultRow(
-                    quiz: q,
-                    subTextColor: subTextColor,
-                    scoreColor: scoreColor,
-                    isDark: isDark,
-                    theme: theme,
-                    borderColor: borderColor,
-                  ),
-                ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -808,107 +916,215 @@ class _ArLabTab extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, i) {
         final student = students[i];
-        return Container(
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: borderColor),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Student header
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0x2200FF88) : const Color(0xFF00FF88).withOpacity(0.1),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: isDark ? const Color(0x5500FF88) : const Color(0xFF00FF88).withOpacity(0.3)),
-                      ),
-                      child: Center(
-                        child: Text(
-                          student.name.isNotEmpty ? student.name[0] : '?',
-                          style: const TextStyle(
-                            color: Color(0xFF00FF88),
-                            fontWeight: FontWeight.w700,
-                            fontSize: 15,
+        final displayedRecords = student.arLabRecords.take(3).toList();
+        final hasMore = student.arLabRecords.length > 3;
+
+        return GestureDetector(
+          onTap: () => _showArLabDialog(context, student),
+          child: Container(
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: borderColor),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Student header
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0x2200FF88) : const Color(0xFF00FF88).withOpacity(0.1),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: isDark ? const Color(0x5500FF88) : const Color(0xFF00FF88).withOpacity(0.3)),
+                        ),
+                        child: Center(
+                          child: Text(
+                            student.name.isNotEmpty ? student.name[0] : '?',
+                            style: const TextStyle(
+                              color: Color(0xFF00FF88),
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            student.name,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              student.name,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
+                            Text(
+                              student.section,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: subTextColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0x2200FF88) : const Color(0xFF00FF88).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: isDark ? const Color(0x5500FF88) : const Color(0xFF00FF88).withOpacity(0.3)),
+                        ),
+                        child: Text(
+                          '${student.arLabRecords.length} Experiment${student.arLabRecords.length != 1 ? 's' : ''}',
+                          style: const TextStyle(
+                            color: Color(0xFF00FF88),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showArLabDialog(BuildContext context, StudentProgress student) {
+    if (student.arLabRecords.isEmpty) return;
+    showDialog(
+      context: context,
+      builder: (context) {
+        final scrollController = ScrollController();
+        int currentPage = 0;
+        const int itemsPerPage = 6;
+        final totalItems = student.arLabRecords.length;
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            final startIndex = currentPage * itemsPerPage;
+            final endIndex = (startIndex + itemsPerPage < totalItems) ? startIndex + itemsPerPage : totalItems;
+            final currentItems = student.arLabRecords.sublist(startIndex, endIndex);
+
+            return Dialog(
+              backgroundColor: cardColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: borderColor),
+              ),
+              insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '${student.name}\'s Records',
+                            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                             overflow: TextOverflow.ellipsis,
                           ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.close, color: subTextColor),
+                          onPressed: () => Navigator.pop(context),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(height: 1, color: borderColor),
+                  Flexible(
+                    child: RawScrollbar(
+                      controller: scrollController,
+                      thumbColor: Colors.white.withOpacity(0.8),
+                      radius: const Radius.circular(4),
+                      thickness: 4,
+                      thumbVisibility: true,
+                      child: ListView.separated(
+                        controller: scrollController,
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.all(16),
+                        itemCount: currentItems.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          return _ArLabRecordRow(
+                            record: currentItems[index],
+                            subTextColor: subTextColor,
+                            scoreColor: scoreColor,
+                            scoreLabel: scoreLabel,
+                            isDark: isDark,
+                            theme: theme,
+                            borderColor: borderColor,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  if (totalItems > itemsPerPage) ...[
+                    Divider(height: 1, color: borderColor),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Visibility(
+                            visible: currentPage > 0,
+                            maintainSize: true,
+                            maintainAnimation: true,
+                            maintainState: true,
+                            child: TextButton(
+                              onPressed: () => setState(() {
+                                currentPage--;
+                                scrollController.jumpTo(0);
+                              }),
+                              child: Text('Previous', style: TextStyle(color: subTextColor)),
+                            ),
+                          ),
                           Text(
-                            student.section,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: subTextColor,
+                            'Page ${currentPage + 1} of ${(totalItems / itemsPerPage).ceil()}',
+                            style: TextStyle(color: subTextColor, fontSize: 12),
+                          ),
+                          Visibility(
+                            visible: endIndex < totalItems,
+                            maintainSize: true,
+                            maintainAnimation: true,
+                            maintainState: true,
+                            child: TextButton(
+                              onPressed: () => setState(() {
+                                currentPage++;
+                                scrollController.jumpTo(0);
+                              }),
+                              child: Text('Next', style: TextStyle(color: isDark ? const Color(0xFF00FF88) : Colors.green)),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0x2200FF88) : const Color(0xFF00FF88).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: isDark ? const Color(0x5500FF88) : const Color(0xFF00FF88).withOpacity(0.3)),
-                      ),
-                      child: Text(
-                        '${student.arLabRecords.length} Experiment${student.arLabRecords.length != 1 ? 's' : ''}',
-                        style: const TextStyle(
-                          color: Color(0xFF00FF88),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
                   ],
-                ),
+                ],
               ),
-              Divider(height: 1, color: borderColor),
-              if (student.arLabRecords.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Text(
-                    'No AR lab records yet.',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: subTextColor,
-                    ),
-                  ),
-                )
-              else
-                ...student.arLabRecords.map(
-                  (r) => _ArLabRecordRow(
-                    record: r,
-                    subTextColor: subTextColor,
-                    scoreColor: scoreColor,
-                    scoreLabel: scoreLabel,
-                    isDark: isDark,
-                    theme: theme,
-                    borderColor: borderColor,
-                  ),
-                ),
-            ],
-          ),
+            );
+          },
         );
       },
     );

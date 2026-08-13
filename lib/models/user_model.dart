@@ -72,6 +72,7 @@ class AppUser {
   VerificationStatus status;
   List<String> sections; // teacher's class sections, e.g. ['9-Rizal', '10-Luna']
   DateTime? lastNotificationReadAt;
+  bool hasAcceptedTerms;
 
   AppUser({
     required this.id,
@@ -81,6 +82,7 @@ class AppUser {
     this.status = VerificationStatus.pending,
     this.sections = const [],
     this.lastNotificationReadAt,
+    this.hasAcceptedTerms = false,
   });
 
   /// Only Teacher accounts require admin sign-off.
@@ -99,6 +101,7 @@ class AppUser {
       status: VerificationStatusX.fromId(data['status'] as String?),
       sections: List<String>.from(data['sections'] ?? const []),
       lastNotificationReadAt: ts is Timestamp ? ts.toDate() : null,
+      hasAcceptedTerms: data['hasAcceptedTerms'] as bool? ?? false,
     );
   }
 
@@ -109,5 +112,6 @@ class AppUser {
         'status': status.id,
         'sections': sections,
         'lastNotificationReadAt': lastNotificationReadAt != null ? Timestamp.fromDate(lastNotificationReadAt!) : null,
+        'hasAcceptedTerms': hasAcceptedTerms,
       };
 }

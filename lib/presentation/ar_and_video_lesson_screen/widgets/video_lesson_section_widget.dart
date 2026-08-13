@@ -42,9 +42,14 @@ class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
   }
 
   Future<void> _fetchYoutubeVideos() async {
+    if (mounted && !_isLoading) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
     try {
       final youtubeService = YoutubeService();
-      final videos = await youtubeService.searchVideos('Chemistry experiments', maxResults: 4);
+      final videos = await youtubeService.searchVideos('Chemistry video lessons', maxResults: 4);
       
       if (mounted) {
         setState(() {
@@ -95,26 +100,79 @@ class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text(
-                'Video Lessons',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                  letterSpacing: 0.5,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Video Lessons',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      letterSpacing: 0.5,
+                      shadows: [
+                        Shadow(
+                          color: Color(0x6600D4FF),
+                          blurRadius: 10,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E3A5F).withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: const Color(0xFF00D4FF).withOpacity(0.3),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.play_circle_fill,
+                          color: Color(0xFFFF0000),
+                          size: 14,
+                        ),
+                        const SizedBox(width: 6),
+                        const Text(
+                          'Suggested on YouTube',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF8BA3C0),
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 6),
-              const Text(
-                'Suggested on YouTube',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                  letterSpacing: 0.2,
+              GestureDetector(
+                onTap: _fetchYoutubeVideos,
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0F1E35),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: const Color(0xFF1E3A5F),
+                      width: 1,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.refresh,
+                    color: Color(0xFF00D4FF),
+                    size: 20,
+                  ),
                 ),
               ),
             ],

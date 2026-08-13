@@ -225,6 +225,23 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  Future<void> acceptTerms() async {
+    if (currentUser == null) return;
+    loading = true;
+    notifyListeners();
+    try {
+      await _db.collection('users').doc(currentUser!.id).update({
+        'hasAcceptedTerms': true,
+      });
+      currentUser!.hasAcceptedTerms = true;
+    } catch (e) {
+      debugPrint('Error accepting terms: $e');
+    } finally {
+      loading = false;
+      notifyListeners();
+    }
+  }
+
   /// For the edge case where role is still null (e.g. first-time Google
   /// sign-in, which doesn't go through the register form) — admin sets
   /// both at once.

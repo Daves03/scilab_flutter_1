@@ -539,97 +539,162 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                     showDialog(
                       context: context,
                       builder: (BuildContext dialogContext) {
+                        final scrollController = ScrollController();
                         return AlertDialog(
                           backgroundColor: isDark ? const Color(0xFF142240) : Colors.white,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          title: Text(
-                            'About App & Developer',
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: isDark ? Colors.white : Colors.black87,
-                            ),
-                          ),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Row(
-                                children: [
-                                  Image.asset(
-                                    'assets/images/scilab_logo-1784970842098.png',
-                                    width: 56,
-                                    height: 56,
+                              Expanded(
+                                child: Text(
+                                  'About App & Developer',
+                                  style: theme.textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: isDark ? Colors.white : Colors.black87,
                                   ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    'Scilab AR',
-                                    style: theme.textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.w700,
-                                      color: isDark ? Colors.white : Colors.black87,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'Version 1.0',
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
-                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              const SizedBox(height: 12),
-                              Text(
-                                'Designed and developed exclusively for Las Piñas National High School - Main',
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
-                                  height: 1.4,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                'Technical Credits: Built by Scilab AR Team',
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Image.asset(
-                                'assets/images/unity_logo.png',
-                                height: 40,
-                                color: isDark ? Colors.grey.shade300 : Colors.grey.shade800,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Core Technology AR: Powered by Unity Game Engine',
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                'Contact us : scilabar@gmail.com',
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: isDark ? const Color(0xFF00D4FF) : Colors.blue,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                              IconButton(
+                                icon: Icon(Icons.close, color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
+                                onPressed: () => Navigator.of(dialogContext).pop(),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
                               ),
                             ],
                           ),
-                          actions: [
-                            ElevatedButton(
-                              onPressed: () => Navigator.of(dialogContext).pop(),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF00D4FF),
-                                foregroundColor: const Color(0xFF0A1628),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                          content: SizedBox(
+                            width: double.maxFinite,
+                            height: MediaQuery.of(context).size.height * 0.55,
+                            child: RawScrollbar(
+                              controller: scrollController,
+                              thumbColor: Colors.white.withOpacity(0.8),
+                              radius: const Radius.circular(4),
+                              thickness: 4,
+                              thumbVisibility: true,
+                              child: SingleChildScrollView(
+                                controller: scrollController,
+                                padding: const EdgeInsets.only(right: 12.0),
+                                child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/scilab_logo-1784970842098.png',
+                                      width: 56,
+                                      height: 56,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Scilab AR',
+                                      style: theme.textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                        color: isDark ? Colors.white : Colors.black87,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              child: const Text('Close', style: TextStyle(fontWeight: FontWeight.w600)),
+                                const SizedBox(height: 20),
+                                Text(
+                                  'THE APP',
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    color: isDark ? Colors.white : Colors.black87,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'SciLab AR is an Augmented Reality (AR) mobile application designed to make chemistry education accessible, safe, and interactive. We believe that financial constraints or lack of laboratory equipment should never hinder a student\'s curiosity.',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
+                                    height: 1.4,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'OUR MISSION',
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    color: isDark ? Colors.white : Colors.black87,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'To provide a virtual laboratory where students can perform chemical experiments with chemical reactions, procedures and explanations without the risk of dangerous or physical exposure to hazardous substances.',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
+                                    height: 1.4,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'THE TEAM',
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    color: isDark ? Colors.white : Colors.black87,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Developed by a group of Computer Science students from Cavite State University Bacoor Campus, this project aims to modernize chemistry experiments education in the Philippines using cutting-edge mobile technology.',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
+                                    height: 1.4,
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                Text(
+                                  'Technical Credits: Built by Scilab AR Team',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Image.asset(
+                                  'assets/images/unity_logo.png',
+                                  height: 40,
+                                  color: isDark ? Colors.grey.shade300 : Colors.grey.shade800,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Core Technology AR: Powered by Unity Game Engine',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  'Contact us : scilabar@gmail.com',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: isDark ? const Color(0xFF00D4FF) : Colors.blue,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                Text(
+                                  'Version 1.0',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  'Designed and developed exclusively for Las Piñas National High School - Main',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
+                                    height: 1.4,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                              ],
                             ),
-                          ],
-                        );
+                          ),
+                        ),
+                      ),
+                    );
                       },
                     );
                   },
