@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// The role a user selects right after logging in.
-enum UserRole { grade9, grade10, teacher }
+enum UserRole { grade9, grade10, teacher, admin }
 
 extension UserRoleX on UserRole {
   String get label {
@@ -12,6 +12,8 @@ extension UserRoleX on UserRole {
         return 'Grade 10';
       case UserRole.teacher:
         return 'Teacher';
+      case UserRole.admin:
+        return 'Admin';
     }
   }
 
@@ -23,6 +25,8 @@ extension UserRoleX on UserRole {
         return 'G10';
       case UserRole.teacher:
         return 'Tc';
+      case UserRole.admin:
+        return 'Ad';
     }
   }
 
@@ -37,6 +41,8 @@ extension UserRoleX on UserRole {
         return UserRole.grade10;
       case 'teacher':
         return UserRole.teacher;
+      case 'admin':
+        return UserRole.admin;
       default:
         return null;
     }
@@ -90,6 +96,7 @@ class AppUser {
 
   bool get isStudent => role == UserRole.grade9 || role == UserRole.grade10;
   bool get isTeacher => role == UserRole.teacher;
+  bool get isAdmin => role == UserRole.admin;
 
   factory AppUser.fromMap(String id, Map<String, dynamic> data) {
     final ts = data['lastNotificationReadAt'];

@@ -80,6 +80,7 @@ class AuthService extends ChangeNotifier {
         sections: sections,
       );
       await _db.collection('users').doc(uid).set(newUser.toMap());
+      await cred.user?.sendEmailVerification();
     } on fb.FirebaseAuthException catch (e) {
       throw AuthFailure(_friendlyAuthError(e));
     } finally {
@@ -97,10 +98,41 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
     try {
       final cred = await _auth.signInWithEmailAndPassword(email: email, password: password);
+      
+      if (cred.user != null && !cred.user!.emailVerified) {
+        await _auth.signOut();
+        throw AuthFailure('Please verify your email first. Check your inbox.');
+      }
+
       final doc = await _db.collection('users').doc(cred.user!.uid).get();
-      return doc.data()?['role'] == 'teacher' ? 'teacher' : 'student';
+      final roleData = doc.data()?['role'];
+      
+      if (roleData == 'admin') {
+        await _auth.signOut();
+        throw AuthFailure('Admins must use the separate Admin Web Portal to log in.');
+      }
+      
+      return roleData == 'teacher' ? 'teacher' : 'student';
     } on fb.FirebaseAuthException catch (e) {
       throw AuthFailure(_friendlyAuthError(e));
+    } finally {
+      loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> resetPassword(String email) async {
+    loading = true;
+    notifyListeners();
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } on fb.FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        throw AuthFailure('No user found for that email.');
+      }
+      throw AuthFailure('Failed to send reset email: ${e.message}');
+    } catch (e) {
+      throw AuthFailure('An unexpected error occurred.');
     } finally {
       loading = false;
       notifyListeners();
@@ -143,7 +175,12 @@ class AuthService extends ChangeNotifier {
         }
         final data = doc.data();
         if (data != null) {
-          userRoleStr = data['role'] == 'teacher' ? 'teacher' : 'student';
+          final roleData = data['role'];
+          if (roleData == 'admin') {
+            userRoleStr = 'admin';
+          } else {
+            userRoleStr = roleData == 'teacher' ? 'teacher' : 'student';
+          }
         } else {
           userRoleStr = 'student';
         }

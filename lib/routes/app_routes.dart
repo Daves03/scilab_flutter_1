@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb;
 
 import '../models/user_model.dart';
 import '../models/course_model.dart';
@@ -21,7 +22,7 @@ import '../presentation/student_profile_screen/student_profile_screen.dart';
 import '../presentation/unity_ar_screen/unity_ar_screen.dart';
 import '../widgets/app_scaffold.dart';
 import '../presentation/terms_screen/terms_screen.dart';
-
+import '../presentation/verify_email_screen/verify_email_screen.dart';
 class AppRoutes {
   static const String initial = '/';
   static const String overviewScreen = '/overview';
@@ -42,6 +43,7 @@ class AppRoutes {
   static const String studentProgressScreen = '/student-progress-screen';
   static const String unityArScreen = '/unity-ar';
   static const String termsScreen = '/terms-and-conditions';
+  static const String verifyEmailScreen = '/verify-email';
 
   static GoRouter get router => appRouter;
 }
@@ -63,6 +65,11 @@ final GoRouter appRouter = GoRouter(
 
     if (!auth.isLoggedIn) {
       return _publicRoutes.contains(path) ? null : AppRoutes.overviewScreen;
+    }
+
+    final fbUser = fb.FirebaseAuth.instance.currentUser;
+    if (fbUser != null && !fbUser.emailVerified) {
+      return path == AppRoutes.verifyEmailScreen ? null : AppRoutes.verifyEmailScreen;
     }
 
     if (auth.currentUser?.role == null) {
@@ -194,6 +201,22 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.unityArScreen,
       builder: (context, state) => 
         UnityArScreen(experimentId: state.uri.queryParameters['experimentId']),
+    ),
+    GoRoute(
+      path: AppRoutes.verifyEmailScreen,
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: const VerifyEmailScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+            ),
+            child: child,
+          );
+        },
+      ),
     ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) =>

@@ -81,6 +81,34 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
     }
   }
 
+  Future<void> _handleForgotPassword() async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty || !email.contains('@')) {
+      setState(() {
+        _errorMessage = 'Please enter a valid email address to reset your password.';
+      });
+      return;
+    }
+    
+    try {
+      await AuthService.instance.resetPassword(email);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Password reset email sent to $email'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = e.toString().replaceAll('Exception: ', '');
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -173,6 +201,18 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                       style: TextStyle(fontSize: 13, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700),
                     ),
                   ],
+                ),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: _handleForgotPassword,
+                child: Text(
+                  'Forgot password?',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF00D4FF),
+                  ),
                 ),
               ),
             ],

@@ -45,7 +45,10 @@ class _RegisterFormWidgetState extends State<RegisterFormWidget> {
       final snapshot = await FirebaseFirestore.instance.collection('sections').get();
       if (mounted) {
         setState(() {
-          _allSections = snapshot.docs.map((d) => d.data()).toList();
+          _allSections = snapshot.docs
+              .map((d) => d.data())
+              .where((d) => d['isTrashed'] != true)
+              .toList();
           _isLoadingSections = false;
         });
       }
