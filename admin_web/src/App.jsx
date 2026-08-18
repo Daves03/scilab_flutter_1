@@ -54,13 +54,13 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route 
-          path="/login" 
-          element={!user || !isAdmin ? <Login /> : <Navigate to="/" />} 
+        <Route
+          path="/login"
+          element={!user || !isAdmin ? <Login /> : <Navigate to="/" />}
         />
-        
-        <Route 
-          path="/" 
+
+        <Route
+          path="/"
           element={user && isAdmin ? <Layout /> : <Navigate to="/login" />}
         >
           <Route index element={<Overview />} />
