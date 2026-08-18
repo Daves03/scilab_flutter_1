@@ -5,6 +5,7 @@ import '../../core/app_export.dart';
 import '../../services/auth_service.dart';
 import '../../routes/app_routes.dart';
 import '../../widgets/custom_icon_widget.dart';
+import '../../models/user_model.dart';
 
 class PendingApprovalScreen extends StatelessWidget {
   const PendingApprovalScreen({super.key});
@@ -13,6 +14,7 @@ class PendingApprovalScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthService>();
     final isStudent = auth.currentUser?.isStudent ?? true;
+    final isRejected = auth.currentUser?.status == VerificationStatus.rejected;
     
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -24,10 +26,14 @@ class PendingApprovalScreen extends StatelessWidget {
               padding: const EdgeInsets.all(32),
               constraints: const BoxConstraints(maxWidth: 400),
               decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF2E2010) : const Color(0xFFFFF8E1),
+                color: Theme.of(context).brightness == Brightness.dark 
+                    ? (isRejected ? const Color(0xFF2E1010) : const Color(0xFF2E2010)) 
+                    : (isRejected ? const Color(0xFFFFEBEE) : const Color(0xFFFFF8E1)),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: const Color(0xFFFFB800).withAlpha(102),
+                  color: isRejected 
+                      ? const Color(0xFFF44336).withAlpha(102) 
+                      : const Color(0xFFFFB800).withAlpha(102),
                   width: 1,
                 ),
                 boxShadow: [
@@ -42,13 +48,13 @@ class PendingApprovalScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   CustomIconWidget(
-                    iconName: 'hourglass_top',
-                    color: const Color(0xFFFFB800),
+                    iconName: isRejected ? 'block' : 'hourglass_top',
+                    color: isRejected ? const Color(0xFFF44336) : const Color(0xFFFFB800),
                     size: 64,
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Account Pending Approval',
+                    isRejected ? 'Account Rejected' : 'Account Pending Approval',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
@@ -58,9 +64,11 @@ class PendingApprovalScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    isStudent
-                        ? 'Your account has been submitted for review. Your teacher will approve your registration shortly.'
-                        : 'Your account has been submitted for review. An admin will approve your registration shortly.',
+                    isRejected 
+                        ? 'Your account registration was not approved by the administrator. If you believe this is a mistake, please contact them.'
+                        : (isStudent
+                            ? 'Your account has been submitted for review. Your teacher will approve your registration shortly.'
+                            : 'Your account has been submitted for review. An admin will approve your registration shortly.'),
                     style: TextStyle(
                       fontSize: 15,
                       height: 1.5,
@@ -80,7 +88,10 @@ class PendingApprovalScreen extends StatelessWidget {
                         }
                       },
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFFFFB800), width: 1.5),
+                        side: BorderSide(
+                          color: isRejected ? const Color(0xFFF44336) : const Color(0xFFFFB800), 
+                          width: 1.5
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(50),
                         ),
@@ -89,7 +100,9 @@ class PendingApprovalScreen extends StatelessWidget {
                         'Sign Out & Return',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFFFC107) : const Color(0xFFE6A300),
+                          color: isRejected 
+                              ? const Color(0xFFF44336) 
+                              : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFFFFC107) : const Color(0xFFE6A300)),
                           fontWeight: FontWeight.w600,
                           fontSize: 16,
                         ),

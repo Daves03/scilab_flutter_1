@@ -10,8 +10,7 @@ export default function ManageUsers() {
   const [searchQuery, setSearchQuery] = useState('');
   const [users, setUsers] = useState([]);
   
-  const [deleteConfirm, setDeleteConfirm] = useState(null); // User to move to trash
-  const [permanentDeleteConfirm, setPermanentDeleteConfirm] = useState(null); // User to permanently delete
+  const [deleteConfirm, setDeleteConfirm] = useState(null); // User to reject
   const [recoverConfirm, setRecoverConfirm] = useState(null); // User to recover
   const [resetConfirm, setResetConfirm] = useState(null); // User to reset password
 
@@ -71,17 +70,6 @@ export default function ManageUsers() {
     }
   };
 
-  const handlePermanentDelete = async () => {
-    if (!permanentDeleteConfirm) return;
-    try {
-      await deleteDoc(doc(db, 'users', permanentDeleteConfirm.id));
-      setPermanentDeleteConfirm(null);
-    } catch (e) {
-      console.error(e);
-      alert('Error permanently deleting user');
-    }
-  };
-
   const handleConfirmReset = async () => {
     if (!resetConfirm) return;
     try {
@@ -122,7 +110,7 @@ export default function ManageUsers() {
               className={`tab ${activeTab === 'rejected' ? 'active' : ''}`}
               onClick={() => setActiveTab('rejected')}
             >
-              Trash ({activeTab === 'rejected' ? users.length : '...'})
+              Rejected ({activeTab === 'rejected' ? users.length : '...'})
             </button>
           </div>
           
@@ -154,7 +142,7 @@ export default function ManageUsers() {
 
         {users.length === 0 ? (
           <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-            {activeTab === 'rejected' ? 'Trash is empty.' : 'No users found in this category.'}
+            {activeTab === 'rejected' ? 'No rejected users.' : 'No users found in this category.'}
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
@@ -206,8 +194,8 @@ export default function ManageUsers() {
                           <button className="btn btn-success" onClick={() => handleApprove(user.id, user.role)} title="Approve">
                             <CheckCircle size={16} />
                           </button>
-                          <button className="btn btn-danger" onClick={() => setDeleteConfirm(user)} title="Move to Trash">
-                            <Trash2 size={16} />
+                          <button className="btn btn-danger" onClick={() => setDeleteConfirm(user)} title="Reject">
+                            <XCircle size={16} />
                           </button>
                         </div>
                       )}
@@ -218,8 +206,8 @@ export default function ManageUsers() {
                             <Key size={16} /> Reset
                           </button>
                           {user.role !== 'admin' && (
-                            <button className="btn btn-danger" onClick={() => setDeleteConfirm(user)} title="Move to Trash">
-                              <Trash2 size={16} />
+                            <button className="btn btn-danger" onClick={() => setDeleteConfirm(user)} title="Revoke">
+                              <XCircle size={16} />
                             </button>
                           )}
                         </div>
@@ -229,9 +217,6 @@ export default function ManageUsers() {
                         <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                           <button className="btn btn-success" onClick={() => setRecoverConfirm(user)} title="Recover User">
                             <RefreshCcw size={16} />
-                          </button>
-                          <button className="btn btn-danger" onClick={() => setPermanentDeleteConfirm(user)} title="Permanently Delete">
-                            <Trash2 size={16} />
                           </button>
                         </div>
                       )}
@@ -244,7 +229,7 @@ export default function ManageUsers() {
         )}
       </div>
 
-      {/* Move to Trash Modal */}
+      {/* Reject Modal */}
       {deleteConfirm && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
@@ -257,41 +242,18 @@ export default function ManageUsers() {
             <div style={{ background: 'rgba(255, 71, 87, 0.1)', padding: '16px', borderRadius: '50%', display: 'inline-block', marginBottom: '16px' }}>
               <AlertTriangle size={32} color="var(--accent-red)" />
             </div>
-            <h2 style={{ marginBottom: '12px' }}>Move to Trash?</h2>
+            <h2 style={{ marginBottom: '12px' }}>
+              {deleteConfirm.status === 'approved' ? 'Revoke User Access?' : 'Reject User?'}
+            </h2>
             <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: 1.5 }}>
-              Are you sure you want to move <strong>"{deleteConfirm.name}"</strong> to the trash? 
-              They will no longer be able to access their account until you recover them.
+              Are you sure you want to {deleteConfirm.status === 'approved' ? 'revoke access for' : 'reject'} <strong>"{deleteConfirm.name}"</strong>? 
+              They will be moved to the Rejected list and will not be able to access the app.
             </p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
               <button className="btn btn-secondary" onClick={() => setDeleteConfirm(null)}>Cancel</button>
-              <button className="btn btn-danger" onClick={handleConfirmDelete}>Yes, move to trash</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Permanent Delete Modal */}
-      {permanentDeleteConfirm && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.8)',
-          backdropFilter: 'blur(6px)',
-          display: 'flex', justifyContent: 'center', alignItems: 'center',
-          zIndex: 100
-        }}>
-          <div className="glass-panel animate-fade-in" style={{ width: '100%', maxWidth: '420px', padding: '32px', textAlign: 'center', border: '1px solid var(--accent-red)' }}>
-            <div style={{ background: 'rgba(255, 71, 87, 0.2)', padding: '16px', borderRadius: '50%', display: 'inline-block', marginBottom: '16px' }}>
-              <AlertTriangle size={32} color="var(--accent-red)" />
-            </div>
-            <h2 style={{ marginBottom: '12px', color: 'var(--accent-red)' }}>Permanent Delete</h2>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: 1.5 }}>
-              Are you sure you want to permanently delete <strong>"{permanentDeleteConfirm.name}"</strong>? 
-              <br /><br />
-              This action <strong>cannot be undone</strong> and will completely wipe their account from the database.
-            </p>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-              <button className="btn btn-secondary" onClick={() => setPermanentDeleteConfirm(null)}>Cancel</button>
-              <button className="btn btn-danger" onClick={handlePermanentDelete}>Permanently Delete</button>
+              <button className="btn btn-danger" onClick={handleConfirmDelete}>
+                {deleteConfirm.status === 'approved' ? 'Yes, revoke access' : 'Yes, reject user'}
+              </button>
             </div>
           </div>
         </div>

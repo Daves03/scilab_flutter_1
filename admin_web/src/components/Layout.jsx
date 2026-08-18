@@ -6,7 +6,8 @@ import {
   Layers, 
   BookOpen, 
   LogOut, 
-  ShieldAlert
+  ShieldAlert,
+  Box
 } from 'lucide-react';
 
 export default function Layout() {
@@ -62,6 +63,14 @@ export default function Layout() {
           >
             <BookOpen size={20} />
             Teacher Uploads
+          </NavLink>
+          
+          <NavLink 
+            to="/ar-labs" 
+            className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+          >
+            <Box size={20} />
+            AR Labs
           </NavLink>
         </nav>
 
