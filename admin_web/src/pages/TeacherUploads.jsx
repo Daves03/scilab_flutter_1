@@ -29,8 +29,8 @@ export default function TeacherUploads() {
   }, []);
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', gap: '24px', height: 'calc(100vh - 100px)' }}>
-      <div style={{ flex: '0 0 350px', display: 'flex', flexDirection: 'column' }}>
+    <div className="animate-fade-in flex-mobile-col" style={{ display: 'flex', gap: '24px', height: 'calc(100vh - 100px)' }}>
+      <div className="mobile-w-full" style={{ flex: '0 0 350px', display: 'flex', flexDirection: 'column' }}>
         <div className="page-header" style={{ marginBottom: '24px' }}>
           <div>
             <h1>Teacher Uploads</h1>

@@ -92,8 +92,8 @@ export default function ManageUsers() {
       </div>
 
       <div className="glass-panel" style={{ padding: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid var(--border-light)' }}>
-          <div className="tabs" style={{ borderBottom: 'none', marginBottom: 0 }}>
+        <div className="flex-mobile-col" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid var(--border-light)' }}>
+          <div className="tabs mobile-tabs" style={{ borderBottom: 'none', marginBottom: 0 }}>
             <button 
               className={`tab ${activeTab === 'pending' ? 'active' : ''}`}
               onClick={() => setActiveTab('pending')}
@@ -114,12 +114,12 @@ export default function ManageUsers() {
             </button>
           </div>
           
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <div className="input-group" style={{ marginBottom: 0 }}>
+          <div className="flex-mobile-col mobile-w-full" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <div className="input-group mobile-w-full" style={{ marginBottom: 0 }}>
               <div style={{ position: 'relative' }}>
                 <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
                 <input 
-                  className="input-field"
+                  className="input-field mobile-w-full"
                   style={{ padding: '8px 12px 8px 36px', width: '220px', margin: 0 }}
                   placeholder="Search name or email..."
                   value={searchQuery}
@@ -128,7 +128,7 @@ export default function ManageUsers() {
               </div>
             </div>
             <select 
-              className="input-field" 
+              className="input-field mobile-w-full" 
               style={{ width: '160px', padding: '8px 12px', margin: 0 }}
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}

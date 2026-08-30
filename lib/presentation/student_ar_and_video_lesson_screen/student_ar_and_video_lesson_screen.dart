@@ -260,12 +260,10 @@ class _StudentArAndVideoLessonScreenState
               borderRadius: BorderRadius.circular(12.0),
               border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x3300D4FF) : const Color(0xFF00D4FF).withOpacity(0.3), width: 1),
             ),
-            child: const Center(
-              child: CustomIconWidget(
-                iconName: 'view_in_ar',
-                color: Color(0xFF00D4FF),
-                size: 20,
-              ),
+            clipBehavior: Clip.antiAlias,
+            child: Image.asset(
+              'assets/images/scilab_logo_cropped.png',
+              fit: BoxFit.contain,
             ),
           ),
           const SizedBox(width: 12),

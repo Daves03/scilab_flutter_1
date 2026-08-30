@@ -121,8 +121,8 @@ export default function ManageSections() {
       </div>
 
       <div className="glass-panel" style={{ padding: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid var(--border-light)' }}>
-          <div className="tabs" style={{ borderBottom: 'none', marginBottom: 0 }}>
+        <div className="flex-mobile-col" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid var(--border-light)', gap: '16px' }}>
+          <div className="tabs mobile-tabs" style={{ borderBottom: 'none', marginBottom: 0 }}>
             <button 
               className={`tab ${activeTab === 'active' ? 'active' : ''}`}
               onClick={() => setActiveTab('active')}
@@ -138,7 +138,7 @@ export default function ManageSections() {
           </div>
           
           <select 
-            className="input-field" 
+            className="input-field mobile-w-full" 
             style={{ width: '200px', padding: '8px 12px' }}
             value={gradeFilter}
             onChange={(e) => setGradeFilter(e.target.value)}

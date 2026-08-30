@@ -210,14 +210,15 @@ export default function ARLabManager() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {experiments.map(exp => (
-              <div key={exp._docId} style={{ 
+              <div className="flex-mobile-col" key={exp._docId} style={{ 
                 background: 'rgba(255,255,255,0.03)', 
                 border: '1px solid var(--border-light)',
                 borderRadius: '12px',
                 padding: '20px',
                 display: 'flex',
                 justifyContent: 'space-between',
-                alignItems: 'center'
+                alignItems: 'center',
+                gap: '16px'
               }}>
                 <div>
                   <h3 style={{ margin: '0 0 8px 0', color: 'white' }}>{exp.title}</h3>
@@ -226,7 +227,7 @@ export default function ARLabManager() {
                     <span>Topic: {exp.topic}</span>
                   </div>
                 </div>
-                <button className="btn btn-secondary" onClick={() => setEditingExp({...exp})}>
+                <button className="btn btn-secondary mobile-w-full" onClick={() => setEditingExp({...exp})}>
                   <Edit size={16} /> Edit Content
                 </button>
               </div>
