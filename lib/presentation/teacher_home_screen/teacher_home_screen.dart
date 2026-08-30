@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ui';
+import 'package:fl_chart/fl_chart.dart';
 
 import 'package:go_router/go_router.dart';
 import '../../core/app_export.dart';
@@ -47,6 +48,8 @@ class _StudentSummary {
   }
 }
 
+enum DashboardTab { allStudents, needsHelp, classAvg }
+
 class TeacherHomeScreen extends StatefulWidget {
   const TeacherHomeScreen({super.key});
 
@@ -62,6 +65,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
 
   List<_StudentSummary> _students = [];
   bool _loading = true;
+  DashboardTab _currentTab = DashboardTab.allStudents;
   
   final StreamController<List<Map<String, dynamic>>> _notifController = StreamController.broadcast();
   StreamSubscription? _usersSub;
@@ -193,6 +197,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
 
   bool _isSearching = false;
   String _searchQuery = '';
+  String _selectedChartSection = 'All';
   final TextEditingController _searchCtrl = TextEditingController();
 
   @override
@@ -338,7 +343,12 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    final filteredStudents = _students.where((s) {
+    List<_StudentSummary> activeStudents = _students;
+    if (_currentTab == DashboardTab.needsHelp) {
+      activeStudents = _students.where((s) => s.overallScore < 60).toList();
+    }
+
+    final filteredStudents = activeStudents.where((s) {
       final q = _searchQuery.toLowerCase();
       return s.name.toLowerCase().contains(q) || s.section.toLowerCase().contains(q);
     }).toList();
@@ -356,56 +366,65 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
             ),
             SliverToBoxAdapter(child: _buildDateTimeCard()),
             SliverToBoxAdapter(child: _buildClassOverview()),
-            SliverToBoxAdapter(
-              child: _buildSectionLabel('Student Progress Summary'),
-            ),
-            filteredStudents.isEmpty
-                ? SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 40),
-                      child: Center(
-                        child: Text(
-                          'No students found',
-                          style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 14),
+            if (_currentTab == DashboardTab.classAvg)
+              SliverToBoxAdapter(
+                child: _buildClassAvgChart(),
+              )
+            else ...[
+              SliverToBoxAdapter(
+                child: _buildSectionLabel('Student Progress Summary'),
+              ),
+              filteredStudents.isEmpty
+                  ? SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 40),
+                        child: Center(
+                          child: Text(
+                            'No students found',
+                            style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 14),
+                          ),
                         ),
                       ),
-                    ),
-                  )
-                : SliverList(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final delay = index * 80;
-                      return AnimatedBuilder(
-                        animation: _entranceController,
-                        builder: (context, child) {
-                          final slide =
-                              Tween<Offset>(
-                                begin: const Offset(0, 0.15),
-                                end: Offset.zero,
-                              ).animate(
-                                CurvedAnimation(
-                                  parent: _entranceController,
-                                  curve: Interval(
-                                    (delay / 700).clamp(0.0, 0.8),
-                                    ((delay + 300) / 700).clamp(0.0, 1.0),
-                                    curve: Curves.easeOutCubic,
+                    )
+                  : SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final delay = index * 80;
+                        return AnimatedBuilder(
+                          animation: _entranceController,
+                          builder: (context, child) {
+                            final slide =
+                                Tween<Offset>(
+                                  begin: const Offset(0, 0.15),
+                                  end: Offset.zero,
+                                ).animate(
+                                  CurvedAnimation(
+                                    parent: _entranceController,
+                                    curve: Interval(
+                                      (delay / 700).clamp(0.0, 0.8),
+                                      ((delay + 300) / 700).clamp(0.0, 1.0),
+                                      curve: Curves.easeOutCubic,
+                                    ),
                                   ),
-                                ),
-                              );
-                          return SlideTransition(
-                            position: slide,
-                            child: FadeTransition(
-                              opacity: _entranceController,
-                              child: child,
+                                );
+                            return SlideTransition(
+                              position: slide,
+                              child: FadeTransition(
+                                opacity: _entranceController,
+                                child: child,
+                              ),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                            child: _StudentProgressCard(
+                              student: filteredStudents[index],
+                              showBadge: _currentTab == DashboardTab.needsHelp,
                             ),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-              child: _StudentProgressCard(student: filteredStudents[index]),
-                        ),
-                      );
-                    }, childCount: filteredStudents.length),
-                  ),
+                          ),
+                        );
+                      }, childCount: filteredStudents.length),
+                    ),
+            ],
             const SliverToBoxAdapter(child: SizedBox(height: 140)),
           ],
         ),
@@ -865,16 +884,8 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
               icon: 'groups',
               label: 'Total Students',
               value: '${_students.length}',
-              color: const Color(0xFF00D4FF),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: _StatCard(
-              icon: 'emoji_events',
-              label: 'Excellent',
-              value: '$_excellentCount',
-              color: const Color(0xFF00D4FF),
+              color: _currentTab == DashboardTab.allStudents ? const Color(0xFF00D4FF) : const Color(0xFF00D4FF).withAlpha(128),
+              onTap: () => setState(() => _currentTab = DashboardTab.allStudents),
             ),
           ),
           const SizedBox(width: 10),
@@ -883,7 +894,8 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
               icon: 'warning_amber',
               label: 'Needs Help',
               value: '$_needsHelpCount',
-              color: const Color(0xFFFF6B6B),
+              color: _currentTab == DashboardTab.needsHelp ? const Color(0xFFFF6B6B) : const Color(0xFFFF6B6B).withAlpha(128),
+              onTap: () => setState(() => _currentTab = DashboardTab.needsHelp),
             ),
           ),
           const SizedBox(width: 10),
@@ -892,7 +904,228 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
               icon: 'bar_chart',
               label: 'Class Avg',
               value: '${_classAvgScore.toStringAsFixed(0)}%',
-              color: const Color(0xFF7C3AED),
+              color: _currentTab == DashboardTab.classAvg ? const Color(0xFF7C3AED) : const Color(0xFF7C3AED).withAlpha(128),
+              onTap: () => setState(() => _currentTab = DashboardTab.classAvg),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildClassAvgChart() {
+    if (_students.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 40),
+        child: Center(
+          child: Text(
+            'No student data available',
+            style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 14),
+          ),
+        ),
+      );
+    }
+
+    final sections = ['All'];
+    for (var s in _students) {
+      if (!sections.contains(s.section)) {
+        sections.add(s.section);
+      }
+    }
+
+    final List<String> xAxisLabels = [];
+    final List<double> yValues = [];
+    final List<Color> barColors = [];
+    final List<String> tooltips = [];
+
+    if (_selectedChartSection == 'All') {
+      final Map<String, List<_StudentSummary>> grouped = {};
+      for (var s in _students) {
+        grouped.putIfAbsent(s.section, () => []).add(s);
+      }
+      
+      final sortedSections = grouped.keys.toList()..sort();
+      for (var sec in sortedSections) {
+        final sectionStudents = grouped[sec]!;
+        final avg = sectionStudents.map((s) => s.overallScore).reduce((a, b) => a + b) / sectionStudents.length;
+        
+        Color c = const Color(0xFF00D4FF);
+        if (avg >= 80) c = const Color(0xFF00D4FF);
+        else if (avg >= 60) c = const Color(0xFF7C3AED);
+        else c = const Color(0xFFFF6B6B);
+        
+        String shortSec = sec.length > 10 ? sec.substring(0, 10) + '...' : sec;
+        
+        xAxisLabels.add(shortSec);
+        yValues.add(avg);
+        barColors.add(c);
+        tooltips.add('Section $sec\nAvg: ${avg.toStringAsFixed(1)}%');
+      }
+    } else {
+      final filteredStudents = _students.where((s) => s.section == _selectedChartSection).toList();
+      filteredStudents.sort((a, b) => a.name.compareTo(b.name));
+      
+      for (var s in filteredStudents) {
+        String shortName = s.name.split(' ').first;
+        if (shortName.length > 6) shortName = shortName.substring(0, 6) + '.';
+        
+        xAxisLabels.add(shortName);
+        yValues.add(s.overallScore);
+        barColors.add(s.performanceColor);
+        tooltips.add('${s.name}\n${s.section}\n${s.overallScore.toStringAsFixed(1)}%');
+      }
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Student Overall Scores', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: sections.map((sec) {
+                final isSelected = _selectedChartSection == sec;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        _selectedChartSection = sec;
+                      });
+                    },
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: isSelected ? const Color(0xFF00D4FF).withAlpha(40) : Colors.transparent,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: isSelected ? const Color(0xFF00D4FF) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+                        ),
+                      ),
+                      child: Text(
+                        sec == 'All' ? 'All Sections' : 'Section $sec',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected 
+                              ? const Color(0xFF00D4FF) 
+                              : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            height: 250,
+            child: yValues.isEmpty 
+              ? Center(
+                  child: Text(
+                    'No data in this section',
+                    style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 14),
+                  ),
+                )
+              : BarChart(
+              BarChartData(
+                alignment: BarChartAlignment.spaceAround,
+                maxY: 100,
+                barTouchData: BarTouchData(
+                  enabled: true,
+                  touchTooltipData: BarTouchTooltipData(
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                      return BarTooltipItem(
+                        tooltips[group.x],
+                        const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      );
+                    },
+                  ),
+                ),
+                titlesData: FlTitlesData(
+                  show: true,
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 40,
+                      getTitlesWidget: (value, meta) {
+                        if (value.toInt() >= 0 && value.toInt() < xAxisLabels.length) {
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(xAxisLabels[value.toInt()], style: const TextStyle(fontSize: 10)),
+                          );
+                        }
+                        return const Text('');
+                      },
+                    ),
+                  ),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 40,
+                      getTitlesWidget: (value, meta) {
+                        if (value % 20 != 0) return const SizedBox.shrink();
+                        return Text('${value.toInt()}', style: TextStyle(fontSize: 10, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600));
+                      },
+                    ),
+                  ),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                ),
+                borderData: FlBorderData(show: false),
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                  getDrawingHorizontalLine: (value) => FlLine(
+                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300,
+                    strokeWidth: 1,
+                  ),
+                ),
+                barGroups: List.generate(yValues.length, (i) {
+                  return BarChartGroupData(
+                    x: i,
+                    barRods: [
+                      BarChartRodData(
+                        toY: yValues[i],
+                        color: barColors[i],
+                        width: 20,
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+                      )
+                    ],
+                  );
+                }),
+              ),
+            ),
+          ),
+          const SizedBox(height: 32),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const CustomIconWidget(iconName: 'info_outline', color: Color(0xFF00D4FF), size: 24),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'This chart displays the individual overall score of every student you handle across all sections. The overall score represents an equal average between your students\' Quiz results and their performance in the AR Laboratory.',
+                    style: TextStyle(
+                      fontSize: 13,
+                      height: 1.5,
+                      color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -932,23 +1165,27 @@ class _StatCard extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
+  final VoidCallback? onTap;
 
   const _StatCard({
     required this.icon,
     required this.label,
     required this.value,
     required this.color,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
-        borderRadius: BorderRadius.circular(14.0),
-        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
-      ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        decoration: BoxDecoration(
+          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+          borderRadius: BorderRadius.circular(14.0),
+          border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+        ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -972,7 +1209,7 @@ class _StatCard extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ));
   }
 }
 
@@ -980,8 +1217,9 @@ class _StatCard extends StatelessWidget {
 
 class _StudentProgressCard extends StatelessWidget {
   final _StudentSummary student;
+  final bool showBadge;
 
-  const _StudentProgressCard({required this.student});
+  const _StudentProgressCard({required this.student, this.showBadge = true});
 
   @override
   Widget build(BuildContext context) {
@@ -1040,27 +1278,28 @@ class _StudentProgressCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: student.performanceColor.withAlpha(30),
-                  borderRadius: BorderRadius.circular(20.0),
-                  border: Border.all(
-                    color: student.performanceColor.withAlpha(80),
+              if (showBadge)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: student.performanceColor.withAlpha(30),
+                    borderRadius: BorderRadius.circular(20.0),
+                    border: Border.all(
+                      color: student.performanceColor.withAlpha(80),
+                    ),
+                  ),
+                  child: Text(
+                    student.performanceLabel,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: student.performanceColor,
+                    ),
                   ),
                 ),
-                child: Text(
-                  student.performanceLabel,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: student.performanceColor,
-                  ),
-                ),
-              ),
             ],
           ),
           const SizedBox(height: 14),
