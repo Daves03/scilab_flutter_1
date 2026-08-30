@@ -23,6 +23,10 @@ import '../presentation/unity_ar_screen/unity_ar_screen.dart';
 import '../widgets/app_scaffold.dart';
 import '../presentation/terms_screen/terms_screen.dart';
 import '../presentation/verify_email_screen/verify_email_screen.dart';
+import '../presentation/file_viewers/pdf_viewer_screen.dart';
+import '../presentation/file_viewers/video_player_screen.dart';
+import '../presentation/file_viewers/image_viewer_screen.dart';
+
 class AppRoutes {
   static const String initial = '/';
   static const String overviewScreen = '/overview';
@@ -44,6 +48,9 @@ class AppRoutes {
   static const String unityArScreen = '/unity-ar';
   static const String termsScreen = '/terms-and-conditions';
   static const String verifyEmailScreen = '/verify-email';
+  static const String pdfViewerScreen = '/pdf-viewer';
+  static const String videoViewerScreen = '/video-viewer';
+  static const String imageViewerScreen = '/image-viewer';
 
   static GoRouter get router => appRouter;
 }
@@ -217,6 +224,30 @@ final GoRouter appRouter = GoRouter(
           );
         },
       ),
+    ),
+    GoRoute(
+      path: AppRoutes.pdfViewerScreen,
+      builder: (context, state) {
+        final title = state.uri.queryParameters['title'] ?? 'PDF Document';
+        final url = state.uri.queryParameters['url'] ?? '';
+        return PdfViewerScreen(title: title, url: url);
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.videoViewerScreen,
+      builder: (context, state) {
+        final title = state.uri.queryParameters['title'] ?? 'Video';
+        final url = state.uri.queryParameters['url'] ?? '';
+        return VideoPlayerScreen(title: title, url: url);
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.imageViewerScreen,
+      builder: (context, state) {
+        final title = state.uri.queryParameters['title'] ?? 'Image';
+        final url = state.uri.queryParameters['url'] ?? '';
+        return ImageViewerScreen(title: title, url: url);
+      },
     ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) =>

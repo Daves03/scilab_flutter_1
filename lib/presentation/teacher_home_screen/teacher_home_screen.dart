@@ -413,6 +413,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
               bottom: 124,
               right: 20,
               child: FloatingActionButton(
+                heroTag: null,
                 onPressed: () async {
                   final result = await showDialog(
                     context: context,

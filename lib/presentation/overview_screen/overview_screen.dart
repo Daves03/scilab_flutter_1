@@ -496,8 +496,8 @@ class _OverviewScreenState extends State<OverviewScreen>
           ),
         ),
         const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        Wrap(
+          alignment: WrapAlignment.center,
           children: List.generate(_features.length, (i) {
             final isActive = i == _currentFeaturePage;
             return AnimatedContainer(

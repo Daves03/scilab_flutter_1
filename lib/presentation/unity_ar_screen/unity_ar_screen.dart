@@ -6,6 +6,9 @@ import 'package:provider/provider.dart';
 import '../../services/auth_service.dart';
 import '../../services/activity_service.dart';
 import '../../models/experiment_step.dart';
+import '../../models/ar_experiment_model.dart';
+import '../../data/dummy_ar_experiments.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 
 class UnityArScreen extends StatefulWidget {
@@ -29,34 +32,7 @@ class _UnityArScreenState extends State<UnityArScreen> with TickerProviderStateM
 
   // --- NEW: Step tracking variables ---
   int _currentStepIndex = 0;
-
-  // Define steps for each experiment ID (Add your 6 experiments here!)
-  final Map<String, List<ExperimentStep>> _experimentStepsMap = {
-    '1': [
-      ExperimentStep(bottleTag: 'Surf', instructionTitle: 'Step 1: Add Soap', instructionDetail: 'Pour the dish soap into the beaker.'),
-      ExperimentStep(bottleTag: 'Peroxide', instructionTitle: 'Step 2: Add Peroxide', instructionDetail: 'Add hydrogen peroxide to the mixture.'),
-      ExperimentStep(bottleTag: 'Dye', instructionTitle: 'Step 3: Add Dye', instructionDetail: 'Add food coloring.'),
-      ExperimentStep(bottleTag: 'Yeast', instructionTitle: 'Step 4: Add Yeast to Cylinder', instructionDetail: 'Pour the yeast into the cylinder with water'),
-      ExperimentStep(bottleTag: 'Activator', instructionTitle: 'Step 5: Pour Yeast', instructionDetail: 'Pour the Cylinder with yeast last to start the reaction!')
-    ],
-    '2': [
-      ExperimentStep(bottleTag: 'ChemicalA', instructionTitle: 'Step 1: Base Liquid', instructionDetail: 'Pour the base solution.'),
-      ExperimentStep(bottleTag: 'ActivatorB', instructionTitle: 'Step 2: Catalyst', instructionDetail: 'Add the activator to complete.'),
-    ],
-    '3': [
-      ExperimentStep(bottleTag: 'ElectrodeA', instructionTitle: 'Step 1: Setup', instructionDetail: 'Place the electrodes.'),
-      ExperimentStep(bottleTag: 'Power', instructionTitle: 'Step 2: Power On', instructionDetail: 'Connect to battery.'),
-    ],
-    '4': [
-      ExperimentStep(bottleTag: 'ReagentX', instructionTitle: 'Step 1: Reagent', instructionDetail: 'Add Reagent X.'),
-    ],
-    '5': [
-      ExperimentStep(bottleTag: 'ElementA', instructionTitle: 'Step 1: Element', instructionDetail: 'Inspect Element A.'),
-    ],
-  };
-
-  List<ExperimentStep> get _currentSteps => 
-    _experimentStepsMap[_activeExperimentId] ?? [];
+  List<ExperimentStep> _currentSteps = [];
 
   @override
   void initState() {
@@ -111,6 +87,31 @@ class _UnityArScreenState extends State<UnityArScreen> with TickerProviderStateM
         _activeExperimentId = normalizedId;
         _currentStepIndex = 0; // Reset steps on launch
       });
+
+      // Fetch dynamic steps from Firestore
+      try {
+        final docSnapshot = await FirebaseFirestore.instance.collection('ar_experiments').doc(experimentId).get();
+        if (docSnapshot.exists) {
+          final experimentModel = ArExperimentModel.fromMap(docSnapshot.id, docSnapshot.data()!);
+          if (mounted) {
+            setState(() {
+              _currentSteps = experimentModel.steps;
+            });
+          }
+        } else {
+          final dummyExp = dummyArExperiments.firstWhere(
+            (e) => e.id == experimentId,
+            orElse: () => dummyArExperiments.first,
+          );
+          if (mounted) {
+            setState(() {
+              _currentSteps = dummyExp.steps;
+            });
+          }
+        }
+      } catch (e) {
+        print('Error fetching experiment steps: $e');
+      }
 
       // Tell Unity to load the experiment / scene
       sendToUnity('FlutterReceiver', 'LoadExperiment', normalizedId);

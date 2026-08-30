@@ -8,4 +8,20 @@ class ExperimentStep {
     required this.instructionTitle,
     required this.instructionDetail,
   });
+
+  factory ExperimentStep.fromMap(Map<String, dynamic> data) {
+    return ExperimentStep(
+      bottleTag: data['bottleTag'] ?? '',
+      instructionTitle: data['instructionTitle'] ?? '',
+      instructionDetail: data['instructionDetail'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'bottleTag': bottleTag,
+      'instructionTitle': instructionTitle,
+      'instructionDetail': instructionDetail,
+    };
+  }
 }

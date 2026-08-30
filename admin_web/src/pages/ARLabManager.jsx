@@ -13,6 +13,10 @@ const DUMMY_EXPERIMENTS = [
     safetyNote: 'Limewater is mildly alkaline (pH ~12). Avoid contact with eyes and skin. Wear safety goggles and gloves. Do not ingest. Ensure adequate ventilation when generating CO₂ from acid-carbonate reactions.',
     relatedConcepts: ['Carbon Dioxide', 'Calcium Hydroxide', 'Precipitation Reactions', 'Qualitative Analysis', 'Carbonates'],
     requiredMaterials: ['Limewater (calcium hydroxide) solution', 'Test tubes or flasks', 'Delivery tube with stopper', 'Source of CO₂ (e.g., dilute acid and carbonate salt)', 'Safety goggles'],
+    steps: [
+      { bottleTag: 'ChemicalA', instructionTitle: 'Step 1: Base Liquid', instructionDetail: 'Pour the base solution.' },
+      { bottleTag: 'ActivatorB', instructionTitle: 'Step 2: Catalyst', instructionDetail: 'Add the activator to complete.' },
+    ],
     thumbnailUrl: 'https://img.rocket.new/generatedImages/rocket_gen_img_159a809cd-1767041982810.png',
     iconName: 'bubble_chart',
     tintColorValue: 0xFF0D2E1F,
@@ -27,6 +31,9 @@ const DUMMY_EXPERIMENTS = [
     safetyNote: 'Silver nitrate is corrosive and will stain skin and clothing dark brown/black. Wear gloves and goggles at all times. Avoid contact with organic materials. Dispose of silver waste in designated containers — do not pour down the drain.',
     relatedConcepts: ['Halide Ions', 'Ionic Precipitation', 'Qualitative Analysis', 'Solubility Rules', 'Silver Compounds'],
     requiredMaterials: ['Silver nitrate solution (AgNO₃, 0.1 M)', 'Test tubes and rack', 'Droppers or pipettes', 'Solutions containing Cl⁻, Br⁻, and I⁻ ions', 'Dilute nitric acid (HNO₃)'],
+    steps: [
+      { bottleTag: 'ReagentX', instructionTitle: 'Step 1: Reagent', instructionDetail: 'Add Reagent X.' },
+    ],
     thumbnailUrl: 'https://img.rocket.new/generatedImages/rocket_gen_img_173eec5f9-1784971684687.png',
     iconName: 'science',
     tintColorValue: 0xFF1E1535,
@@ -41,6 +48,10 @@ const DUMMY_EXPERIMENTS = [
     safetyNote: 'Use low-voltage power sources (batteries, 6V max). Never use mains electricity for conductivity tests. Keep water away from electrical connections. Dry hands before handling equipment. Dispose of solutions properly after testing.',
     relatedConcepts: ['Electrolytes', 'Ionic Compounds', 'Electric Current', 'Free Ions', 'Metallic Bonding'],
     requiredMaterials: ['Conductivity apparatus (battery, wires, light bulb/LED, electrodes)', 'Small beakers', 'Distilled water', 'Various test substances (NaCl, sugar, tap water)', 'Stirring rods'],
+    steps: [
+      { bottleTag: 'ElectrodeA', instructionTitle: 'Step 1: Setup', instructionDetail: 'Place the electrodes.' },
+      { bottleTag: 'Power', instructionTitle: 'Step 2: Power On', instructionDetail: 'Connect to battery.' },
+    ],
     thumbnailUrl: 'https://img.rocket.new/generatedImages/rocket_gen_img_14f381e2d-1784971685298.png',
     iconName: 'bolt',
     tintColorValue: 0xFF0D2A2E,
@@ -55,6 +66,7 @@ const DUMMY_EXPERIMENTS = [
     safetyNote: 'Use sealed containers when performing reactions that produce gases to prevent mass loss. Handle chemicals carefully to avoid spills. Wear goggles and gloves. Ensure the balance is calibrated and on a stable surface before measuring.',
     relatedConcepts: ['Stoichiometry', 'Balanced Equations', 'Closed Systems', 'Antoine Lavoisier', 'Mole Concept'],
     requiredMaterials: ['Electronic balance (sensitive to 0.01g)', 'Erlenmeyer flask', 'Balloon or tight-fitting stopper', 'Baking soda (Sodium bicarbonate)', 'Vinegar (Dilute acetic acid)'],
+    steps: [],
     thumbnailUrl: 'https://images.pexels.com/photos/3735747/pexels-photo-3735747.jpeg',
     iconName: 'balance',
     tintColorValue: 0xFF2E1510,
@@ -69,6 +81,7 @@ const DUMMY_EXPERIMENTS = [
     safetyNote: 'Some acids and bases are corrosive. Always wear goggles and gloves. Avoid skin contact with strong acids (HCl, H₂SO₄) or strong bases (NaOH). Neutralize spills with sodium bicarbonate (for acids) or dilute acid (for bases) before cleaning.',
     relatedConcepts: ['pH Scale', 'Acids and Bases', 'Neutralization', 'Indicators', 'Hydrogen Ion Concentration'],
     requiredMaterials: ['Universal indicator solution or red cabbage juice', 'Test tubes or spotting plate', 'Droppers', 'Various test liquids (lemon juice, vinegar, soapy water, etc.)', 'pH color chart'],
+    steps: [],
     thumbnailUrl: 'https://img.rocket.new/generatedImages/rocket_gen_img_1d0d8b59b-1772367719711.png',
     iconName: 'colorize',
     tintColorValue: 0xFF0D2E3F,
@@ -83,6 +96,13 @@ const DUMMY_EXPERIMENTS = [
     safetyNote: 'Use only 3–6% hydrogen peroxide for classroom demonstrations. High-concentration H₂O₂ (30%+) causes severe burns and must only be handled by trained instructors with full PPE. The reaction is exothermic — the foam will be hot. Do not touch immediately after the reaction.',
     relatedConcepts: ['Catalysis', 'Decomposition Reactions', 'Exothermic Reactions', 'Hydrogen Peroxide', 'Oxygen Gas'],
     requiredMaterials: ['Hydrogen peroxide (3% or 6%)', 'Liquid dish soap', 'Food coloring', 'Dry yeast dissolved in warm water (or KI solution)', 'Graduated cylinder or empty plastic bottle', 'Safety tray or tarp (to catch foam)'],
+    steps: [
+      { bottleTag: 'Surf', instructionTitle: 'Step 1: Add Soap', instructionDetail: 'Pour the dish soap into the beaker.' },
+      { bottleTag: 'Peroxide', instructionTitle: 'Step 2: Add Peroxide', instructionDetail: 'Add hydrogen peroxide to the mixture.' },
+      { bottleTag: 'Dye', instructionTitle: 'Step 3: Add Dye', instructionDetail: 'Add food coloring.' },
+      { bottleTag: 'Yeast', instructionTitle: 'Step 4: Add Yeast to Cylinder', instructionDetail: 'Pour the yeast into the cylinder with water' },
+      { bottleTag: 'Activator', instructionTitle: 'Step 5: Pour Yeast', instructionDetail: 'Pour the Cylinder with yeast last to start the reaction!' }
+    ],
     thumbnailUrl: 'https://img.rocket.new/generatedImages/rocket_gen_img_1ee613807-1784971685914.png',
     iconName: 'waves',
     tintColorValue: 0xFF1A2E0D,
@@ -97,6 +117,9 @@ const DUMMY_EXPERIMENTS = [
     safetyNote: 'Always work near a fume hood or in a well-ventilated area. Tie back hair and avoid loose clothing near open flames. Use nichrome wire loops cleaned with hydrochloric acid between tests. Some metal salts (barium compounds) are toxic — wash hands thoroughly after handling.',
     relatedConcepts: ['Atomic Emission Spectra', 'Electron Energy Levels', 'Photon Emission', 'Metal Ion Identification', 'Spectroscopy'],
     requiredMaterials: ['Bunsen burner', 'Nichrome wire loops or wooden splints soaked in water', 'Dilute hydrochloric acid (for cleaning wire)', 'Metal salt solutions (LiCl, NaCl, KCl, CuCl₂, BaCl₂)', 'Safety goggles'],
+    steps: [
+      { bottleTag: 'ElementA', instructionTitle: 'Step 1: Element', instructionDetail: 'Inspect Element A.' }
+    ],
     thumbnailUrl: 'https://img.rocket.new/generatedImages/rocket_gen_img_1817773a0-1784320962469.png',
     iconName: 'local_fire_department',
     tintColorValue: 0xFF2E1A00,
@@ -152,6 +175,7 @@ export default function ARLabManager() {
         safetyNote: editingExp.safetyNote,
         relatedConcepts: editingExp.relatedConcepts,
         requiredMaterials: editingExp.requiredMaterials,
+        steps: editingExp.steps || [],
       });
       setEditingExp(null);
     } catch (error) {
@@ -173,6 +197,22 @@ export default function ARLabManager() {
   const handleArrayRemove = (field, index) => {
     const newArray = editingExp[field].filter((_, i) => i !== index);
     setEditingExp({ ...editingExp, [field]: newArray });
+  };
+
+  const handleStepChange = (index, field, value) => {
+    const newSteps = [...(editingExp.steps || [])];
+    newSteps[index] = { ...newSteps[index], [field]: value };
+    setEditingExp({ ...editingExp, steps: newSteps });
+  };
+
+  const handleStepAdd = () => {
+    const newSteps = [...(editingExp.steps || []), { bottleTag: '', instructionTitle: '', instructionDetail: '' }];
+    setEditingExp({ ...editingExp, steps: newSteps });
+  };
+
+  const handleStepRemove = (index) => {
+    const newSteps = (editingExp.steps || []).filter((_, i) => i !== index);
+    setEditingExp({ ...editingExp, steps: newSteps });
   };
 
   if (loading) {
@@ -369,6 +409,43 @@ export default function ARLabManager() {
                       </div>
                     ))}
                   </div>
+                </div>
+              </div>
+
+              <div className="input-group">
+                <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  Experiment Steps (Dynamic AR Actions)
+                  <button type="button" onClick={handleStepAdd} style={{ background: 'none', border: 'none', color: 'var(--accent-purple)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                    + Add Step
+                  </button>
+                </label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {(editingExp.steps || []).map((step, index) => (
+                    <div key={`step-${index}`} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 3fr auto', gap: '8px', alignItems: 'start', background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                      <div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Bottle Tag</div>
+                        <input className="input-field" style={{ margin: 0, padding: '6px' }} value={step.bottleTag} onChange={(e) => handleStepChange(index, 'bottleTag', e.target.value)} placeholder="e.g. Surf" required />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Title</div>
+                        <input className="input-field" style={{ margin: 0, padding: '6px' }} value={step.instructionTitle} onChange={(e) => handleStepChange(index, 'instructionTitle', e.target.value)} placeholder="e.g. Step 1: Soap" required />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Detail</div>
+                        <input className="input-field" style={{ margin: 0, padding: '6px' }} value={step.instructionDetail} onChange={(e) => handleStepChange(index, 'instructionDetail', e.target.value)} placeholder="Pour soap into beaker" required />
+                      </div>
+                      <div style={{ paddingTop: '18px' }}>
+                        <button type="button" onClick={() => handleStepRemove(index)} className="btn btn-secondary" style={{ padding: '8px', height: '34px' }}>
+                          <X size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  {(!editingExp.steps || editingExp.steps.length === 0) && (
+                    <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem', fontStyle: 'italic', border: '1px dashed var(--border-light)', borderRadius: '8px' }}>
+                      No steps added yet. Add steps to make this experiment interactive in AR.
+                    </div>
+                  )}
                 </div>
               </div>
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'experiment_step.dart';
 
 class ArExperimentModel {
   final String id;
@@ -13,6 +14,7 @@ class ArExperimentModel {
   final String iconName;
   final int tintColorValue;
   final String semanticLabel;
+  final List<ExperimentStep> steps;
 
   const ArExperimentModel({
     required this.id,
@@ -27,6 +29,7 @@ class ArExperimentModel {
     required this.iconName,
     required this.tintColorValue,
     required this.semanticLabel,
+    this.steps = const [],
   });
 
   factory ArExperimentModel.fromMap(String id, Map<String, dynamic> data) {
@@ -43,6 +46,9 @@ class ArExperimentModel {
       iconName: data['iconName'] ?? 'science',
       tintColorValue: data['tintColorValue'] ?? 0xFF142240,
       semanticLabel: data['semanticLabel'] ?? 'AR Experiment',
+      steps: data['steps'] != null 
+          ? (data['steps'] as List).map((s) => ExperimentStep.fromMap(Map<String, dynamic>.from(s))).toList()
+          : [],
     );
   }
 
@@ -59,6 +65,7 @@ class ArExperimentModel {
       'iconName': iconName,
       'tintColorValue': tintColorValue,
       'semanticLabel': semanticLabel,
+      'steps': steps.map((s) => s.toMap()).toList(),
     };
   }
 

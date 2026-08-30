@@ -30,6 +30,10 @@ const List<Map<String, dynamic>> _experimentMaps = [
       'tintColorValue': 0xFF0D2E1F,
       'semanticLabel':
           'Clear glass flask with milky white liquid showing carbon dioxide limewater test',
+      'steps': [
+        {'bottleTag': 'ChemicalA', 'instructionTitle': 'Step 1: Base Liquid', 'instructionDetail': 'Pour the base solution.'},
+        {'bottleTag': 'ActivatorB', 'instructionTitle': 'Step 2: Catalyst', 'instructionDetail': 'Add the activator to complete.'},
+      ],
     },
     {
       'id': 'ar2',
@@ -60,6 +64,9 @@ const List<Map<String, dynamic>> _experimentMaps = [
       'tintColorValue': 0xFF1E1535,
       'semanticLabel':
           'Test tubes showing white cream and yellow precipitates from silver nitrate halide tests',
+      'steps': [
+        {'bottleTag': 'ReagentX', 'instructionTitle': 'Step 1: Reagent', 'instructionDetail': 'Add Reagent X.'},
+      ],
     },
     {
       'id': 'ar3',
@@ -90,6 +97,10 @@ const List<Map<String, dynamic>> _experimentMaps = [
       'tintColorValue': 0xFF0D2A2E,
       'semanticLabel':
           'Conductivity apparatus with electrodes in solution connected to a light bulb',
+      'steps': [
+        {'bottleTag': 'ElectrodeA', 'instructionTitle': 'Step 1: Setup', 'instructionDetail': 'Place the electrodes.'},
+        {'bottleTag': 'Power', 'instructionTitle': 'Step 2: Power On', 'instructionDetail': 'Connect to battery.'},
+      ],
     },
     {
       'id': 'ar4',
@@ -181,6 +192,13 @@ const List<Map<String, dynamic>> _experimentMaps = [
       'tintColorValue': 0xFF1A2E0D,
       'semanticLabel':
           'Large colorful foam eruption from cylinder demonstrating elephant toothpaste reaction',
+      'steps': [
+        {'bottleTag': 'Surf', 'instructionTitle': 'Step 1: Add Soap', 'instructionDetail': 'Pour the dish soap into the beaker.'},
+        {'bottleTag': 'Peroxide', 'instructionTitle': 'Step 2: Add Peroxide', 'instructionDetail': 'Add hydrogen peroxide to the mixture.'},
+        {'bottleTag': 'Dye', 'instructionTitle': 'Step 3: Add Dye', 'instructionDetail': 'Add food coloring.'},
+        {'bottleTag': 'Yeast', 'instructionTitle': 'Step 4: Add Yeast to Cylinder', 'instructionDetail': 'Pour the yeast into the cylinder with water'},
+        {'bottleTag': 'Activator', 'instructionTitle': 'Step 5: Pour Yeast', 'instructionDetail': 'Pour the Cylinder with yeast last to start the reaction!'},
+      ],
     },
     {
       'id': 'ar7',
@@ -211,6 +229,9 @@ const List<Map<String, dynamic>> _experimentMaps = [
       'tintColorValue': 0xFF2E1A00,
       'semanticLabel':
           'Colorful flame test showing bright orange yellow and green flames from metal salts',
+      'steps': [
+        {'bottleTag': 'ElementA', 'instructionTitle': 'Step 1: Element', 'instructionDetail': 'Inspect Element A.'},
+      ],
     },
   ];
 

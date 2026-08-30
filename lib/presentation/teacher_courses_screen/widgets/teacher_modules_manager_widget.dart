@@ -1,5 +1,11 @@
 import 'dart:typed_data';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:file_selector/file_selector.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:mime/mime.dart';
 import '../../../core/app_export.dart';
 import '../../../models/course_model.dart';
 import '../../../services/course_service.dart';
@@ -59,6 +65,7 @@ class _CourseModulesManagerWidgetState
     int numQuestions = 5;
     XFile? selectedFile;
     bool isGenerating = false;
+    bool isUploading = false;
 
     showDialog(
       context: context,
@@ -88,19 +95,31 @@ class _CourseModulesManagerWidgetState
               GestureDetector(
                 onTap: () async {
                   final typeGroup = XTypeGroup(
-                    label: 'Documents',
-                    extensions: ['pdf', 'doc', 'docx', 'ppt', 'pptx'],
+                    label: 'Files',
+                    extensions: ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'mp4', 'mov', 'jpg', 'png', 'jpeg'],
                   );
                   final XFile? result = await openFile(acceptedTypeGroups: [typeGroup]);
 
                   if (result != null) {
                     setDialogState(() {
                       selectedFile = result;
-                      // Auto-select type based on extension
+                      // Auto-select type based on extension or mime type
                       final lowerName = selectedFile!.name.toLowerCase();
-                      if (lowerName.endsWith('pdf')) selectedType = 'pdf';
-                      else if (lowerName.endsWith('doc') || lowerName.endsWith('docx')) selectedType = 'doc';
-                      else if (lowerName.endsWith('ppt') || lowerName.endsWith('pptx')) selectedType = 'ppt';
+                      final mime = selectedFile!.mimeType?.toLowerCase() ?? lookupMimeType(selectedFile!.name)?.toLowerCase() ?? '';
+                      
+                      if (lowerName.endsWith('pdf') || mime.contains('pdf')) {
+                        selectedType = 'pdf';
+                      } else if (lowerName.endsWith('doc') || lowerName.endsWith('docx') || mime.contains('word') || mime.contains('document')) {
+                        selectedType = 'doc';
+                      } else if (lowerName.endsWith('ppt') || lowerName.endsWith('pptx') || mime.contains('presentation')) {
+                        selectedType = 'ppt';
+                      } else if (lowerName.endsWith('mp4') || lowerName.endsWith('mov') || mime.startsWith('video/')) {
+                        selectedType = 'video';
+                      } else if (lowerName.endsWith('jpg') || lowerName.endsWith('png') || lowerName.endsWith('jpeg') || mime.startsWith('image/')) {
+                        selectedType = 'image';
+                      } else {
+                        selectedType = 'other';
+                      }
                     });
                   }
                 },
@@ -143,6 +162,48 @@ class _CourseModulesManagerWidgetState
                     ],
                   ),
                 ),
+              ),
+              const SizedBox(height: 16),
+              // File Type Dropdown
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'File Type',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF8BA3C0)),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF142240),
+                      borderRadius: BorderRadius.circular(10.0),
+                      border: Border.all(color: const Color(0xFF1E3A5F), width: 1),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: selectedType,
+                        dropdownColor: const Color(0xFF142240),
+                        isExpanded: true,
+                        icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF8BA3C0)),
+                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                        items: const [
+                          DropdownMenuItem(value: 'pdf', child: Text('PDF Document')),
+                          DropdownMenuItem(value: 'doc', child: Text('Word Document (DOC/DOCX)')),
+                          DropdownMenuItem(value: 'ppt', child: Text('Presentation (PPT/PPTX)')),
+                          DropdownMenuItem(value: 'video', child: Text('Video (MP4/MOV)')),
+                          DropdownMenuItem(value: 'image', child: Text('Image (JPG/PNG)')),
+                          DropdownMenuItem(value: 'other', child: Text('Other')),
+                        ],
+                        onChanged: (val) {
+                          if (val != null) {
+                            setDialogState(() => selectedType = val);
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ],
               ),
               if (selectedType == 'pdf' && existing == null) ...[
                 const SizedBox(height: 14),
@@ -215,14 +276,14 @@ class _CourseModulesManagerWidgetState
                   ),
                 ],
               ],
-              if (isGenerating) ...[
+              if (isUploading || isGenerating) ...[
                 const SizedBox(height: 16),
-                const Center(
+                Center(
                   child: Column(
                     children: [
-                      CircularProgressIndicator(color: Color(0xFF00D4FF)),
-                      SizedBox(height: 8),
-                      Text('AI is reading document...', style: TextStyle(color: Colors.white, fontSize: 12)),
+                      const CircularProgressIndicator(color: Color(0xFF00D4FF)),
+                      const SizedBox(height: 8),
+                      Text(isUploading ? 'Uploading file...' : 'AI is reading document...', style: const TextStyle(color: Colors.white, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -231,18 +292,48 @@ class _CourseModulesManagerWidgetState
           ),
           onSave: () async {
             if (titleCtrl.text.trim().isEmpty) return;
-            if (isGenerating) return;
+            if (isGenerating || isUploading) return;
 
             final now = DateTime.now();
             final dateStr = '${_monthName(now.month)} ${now.day}, ${now.year}';
             
-            if (autoGenerateQuiz && selectedFile != null) {
+            Uint8List? fileBytes;
+            String downloadUrl = existing?.url ?? '';
+            String storagePath = existing?.storagePath ?? '';
+            int fileSizeBytes = existing?.fileSizeBytes ?? 0;
+
+            if (selectedFile != null) {
+              setDialogState(() => isUploading = true);
+              
+              fileBytes = await selectedFile!.readAsBytes();
+              fileSizeBytes = fileBytes.length;
+              
+              // Upload to Firebase Storage
+              final safeName = selectedFile!.name.replaceAll(RegExp(r'\s+'), '_');
+              storagePath = 'course_modules/${widget.course.id}/${now.millisecondsSinceEpoch}_$safeName';
+              try {
+                final ref = FirebaseStorage.instance.ref(storagePath);
+                final snapshot = await ref.putData(fileBytes);
+                downloadUrl = await snapshot.ref.getDownloadURL();
+              } catch (e) {
+                print("Error uploading file: $e");
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Failed to upload file.')),
+                  );
+                }
+                setDialogState(() => isUploading = false);
+                return;
+              }
+              setDialogState(() => isUploading = false);
+            }
+            
+            if (autoGenerateQuiz && fileBytes != null) {
               setDialogState(() => isGenerating = true);
               
-              final bytes = await selectedFile!.readAsBytes();
               final aiService = AiQuizGeneratorService();
               final generatedQuizzes = await aiService.generateQuizzesFromPdf(
-                bytes, 
+                fileBytes, 
                 titleCtrl.text.trim(),
                 numQuizzes: numQuizzes,
                 numQuestions: numQuestions,
@@ -252,7 +343,7 @@ class _CourseModulesManagerWidgetState
                 widget.course.quizzes.addAll(generatedQuizzes);
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('\${generatedQuizzes.length} AI Quiz(zes) generated successfully!')),
+                    SnackBar(content: Text('${generatedQuizzes.length} AI Quiz(zes) generated successfully!')),
                   );
                 }
               } else {
@@ -274,9 +365,9 @@ class _CourseModulesManagerWidgetState
                     fileType: selectedType,
                     uploadedByName: context.read<AuthService>().currentUser?.name ?? 'Teacher',
                     uploadedAt: now,
-                    fileSizeBytes: 0, // Fallback since XFile doesn't have size directly
-                    url: '',
-                    storagePath: '',
+                    fileSizeBytes: fileSizeBytes,
+                    url: downloadUrl,
+                    storagePath: storagePath,
                   ),
                 );
               } else {
@@ -289,9 +380,9 @@ class _CourseModulesManagerWidgetState
                     fileType: selectedType,
                     uploadedByName: existing.uploadedByName,
                     uploadedAt: existing.uploadedAt,
-                    fileSizeBytes: existing.fileSizeBytes,
-                    url: existing.url,
-                    storagePath: existing.storagePath,
+                    fileSizeBytes: fileSizeBytes,
+                    url: downloadUrl,
+                    storagePath: storagePath,
                   );
                 }
               }
@@ -380,6 +471,37 @@ class _CourseModulesManagerWidgetState
                       module: module,
                       typeColor: info['color'],
                       typeIcon: info['icon'],
+                      onPreview: () async {
+                        final type = module.fileType;
+                        final url = module.url;
+                        final title = module.title;
+                        
+                        if (url.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('This file is unavailable or not uploaded properly.')),
+                          );
+                          return;
+                        }
+                        
+                        if (type == 'pdf') {
+                          context.push('/pdf-viewer?url=${Uri.encodeComponent(url)}&title=${Uri.encodeComponent(title)}');
+                        } else if (type == 'video' || url.toLowerCase().endsWith('.mp4') || url.toLowerCase().endsWith('.mov')) {
+                          context.push('/video-viewer?url=${Uri.encodeComponent(url)}&title=${Uri.encodeComponent(title)}');
+                        } else if (url.toLowerCase().endsWith('.jpg') || url.toLowerCase().endsWith('.png') || url.toLowerCase().endsWith('.jpeg')) {
+                          context.push('/image-viewer?url=${Uri.encodeComponent(url)}&title=${Uri.encodeComponent(title)}');
+                        } else {
+                          final uri = Uri.parse(url);
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri, mode: LaunchMode.inAppWebView);
+                          } else {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Could not open the file link.')),
+                              );
+                            }
+                          }
+                        }
+                      },
                       onEdit: () => _editModule(module),
                       onDelete: () => _deleteModule(module),
                     );
@@ -397,6 +519,7 @@ class _ModuleCard extends StatelessWidget {
   final CourseModule module;
   final Color typeColor;
   final String typeIcon;
+  final VoidCallback onPreview;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
@@ -404,6 +527,7 @@ class _ModuleCard extends StatelessWidget {
     required this.module,
     required this.typeColor,
     required this.typeIcon,
+    required this.onPreview,
     required this.onEdit,
     required this.onDelete,
   });
@@ -483,6 +607,12 @@ class _ModuleCard extends StatelessWidget {
           const SizedBox(width: 8),
           Column(
             children: [
+              _ActionIconBtn(
+                icon: 'visibility',
+                color: const Color(0xFF00D4FF),
+                onTap: onPreview,
+              ),
+              const SizedBox(height: 6),
               _ActionIconBtn(
                 icon: 'edit',
                 color: const Color(0xFFFFB800),

@@ -1,3 +1,5 @@
+import 'package:url_launcher/url_launcher.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/app_export.dart';
 import '../../../models/course_model.dart';
 
@@ -244,21 +246,52 @@ class _ModuleCardState extends State<_ModuleCard> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Opening "${widget.module.title}"…',
-                          style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87),
+                  onPressed: () async {
+                    if (widget.module.url.isNotEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Opening "${widget.module.title}"…',
+                            style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87),
+                          ),
+                          backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          duration: const Duration(seconds: 2),
                         ),
-                        backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.0),
+                      );
+                      
+                      final type = widget.module.fileType;
+                      final url = widget.module.url;
+                      final title = widget.module.title;
+                      
+                      if (type == 'pdf') {
+                        context.push('/pdf-viewer?url=${Uri.encodeComponent(url)}&title=${Uri.encodeComponent(title)}');
+                      } else if (type == 'video' || url.toLowerCase().endsWith('.mp4') || url.toLowerCase().endsWith('.mov')) {
+                        context.push('/video-viewer?url=${Uri.encodeComponent(url)}&title=${Uri.encodeComponent(title)}');
+                      } else if (url.toLowerCase().endsWith('.jpg') || url.toLowerCase().endsWith('.png') || url.toLowerCase().endsWith('.jpeg')) {
+                        context.push('/image-viewer?url=${Uri.encodeComponent(url)}&title=${Uri.encodeComponent(title)}');
+                      } else {
+                        final uri = Uri.parse(url);
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri, mode: LaunchMode.inAppWebView);
+                        } else {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Could not open the file link.')),
+                            );
+                          }
+                        }
+                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('This file is unavailable or not uploaded properly.'),
                         ),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
+                      );
+                    }
                   },
                   icon: CustomIconWidget(
                     iconName: widget.module.fileType == 'video'
