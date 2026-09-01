@@ -201,6 +201,12 @@ class _UnityArScreenState extends State<UnityArScreen> with TickerProviderStateM
   }
 
   void _showEarlyActivatorWarning(String ingredient) {
+    String message = "Wait! Don't add the $ingredient yet. Mix the other ingredients first.";
+    
+    if (ingredient == "BeakerEmpty") {
+      message = "The beaker is still empty! Pour the bottle first.";
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -209,7 +215,7 @@ class _UnityArScreenState extends State<UnityArScreen> with TickerProviderStateM
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                "Wait! Don't add the $ingredient yet. Mix the other ingredients first.",
+                message,
                 style: const TextStyle(fontSize: 14),
               ),
             ),

@@ -65,7 +65,9 @@ const List<Map<String, dynamic>> _experimentMaps = [
       'semanticLabel':
           'Test tubes showing white cream and yellow precipitates from silver nitrate halide tests',
       'steps': [
-        {'bottleTag': 'ReagentX', 'instructionTitle': 'Step 1: Reagent', 'instructionDetail': 'Add Reagent X.'},
+        {'bottleTag': 'DropperFill', 'instructionTitle': 'Step 1: Fill Dropper', 'instructionDetail': 'Fill the dropper with Chloride solution from the side beaker.'},
+        {'bottleTag': 'Bottle', 'instructionTitle': 'Step 2: Pour Silver Nitrate', 'instructionDetail': 'Pour the Silver Nitrate bottle into the main beaker.'},
+        {'bottleTag': 'DropperDrop', 'instructionTitle': 'Step 3: Add Chloride', 'instructionDetail': 'Drop the Chloride solution into the main beaker and observe the reaction.'},
       ],
     },
     {
