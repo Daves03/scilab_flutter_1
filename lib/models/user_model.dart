@@ -77,6 +77,7 @@ class AppUser {
   UserRole? role;
   VerificationStatus status;
   List<String> sections; // teacher's class sections, e.g. ['9-Rizal', '10-Luna']
+  String? studentNumber; // unique identifier for students
   DateTime? lastNotificationReadAt;
   bool hasAcceptedTerms;
 
@@ -87,6 +88,7 @@ class AppUser {
     this.role,
     this.status = VerificationStatus.pending,
     this.sections = const [],
+    this.studentNumber,
     this.lastNotificationReadAt,
     this.hasAcceptedTerms = false,
   });
@@ -107,6 +109,7 @@ class AppUser {
       role: UserRoleX.fromId(data['role'] as String?),
       status: VerificationStatusX.fromId(data['status'] as String?),
       sections: List<String>.from(data['sections'] ?? const []),
+      studentNumber: data['studentNumber'] as String?,
       lastNotificationReadAt: ts is Timestamp ? ts.toDate() : null,
       hasAcceptedTerms: data['hasAcceptedTerms'] as bool? ?? false,
     );
@@ -118,6 +121,7 @@ class AppUser {
         'role': role?.id,
         'status': status.id,
         'sections': sections,
+        if (studentNumber != null) 'studentNumber': studentNumber,
         'lastNotificationReadAt': lastNotificationReadAt != null ? Timestamp.fromDate(lastNotificationReadAt!) : null,
         'hasAcceptedTerms': hasAcceptedTerms,
       };

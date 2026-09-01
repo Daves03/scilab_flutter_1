@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, query, where, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { db, auth } from '../firebase';
-import { CheckCircle, XCircle, Key, RefreshCcw, Trash2, AlertTriangle, Search } from 'lucide-react';
+import { CheckCircle, XCircle, Key, RefreshCcw, Trash2, AlertTriangle, Search, Edit } from 'lucide-react';
 
 export default function ManageUsers() {
   const [activeTab, setActiveTab] = useState('pending'); // 'pending' | 'approved' | 'rejected'
@@ -13,6 +13,10 @@ export default function ManageUsers() {
   const [deleteConfirm, setDeleteConfirm] = useState(null); // User to reject
   const [recoverConfirm, setRecoverConfirm] = useState(null); // User to recover
   const [resetConfirm, setResetConfirm] = useState(null); // User to reset password
+  
+  const [editUser, setEditUser] = useState(null); // User to edit
+  const [editName, setEditName] = useState('');
+  const [editStudentNumber, setEditStudentNumber] = useState('');
 
   useEffect(() => {
     const q = query(collection(db, 'users'), where('status', '==', activeTab));
@@ -82,6 +86,27 @@ export default function ManageUsers() {
     }
   };
 
+  const handleOpenEdit = (user) => {
+    setEditUser(user);
+    setEditName(user.name || '');
+    setEditStudentNumber(user.studentNumber || '');
+  };
+
+  const handleConfirmEdit = async (e) => {
+    e.preventDefault();
+    if (!editUser) return;
+    try {
+      await updateDoc(doc(db, 'users', editUser.id), {
+        name: editName,
+        studentNumber: editStudentNumber
+      });
+      setEditUser(null);
+    } catch (err) {
+      console.error(err);
+      alert('Error updating user');
+    }
+  };
+
   return (
     <div className="animate-fade-in">
       <div className="page-header">
@@ -121,7 +146,7 @@ export default function ManageUsers() {
                 <input 
                   className="input-field mobile-w-full"
                   style={{ padding: '8px 12px 8px 36px', width: '220px', margin: 0 }}
-                  placeholder="Search name or email..."
+                  placeholder="Search name, email, or student no..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -150,6 +175,7 @@ export default function ManageUsers() {
               <thead>
                 <tr>
                   <th>Name</th>
+                  <th>Student Number</th>
                   <th>Email</th>
                   <th>Role</th>
                   <th>Sections</th>
@@ -169,7 +195,8 @@ export default function ManageUsers() {
                     const q = searchQuery.toLowerCase();
                     const name = (u.name || '').toLowerCase();
                     const email = (u.email || '').toLowerCase();
-                    searchMatch = name.includes(q) || email.includes(q);
+                    const studentNum = (u.studentNumber || '').toLowerCase();
+                    searchMatch = name.includes(q) || email.includes(q) || studentNum.includes(q);
                   }
                   
                   return roleMatch && searchMatch;
@@ -179,6 +206,9 @@ export default function ManageUsers() {
                       <div style={{ fontWeight: 600, color: 'white', textDecoration: activeTab === 'rejected' ? 'line-through' : 'none' }}>
                         {user.name || 'No Name'}
                       </div>
+                    </td>
+                    <td style={{ textDecoration: activeTab === 'rejected' ? 'line-through' : 'none', color: 'var(--text-secondary)' }}>
+                      {user.studentNumber ? `#${user.studentNumber}` : '-'}
                     </td>
                     <td style={{ textDecoration: activeTab === 'rejected' ? 'line-through' : 'none' }}>{user.email}</td>
                     <td>
@@ -202,6 +232,9 @@ export default function ManageUsers() {
 
                       {activeTab === 'approved' && (
                         <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                          <button className="btn btn-secondary" onClick={() => handleOpenEdit(user)} title="Edit User">
+                            <Edit size={16} /> Edit
+                          </button>
                           <button className="btn btn-secondary" onClick={() => setResetConfirm(user)} title="Reset Password">
                             <Key size={16} /> Reset
                           </button>
@@ -228,6 +261,50 @@ export default function ManageUsers() {
           </div>
         )}
       </div>
+
+      {/* Edit User Modal */}
+      {editUser && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.6)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex', justifyContent: 'center', alignItems: 'center',
+          zIndex: 100
+        }}>
+          <div className="glass-panel animate-fade-in" style={{ width: '100%', maxWidth: '420px', padding: '32px' }}>
+            <h2 style={{ marginBottom: '24px', textAlign: 'center' }}>Edit User</h2>
+            <form onSubmit={handleConfirmEdit}>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-secondary)', fontSize: '13px' }}>Full Name</label>
+                <input
+                  type="text"
+                  className="input-field"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  style={{ width: '100%' }}
+                  required
+                />
+              </div>
+              {editUser.role !== 'teacher' && (
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-secondary)', fontSize: '13px' }}>Student Number</label>
+                  <input
+                    type="text"
+                    className="input-field"
+                    value={editStudentNumber}
+                    onChange={(e) => setEditStudentNumber(e.target.value)}
+                    style={{ width: '100%' }}
+                  />
+                </div>
+              )}
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                <button type="button" className="btn btn-secondary" onClick={() => setEditUser(null)}>Cancel</button>
+                <button type="submit" className="btn btn-primary" style={{ paddingLeft: '24px', paddingRight: '24px' }}>Save Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Reject Modal */}
       {deleteConfirm && (

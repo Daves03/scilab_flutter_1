@@ -19,6 +19,7 @@ import 'package:provider/provider.dart';
 class _StudentSummary {
   final String name;
   final String section;
+  final String? studentNumber;
   final double avgQuizScore; // 0.0 – 1.0
   final double avgArScore; // 0.0 – 100.0
   final int quizzesTaken;
@@ -27,6 +28,7 @@ class _StudentSummary {
   const _StudentSummary({
     required this.name,
     required this.section,
+    this.studentNumber,
     required this.avgQuizScore,
     required this.avgArScore,
     required this.quizzesTaken,
@@ -128,6 +130,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
          dynamicStudents.add(_StudentSummary(
            name: u.name,
            section: section,
+           studentNumber: u.studentNumber,
            avgQuizScore: avgQuizScore,
            avgArScore: avgArScore,
            quizzesTaken: uAttempts.length,
@@ -1278,28 +1281,45 @@ class _StudentProgressCard extends StatelessWidget {
                   ],
                 ),
               ),
-              if (showBadge)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: student.performanceColor.withAlpha(30),
-                    borderRadius: BorderRadius.circular(20.0),
-                    border: Border.all(
-                      color: student.performanceColor.withAlpha(80),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (student.studentNumber != null && student.studentNumber!.isNotEmpty)
+                    Padding(
+                      padding: EdgeInsets.only(bottom: showBadge ? 6.0 : 0),
+                      child: Text(
+                        '#${student.studentNumber}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF00A0D4),
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    student.performanceLabel,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: student.performanceColor,
+                  if (showBadge)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: student.performanceColor.withAlpha(30),
+                        borderRadius: BorderRadius.circular(20.0),
+                        border: Border.all(
+                          color: student.performanceColor.withAlpha(80),
+                        ),
+                      ),
+                      child: Text(
+                        student.performanceLabel,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: student.performanceColor,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
+                ],
+              ),
             ],
           ),
           const SizedBox(height: 14),

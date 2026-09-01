@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:flutter/foundation.dart';
@@ -36,6 +37,13 @@ class AuthService extends ChangeNotifier {
     _authSub = _auth.authStateChanges().listen(_onAuthChanged);
   }
 
+  String _generateStudentNumber() {
+    final random = Random();
+    final year = DateTime.now().year;
+    final randDigits = random.nextInt(90000) + 10000; // 5 digits
+    return '$year$randDigits';
+  }
+
   void _onAuthChanged(fb.User? fbUser) {
     _userDocSub?.cancel();
     if (fbUser == null) {
@@ -71,6 +79,9 @@ class AuthService extends ChangeNotifier {
         password: password,
       );
       final uid = cred.user!.uid;
+      final isStudent = role == UserRole.grade9 || role == UserRole.grade10;
+      final generatedStudentNumber = isStudent ? _generateStudentNumber() : null;
+      
       final newUser = AppUser(
         id: uid,
         name: name,
@@ -78,6 +89,7 @@ class AuthService extends ChangeNotifier {
         role: role,
         status: VerificationStatus.pending,
         sections: sections,
+        studentNumber: generatedStudentNumber,
       );
       await _db.collection('users').doc(uid).set(newUser.toMap());
       await cred.user?.sendEmailVerification();
@@ -205,15 +217,20 @@ class AuthService extends ChangeNotifier {
     loading = true;
     notifyListeners();
     try {
+      final isStudent = role == 'grade9' || role == 'grade10';
+      final generatedStudentNumber = isStudent ? _generateStudentNumber() : null;
+
       final docRef = _db.collection('users').doc(user.uid);
       await docRef.set({
         'name': name,
         'role': role,
         'sections': sections,
+        if (generatedStudentNumber != null) 'studentNumber': generatedStudentNumber,
       }, SetOptions(merge: true));
       if (currentUser != null) {
         currentUser!.role = UserRoleX.fromId(role);
         currentUser!.sections = sections;
+        currentUser!.studentNumber = generatedStudentNumber;
       }
     } catch (e) {
       throw AuthFailure('Failed to complete profile: $e');

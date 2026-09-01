@@ -26,6 +26,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
   String _studentName = '';
   String _gradeLevel = '';
   String _schoolSection = '';
+  String _studentNumber = '';
 
   static const String _markerAssetPath =
       'assets/images/scilab_AR_marker-1785125880437.png';
@@ -44,6 +45,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
       _schoolSection = (user?.sections != null && user!.sections.isNotEmpty) 
           ? user.sections.first 
           : 'Section A';
+      _studentNumber = user?.studentNumber ?? '';
     });
   }
 
@@ -350,6 +352,17 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                         ],
                       ),
                     ),
+                    if (_studentNumber.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        '#$_studentNumber',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 24),
                     Divider(
                       color: isDark ? const Color(0xFF1E3A5F) : Colors.grey.shade200,

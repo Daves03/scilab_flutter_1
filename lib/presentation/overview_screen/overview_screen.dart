@@ -19,13 +19,23 @@ class _OverviewScreenState extends State<OverviewScreen>
   late PageController _featurePageController;
   int _currentFeaturePage = 0;
 
+  late PageController _arPreviewController;
+  int _currentArPreviewPage = 0;
+
+  final List<String> _arPreviewImages = const [
+    'assets/images/ar_preview_1.png',
+    'assets/images/ar_preview_2.png',
+    'assets/images/ar_preview_3.png',
+    'assets/images/ar_preview_5.png',
+  ];
+
   final List<_FeatureItem> _features = const [
     _FeatureItem(
       icon: 'view_in_ar',
       title: 'AR Chemistry Lab',
-      subtitle: 'Visualize molecules & reactions in augmented reality',
+      subtitle: 'Perform chemistry experiments in AR',
       description:
-          'Run virtual titrations, explore molecular orbitals, and watch chemical reactions unfold in 3D — no lab coat required.',
+          'Conduct virtual experiments like Flame Tests and Elephant Toothpaste. Follow guided steps and watch reactions unfold in 3D.',
       color: AppTheme.accentCyan,
       tint: AppTheme.tintCyan,
       imageUrl:
@@ -35,9 +45,9 @@ class _OverviewScreenState extends State<OverviewScreen>
     _FeatureItem(
       icon: 'play_circle_filled',
       title: 'Video Lessons',
-      subtitle: 'Expert-taught chemistry lessons on demand',
+      subtitle: 'Recommended chemistry video lessons',
       description:
-          'Stream curated video lessons covering Organic, Inorganic, Physical, and Biochemistry — for Grades 9–10.',
+          'Stream YouTube video recommendations based on the specific chemistry topics and AR experiments you are exploring.',
       color: AppTheme.accentPurple,
       tint: AppTheme.tintPurple,
       imageUrl:
@@ -47,9 +57,9 @@ class _OverviewScreenState extends State<OverviewScreen>
     _FeatureItem(
       icon: 'quiz',
       title: 'Smart Quizzes',
-      subtitle: 'Test your knowledge with adaptive assessments',
+      subtitle: 'Build custom quizzes or generate with AI',
       description:
-          'Instant feedback, detailed explanations, and progress tracking help you master every concept before exam day.',
+          'Teachers can create quizzes manually or use AI to instantly generate questions by analyzing attached course modules.',
       color: AppTheme.accentGreen,
       tint: AppTheme.tintGreen,
       imageUrl:
@@ -59,14 +69,38 @@ class _OverviewScreenState extends State<OverviewScreen>
     _FeatureItem(
       icon: 'menu_book',
       title: 'Course Library',
-      subtitle: '20+ structured courses across all chemistry branches',
+      subtitle: 'Access structured courses tailored for your class',
       description:
-          'Follow guided learning paths with chapter-by-chapter progress tracking, ratings, and peer enrollment stats.',
+          'Follow teacher-guided learning paths with modules, interactive quizzes, and seamless progress tracking.',
       color: AppTheme.warningAmber,
       tint: AppTheme.tintAmber,
       imageUrl:
           'https://images.pexels.com/photos/3825527/pexels-photo-3825527.jpeg',
       imageLabel: 'Open chemistry textbook with colorful molecular diagrams',
+    ),
+    _FeatureItem(
+      icon: 'insights',
+      title: 'Progress Tracking',
+      subtitle: 'Monitor your learning journey',
+      description:
+          'Keep track of your quiz scores, completed modules, and overall course progression in real-time.',
+      color: AppTheme.accentCyan,
+      tint: AppTheme.tintCyan,
+      imageUrl:
+          'https://images.pexels.com/photos/5905717/pexels-photo-5905717.jpeg',
+      imageLabel: 'Student tracking progress on digital device',
+    ),
+    _FeatureItem(
+      icon: 'verified_user',
+      title: 'Secure Classrooms',
+      subtitle: 'Learn safely with teacher approval',
+      description:
+          'Join secure digital classrooms where your teachers approve access, curate content, and monitor your progress.',
+      color: AppTheme.accentPurple,
+      tint: AppTheme.tintPurple,
+      imageUrl:
+          'https://images.pexels.com/photos/4143791/pexels-photo-4143791.jpeg',
+      imageLabel: 'Teacher guiding a student in a classroom',
     ),
   ];
 
@@ -92,6 +126,14 @@ class _OverviewScreenState extends State<OverviewScreen>
         setState(() => _currentFeaturePage = page);
       }
     });
+
+    _arPreviewController = PageController();
+    _arPreviewController.addListener(() {
+      final page = _arPreviewController.page?.round() ?? 0;
+      if (page != _currentArPreviewPage) {
+        setState(() => _currentArPreviewPage = page);
+      }
+    });
   }
 
   @override
@@ -100,6 +142,7 @@ class _OverviewScreenState extends State<OverviewScreen>
     _floatController.dispose();
     _pulseController.dispose();
     _featurePageController.dispose();
+    _arPreviewController.dispose();
     super.dispose();
   }
 
@@ -328,6 +371,52 @@ class _OverviewScreenState extends State<OverviewScreen>
               ),
             ),
             const SizedBox(height: 28),
+            SizedBox(
+              height: 220,
+              child: PageView.builder(
+                controller: _arPreviewController,
+                itemCount: _arPreviewImages.length,
+                itemBuilder: (context, index) {
+                  return Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      image: DecorationImage(
+                        image: AssetImage(_arPreviewImages[index]),
+                        fit: BoxFit.cover,
+                      ),
+                      border: Border.all(
+                        color: AppTheme.accentCyan.withAlpha(51),
+                        width: 1,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
+            Center(
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                children: List.generate(_arPreviewImages.length, (i) {
+                  final isActive = i == _currentArPreviewPage;
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOutCubic,
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    width: isActive ? 20 : 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: isActive
+                          ? AppTheme.accentCyan
+                          : AppTheme.textCaption.withAlpha(102),
+                      borderRadius: BorderRadius.circular(3.0),
+                    ),
+                  );
+                }),
+              ),
+            ),
+            const SizedBox(height: 28),
             Row(
               children: [
                 Expanded(
@@ -496,24 +585,26 @@ class _OverviewScreenState extends State<OverviewScreen>
           ),
         ),
         const SizedBox(height: 16),
-        Wrap(
-          alignment: WrapAlignment.center,
-          children: List.generate(_features.length, (i) {
-            final isActive = i == _currentFeaturePage;
-            return AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOutCubic,
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              width: isActive ? 20 : 6,
-              height: 6,
-              decoration: BoxDecoration(
-                color: isActive
-                    ? _features[_currentFeaturePage].color
-                    : AppTheme.textCaption.withAlpha(102),
-                borderRadius: BorderRadius.circular(3.0),
-              ),
-            );
-          }),
+        Center(
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            children: List.generate(_features.length, (i) {
+              final isActive = i == _currentFeaturePage;
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                width: isActive ? 20 : 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: isActive
+                      ? _features[_currentFeaturePage].color
+                      : AppTheme.textCaption.withAlpha(102),
+                  borderRadius: BorderRadius.circular(3.0),
+                ),
+              );
+            }),
+          ),
         ),
       ],
     );
@@ -673,7 +764,9 @@ class _FeatureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: () => _showPreviewDialog(context),
+      child: Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
         color: AppTheme.surfaceCard,
@@ -789,6 +882,86 @@ class _FeatureCard extends StatelessWidget {
           ],
         ),
       ),
+      ),
+    );
+  }
+
+  void _showPreviewDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: AppTheme.surfaceCard,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(_iconData(feature.icon), size: 48, color: feature.color),
+              const SizedBox(height: 16),
+              Text(
+                feature.title,
+                style: GoogleFonts.manrope(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textPrimary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Content Preview',
+                style: GoogleFonts.manrope(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: feature.color,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Sign in or create an account to explore ${feature.title} and access our full suite of interactive learning tools.',
+                style: GoogleFonts.manrope(
+                  fontSize: 14,
+                  color: AppTheme.textMuted,
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    context.go(AppRoutes.signUpLoginScreen);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: feature.color,
+                    foregroundColor: AppTheme.primaryNavy,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text('Get Started'),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  'Maybe Later',
+                  style: GoogleFonts.manrope(
+                    color: AppTheme.textMuted,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -802,6 +975,10 @@ class _FeatureCard extends StatelessWidget {
         return Icons.quiz_rounded;
       case 'menu_book':
         return Icons.menu_book_rounded;
+      case 'insights':
+        return Icons.insights_rounded;
+      case 'verified_user':
+        return Icons.verified_user_rounded;
       default:
         return Icons.star_rounded;
     }

@@ -19,12 +19,14 @@ class StudentProgress {
   final String section;
   final List<QuizResult> quizResults;
   final List<ArLabRecord> arLabRecords;
+  final String? studentNumber;
 
   const StudentProgress({
     required this.name,
     required this.section,
     required this.quizResults,
     required this.arLabRecords,
+    this.studentNumber,
   });
 }
 
@@ -171,6 +173,7 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
            section: section,
            quizResults: quizResults,
            arLabRecords: uArRecords,
+           studentNumber: u.studentNumber,
          ));
       }
 
@@ -204,9 +207,11 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
           .toList();
     }
     if (_searchQuery.isNotEmpty) {
+      final q = _searchQuery.toLowerCase();
       students = students
           .where(
-            (s) => s.name.toLowerCase().contains(_searchQuery.toLowerCase()),
+            (s) => s.name.toLowerCase().contains(q) || 
+                   (s.studentNumber ?? '').toLowerCase().contains(q),
           )
           .toList();
     }
@@ -616,6 +621,14 @@ class _QuizResultsTab extends StatelessWidget {
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
+                            if (student.studentNumber != null && student.studentNumber!.isNotEmpty)
+                              Text(
+                                '#${student.studentNumber}',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF00A0D4),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             Text(
                               student.section,
                               style: theme.textTheme.labelSmall?.copyWith(
@@ -966,6 +979,14 @@ class _ArLabTab extends StatelessWidget {
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
+                            if (student.studentNumber != null && student.studentNumber!.isNotEmpty)
+                              Text(
+                                '#${student.studentNumber}',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00A050),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             Text(
                               student.section,
                               style: theme.textTheme.labelSmall?.copyWith(
