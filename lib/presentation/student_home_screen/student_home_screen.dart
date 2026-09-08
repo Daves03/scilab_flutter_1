@@ -429,6 +429,11 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
         }
       }
       
+      final clearedAt = user.notificationsClearedAt;
+      if (clearedAt != null) {
+        notifications.removeWhere((n) => !(n['timestamp'] as DateTime).isAfter(clearedAt));
+      }
+
       notifications.sort((a, b) => (b['timestamp'] as DateTime).compareTo(a['timestamp'] as DateTime));
       if (notifications.length > 5) notifications = notifications.sublist(0, 5);
       return notifications;
@@ -523,16 +528,80 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                             ),
                           ],
                         ),
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade200,
-                              shape: BoxShape.circle,
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (notifs.isNotEmpty)
+                              TextButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (confirmCtx) {
+                                      final isDark = Theme.of(context).brightness == Brightness.dark;
+                                      return AlertDialog(
+                                        backgroundColor: isDark ? const Color(0xFF142240) : Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(16),
+                                          side: BorderSide(color: isDark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+                                        ),
+                                        title: Text(
+                                          'Clear All Notifications',
+                                          style: TextStyle(
+                                            color: isDark ? Colors.white : Colors.black87,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        content: Text(
+                                          'Are you sure you want to clear all notifications?',
+                                          style: TextStyle(
+                                            color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
+                                          ),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(confirmCtx),
+                                            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              context.read<AuthService>().clearAllNotifications();
+                                              Navigator.pop(confirmCtx);
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text('Clear', style: TextStyle(color: Color(0xFFFF4757))),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                child: Text(
+                                  'Clear All',
+                                  style: TextStyle(
+                                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            if (notifs.isNotEmpty) const SizedBox(width: 12),
+                            GestureDetector(
+                              onTap: () => Navigator.pop(context),
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade200,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: CustomIconWidget(iconName: 'close', color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700, size: 16),
+                              ),
                             ),
-                            child: CustomIconWidget(iconName: 'close', color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700, size: 16),
-                          ),
+                          ],
                         ),
                       ],
                     ),

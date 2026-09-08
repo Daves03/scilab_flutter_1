@@ -17,6 +17,7 @@ import 'package:provider/provider.dart';
 
 // ── Reuse data models from teacher_progress_screen ────────────────────────────
 class _StudentSummary {
+  final String id;
   final String name;
   final String section;
   final String? studentNumber;
@@ -26,6 +27,7 @@ class _StudentSummary {
   final int arAttempts;
 
   const _StudentSummary({
+    required this.id,
     required this.name,
     required this.section,
     this.studentNumber,
@@ -78,6 +80,9 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   List<QueryDocumentSnapshot> _quizAttempts = [];
   List<QueryDocumentSnapshot> _arAttempts = [];
   
+  List<Course> _allCourses = [];
+  List<QuizAttempt> _allAttempts = [];
+
   final Map<String, DateTime> _pendingUserTimestamps = {};
 
   Future<void> _loadData() async {
@@ -92,8 +97,16 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
           
       final users = studentsSnap.docs.map((d) => AppUser.fromMap(d.id, d.data())).toList();
 
+      final coursesSnap = await db.collection('courses').get();
+      final courses = coursesSnap.docs.map((d) => Course.fromMap(d.id, d.data())).toList();
+
       final attemptsSnap = await db.collection('quiz_attempts').get();
       final allAttempts = attemptsSnap.docs.map((d) => QuizAttempt.fromMap(d.id, d.data())).toList();
+
+      if (mounted) {
+        _allCourses = courses;
+        _allAttempts = allAttempts;
+      }
 
       List<_StudentSummary> dynamicStudents = [];
       for (var u in users) {
@@ -128,6 +141,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
          final section = u.sections.isNotEmpty ? u.sections.first : 'No Section';
 
          dynamicStudents.add(_StudentSummary(
+           id: u.id,
            name: u.name,
            section: section,
            studentNumber: u.studentNumber,
@@ -143,6 +157,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
           _students = dynamicStudents;
           _loading = false;
         });
+        _updateNotifs();
       }
     } catch (e) {
       print('Error loading dynamic progress: $e');
@@ -226,97 +241,25 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     final db = FirebaseFirestore.instance;
     final user = context.read<AuthService>().currentUser;
     if (user == null) return;
-    
-    void updateNotifs() async {
-      List<Map<String, dynamic>> notifications = [];
-      final teacherSections = user.sections;
-      
-      // 1. Pending Users
-      for (var doc in _pendingUsers) {
-        final u = AppUser.fromMap(doc.id, doc.data() as Map<String, dynamic>);
-        if (u.sections.any((s) => teacherSections.contains(s))) {
-          if (!_pendingUserTimestamps.containsKey(u.id)) {
-            _pendingUserTimestamps[u.id] = DateTime.now();
-          }
-          notifications.add({
-            'title': 'New Student Approval',
-            'desc': '${u.name} requested to join ${u.sections.first}.',
-            'icon': 'person_add',
-            'color': const Color(0xFF7C3AED),
-            'timestamp': _pendingUserTimestamps[u.id]!,
-            'action': 'approval',
-          });
-        }
-      }
-
-      // 2. Quiz Attempts
-      for (var doc in _quizAttempts) {
-        final data = doc.data() as Map<String, dynamic>;
-        final studentId = data['studentId'] as String? ?? '';
-        final title = data['quizTitle'] as String? ?? '';
-        final ts = data['submittedAt'] as Timestamp?;
-        // We only have the top 10 recent quizzes, so fetching names individually is okay
-        String name = 'A student';
-        if (studentId.isNotEmpty) {
-           final sDoc = await db.collection('users').doc(studentId).get();
-           if (sDoc.exists) name = sDoc.data()?['name'] ?? name;
-        }
-        notifications.add({
-          'title': 'Quiz Submitted',
-          'desc': '$name submitted $title.',
-          'icon': 'assignment_turned_in',
-          'color': const Color(0xFF00D4FF),
-          'timeStr': _formatNotificationTime(ts?.toDate()),
-          'timestamp': ts?.toDate() ?? DateTime.now(),
-        });
-      }
-
-      // 3. AR Results
-      for (var doc in _arAttempts) {
-        final data = doc.data() as Map<String, dynamic>;
-        final title = data['experimentId'] as String? ?? 'Experiment';
-        final ts = data['completedAt'] as Timestamp?;
-        // Parent doc id is the studentId
-        String name = 'A student';
-        final parentRef = doc.reference.parent.parent;
-        if (parentRef != null) {
-           final sDoc = await parentRef.get();
-           if (sDoc.exists) name = sDoc.data()?['name'] ?? name;
-        }
-        notifications.add({
-          'title': 'AR Activity Completed',
-          'desc': '$name completed $title.',
-          'icon': 'view_in_ar',
-          'color': const Color(0xFFFFB300),
-          'timeStr': _formatNotificationTime(ts?.toDate()),
-          'timestamp': ts?.toDate() ?? DateTime.now(),
-        });
-      }
-
-      notifications.sort((a, b) => (b['timestamp'] as DateTime).compareTo(a['timestamp'] as DateTime));
-      _notifController.add(notifications);
-    }
 
     _usersSub = db.collection('users')
       .where('role', whereIn: [UserRole.grade9.id, UserRole.grade10.id])
       .where('status', isEqualTo: VerificationStatus.pending.id)
       .snapshots().listen((snap) {
         _pendingUsers = snap.docs;
-        updateNotifs();
+        _updateNotifs();
       });
 
     _quizSub = db.collection('quiz_attempts')
       .orderBy('submittedAt', descending: true).limit(10)
       .snapshots().listen((snap) {
         _quizAttempts = snap.docs;
-        updateNotifs();
+        _updateNotifs();
       });
       
-    // Collection group query might fail if index is missing, so we wrap in try-catch or limit
     try {
       _arSub = db.collectionGroup('experiment_activity')
         .where('completed', isEqualTo: true)
-        // Can't orderBy completedAt easily without composite index, so just listen
         .snapshots().listen((snap) {
           final sorted = snap.docs.toList()..sort((a, b) {
             final ta = (a.data() as Map<String, dynamic>)['completedAt'] as Timestamp?;
@@ -325,11 +268,137 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
             return tb.compareTo(ta);
           });
           _arAttempts = sorted.take(10).toList();
-          updateNotifs();
+          _updateNotifs();
         });
     } catch (e) {
       print('AR notification stream failed: $e');
     }
+  }
+
+  void _updateNotifs() async {
+    if (!mounted) return;
+    final db = FirebaseFirestore.instance;
+    final user = context.read<AuthService>().currentUser;
+    if (user == null) return;
+
+    List<Map<String, dynamic>> notifications = [];
+    final teacherSections = user.sections;
+    
+    // 1. Pending Users
+    for (var doc in _pendingUsers) {
+      final u = AppUser.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+      if (u.sections.any((s) => teacherSections.contains(s))) {
+        if (!_pendingUserTimestamps.containsKey(u.id)) {
+          _pendingUserTimestamps[u.id] = DateTime.now();
+        }
+        notifications.add({
+          'title': 'New Student Approval',
+          'desc': '${u.name} requested to join ${u.sections.first}.',
+          'icon': 'person_add',
+          'color': const Color(0xFF7C3AED),
+          'timestamp': _pendingUserTimestamps[u.id]!,
+          'action': 'approval',
+        });
+      }
+    }
+
+    final studentMap = {for (var s in _students) s.id: s.name};
+
+    // 2. Answered Quizzes (from _quizAttempts)
+    Map<String, List<Map<String, dynamic>>> answeredQuizzes = {};
+    for (var doc in _quizAttempts) {
+       final data = doc.data() as Map<String, dynamic>;
+       final sId = data['studentId'] as String? ?? '';
+       if (studentMap.containsKey(sId)) {
+          final title = data['quizTitle'] as String? ?? 'Quiz';
+          answeredQuizzes.putIfAbsent(title, () => []).add(data);
+       }
+    }
+    for (var entry in answeredQuizzes.entries) {
+       final title = entry.key;
+       final attempts = entry.value;
+       final count = attempts.length;
+       final ts = attempts.first['submittedAt'] as Timestamp?;
+       notifications.add({
+          'title': 'Quiz Submitted',
+          'desc': count == 1 ? '${studentMap[attempts.first['studentId']]} answered $title.' : '$count students answered $title.',
+          'icon': 'assignment_turned_in',
+          'color': const Color(0xFF00D4FF),
+          'timeStr': _formatNotificationTime(ts?.toDate()),
+          'timestamp': ts?.toDate() ?? DateTime.now(),
+       });
+    }
+
+    // 3. AR Results
+    final Map<String, String> arExpMap = {
+      'lab_1': 'Experiment 1: Microscope',
+      'lab_2': 'Experiment 2: Cell Structure',
+      'lab_3': 'Experiment 3: Mitosis',
+    };
+    
+    Map<String, List<Map<String, dynamic>>> arResults = {};
+    for (var doc in _arAttempts) {
+       final data = doc.data() as Map<String, dynamic>;
+       final parentRef = doc.reference.parent.parent;
+       if (parentRef != null && studentMap.containsKey(parentRef.id)) {
+          final expId = data['experimentId'] as String? ?? 'Experiment';
+          final title = arExpMap[expId] ?? expId;
+          arResults.putIfAbsent(title, () => []).add({
+             'data': data,
+             'studentId': parentRef.id,
+          });
+       }
+    }
+    for (var entry in arResults.entries) {
+       final title = entry.key;
+       final acts = entry.value;
+       final count = acts.length;
+       final ts = acts.first['data']['completedAt'] as Timestamp?;
+       notifications.add({
+          'title': 'AR Activity Completed',
+          'desc': count == 1 ? '${studentMap[acts.first['studentId']]} completed $title.' : '$count students completed $title.',
+          'icon': 'view_in_ar',
+          'color': const Color(0xFFFFB300),
+          'timeStr': _formatNotificationTime(ts?.toDate()),
+          'timestamp': ts?.toDate() ?? DateTime.now(),
+       });
+    }
+
+    // 4. Missed Quizzes (from _allCourses and _allAttempts)
+    Map<String, List<String>> missedQuizzes = {};
+    Map<String, DateTime> missedQuizTimes = {};
+    for (var s in _students) {
+       for (var course in _allCourses) {
+          if (course.sections.contains(s.section)) {
+             for (var quiz in course.quizzes) {
+                final hasAttempted = _allAttempts.any((a) => a.quizId == quiz.id && a.studentId == s.id);
+                if (!hasAttempted && quiz.dueDate != null && quiz.dueDate!.isBefore(DateTime.now())) {
+                   missedQuizzes.putIfAbsent(quiz.title, () => []).add(s.id);
+                   if (!missedQuizTimes.containsKey(quiz.title)) {
+                       missedQuizTimes[quiz.title] = quiz.dueDate!;
+                   }
+                }
+             }
+          }
+       }
+    }
+    for (var entry in missedQuizzes.entries) {
+       final title = entry.key;
+       final ids = entry.value;
+       final count = ids.length;
+       final dueDate = missedQuizTimes[title] ?? DateTime.now();
+       notifications.add({
+          'title': 'Quiz Missed',
+          'desc': count == 1 ? '${studentMap[ids.first]} missed $title.' : '$count students missed $title.',
+          'icon': 'warning',
+          'color': const Color(0xFFFF4757),
+          'timeStr': _formatNotificationTime(dueDate),
+          'timestamp': dueDate,
+       });
+    }
+
+    notifications.sort((a, b) => (b['timestamp'] as DateTime).compareTo(a['timestamp'] as DateTime));
+    _notifController.add(notifications);
   }
 
   @override
@@ -353,7 +422,9 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
 
     final filteredStudents = activeStudents.where((s) {
       final q = _searchQuery.toLowerCase();
-      return s.name.toLowerCase().contains(q) || s.section.toLowerCase().contains(q);
+      return s.name.toLowerCase().contains(q) ||
+             s.section.toLowerCase().contains(q) ||
+             (s.studentNumber != null && s.studentNumber!.toLowerCase().contains(q));
     }).toList();
 
     return Scaffold(
@@ -575,7 +646,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                   return GestureDetector(
                     onTap: () {
                       context.read<AuthService>().markNotificationsAsRead();
-                      _showNotificationsDialog(context);
+                      _showNotificationsDialog(context, notifs);
                     },
                     child: Container(
                       width: 44,
@@ -631,7 +702,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   // _fetchDynamicNotifications removed, replaced by Stream
 
 
-  void _showNotificationsDialog(BuildContext context) {
+  void _showNotificationsDialog(BuildContext context, List<Map<String, dynamic>> notifs) {
     showDialog(
       context: context,
       builder: (context) {
@@ -653,21 +724,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                 ),
               ],
             ),
-            child: StreamBuilder<List<Map<String, dynamic>>>(
-              stream: _notifController.stream,
-              builder: (ctx, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const SizedBox(
-                    height: 200,
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-                }
-                
-                final notifs = snapshot.data ?? [];
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -721,9 +781,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                         );
                       }).toList(),
                   ],
-                );
-              },
-            ),
+                ),
           ),
         );
       },

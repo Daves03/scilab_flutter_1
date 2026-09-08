@@ -79,6 +79,7 @@ class AppUser {
   List<String> sections; // teacher's class sections, e.g. ['9-Rizal', '10-Luna']
   String? studentNumber; // unique identifier for students
   DateTime? lastNotificationReadAt;
+  DateTime? notificationsClearedAt;
   bool hasAcceptedTerms;
 
   AppUser({
@@ -90,6 +91,7 @@ class AppUser {
     this.sections = const [],
     this.studentNumber,
     this.lastNotificationReadAt,
+    this.notificationsClearedAt,
     this.hasAcceptedTerms = false,
   });
 
@@ -102,6 +104,7 @@ class AppUser {
 
   factory AppUser.fromMap(String id, Map<String, dynamic> data) {
     final ts = data['lastNotificationReadAt'];
+    final clearedTs = data['notificationsClearedAt'];
     return AppUser(
       id: id,
       name: (data['name'] as String?) ?? '',
@@ -111,6 +114,7 @@ class AppUser {
       sections: List<String>.from(data['sections'] ?? const []),
       studentNumber: data['studentNumber'] as String?,
       lastNotificationReadAt: ts is Timestamp ? ts.toDate() : null,
+      notificationsClearedAt: clearedTs is Timestamp ? clearedTs.toDate() : null,
       hasAcceptedTerms: data['hasAcceptedTerms'] as bool? ?? false,
     );
   }

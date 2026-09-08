@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../core/app_export.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/custom_icon_widget.dart';
+import '../../models/course_model.dart';
+import '../../models/user_model.dart';
 
 class _QuizResult {
   final String title;
@@ -12,6 +14,13 @@ class _QuizResult {
   final int total;
   final DateTime timestamp;
   const _QuizResult(this.title, this.date, this.score, this.total, this.timestamp);
+}
+
+class _MissedQuizResult {
+  final String title;
+  final String date;
+  final DateTime timestamp;
+  const _MissedQuizResult(this.title, this.date, this.timestamp);
 }
 
 class _ArExperimentResult {
@@ -34,6 +43,7 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
 
   bool _loading = true;
   List<_QuizResult> _quizzes = [];
+  List<_MissedQuizResult> _missedQuizzes = [];
   List<_ArExperimentResult> _arExperiments = [];
   String _avgQuiz = '0%';
   String _avgAr = '0.0';
@@ -115,9 +125,28 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
       // Sort AR by date descending if completedAt exists
       ars.sort((a, b) => b.date.compareTo(a.date)); 
 
+      // Fetch missed quizzes
+      List<_MissedQuizResult> missedQuizzes = [];
+      if (user.role != null) {
+        final coursesSnap = await db.collection('courses').where('grade', isEqualTo: user.role!.label).get();
+        for (var doc in coursesSnap.docs) {
+          final course = Course.fromMap(doc.id, doc.data());
+          if (user.sections.isNotEmpty && course.sections.contains(user.sections.first)) {
+            for (var q in course.quizzes) {
+               final hasAttempted = qSnap.docs.any((d) => (d.data()['quizId'] as String?) == q.id);
+               if (!hasAttempted && q.dueDate != null && q.dueDate!.isBefore(DateTime.now())) {
+                  missedQuizzes.add(_MissedQuizResult(q.title, _formatDate(q.dueDate!), q.dueDate!));
+               }
+            }
+          }
+        }
+        missedQuizzes.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      }
+
       if (mounted) {
         setState(() {
           _quizzes = quizzes;
+          _missedQuizzes = missedQuizzes;
           _arExperiments = ars;
           _avgQuiz = '${avgQ.toStringAsFixed(0)}%';
           _avgAr = avgA.toStringAsFixed(1);
@@ -173,6 +202,30 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
                       child: _buildQuizCard(_quizzes[index]),
                     ),
                     childCount: _quizzes.length,
+                  ),
+                ),
+          SliverToBoxAdapter(
+            child: _buildAnimatedSection(
+              delay: 250,
+              child: _buildSectionHeader('Missed Quizzes', 'warning', color: const Color(0xFFFF4757)),
+            ),
+          ),
+          _missedQuizzes.isEmpty
+              ? SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Center(
+                      child: Text('No missed quizzes.', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600)),
+                    ),
+                  ),
+                )
+              : SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => _buildAnimatedSection(
+                      delay: 300 + (index * 50),
+                      child: _buildMissedQuizCard(_missedQuizzes[index]),
+                    ),
+                    childCount: _missedQuizzes.length,
                   ),
                 ),
           SliverToBoxAdapter(
@@ -380,14 +433,14 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
     );
   }
 
-  Widget _buildSectionHeader(String title, String icon) {
+  Widget _buildSectionHeader(String title, String icon, {Color color = const Color(0xFF8BA3C0)}) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
       child: Row(
         children: [
           CustomIconWidget(
             iconName: icon,
-            color: const Color(0xFF8BA3C0),
+            color: color,
             size: 20,
           ),
           const SizedBox(width: 8),
@@ -457,6 +510,62 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
             ),
             child: Text(
               '${result.score} / ${result.total}',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: scoreColor,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMissedQuizCard(_MissedQuizResult result) {
+    const scoreColor = Color(0xFFFF4757);
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  result.title,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Due: ${result.date}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: scoreColor.withAlpha(20),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: scoreColor.withAlpha(80)),
+            ),
+            child: const Text(
+              'Missed',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,

@@ -279,6 +279,19 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  Future<void> clearAllNotifications() async {
+    if (currentUser == null) return;
+    try {
+      await _db.collection('users').doc(currentUser!.id).update({
+        'notificationsClearedAt': FieldValue.serverTimestamp(),
+      });
+      currentUser!.notificationsClearedAt = DateTime.now();
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error clearing notifications: $e');
+    }
+  }
+
   Future<void> acceptTerms() async {
     if (currentUser == null) return;
     loading = true;
