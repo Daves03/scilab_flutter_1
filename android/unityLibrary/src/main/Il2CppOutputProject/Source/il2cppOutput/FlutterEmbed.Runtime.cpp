@@ -270,7 +270,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RuntimeHelpers_InitializeArray_m751372AA
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 118883
+// Method Definition Index: 115022
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void SendToFlutter_Send_m46A64C268F0E9BEB106502B03668E140B756C393 (String_t* ___0_data, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -342,7 +342,7 @@ IL_002c:
 		return;
 	}
 }
-// Method Definition Index: 118884
+// Method Definition Index: 115023
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void SendToFlutter__ctor_m2228BB79569188ED752746B0175D86941F71D37B (SendToFlutter_tFB22A5CB193AC448C2E8FA7038B51B3F3EF7CBFF* __this, const RuntimeMethod* method) 
 {
 	{
@@ -358,7 +358,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void SendToFlutter__ctor_m2228BB79569188ED752
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 118885
+// Method Definition Index: 115024
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR MonoScriptData_t3BB74EC0695EE152C3C9F56CB66BE1B49AB4B506 UnitySourceGeneratedAssemblyMonoScriptTypes_v1_Get_m31559371FE982020D7542CD8A0371AEF93100BAA (const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -392,7 +392,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR MonoScriptData_t3BB74EC0695EE152C3C9F56CB66BE
 		return L_6;
 	}
 }
-// Method Definition Index: 118886
+// Method Definition Index: 115025
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void UnitySourceGeneratedAssemblyMonoScriptTypes_v1__ctor_mF75E382740982D5C63AE6BECBC5BFB03C4F32392 (UnitySourceGeneratedAssemblyMonoScriptTypes_v1_tF66B478EBB543479528DCC535FF86306AC66C407* __this, const RuntimeMethod* method) 
 {
 	{

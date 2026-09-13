@@ -8200,7 +8200,7 @@ IL2CPP_EXTERN_C void VuAreaTargetCaptureConfig_t01BFB59D0BF57FA29167B48F37485A26
 IL2CPP_EXTERN_C void VuAreaTargetCaptureConfig_t01BFB59D0BF57FA29167B48F37485A260818649F_marshal_com_cleanup(VuAreaTargetCaptureConfig_t01BFB59D0BF57FA29167B48F37485A260818649F_marshaled_com& marshaled)
 {
 }
-// Method Definition Index: 106688
+// Method Definition Index: 102867
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAreaTargetCaptureConfig__ctor_m13B8167B0A048EB4CB0A28FE3D03E6B07CBC75E6 (VuAreaTargetCaptureConfig_t01BFB59D0BF57FA29167B48F37485A260818649F* __this, const RuntimeMethod* method) 
 {
 	{
@@ -8216,7 +8216,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAreaTargetCaptureConfig__ctor_m13B8167
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106689
+// Method Definition Index: 102868
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Internal_t3A4727F1194A014FB49840D49C0FB0DDBE69CDD2 Internal_Create_mAA34F3D618533492A9711782FA8BD0891E0FFC03 (VuAreaTargetCaptureConfig_t01BFB59D0BF57FA29167B48F37485A260818649F* ___0_config, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -8275,7 +8275,7 @@ IL_0025:
 		return L_6;
 	}
 }
-// Method Definition Index: 106690
+// Method Definition Index: 102869
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* Internal_Clone_m5D650994C4749269AAE9E368D21F59274483D79D (Internal_t3A4727F1194A014FB49840D49C0FB0DDBE69CDD2* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -8417,7 +8417,7 @@ IL2CPP_EXTERN_C void VuAreaTargetCaptureGenerationConfig_t18CF7F50DE1C5812052F46
 	il2cpp_codegen_marshal_free_bstring(marshaled.___alignmentTargetName);
 	marshaled.___alignmentTargetName = NULL;
 }
-// Method Definition Index: 106691
+// Method Definition Index: 102870
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAreaTargetCaptureGenerationConfig__ctor_m9A280BCC69C31E4330B4B2F8767FCF6C3719AB70 (VuAreaTargetCaptureGenerationConfig_t18CF7F50DE1C5812052F4601B9B421DB5E4916E9* __this, const RuntimeMethod* method) 
 {
 	{
@@ -8537,7 +8537,7 @@ IL2CPP_EXTERN_C void Internal_t725F163761104F5EB770A710D1A17C285F66E4EC_marshal_
 	il2cpp_codegen_marshal_free(marshaled.___alignmentTargetName);
 	marshaled.___alignmentTargetName = NULL;
 }
-// Method Definition Index: 106692
+// Method Definition Index: 102871
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Internal_t725F163761104F5EB770A710D1A17C285F66E4EC Internal_Create_mDBB3833B7B7C558E240346396A2A3052DB00DDD9 (VuAreaTargetCaptureGenerationConfig_t18CF7F50DE1C5812052F4601B9B421DB5E4916E9* ___0_config, const RuntimeMethod* method) 
 {
 	Internal_t725F163761104F5EB770A710D1A17C285F66E4EC V_0;
@@ -8590,7 +8590,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Internal_t725F163761104F5EB770A710D1A17C285F6
 		return L_18;
 	}
 }
-// Method Definition Index: 106693
+// Method Definition Index: 102872
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* Internal_Clone_m8CC1C502A9233B8D95E824DA4EF6EFC5E7BA6CF1 (Internal_t725F163761104F5EB770A710D1A17C285F66E4EC* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -8650,7 +8650,7 @@ IL2CPP_EXTERN_C  RuntimeObject* Internal_Clone_m8CC1C502A9233B8D95E824DA4EF6EFC5
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106695
+// Method Definition Index: 102874
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCaptureController_vuEngineGetAreaTargetCaptureController_mC7FCD9F27D4DF8671963BAE3316CFA5798F369EA (intptr_t ___0_engine, intptr_t* ___1_controller, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -8672,7 +8672,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCaptureController_vuEngin
 
 	return returnValue;
 }
-// Method Definition Index: 106696
+// Method Definition Index: 102875
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCaptureController_vuAreaTargetCaptureControllerCreateAreaTargetCapture_m06F511C91BF47BE8B661BE1D6B39646D259A23D0 (intptr_t ___0_controller, Internal_t3A4727F1194A014FB49840D49C0FB0DDBE69CDD2* ___1_config, intptr_t* ___2_capture, int32_t* ___3_error, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, Internal_t3A4727F1194A014FB49840D49C0FB0DDBE69CDD2*, intptr_t*, int32_t*);
@@ -8694,7 +8694,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCaptureController_vuAreaT
 
 	return returnValue;
 }
-// Method Definition Index: 106697
+// Method Definition Index: 102876
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAreaTargetCaptureController_tC882D4509D20F8CE77B2042BC0B188D9E17D2FEB* VuAreaTargetCaptureController_Create_m95CE9D642A52E714524EC96B064FF3B1DA9DEF87 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -8732,7 +8732,7 @@ IL_001a:
 		return L_6;
 	}
 }
-// Method Definition Index: 106698
+// Method Definition Index: 102877
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAreaTargetCaptureController__ctor_m684BCAD8248039FF6C062654EC29C08AA3ED6B83 (VuAreaTargetCaptureController_tC882D4509D20F8CE77B2042BC0B188D9E17D2FEB* __this, VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, intptr_t ___1_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -8742,7 +8742,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAreaTargetCaptureController__ctor_m684
 		return;
 	}
 }
-// Method Definition Index: 106699
+// Method Definition Index: 102878
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuAreaTargetCaptureController_CreateAreaTargetCapture_m702852AEC47A1525FB76D2669770500ECE1F0766 (VuAreaTargetCaptureController_tC882D4509D20F8CE77B2042BC0B188D9E17D2FEB* __this, VuAreaTargetCaptureConfig_t01BFB59D0BF57FA29167B48F37485A260818649F* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -8791,7 +8791,7 @@ IL_0024:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106711
+// Method Definition Index: 102890
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptureStart_mDDFBB649BE01FE54370E467B1DDCBB1DAA1AF61B (intptr_t ___0_capture, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -8813,7 +8813,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptu
 
 	return returnValue;
 }
-// Method Definition Index: 106712
+// Method Definition Index: 102891
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptureStop_mDBAC0532CCE89FA1B2DDEF5EEDAAC657E847356B (intptr_t ___0_capture, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -8835,7 +8835,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptu
 
 	return returnValue;
 }
-// Method Definition Index: 106713
+// Method Definition Index: 102892
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCapturePause_m9119AFB8BB685EEA62FFE3AE07A6F93330B8BBE3 (intptr_t ___0_capture, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -8857,7 +8857,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptu
 
 	return returnValue;
 }
-// Method Definition Index: 106714
+// Method Definition Index: 102893
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptureResume_m6FAE3CF7FCFCE518D0F047B8E6F08736719F64CA (intptr_t ___0_capture, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -8879,7 +8879,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptu
 
 	return returnValue;
 }
-// Method Definition Index: 106715
+// Method Definition Index: 102894
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptureGenerate_m45936C0C99D96FB8706FE4CFD00809EAD0FBFF6B (intptr_t ___0_capture, Internal_t725F163761104F5EB770A710D1A17C285F66E4EC* ___1_config, int32_t* ___2_error, const RuntimeMethod* method) 
 {
 
@@ -8908,7 +8908,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptu
 
 	return returnValue;
 }
-// Method Definition Index: 106716
+// Method Definition Index: 102895
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptureGetStatus_m75BDE9DEB0C4568EAD6C8AF227C77E25487FF7FF (intptr_t ___0_capture, int32_t* ___1_status, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -8930,7 +8930,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptu
 
 	return returnValue;
 }
-// Method Definition Index: 106717
+// Method Definition Index: 102896
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptureGetStatusInfo_m0C9575AE21EE3532D3450B827C1CA156BF7FC92E (intptr_t ___0_capture, int32_t* ___1_statusInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -8952,7 +8952,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptu
 
 	return returnValue;
 }
-// Method Definition Index: 106718
+// Method Definition Index: 102897
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptureCancelGeneration_m2112B0CDC94147BB64441B57E79A91CB049780BB (intptr_t ___0_capture, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -8974,7 +8974,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptu
 
 	return returnValue;
 }
-// Method Definition Index: 106719
+// Method Definition Index: 102898
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptureGetGenerationProgress_m8249E9C71222A6426F105BBBD731495B848CEC05 (intptr_t ___0_capture, float* ___1_progress, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, float*);
@@ -8996,7 +8996,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptu
 
 	return returnValue;
 }
-// Method Definition Index: 106720
+// Method Definition Index: 102899
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptureGetGenerationTimeEstimate_m6C58E458903E885AAD85EB6FFF82A182E8D0B0B0 (intptr_t ___0_capture, int32_t* ___1_remainingTimeSeconds, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -9018,7 +9018,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptu
 
 	return returnValue;
 }
-// Method Definition Index: 106721
+// Method Definition Index: 102900
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptureDestroy_mCB89D975B41B664E61408E603B09FFF1A70E9D82 (intptr_t ___0_capture, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -9040,7 +9040,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_vuAreaTargetCaptu
 
 	return returnValue;
 }
-// Method Definition Index: 106722
+// Method Definition Index: 102901
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuAreaTargetCapture_get_NativeHandle_mBD757A158BD2918C664DB5B03F6EFC82E2846130 (VuAreaTargetCapture_t8DA2FAB96E707D7315486F4ACC6629605843B7A6* __this, const RuntimeMethod* method) 
 {
 	{
@@ -9048,7 +9048,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuAreaTargetCapture_get_NativeHandle
 		return L_0;
 	}
 }
-// Method Definition Index: 106723
+// Method Definition Index: 102902
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_get_Status_m8F39104C8EFEB6E9A2CD9AAFA29E358C0C4BCFAC (VuAreaTargetCapture_t8DA2FAB96E707D7315486F4ACC6629605843B7A6* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -9068,7 +9068,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_get_Status_m8F391
 		return L_2;
 	}
 }
-// Method Definition Index: 106724
+// Method Definition Index: 102903
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_get_StatusInfo_mCC2EE224A764EAE9DEC8760DCDB5D7973BE4C975 (VuAreaTargetCapture_t8DA2FAB96E707D7315486F4ACC6629605843B7A6* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -9088,7 +9088,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_get_StatusInfo_mC
 		return L_2;
 	}
 }
-// Method Definition Index: 106725
+// Method Definition Index: 102904
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR float VuAreaTargetCapture_get_GenerationProgress_m6FDEBEF4E031A4BD786A417F003D88567E3BC54C (VuAreaTargetCapture_t8DA2FAB96E707D7315486F4ACC6629605843B7A6* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -9108,7 +9108,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR float VuAreaTargetCapture_get_GenerationProgr
 		return L_2;
 	}
 }
-// Method Definition Index: 106726
+// Method Definition Index: 102905
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_get_GenerationTimeEstimate_m040B4C89985CD85F9730EFCD3CADDA65B42D1462 (VuAreaTargetCapture_t8DA2FAB96E707D7315486F4ACC6629605843B7A6* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -9128,7 +9128,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetCapture_get_GenerationTim
 		return L_2;
 	}
 }
-// Method Definition Index: 106727
+// Method Definition Index: 102906
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAreaTargetCapture__ctor_mFFEC7DBE6C7748B6F824A46C6E67B481183DC077 (VuAreaTargetCapture_t8DA2FAB96E707D7315486F4ACC6629605843B7A6* __this, intptr_t ___0_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -9138,7 +9138,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAreaTargetCapture__ctor_mFFEC7DBE6C774
 		return;
 	}
 }
-// Method Definition Index: 106728
+// Method Definition Index: 102907
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAreaTargetCapture_Start_m0002252EDB0CD834E1F90DE25A547B4B10F32AED (VuAreaTargetCapture_t8DA2FAB96E707D7315486F4ACC6629605843B7A6* __this, const RuntimeMethod* method) 
 {
 	{
@@ -9150,7 +9150,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAreaTargetCapture_Start_m0002252EDB0CD
 		return L_2;
 	}
 }
-// Method Definition Index: 106729
+// Method Definition Index: 102908
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAreaTargetCapture_Stop_mB966035F712D550C48358D12D54AA369E27FF8B6 (VuAreaTargetCapture_t8DA2FAB96E707D7315486F4ACC6629605843B7A6* __this, const RuntimeMethod* method) 
 {
 	{
@@ -9162,7 +9162,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAreaTargetCapture_Stop_mB966035F712D55
 		return L_2;
 	}
 }
-// Method Definition Index: 106730
+// Method Definition Index: 102909
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAreaTargetCapture_Pause_m4703E10FA3B557B168DE1937C8CAA5DCF3583700 (VuAreaTargetCapture_t8DA2FAB96E707D7315486F4ACC6629605843B7A6* __this, const RuntimeMethod* method) 
 {
 	{
@@ -9174,7 +9174,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAreaTargetCapture_Pause_m4703E10FA3B55
 		return L_2;
 	}
 }
-// Method Definition Index: 106731
+// Method Definition Index: 102910
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAreaTargetCapture_Resume_m443BC3973DEE4431BA2EABF0082409AB760D8D90 (VuAreaTargetCapture_t8DA2FAB96E707D7315486F4ACC6629605843B7A6* __this, const RuntimeMethod* method) 
 {
 	{
@@ -9186,7 +9186,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAreaTargetCapture_Resume_m443BC3973DEE
 		return L_2;
 	}
 }
-// Method Definition Index: 106732
+// Method Definition Index: 102911
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAreaTargetCapture_Generate_m2AD79ED948A4898E72BB0CF838554E6D56A0DF94 (VuAreaTargetCapture_t8DA2FAB96E707D7315486F4ACC6629605843B7A6* __this, VuAreaTargetCaptureGenerationConfig_t18CF7F50DE1C5812052F4601B9B421DB5E4916E9* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	Internal_t725F163761104F5EB770A710D1A17C285F66E4EC V_0;
@@ -9216,7 +9216,7 @@ IL_001d:
 		return (bool)0;
 	}
 }
-// Method Definition Index: 106733
+// Method Definition Index: 102912
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAreaTargetCapture_CancelGeneration_m7083DB5DF9D427921E0D4C39D01778EFA2E24EDD (VuAreaTargetCapture_t8DA2FAB96E707D7315486F4ACC6629605843B7A6* __this, const RuntimeMethod* method) 
 {
 	{
@@ -9228,7 +9228,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAreaTargetCapture_CancelGeneration_m70
 		return L_2;
 	}
 }
-// Method Definition Index: 106734
+// Method Definition Index: 102913
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAreaTargetCapture_Destroy_m5B298E43FEE3959033AA772FABEA8AEB40DB244D (VuAreaTargetCapture_t8DA2FAB96E707D7315486F4ACC6629605843B7A6* __this, const RuntimeMethod* method) 
 {
 	{
@@ -9248,7 +9248,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAreaTargetCapture_Destroy_m5B298E43FEE
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106735
+// Method Definition Index: 102914
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuBarcodeConfig_Clone_mD1D7CB7F1FAEAE797BD417FF46653566D3A3CD1D (VuBarcodeConfig_t7BBE8BDFEF266F4A644D5CC10FBDFCCD59C3D215* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -9360,7 +9360,7 @@ IL_0036:
 		return L_16;
 	}
 }
-// Method Definition Index: 106736
+// Method Definition Index: 102915
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuBarcodeConfig__ctor_mE36283E714D11CFA7D4FC10F5E43D52B2FAB8684 (VuBarcodeConfig_t7BBE8BDFEF266F4A644D5CC10FBDFCCD59C3D215* __this, const RuntimeMethod* method) 
 {
 	{
@@ -9422,7 +9422,7 @@ IL2CPP_EXTERN_C void Internal_tA00ED8552BF09C2BBDF92F59C9FFB9BD61FD7E6E_marshal_
 IL2CPP_EXTERN_C void Internal_tA00ED8552BF09C2BBDF92F59C9FFB9BD61FD7E6E_marshal_com_cleanup(Internal_tA00ED8552BF09C2BBDF92F59C9FFB9BD61FD7E6E_marshaled_com& marshaled)
 {
 }
-// Method Definition Index: 106737
+// Method Definition Index: 102916
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Internal_tA00ED8552BF09C2BBDF92F59C9FFB9BD61FD7E6E* Internal_Create_mBEEE88FC48546850B0989F22F104F28DE41F1B8A (VuBarcodeConfig_t7BBE8BDFEF266F4A644D5CC10FBDFCCD59C3D215* ___0_config, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -9497,7 +9497,7 @@ IL_001c:
 		return L_9;
 	}
 }
-// Method Definition Index: 106738
+// Method Definition Index: 102917
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void Internal__ctor_m109379E7A215FB1CF25ECC46C9068BEF7561FD20 (Internal_tA00ED8552BF09C2BBDF92F59C9FFB9BD61FD7E6E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -9537,7 +9537,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void Internal__ctor_m109379E7A215FB1CF25ECC46
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106739
+// Method Definition Index: 102918
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuBarcodeTypeSet_vuBarcodeTypeSetCreate_mD1DFFF82061EA427D880FA5DA3EE8CED1EBCBC40 (intptr_t* ___0_setHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*);
@@ -9559,7 +9559,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuBarcodeTypeSet_vuBarcodeTypeSetCrea
 
 	return returnValue;
 }
-// Method Definition Index: 106740
+// Method Definition Index: 102919
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuBarcodeTypeSet_vuBarcodeTypeSetGetSize_m8FF1AE2E90A5E386DA85C4A2ADB86A979329BE84 (intptr_t ___0_setHandle, int32_t* ___1_size, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -9581,7 +9581,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuBarcodeTypeSet_vuBarcodeTypeSetGetS
 
 	return returnValue;
 }
-// Method Definition Index: 106741
+// Method Definition Index: 102920
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuBarcodeTypeSet_vuBarcodeTypeSetHasElement_mFBA635292EF674F96E41FC984923908397023D4E (intptr_t ___0_setHandle, int32_t ___1_type, int32_t* ___2_result, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t, int32_t*);
@@ -9603,7 +9603,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuBarcodeTypeSet_vuBarcodeTypeSetHasE
 
 	return returnValue;
 }
-// Method Definition Index: 106742
+// Method Definition Index: 102921
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuBarcodeTypeSet_vuBarcodeTypeSetAddElement_mD026EF45D89B45C1A7D00865B6FF905042BA0E60 (intptr_t ___0_setHandle, int32_t ___1_type, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -9625,7 +9625,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuBarcodeTypeSet_vuBarcodeTypeSetAddE
 
 	return returnValue;
 }
-// Method Definition Index: 106743
+// Method Definition Index: 102922
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuBarcodeTypeSet_vuBarcodeTypeSetDestroy_m0CBDA47E44E21E126EE40A4BBB30F02312B2818E (intptr_t ___0_setHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -9647,7 +9647,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuBarcodeTypeSet_vuBarcodeTypeSetDest
 
 	return returnValue;
 }
-// Method Definition Index: 106744
+// Method Definition Index: 102923
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuBarcodeTypeSet__ctor_mDF4F56C3DA8717D4F00D6CD80099E807DC7BB85E (VuBarcodeTypeSet_t0954DAA9EA6AAE48DDD1C86AE83BE0C3F3A6360E* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -9681,7 +9681,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuBarcodeTypeSet__ctor_mDF4F56C3DA8717D4
 		return;
 	}
 }
-// Method Definition Index: 106745
+// Method Definition Index: 102924
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuBarcodeTypeSet__ctor_mB3A00818E0E30FD396A84CD4F90C63B44DDA8D44 (VuBarcodeTypeSet_t0954DAA9EA6AAE48DDD1C86AE83BE0C3F3A6360E* __this, HashSet_1_t1D08A77AB4532702C57DA8021A2B9C6F9D44D412* ___0_observedTypes, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -9754,7 +9754,7 @@ IL_0037:
 		return;
 	}
 }
-// Method Definition Index: 106746
+// Method Definition Index: 102925
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuBarcodeTypeSet_GetEnumerator_m9331271783C1CE3F86630FE8CC81DD4E84064388 (VuBarcodeTypeSet_t0954DAA9EA6AAE48DDD1C86AE83BE0C3F3A6360E* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -9780,7 +9780,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuBarcodeTypeSet_GetEnumerator
 		return L_3;
 	}
 }
-// Method Definition Index: 106747
+// Method Definition Index: 102926
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuBarcodeTypeSet_System_Collections_IEnumerable_GetEnumerator_mD8E7151ED6A198D1F6A3FA584A60E2C0DAA4B7DB (VuBarcodeTypeSet_t0954DAA9EA6AAE48DDD1C86AE83BE0C3F3A6360E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -9789,7 +9789,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuBarcodeTypeSet_System_Collec
 		return L_0;
 	}
 }
-// Method Definition Index: 106748
+// Method Definition Index: 102927
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuBarcodeTypeSet__cctor_m159E0360C8967C88DF3710733E340FA2AD08E433 (const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -9818,7 +9818,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuBarcodeTypeSet__cctor_m159E0360C8967C8
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106751
+// Method Definition Index: 102930
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuBarcodeObserver_vuEngineCreateBarcodeObserver_mABE715314BF23EEAF8F8F24846308CF19B147877 (intptr_t ___0_engineHandle, intptr_t* ___1_observerHandle, Internal_tA00ED8552BF09C2BBDF92F59C9FFB9BD61FD7E6E* ___2_config, int32_t* ___3_errorCode, const RuntimeMethod* method) 
 {
 
@@ -9842,7 +9842,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuBarcodeObserver_vuEngineCreateBarco
 
 	return returnValue;
 }
-// Method Definition Index: 106752
+// Method Definition Index: 102931
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuBarcodeObserver_vuBarcodeObserverGetObservedTypes_m609D2B761C7CFF7CCA8D4F4C3ABE0BE55BE249FD (intptr_t ___0_observerHandle, intptr_t ___1_types, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t);
@@ -9864,7 +9864,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuBarcodeObserver_vuBarcodeObserverGe
 
 	return returnValue;
 }
-// Method Definition Index: 106753
+// Method Definition Index: 102932
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR HashSet_1_t1D08A77AB4532702C57DA8021A2B9C6F9D44D412* VuBarcodeObserver_get_ObservedTypes_m706CCE63B04E1BFEEF52BAD1B79D8A36DC6B8D09 (VuBarcodeObserver_tCFD4C8F5BC97BD4C85DBAC4EEEBDC17CF3A2B96C* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -10031,7 +10031,7 @@ IL_0072:
 		return L_21;
 	}
 }
-// Method Definition Index: 106754
+// Method Definition Index: 102933
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuBarcodeObserver_get_DetectionMode_mC3B3BBA7EAE7BFD4D3D10D7BA8F4185B305CB7E9 (VuBarcodeObserver_tCFD4C8F5BC97BD4C85DBAC4EEEBDC17CF3A2B96C* __this, const RuntimeMethod* method) 
 {
 	{
@@ -10039,7 +10039,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuBarcodeObserver_get_DetectionMode_m
 		return L_0;
 	}
 }
-// Method Definition Index: 106755
+// Method Definition Index: 102934
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuBarcodeObserver_tCFD4C8F5BC97BD4C85DBAC4EEEBDC17CF3A2B96C* VuBarcodeObserver_Create_mC23B9C65D93D8A7C9BD28E50453911F683F08221 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, VuBarcodeConfig_t7BBE8BDFEF266F4A644D5CC10FBDFCCD59C3D215* ___1_config, int32_t* ___2_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -10090,7 +10090,7 @@ IL_0030:
 		return (VuBarcodeObserver_tCFD4C8F5BC97BD4C85DBAC4EEEBDC17CF3A2B96C*)NULL;
 	}
 }
-// Method Definition Index: 106756
+// Method Definition Index: 102935
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuBarcodeObserver__ctor_mB58E601AE45F2F02FFFC97A09B800BD8AE020B0A (VuBarcodeObserver_tCFD4C8F5BC97BD4C85DBAC4EEEBDC17CF3A2B96C* __this, VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, intptr_t ___1_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -10218,7 +10218,7 @@ IL2CPP_EXTERN_C void VuBarcodeObservationInstanceInfo_tD0B3DD9D7324AB95C53AAC1D1
 		marshaled.___vertices = NULL;
 	}
 }
-// Method Definition Index: 106757
+// Method Definition Index: 102936
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuBarcodeObservationInstanceInfo_vuBarcodeObservationGetInstanceInfo_mF37CFC64E4ACD7552C8AD01DFE18C8EF895F9479 (intptr_t ___0_observation, Internal_t914C73D26CAA9132E0DE3BF127D967A2B61C3AB6* ___1_instanceInfo, const RuntimeMethod* method) 
 {
 
@@ -10253,7 +10253,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuBarcodeObservationInstanceInfo_vuBa
 
 	return returnValue;
 }
-// Method Definition Index: 106758
+// Method Definition Index: 102937
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuBarcodeObservationInstanceInfo_tD0B3DD9D7324AB95C53AAC1D1ACEF9F701C6C3B1 VuBarcodeObservationInstanceInfo_Create_mA25FBB3E98B497F46D89184B503A6DB94DDDE03F (intptr_t ___0_observation, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -10420,7 +10420,7 @@ IL2CPP_EXTERN_C void Internal_t914C73D26CAA9132E0DE3BF127D967A2B61C3AB6_marshal_
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106761
+// Method Definition Index: 102940
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuBarcodeObservation_vuBarcodeObservationGetInfo_m77511064A24D0CC682024E5AC4D07BE1C6782433 (intptr_t ___0_observation, VuBarcodeObservationInfo_tA90182AD8D6A610AD5258839B90A72B2EB2F795B* ___1_info, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuBarcodeObservationInfo_tA90182AD8D6A610AD5258839B90A72B2EB2F795B*);
@@ -10442,7 +10442,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuBarcodeObservation_vuBarcodeObserva
 
 	return returnValue;
 }
-// Method Definition Index: 106762
+// Method Definition Index: 102941
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuBarcodeObservationInstanceInfo_tD0B3DD9D7324AB95C53AAC1D1ACEF9F701C6C3B1 VuBarcodeObservation_get_InstanceInfo_m21C2061B4AA911690A77D7817A2AAE9400587CA0 (VuBarcodeObservation_t41BAEE3EF4C17E5A612ED2B497A97002D3C20381* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -10484,7 +10484,7 @@ IL_0023:
 		return L_6;
 	}
 }
-// Method Definition Index: 106763
+// Method Definition Index: 102942
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuBarcodeObservationInfo_tA90182AD8D6A610AD5258839B90A72B2EB2F795B VuBarcodeObservation_get_Info_mAC7A1C80E0A97AE9ED8A844C87EAE0EA06FAADF7 (VuBarcodeObservation_t41BAEE3EF4C17E5A612ED2B497A97002D3C20381* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -10538,7 +10538,7 @@ IL_0033:
 		return L_8;
 	}
 }
-// Method Definition Index: 106764
+// Method Definition Index: 102943
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuBarcodeObservation__ctor_m543B22EC73ADE0C66FA4026B278E1483B9590453 (VuBarcodeObservation_t41BAEE3EF4C17E5A612ED2B497A97002D3C20381* __this, const RuntimeMethod* method) 
 {
 	{
@@ -10546,7 +10546,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuBarcodeObservation__ctor_m543B22EC73AD
 		return;
 	}
 }
-// Method Definition Index: 106765
+// Method Definition Index: 102944
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuBarcodeObservation_UnregisterObservation_m6725715A6821757A74148D24DEDFA2F285512D89 (VuBarcodeObservation_t41BAEE3EF4C17E5A612ED2B497A97002D3C20381* __this, const RuntimeMethod* method) 
 {
 	{
@@ -10638,7 +10638,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuBarcodeObservation_UnregisterObservati
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106766
+// Method Definition Index: 102945
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_cs3DTilesCreate_mF4E6B0B86DECC32BE7C1CD337E7FBB74C0B6F439 (intptr_t* ___0_tiles, intptr_t ___1_path, int32_t ___2_storageType, int32_t* ___3_error, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*, intptr_t, int32_t, int32_t*);
@@ -10660,7 +10660,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_cs3DTilesCreate_mF4E6B0
 
 	return returnValue;
 }
-// Method Definition Index: 106767
+// Method Definition Index: 102946
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_cs3DTilesCreateFromCloudConfig_m9FE777F25ED7D51472DE3F2A8486BC4A3DBEF244 (intptr_t* ___0_tiles, intptr_t ___1_targetId, intptr_t ___2_userAuth, intptr_t ___3_secretAuth, intptr_t ___4_assetType, intptr_t ___5_asset, int32_t* ___6_error, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*, intptr_t, intptr_t, intptr_t, intptr_t, intptr_t, int32_t*);
@@ -10682,7 +10682,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_cs3DTilesCreateFromClou
 
 	return returnValue;
 }
-// Method Definition Index: 106768
+// Method Definition Index: 102947
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_cs3DTilesHasTileSet_mD07D9C2C29FB659C24F41A29E98146657B33A5B1 (intptr_t ___0_tiles, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -10704,7 +10704,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_cs3DTilesHasTileSet_mD0
 
 	return returnValue;
 }
-// Method Definition Index: 106769
+// Method Definition Index: 102948
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_cs3DTilesGetTileSet_mC9090A6028B2079F67F7F30DBBA4399F22272687 (intptr_t ___0_tiles, intptr_t* ___1_jsonTextBuffer, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -10726,7 +10726,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_cs3DTilesGetTileSet_mC9
 
 	return returnValue;
 }
-// Method Definition Index: 106770
+// Method Definition Index: 102949
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_cs3DTilesDestroy_m869C13BACC670C3D83BA00A174622DBDE61326EF (intptr_t ___0_tiles, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -10748,7 +10748,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_cs3DTilesDestroy_m869C1
 
 	return returnValue;
 }
-// Method Definition Index: 106771
+// Method Definition Index: 102950
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csScenesLoad_mA7EA5B5C312645B9EEDD215BA4DA546FE9E45F62 (intptr_t* ___0_scenes, intptr_t ___1_tiles, intptr_t ___2_entryPath, int32_t* ___3_error, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*, intptr_t, intptr_t, int32_t*);
@@ -10770,7 +10770,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csScenesLoad_mA7EA5B5C3
 
 	return returnValue;
 }
-// Method Definition Index: 106772
+// Method Definition Index: 102951
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csScenesLoadWithoutMaterials_m32CC9E35C8037EAA58C860B499CBF7C771CB6A02 (intptr_t* ___0_scenes, intptr_t ___1_tiles, intptr_t ___2_entryPath, int32_t* ___3_error, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*, intptr_t, intptr_t, int32_t*);
@@ -10792,7 +10792,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csScenesLoadWithoutMate
 
 	return returnValue;
 }
-// Method Definition Index: 106773
+// Method Definition Index: 102952
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csScenesLoadFromRawFile_mF355D8B5FD1C793B2DE04E6B90B1392BABD53E23 (intptr_t* ___0_scenes, intptr_t ___1_path, int32_t ___2_storageType, int32_t* ___3_error, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*, intptr_t, int32_t, int32_t*);
@@ -10814,7 +10814,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csScenesLoadFromRawFile
 
 	return returnValue;
 }
-// Method Definition Index: 106774
+// Method Definition Index: 102953
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csScenesLoadWithoutMaterialsFromRawFile_m7E6BE746C6366EF5E7600DE5B56AF5ABB2860DCC (intptr_t* ___0_scenes, intptr_t ___1_path, int32_t ___2_storageType, int32_t* ___3_error, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*, intptr_t, int32_t, int32_t*);
@@ -10836,7 +10836,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csScenesLoadWithoutMate
 
 	return returnValue;
 }
-// Method Definition Index: 106775
+// Method Definition Index: 102954
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csScenesDestroy_mC75D1DEDEFF76AA7E1A77683E02F5AC69BD64D53 (intptr_t ___0_scenes, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -10858,7 +10858,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csScenesDestroy_mC75D1D
 
 	return returnValue;
 }
-// Method Definition Index: 106776
+// Method Definition Index: 102955
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csSceneListGetSize_m57FC0D05B2FF69E69EFB8D7CE6595359FECDE9CF (intptr_t ___0_list, int32_t* ___1_listSize, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -10880,7 +10880,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csSceneListGetSize_m57F
 
 	return returnValue;
 }
-// Method Definition Index: 106777
+// Method Definition Index: 102956
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csSceneListGetElement_mA4DC19756A443EFD8E43B96377FB38FAA329B589 (intptr_t ___0_list, int32_t ___1_element, intptr_t* ___2_scene, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t, intptr_t*);
@@ -10902,7 +10902,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csSceneListGetElement_m
 
 	return returnValue;
 }
-// Method Definition Index: 106778
+// Method Definition Index: 102957
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csSceneGetName_mDD8B92AE7D31BFEC9B9C85C13D208A7E36130224 (intptr_t ___0_scene, intptr_t* ___1_name, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -10924,7 +10924,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csSceneGetName_mDD8B92A
 
 	return returnValue;
 }
-// Method Definition Index: 106779
+// Method Definition Index: 102958
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csSceneGetNodeList_m5D0D8666623A8135BA20DCE77A99BBBC48D4AC99 (intptr_t ___0_scene, intptr_t* ___1_nodeList, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -10946,7 +10946,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csSceneGetNodeList_m5D0
 
 	return returnValue;
 }
-// Method Definition Index: 106780
+// Method Definition Index: 102959
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csNodeListGetSize_m7A132F71DE5B4AB3DE3F8AED3D21DCE85CE7900E (intptr_t ___0_list, int32_t* ___1_listSize, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -10968,7 +10968,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csNodeListGetSize_m7A13
 
 	return returnValue;
 }
-// Method Definition Index: 106781
+// Method Definition Index: 102960
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csNodeListGetElement_m8F84E144BCD2756EA7D6A4D599633F33783D6830 (intptr_t ___0_list, int32_t ___1_element, intptr_t* ___2_node, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t, intptr_t*);
@@ -10990,7 +10990,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csNodeListGetElement_m8
 
 	return returnValue;
 }
-// Method Definition Index: 106782
+// Method Definition Index: 102961
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csNodeGetNodeList_m3BC2CE5BC024A3B3D4F568EB2C936EDAAEFEAAF7 (intptr_t ___0_node, intptr_t* ___1_nodeList, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -11012,7 +11012,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csNodeGetNodeList_m3BC2
 
 	return returnValue;
 }
-// Method Definition Index: 106783
+// Method Definition Index: 102962
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csNodeGetMeshList_m739D7548871FD7DA828D0AD443861AD8DE9F42BD (intptr_t ___0_node, intptr_t* ___1_meshList, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -11034,7 +11034,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csNodeGetMeshList_m739D
 
 	return returnValue;
 }
-// Method Definition Index: 106784
+// Method Definition Index: 102963
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csNodeGetMatrix_m3241B5B392BC687CF04B34A4271E44B336075F86 (intptr_t ___0_node, intptr_t* ___1_matrix, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -11056,7 +11056,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csNodeGetMatrix_m3241B5
 
 	return returnValue;
 }
-// Method Definition Index: 106785
+// Method Definition Index: 102964
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csNodeGetName_m458924221322866B6D658D30F814998A12C162C6 (intptr_t ___0_node, intptr_t* ___1_name, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -11078,7 +11078,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csNodeGetName_m45892422
 
 	return returnValue;
 }
-// Method Definition Index: 106786
+// Method Definition Index: 102965
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMatrixGetValues_m33CD001AB2FD4E85B0E924F9E6C0FEC7F0B37A98 (intptr_t ___0_matrix, intptr_t* ___1_values, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -11100,7 +11100,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMatrixGetValues_m33CD
 
 	return returnValue;
 }
-// Method Definition Index: 106787
+// Method Definition Index: 102966
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csPointCloudCreate_m9265FD8241C0B3215EA8EE0D259EB30BCC142784 (intptr_t* ___0_pointCloud, intptr_t ___1_tiles, intptr_t ___2_entryPath, int32_t* ___3_error, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*, intptr_t, intptr_t, int32_t*);
@@ -11122,7 +11122,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csPointCloudCreate_m926
 
 	return returnValue;
 }
-// Method Definition Index: 106788
+// Method Definition Index: 102967
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csPointCloudCreateFromRawFile_m8CC4A9773151EFD0D51114ABB00911B612647E78 (intptr_t* ___0_pointCloud, intptr_t ___1_path, int32_t ___2_storageType, int32_t* ___3_error, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*, intptr_t, int32_t, int32_t*);
@@ -11144,7 +11144,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csPointCloudCreateFromR
 
 	return returnValue;
 }
-// Method Definition Index: 106789
+// Method Definition Index: 102968
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csPointCloudGetVertexCount_m034FFE56BABFE91D6DF98772427BCE28E5E48249 (intptr_t ___0_pointCloud, int32_t* ___1_vertexCount, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -11166,7 +11166,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csPointCloudGetVertexCo
 
 	return returnValue;
 }
-// Method Definition Index: 106790
+// Method Definition Index: 102969
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csPointCloudGetAttributeList_mA5A3575F34134790DCA6318FDA33BD34367CA84E (intptr_t ___0_pointCloud, intptr_t* ___1_attributes, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -11188,7 +11188,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csPointCloudGetAttribut
 
 	return returnValue;
 }
-// Method Definition Index: 106791
+// Method Definition Index: 102970
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csPointCloudDestroy_mE3FB85804E1FF5824DF7738ED72DF11C5205C90A (intptr_t ___0_pointCloud, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -11210,7 +11210,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csPointCloudDestroy_mE3
 
 	return returnValue;
 }
-// Method Definition Index: 106792
+// Method Definition Index: 102971
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshListGetSize_m0380D9959051BBE8BBB6B53A5147E5FE538718DF (intptr_t ___0_list, int32_t* ___1_listSize, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -11232,7 +11232,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshListGetSize_m0380
 
 	return returnValue;
 }
-// Method Definition Index: 106793
+// Method Definition Index: 102972
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshListGetElement_mCE4B22C3A4F533E2C948E184413CEE6DDE049011 (intptr_t ___0_list, int32_t ___1_element, intptr_t* ___2_mesh, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t, intptr_t*);
@@ -11254,7 +11254,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshListGetElement_mC
 
 	return returnValue;
 }
-// Method Definition Index: 106794
+// Method Definition Index: 102973
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshCreate_mC6D886ED5A6AD19166A64D1BE114725B36829BEE (intptr_t* ___0_mesh, intptr_t ___1_tiles, intptr_t ___2_entryPath, int32_t* ___3_error, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*, intptr_t, intptr_t, int32_t*);
@@ -11276,7 +11276,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshCreate_mC6D886ED5
 
 	return returnValue;
 }
-// Method Definition Index: 106795
+// Method Definition Index: 102974
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshCreateFromRawFile_mD03D5364ECEF4F561783975B95CDA0117FA73052 (intptr_t* ___0_mesh, intptr_t ___1_path, int32_t ___2_storageType, int32_t* ___3_error, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*, intptr_t, int32_t, int32_t*);
@@ -11298,7 +11298,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshCreateFromRawFile
 
 	return returnValue;
 }
-// Method Definition Index: 106796
+// Method Definition Index: 102975
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshGetVertexCount_m456CC0972A7ECCC551FEB9162E8B64DEB9F75A4D (intptr_t ___0_mesh, int32_t* ___1_vertexCount, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -11320,7 +11320,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshGetVertexCount_m4
 
 	return returnValue;
 }
-// Method Definition Index: 106797
+// Method Definition Index: 102976
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshHasIndices_mA1EB20220334CC32C47D1ABEEEAA205E1F87E4EA (intptr_t ___0_mesh, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -11342,7 +11342,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshHasIndices_mA1EB2
 
 	return returnValue;
 }
-// Method Definition Index: 106798
+// Method Definition Index: 102977
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshGetIndexCount_m1EB926551221605B16AEB0350180E188D62FFD81 (intptr_t ___0_mesh, int32_t* ___1_indexCount, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -11364,7 +11364,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshGetIndexCount_m1E
 
 	return returnValue;
 }
-// Method Definition Index: 106799
+// Method Definition Index: 102978
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshGetIndexType_m2FD9AE2D069DC0ABB607E654C82C570F64839E57 (intptr_t ___0_mesh, int32_t* ___1_indexType, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -11386,7 +11386,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshGetIndexType_m2FD
 
 	return returnValue;
 }
-// Method Definition Index: 106800
+// Method Definition Index: 102979
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshCopyIndexData_m6CD7474340AD529AE5ED3B90D0B08930CE4927C5 (intptr_t ___0_mesh, intptr_t ___1_buffer, int32_t ___2_bufferSize, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t, int32_t);
@@ -11408,7 +11408,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshCopyIndexData_m6C
 
 	return returnValue;
 }
-// Method Definition Index: 106801
+// Method Definition Index: 102980
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshGetAttributeList_m439FF430ECC6F61D381D8BD095BDD0B84E2E7464 (intptr_t ___0_mesh, intptr_t* ___1_attributes, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -11430,7 +11430,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshGetAttributeList_
 
 	return returnValue;
 }
-// Method Definition Index: 106802
+// Method Definition Index: 102981
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshHasMaterial_m862CB78817DFE8E5032D5AF2EEE1DD1783E6778C (intptr_t ___0_mesh, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -11452,7 +11452,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshHasMaterial_m862C
 
 	return returnValue;
 }
-// Method Definition Index: 106803
+// Method Definition Index: 102982
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshGetMaterial_mC5A3248A91E729D5D54466C6519DC627EA20DF38 (intptr_t ___0_mesh, intptr_t* ___1_material, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -11474,7 +11474,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshGetMaterial_mC5A3
 
 	return returnValue;
 }
-// Method Definition Index: 106804
+// Method Definition Index: 102983
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshDestroy_m63F5A9C5F5B95C96FE8534B735F35FE84453FFBB (intptr_t ___0_mesh, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -11496,7 +11496,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMeshDestroy_m63F5A9C5
 
 	return returnValue;
 }
-// Method Definition Index: 106805
+// Method Definition Index: 102984
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csAttributeListGetSize_m9D53DF5E78579ADF315BFFEDF95E89B3C56D49EE (intptr_t ___0_list, int32_t* ___1_listSize, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -11518,7 +11518,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csAttributeListGetSize_
 
 	return returnValue;
 }
-// Method Definition Index: 106806
+// Method Definition Index: 102985
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csAttributeListGetElement_m1C6D91C0AD0CA7E2ACF3E5689FAD34214A51E532 (intptr_t ___0_list, int32_t ___1_element, intptr_t* ___2_attribute, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t, intptr_t*);
@@ -11540,7 +11540,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csAttributeListGetEleme
 
 	return returnValue;
 }
-// Method Definition Index: 106807
+// Method Definition Index: 102986
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csAttributeListGetElementByName_m8367655FEB1432282F0EA17CA016A7A6C011BEB2 (intptr_t ___0_list, int32_t ___1_name, intptr_t* ___2_attribute, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t, intptr_t*);
@@ -11562,7 +11562,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csAttributeListGetEleme
 
 	return returnValue;
 }
-// Method Definition Index: 106808
+// Method Definition Index: 102987
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csAttributeGetName_m0B6FB9E0B51FD9DD06BE7BD171432F3AA1699A6E (intptr_t ___0_attribute, int32_t ___1_attributeName, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -11584,7 +11584,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csAttributeGetName_m0B6
 
 	return returnValue;
 }
-// Method Definition Index: 106809
+// Method Definition Index: 102988
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csAttributeGetComponentType_m6FB81615A78FC864C90F44BE004B8A2BD1F34C7D (intptr_t ___0_attribute, int32_t* ___1_componentType, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -11606,7 +11606,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csAttributeGetComponent
 
 	return returnValue;
 }
-// Method Definition Index: 106810
+// Method Definition Index: 102989
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csAttributeGetDataType_mCAA1A78B46498DE7FCCD7BED269674DA680653D1 (intptr_t ___0_attribute, int32_t* ___1_dataType, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -11628,7 +11628,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csAttributeGetDataType_
 
 	return returnValue;
 }
-// Method Definition Index: 106811
+// Method Definition Index: 102990
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csAttributeGetAttributeData_m7A6CA104BB3840FFEAD4CF203F6A9F8808DBCA6E (intptr_t ___0_attribute, intptr_t* ___1_data, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -11650,7 +11650,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csAttributeGetAttribute
 
 	return returnValue;
 }
-// Method Definition Index: 106812
+// Method Definition Index: 102991
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csAttributeDataCopyData_mBB508D03BD21440B45E346E18572D84B8AE29B5E (intptr_t ___0_attributeData, intptr_t ___1_buffer, int32_t ___2_bufferSize, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t, int32_t);
@@ -11672,7 +11672,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csAttributeDataCopyData
 
 	return returnValue;
 }
-// Method Definition Index: 106813
+// Method Definition Index: 102992
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMaterialGetBaseColorFactor_m2BFFB2D9688EA78250DE66F7AF5E35C304EB3978 (intptr_t ___0_material, intptr_t* ___1_values, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -11694,7 +11694,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMaterialGetBaseColorF
 
 	return returnValue;
 }
-// Method Definition Index: 106814
+// Method Definition Index: 102993
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMaterialHasBaseColorTexture_mA852A3A51DB5CC6990550EA8212C465BA6546E22 (intptr_t ___0_material, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -11716,7 +11716,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMaterialHasBaseColorT
 
 	return returnValue;
 }
-// Method Definition Index: 106815
+// Method Definition Index: 102994
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMaterialGetBaseColorTexture_m115E0773C17A976B1C1CAC2401D163ECACE5338B (intptr_t ___0_material, intptr_t* ___1_texture, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -11738,7 +11738,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMaterialGetBaseColorT
 
 	return returnValue;
 }
-// Method Definition Index: 106816
+// Method Definition Index: 102995
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMaterialGetName_m6AFFD1BEF95FE3D1E75366112C08F53A4CA7203B (intptr_t ___0_material, intptr_t* ___1_name, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -11760,7 +11760,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csMaterialGetName_m6AFF
 
 	return returnValue;
 }
-// Method Definition Index: 106817
+// Method Definition Index: 102996
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csTextureGetSource_m189911666F8F0A4B651853CBC46978ED49856EF9 (intptr_t ___0_texture, intptr_t* ___1_textureSource, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -11782,7 +11782,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csTextureGetSource_m189
 
 	return returnValue;
 }
-// Method Definition Index: 106818
+// Method Definition Index: 102997
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csTextureGetSampler_m29700F4E203903A965D94C506AB8CB9AEB66EDFB (intptr_t ___0_texture, intptr_t* ___1_sampler, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -11804,7 +11804,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csTextureGetSampler_m29
 
 	return returnValue;
 }
-// Method Definition Index: 106819
+// Method Definition Index: 102998
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csTextureGetName_m9A2EC748B869BB81C9A3BA8F193E1244690E607F (intptr_t ___0_texture, intptr_t* ___1_name, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -11826,7 +11826,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csTextureGetName_m9A2EC
 
 	return returnValue;
 }
-// Method Definition Index: 106820
+// Method Definition Index: 102999
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csTextureSourceGetImage_mAEA0189609BD7C7213FB90A80C71F652E0BBDB15 (intptr_t ___0_textureSource, intptr_t* ___1_image, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -11848,7 +11848,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csTextureSourceGetImage
 
 	return returnValue;
 }
-// Method Definition Index: 106821
+// Method Definition Index: 103000
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csSamplerGetMinFilter_m19C325E6183278708313A5EBE6F11EDFF73319C3 (intptr_t ___0_sampler, int32_t* ___1_minFilter, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -11870,7 +11870,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csSamplerGetMinFilter_m
 
 	return returnValue;
 }
-// Method Definition Index: 106822
+// Method Definition Index: 103001
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csSamplerGetMagFilter_m8FF110AB976F2943D4B46B900D235A186095E4E3 (intptr_t ___0_sampler, int32_t* ___1_magFilter, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -11892,7 +11892,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csSamplerGetMagFilter_m
 
 	return returnValue;
 }
-// Method Definition Index: 106823
+// Method Definition Index: 103002
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csSamplerGetWrapS_mAA9CFB43457E3B520869EFB3DDD50B18DA598B17 (intptr_t ___0_sampler, int32_t* ___1_wrapS, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -11914,7 +11914,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csSamplerGetWrapS_mAA9C
 
 	return returnValue;
 }
-// Method Definition Index: 106824
+// Method Definition Index: 103003
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csSamplerGetWrapT_mEBC6D4EDD3DB0945F7FBF3A245334FE0E16DB136 (intptr_t ___0_sampler, int32_t* ___1_wrapT, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -11944,7 +11944,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCesiumTiles_csSamplerGetWrapT_mEBC6
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106825
+// Method Definition Index: 103004
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuAnchorObserverConfig_Clone_mF27C1E1BE34B18FD41269734F2094D8508EBB9AE (VuAnchorObserverConfig_tB1FFF4DB4C5CBA736658A3059FDC4CB846F86F68* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -11968,7 +11968,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuAnchorObserverConfig_Clone_m
 		return L_3;
 	}
 }
-// Method Definition Index: 106826
+// Method Definition Index: 103005
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAnchorObserverConfig__ctor_m719C0E528B7F3F99EC3ABEA1C9EE39F07AF9D8A4 (VuAnchorObserverConfig_tB1FFF4DB4C5CBA736658A3059FDC4CB846F86F68* __this, const RuntimeMethod* method) 
 {
 	{
@@ -11985,7 +11985,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAnchorObserverConfig__ctor_m719C0E528B
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106827
+// Method Definition Index: 103006
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Internal_tF40E83FB794AA628DC0CE3FAB8D44BCDB6EC9A8B Internal_Create_mC51E856F907FEAD59EC814DAB5239D77C181D0E8 (VuAnchorObserverConfig_tB1FFF4DB4C5CBA736658A3059FDC4CB846F86F68* ___0_config, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -12068,7 +12068,7 @@ IL_0025:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106828
+// Method Definition Index: 103007
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuHitTestConfig__ctor_mCBAC2BC8E372F2CEED42E15143261706F6EA2D97 (VuHitTestConfig_tDF8C428792A8DAD81204E7A06B68E8E6C03B08EA* __this, const RuntimeMethod* method) 
 {
 	{
@@ -12088,7 +12088,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuHitTestConfig__ctor_mCBAC2BC8E372F2CEE
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106829
+// Method Definition Index: 103008
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void Internal__ctor_m167484968EBA6F83ECC2AA7927867711C75B5A8B (Internal_t6108C773A548AE308F4A05BC41C4F5B23A89E286* __this, VuHitTestConfig_tDF8C428792A8DAD81204E7A06B68E8E6C03B08EA* ___0_config, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -12165,7 +12165,7 @@ IL2CPP_EXTERN_C  void Internal__ctor_m167484968EBA6F83ECC2AA7927867711C75B5A8B_A
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106831
+// Method Definition Index: 103010
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuHitTest_vuHitTestGetPose_mD340BFE40B09DDE2EDBBA46BE82F5B119862C57A (intptr_t ___0_hitTestHandle, VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6* ___1_pose, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6*);
@@ -12187,7 +12187,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuHitTest_vuHitTestGetPose_mD340BFE40
 
 	return returnValue;
 }
-// Method Definition Index: 106832
+// Method Definition Index: 103011
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuHitTest_get_NativeHandle_m7B2186DD9B76493B4BFDD900927347A6285C83C2 (VuHitTest_tCC53DD96C343DA416D47E0152BD0B79C5C8C7FC1* __this, const RuntimeMethod* method) 
 {
 	{
@@ -12195,7 +12195,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuHitTest_get_NativeHandle_m7B2186DD
 		return L_0;
 	}
 }
-// Method Definition Index: 106833
+// Method Definition Index: 103012
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 VuHitTest_get_Pose_m195A2786FCB823CA1708FBDE3DA6398EFF2E5CFF (VuHitTest_tCC53DD96C343DA416D47E0152BD0B79C5C8C7FC1* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -12215,7 +12215,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30F
 		return L_2;
 	}
 }
-// Method Definition Index: 106834
+// Method Definition Index: 103013
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuHitTest__ctor_mAA2EDD0CCA941D3E66D8C191B9CE42922363FD6C (VuHitTest_tCC53DD96C343DA416D47E0152BD0B79C5C8C7FC1* __this, intptr_t ___0_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -12233,7 +12233,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuHitTest__ctor_mAA2EDD0CCA941D3E66D8C19
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106837
+// Method Definition Index: 103016
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuHitTestResults_get_NativeHandle_m4358E2A044BBF8BE2BCBA712D8AB5C6AFCD85A5E (VuHitTestResults_t3491B21BA5280CE486D7D30A12D9C2E0E4085E03* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -12250,7 +12250,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuHitTestResults_get_NativeHandle_m4
 		return L_1;
 	}
 }
-// Method Definition Index: 106838
+// Method Definition Index: 103017
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuHitTestResults_get_Size_m88D61CB105DF6105CBD28127F815625A3E952849 (VuHitTestResults_t3491B21BA5280CE486D7D30A12D9C2E0E4085E03* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -12268,7 +12268,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuHitTestResults_get_Size_m88D61CB105
 		return L_1;
 	}
 }
-// Method Definition Index: 106839
+// Method Definition Index: 103018
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuHitTestResults_get_Item_m5F217D4A239F86CF9CBBAB4C93DF864E9786F4C0 (VuHitTestResults_t3491B21BA5280CE486D7D30A12D9C2E0E4085E03* __this, int32_t ___0_index, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -12287,7 +12287,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuHitTestResults_get_Item_m5F2
 		return L_2;
 	}
 }
-// Method Definition Index: 106840
+// Method Definition Index: 103019
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuHitTestResults__ctor_m7DFE13BEAE1707EA3A7B75F79BD28F7874C8D7B2 (VuHitTestResults_t3491B21BA5280CE486D7D30A12D9C2E0E4085E03* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -12305,7 +12305,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuHitTestResults__ctor_m7DFE13BEAE1707EA
 		return;
 	}
 }
-// Method Definition Index: 106841
+// Method Definition Index: 103020
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuHitTestResults_Finalize_mDD93289902A0F8F1EE5FBD057A429DC8AE4B0283 (VuHitTestResults_t3491B21BA5280CE486D7D30A12D9C2E0E4085E03* __this, const RuntimeMethod* method) 
 {
 	{
@@ -12334,7 +12334,7 @@ IL_0010:
 		return;
 	}
 }
-// Method Definition Index: 106842
+// Method Definition Index: 103021
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuHitTestResults_Dispose_mEF71702E49FF81E91FBCAD38AC89489D9447BC80 (VuHitTestResults_t3491B21BA5280CE486D7D30A12D9C2E0E4085E03* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -12350,7 +12350,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuHitTestResults_Dispose_mEF71702E49FF81
 		return;
 	}
 }
-// Method Definition Index: 106843
+// Method Definition Index: 103022
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuHitTestResults_Dispose_m17B384438B389C1F914108F4E8C4D11E0FB0EA2B (VuHitTestResults_t3491B21BA5280CE486D7D30A12D9C2E0E4085E03* __this, bool ___0_disposing, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -12417,7 +12417,7 @@ IL_0036:
 		return;
 	}
 }
-// Method Definition Index: 106844
+// Method Definition Index: 103023
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuHitTestResults_GetHitTests_mEF6B0F433D2B1B3FDC8DE84EF59792FFB6FA8A54 (VuHitTestResults_t3491B21BA5280CE486D7D30A12D9C2E0E4085E03* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -12561,7 +12561,7 @@ IL2CPP_EXTERN_C void VuAnchorCreationHitTestConfig_t25155ED3C36A385DF0C9DB7AFD74
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106845
+// Method Definition Index: 103024
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void Internal__ctor_m0CA3E92D6C2A9CB7C0A9EEDDBA728ECA9C074691 (Internal_t700378B5797C52CBEABC5C6FD00FED29078D39D5* __this, VuAnchorCreationHitTestConfig_t25155ED3C36A385DF0C9DB7AFD74900CBF754AE1 ___0_config, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -12625,7 +12625,7 @@ IL2CPP_EXTERN_C  void Internal__ctor_m0CA3E92D6C2A9CB7C0A9EEDDBA728ECA9C074691_A
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106852
+// Method Definition Index: 103031
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObserver_vuEngineCreateAnchorObserver_mDF21926AA89BAA9E630CEDAE2C3E0BAEE517421B (intptr_t ___0_engineHandle, intptr_t* ___1_observerHandle, Internal_tF40E83FB794AA628DC0CE3FAB8D44BCDB6EC9A8B* ___2_config, int32_t* ___3_errorCode, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*, Internal_tF40E83FB794AA628DC0CE3FAB8D44BCDB6EC9A8B*, int32_t*);
@@ -12647,7 +12647,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObserver_vuEngineCreateAnchor
 
 	return returnValue;
 }
-// Method Definition Index: 106853
+// Method Definition Index: 103032
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObserver_vuAnchorObserverHitTest_m8FFB7DDB23D8DDACD532A336F0A0C94E0EF53325 (intptr_t ___0_observerHandle, Internal_t6108C773A548AE308F4A05BC41C4F5B23A89E286* ___1_config, intptr_t ___2_hitTestListHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, Internal_t6108C773A548AE308F4A05BC41C4F5B23A89E286*, intptr_t);
@@ -12669,7 +12669,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObserver_vuAnchorObserverHitT
 
 	return returnValue;
 }
-// Method Definition Index: 106854
+// Method Definition Index: 103033
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObserver_vuAnchorObserverCreateAnchor_mA85F59DE573076D4DEBA824DFDCCC86ED0092D7C (intptr_t ___0_observerHandle, VuAnchorCreationConfig_tD020FFA2E43FB1FE69BCD232917659152152F1A0* ___1_config, int32_t* ___2_anchorId, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuAnchorCreationConfig_tD020FFA2E43FB1FE69BCD232917659152152F1A0*, int32_t*);
@@ -12691,7 +12691,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObserver_vuAnchorObserverCrea
 
 	return returnValue;
 }
-// Method Definition Index: 106855
+// Method Definition Index: 103034
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObserver_vuAnchorObserverCreateAnchorWithHitTest_m449D1075BB963F97F1C91A95307C7B83FE70A2FB (intptr_t ___0_observerHandle, Internal_t700378B5797C52CBEABC5C6FD00FED29078D39D5* ___1_config, int32_t* ___2_anchorId, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, Internal_t700378B5797C52CBEABC5C6FD00FED29078D39D5*, int32_t*);
@@ -12713,7 +12713,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObserver_vuAnchorObserverCrea
 
 	return returnValue;
 }
-// Method Definition Index: 106856
+// Method Definition Index: 103035
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObserver_vuAnchorObserverDestroyAnchor_m7028EC4DEDCF8763ADC721C1899EB502121401E7 (intptr_t ___0_observerHandle, int32_t ___1_anchorId, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -12735,7 +12735,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObserver_vuAnchorObserverDest
 
 	return returnValue;
 }
-// Method Definition Index: 106857
+// Method Definition Index: 103036
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObserver_vuAnchorObserverDestroyAnchors_mD1DD9E85B22C747432B078E73E1DDEEF72FDB351 (intptr_t ___0_observerHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -12757,7 +12757,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObserver_vuAnchorObserverDest
 
 	return returnValue;
 }
-// Method Definition Index: 106858
+// Method Definition Index: 103037
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObserver_vuAnchorObserverGetAnchors_mDC85ECD1649C98ADF1E0FEA5C7FB5367E2636544 (intptr_t ___0_observerHandle, intptr_t ___1_anchorListHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t);
@@ -12779,7 +12779,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObserver_vuAnchorObserverGetA
 
 	return returnValue;
 }
-// Method Definition Index: 106859
+// Method Definition Index: 103038
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuAnchorObserver_get_AnchorIds_mC4505DE725D8CA150B015BB122D7A5D5A37600C1 (VuAnchorObserver_tF8624511F6E0A54C10C5B7C039E326951245DAF5* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -12906,7 +12906,7 @@ IL_0059:
 		return L_19;
 	}
 }
-// Method Definition Index: 106860
+// Method Definition Index: 103039
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAnchorObserver_tF8624511F6E0A54C10C5B7C039E326951245DAF5* VuAnchorObserver_Create_mA078F2B2BB688E73E58EA0823C32E6092FA7C2EF (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, VuAnchorObserverConfig_tB1FFF4DB4C5CBA736658A3059FDC4CB846F86F68* ___1_config, int32_t* ___2_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -12951,7 +12951,7 @@ IL_0025:
 		return (VuAnchorObserver_tF8624511F6E0A54C10C5B7C039E326951245DAF5*)NULL;
 	}
 }
-// Method Definition Index: 106861
+// Method Definition Index: 103040
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAnchorObserver__ctor_m327DA4AD884CCFBE2444BBB27AB975DA8BEBB438 (VuAnchorObserver_tF8624511F6E0A54C10C5B7C039E326951245DAF5* __this, VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, intptr_t ___1_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -12961,7 +12961,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAnchorObserver__ctor_m327DA4AD884CCFBE
 		return;
 	}
 }
-// Method Definition Index: 106862
+// Method Definition Index: 103041
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Nullable_1_tCF32C56A2641879C053C86F273C0C6EC1B40BC28 VuAnchorObserver_CreateAnchor_mC6C7205AEBD52346028D98EEA8F100483B4ECB50 (VuAnchorObserver_tF8624511F6E0A54C10C5B7C039E326951245DAF5* __this, VuAnchorCreationConfig_tD020FFA2E43FB1FE69BCD232917659152152F1A0 ___0_config, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -12998,7 +12998,7 @@ IL_001b:
 		return L_4;
 	}
 }
-// Method Definition Index: 106863
+// Method Definition Index: 103042
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Nullable_1_tCF32C56A2641879C053C86F273C0C6EC1B40BC28 VuAnchorObserver_CreateAnchorWithHitTest_m2BF61283636C70D4150D7DC29EA80315CFEE7399 (VuAnchorObserver_tF8624511F6E0A54C10C5B7C039E326951245DAF5* __this, VuAnchorCreationHitTestConfig_t25155ED3C36A385DF0C9DB7AFD74900CBF754AE1 ___0_config, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -13039,7 +13039,7 @@ IL_0023:
 		return L_5;
 	}
 }
-// Method Definition Index: 106864
+// Method Definition Index: 103043
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAnchorObserver_DestroyAnchor_m6E943079224C5D6A6BF9709B27B2DF9D760EB86B (VuAnchorObserver_tF8624511F6E0A54C10C5B7C039E326951245DAF5* __this, int32_t ___0_anchorId, const RuntimeMethod* method) 
 {
 	{
@@ -13052,7 +13052,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAnchorObserver_DestroyAnchor_m6E943079
 		return L_3;
 	}
 }
-// Method Definition Index: 106865
+// Method Definition Index: 103044
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAnchorObserver_DestroyAnchors_m15F8D4306F986735189E66B75AE2DFE6C657C7CB (VuAnchorObserver_tF8624511F6E0A54C10C5B7C039E326951245DAF5* __this, const RuntimeMethod* method) 
 {
 	{
@@ -13064,7 +13064,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAnchorObserver_DestroyAnchors_m15F8D43
 		return L_2;
 	}
 }
-// Method Definition Index: 106866
+// Method Definition Index: 103045
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuAnchorObserver_HitTest_m17ECACE9E1C4EDCB14855DA6C5800EAA6E586A6D (VuAnchorObserver_tF8624511F6E0A54C10C5B7C039E326951245DAF5* __this, VuHitTestConfig_tDF8C428792A8DAD81204E7A06B68E8E6C03B08EA* ___0_config, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -13127,7 +13127,7 @@ IL_0033:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106867
+// Method Definition Index: 103046
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorList_vuAnchorListCreate_m1956F3B6AB54078FA6B628EA11B4774A546E9C64 (intptr_t* ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*);
@@ -13149,7 +13149,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorList_vuAnchorListCreate_m1956
 
 	return returnValue;
 }
-// Method Definition Index: 106868
+// Method Definition Index: 103047
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorList_vuAnchorListGetSize_m0008BD0055FF0C5DBDFC1B2D48A3FEF84E181012 (intptr_t ___0_listHandle, int32_t* ___1_size, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -13171,7 +13171,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorList_vuAnchorListGetSize_m000
 
 	return returnValue;
 }
-// Method Definition Index: 106869
+// Method Definition Index: 103048
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorList_vuAnchorListGetElement_m90E73DA3B5E13A5D6EC489C8ADCDB077D043200C (intptr_t ___0_listHandle, int32_t ___1_element, int32_t* ___2_nativeElement, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t, int32_t*);
@@ -13193,7 +13193,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorList_vuAnchorListGetElement_m
 
 	return returnValue;
 }
-// Method Definition Index: 106870
+// Method Definition Index: 103049
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorList_vuAnchorListDestroy_m16BB5D940CFB92D27F6416C1A710DA97336D0DF9 (intptr_t ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -13215,7 +13215,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorList_vuAnchorListDestroy_m16B
 
 	return returnValue;
 }
-// Method Definition Index: 106871
+// Method Definition Index: 103050
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAnchorList__ctor_mB52B1F6DE3BFF93716EB260DF93A1744B95E923F (VuAnchorList_tF797BA30B3A52FE94B4DFE84ACE04D0D7ADDFBEE* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -13253,7 +13253,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAnchorList__ctor_mB52B1F6DE3BFF93716EB
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106872
+// Method Definition Index: 103051
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuHitTestList_vuHitTestListCreate_m95B868F564FA7C344B0B38BF50836AF3167F18AB (intptr_t* ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*);
@@ -13275,7 +13275,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuHitTestList_vuHitTestListCreate_m95
 
 	return returnValue;
 }
-// Method Definition Index: 106873
+// Method Definition Index: 103052
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuHitTestList_vuHitTestListGetSize_m5C02EE166FEA57730F737AE0EAB14A0C9626831A (intptr_t ___0_listHandle, int32_t* ___1_size, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -13297,7 +13297,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuHitTestList_vuHitTestListGetSize_m5
 
 	return returnValue;
 }
-// Method Definition Index: 106874
+// Method Definition Index: 103053
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuHitTestList_vuHitTestListGetElement_mCC93D060617AC70BF666E94C1214BD7B140EADB9 (intptr_t ___0_listHandle, int32_t ___1_element, intptr_t* ___2_nativeElement, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t, intptr_t*);
@@ -13319,7 +13319,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuHitTestList_vuHitTestListGetElement
 
 	return returnValue;
 }
-// Method Definition Index: 106875
+// Method Definition Index: 103054
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuHitTestList_vuHitTestListDestroy_mDCDD649690ACAE042ACCD340DCBBDD10CE2A4944 (intptr_t ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -13341,7 +13341,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuHitTestList_vuHitTestListDestroy_mD
 
 	return returnValue;
 }
-// Method Definition Index: 106876
+// Method Definition Index: 103055
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuHitTestList__ctor_mA324DBFC79D2B025E7B75FE843B27CA66B0DCD0F (VuHitTestList_t27CB1CAA58362EF0E81F0915FB0893DD3B440F96* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -13371,7 +13371,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuHitTestList__ctor_mA324DBFC79D2B025E7B
 		return;
 	}
 }
-// Method Definition Index: 106877
+// Method Definition Index: 103056
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuHitTest_tCC53DD96C343DA416D47E0152BD0B79C5C8C7FC1* VuHitTestList_GetElement_m603DB877A88E491B0439F92693B89FA5E258EBC0 (VuHitTestList_t27CB1CAA58362EF0E81F0915FB0893DD3B440F96* __this, intptr_t ___0_nativeElement, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -13403,7 +13403,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuHitTest_tCC53DD96C343DA416D47E0152BD0B79C5C
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106880
+// Method Definition Index: 103059
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObservationInfo_vuAnchorObservationGetInfo_mB29F0B951590D18A5660583DF60788B0B2A30AB8 (intptr_t ___0_observation, VuAnchorObservationInfo_t992EE41E6137D5E954F9D67431E32C381AE02ADF* ___1_info, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuAnchorObservationInfo_t992EE41E6137D5E954F9D67431E32C381AE02ADF*);
@@ -13425,7 +13425,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObservationInfo_vuAnchorObser
 
 	return returnValue;
 }
-// Method Definition Index: 106881
+// Method Definition Index: 103060
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAnchorObservationInfo_t992EE41E6137D5E954F9D67431E32C381AE02ADF VuAnchorObservationInfo_Create_m90D7713EF609AFB76250702003C6E11BCF4A8F07 (intptr_t ___0_nativeHandle, const RuntimeMethod* method) 
 {
 	VuAnchorObservationInfo_t992EE41E6137D5E954F9D67431E32C381AE02ADF V_0;
@@ -13459,7 +13459,7 @@ IL_0015:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106882
+// Method Definition Index: 103061
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObservation_vuAnchorObservationGetStatusInfo_mD071243F322B41881B3EF6BDE20FE5F5A7D12230 (intptr_t ___0_observation, int32_t* ___1_statusInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -13481,7 +13481,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObservation_vuAnchorObservati
 
 	return returnValue;
 }
-// Method Definition Index: 106883
+// Method Definition Index: 103062
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObservation_get_StatusInfo_m1949E31E8BFC436F4239F62591C322B587462571 (VuAnchorObservation_tF6F1E740942499347743325836B52BD3202EAA48* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -13501,7 +13501,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObservation_get_StatusInfo_m1
 		return L_2;
 	}
 }
-// Method Definition Index: 106884
+// Method Definition Index: 103063
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObservation_get_AnchorId_mC4E4E58174E4174EC0BA09F7251FC7143A278528 (VuAnchorObservation_tF6F1E740942499347743325836B52BD3202EAA48* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -13522,7 +13522,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAnchorObservation_get_AnchorId_mC4E
 		return L_3;
 	}
 }
-// Method Definition Index: 106885
+// Method Definition Index: 103064
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAnchorObservation__ctor_m761918368D3C2F1B5D164EF690DC9BCBC3D33AF8 (VuAnchorObservation_tF6F1E740942499347743325836B52BD3202EAA48* __this, const RuntimeMethod* method) 
 {
 	{
@@ -13530,7 +13530,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAnchorObservation__ctor_m761918368D3C2
 		return;
 	}
 }
-// Method Definition Index: 106886
+// Method Definition Index: 103065
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAnchorObservation_UnregisterObservation_m016526A456E6AE735DCB3CF557B0EB342B639918 (VuAnchorObservation_tF6F1E740942499347743325836B52BD3202EAA48* __this, const RuntimeMethod* method) 
 {
 	{
@@ -13550,7 +13550,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAnchorObservation_UnregisterObservatio
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106887
+// Method Definition Index: 103066
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuAreaTargetConfig_Clone_mC3E76CB2068E7DF980978494131308F0454FDFE1 (VuAreaTargetConfig_tD971B1CCF77D100334D94B9D7DE92726C074245B* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -13592,7 +13592,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuAreaTargetConfig_Clone_mC3E7
 		return L_11;
 	}
 }
-// Method Definition Index: 106888
+// Method Definition Index: 103067
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAreaTargetConfig__ctor_mA430E325740398681CEE52561854D1DACDE70A8F (VuAreaTargetConfig_tD971B1CCF77D100334D94B9D7DE92726C074245B* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -13696,7 +13696,7 @@ IL2CPP_EXTERN_C void Internal_t92068B42905B23B3F3B6331A473407D9CBD7C6B3_marshal_
 	il2cpp_codegen_marshal_free(marshaled.___targetName);
 	marshaled.___targetName = NULL;
 }
-// Method Definition Index: 106889
+// Method Definition Index: 103068
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Internal_t92068B42905B23B3F3B6331A473407D9CBD7C6B3 Internal_Create_mD267924B49AD638B2DF1E3F077B634CFF8206285 (VuAreaTargetConfig_tD971B1CCF77D100334D94B9D7DE92726C074245B* ___0_config, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -13789,7 +13789,7 @@ IL_0025:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106890
+// Method Definition Index: 103069
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuAreaTargetCloudConfig_Clone_m7D215B34C102557E3377E50FDEB15F51C8CCB8E6 (VuAreaTargetCloudConfig_t137432DDFC9E9B0E63AF4BC7775C733961B7D22E* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -13836,7 +13836,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuAreaTargetCloudConfig_Clone_
 		return L_13;
 	}
 }
-// Method Definition Index: 106891
+// Method Definition Index: 103070
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAreaTargetCloudConfig__ctor_mD52FF3260BBB85000641F71F7F785CBF69624B17 (VuAreaTargetCloudConfig_t137432DDFC9E9B0E63AF4BC7775C733961B7D22E* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -13952,7 +13952,7 @@ IL2CPP_EXTERN_C void Internal_t89188135E33C9740024932380C8C2FE5B97189A8_marshal_
 	il2cpp_codegen_marshal_free(marshaled.___targetId);
 	marshaled.___targetId = NULL;
 }
-// Method Definition Index: 106892
+// Method Definition Index: 103071
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Internal_t89188135E33C9740024932380C8C2FE5B97189A8 Internal_Create_m8F7B0BC8BC70165ED40DE3A346CB816217A003F5 (VuAreaTargetCloudConfig_t137432DDFC9E9B0E63AF4BC7775C733961B7D22E* ___0_config, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -14050,7 +14050,7 @@ IL_0025:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106900
+// Method Definition Index: 103079
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObserver_vuEngineCreateAreaTargetObserver_m29184F8F4FEDEEDAE41B326A507C770FE28946BF (intptr_t ___0_engineHandle, intptr_t* ___1_observerHandle, Internal_t92068B42905B23B3F3B6331A473407D9CBD7C6B3* ___2_config, int32_t* ___3_errorCode, const RuntimeMethod* method) 
 {
 
@@ -14079,7 +14079,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObserver_vuEngineCreateAr
 
 	return returnValue;
 }
-// Method Definition Index: 106901
+// Method Definition Index: 103080
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObserver_vuEngineCreateAreaTargetObserverFromCloudConfig_mD95395A7633874E2A38B1EE2191CA6266D588B9D (intptr_t ___0_engineHandle, intptr_t* ___1_observerHandle, Internal_t89188135E33C9740024932380C8C2FE5B97189A8* ___2_config, int32_t* ___3_errorCode, const RuntimeMethod* method) 
 {
 
@@ -14108,7 +14108,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObserver_vuEngineCreateAr
 
 	return returnValue;
 }
-// Method Definition Index: 106902
+// Method Definition Index: 103081
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObserver_vuAreaTargetObserverGetTargetUniqueId_mE151619E407D2FFBF0DC90F1AA74E83AE012BC1D (intptr_t ___0_observerHandle, intptr_t* ___1_targetId, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -14130,7 +14130,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObserver_vuAreaTargetObse
 
 	return returnValue;
 }
-// Method Definition Index: 106903
+// Method Definition Index: 103082
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObserver_vuAreaTargetObserverGetTargetName_m202EC61F733D711CF1663DC7D25FE08598541061 (intptr_t ___0_observerHandle, intptr_t* ___1_targetName, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -14152,7 +14152,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObserver_vuAreaTargetObse
 
 	return returnValue;
 }
-// Method Definition Index: 106904
+// Method Definition Index: 103083
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObserver_vuAreaTargetObserverGetTargetSize_m5A4450FE0B940439B96C242808A8FEFB4A0F9D45 (intptr_t ___0_observerHandle, VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5* ___1_targetSize, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5*);
@@ -14174,7 +14174,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObserver_vuAreaTargetObse
 
 	return returnValue;
 }
-// Method Definition Index: 106905
+// Method Definition Index: 103084
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObserver_vuAreaTargetObserverGetAABB_m7E870A55B450CEC78256A6F5395342599C145C1E (intptr_t ___0_observerHandle, VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F738* ___1_bbox, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F738*);
@@ -14196,7 +14196,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObserver_vuAreaTargetObse
 
 	return returnValue;
 }
-// Method Definition Index: 106906
+// Method Definition Index: 103085
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObserver_vuAreaTargetObserverRequiresExternalPositions_m6EADD439215DF9212C60F7AD85D15DCEE97E3703 (intptr_t ___0_observerHandle, int32_t* ___1_requiresExternalPositions, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -14218,7 +14218,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObserver_vuAreaTargetObse
 
 	return returnValue;
 }
-// Method Definition Index: 106907
+// Method Definition Index: 103086
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObserver_vuAreaTargetObserverSetExternalPositionFrom2D_m2A979A3CFE5C01F7AABBD80BA2330B8DABF75181 (intptr_t ___0_observerHandle, VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 ___1_position, float ___2_horizontalAccuracy, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8, float);
@@ -14240,7 +14240,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObserver_vuAreaTargetObse
 
 	return returnValue;
 }
-// Method Definition Index: 106908
+// Method Definition Index: 103087
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObserver_vuAreaTargetObserverSetExternalPositionFrom3D_mE3936677F1977B988C3F9123EB880C0D1A470FED (intptr_t ___0_observerHandle, VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 ___1_position, float ___2_horizontalAccuracy, float ___3_verticalAccuracy, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5, float, float);
@@ -14262,7 +14262,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObserver_vuAreaTargetObse
 
 	return returnValue;
 }
-// Method Definition Index: 106909
+// Method Definition Index: 103088
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuAreaTargetObserver_get_TargetUniqueID_m8464788F8E8E1B62937B68E4F29A8D300FA58C41 (VuAreaTargetObserver_t1717B3835A4247B6BD4DC80886D957D3D373D7E0* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -14281,7 +14281,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuAreaTargetObserver_get_TargetUniq
 		return L_2;
 	}
 }
-// Method Definition Index: 106910
+// Method Definition Index: 103089
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuAreaTargetObserver_get_TargetName_mF01B26BFCC03C17BE190D8DF0D7D210D82F4EB33 (VuAreaTargetObserver_t1717B3835A4247B6BD4DC80886D957D3D373D7E0* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -14300,7 +14300,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuAreaTargetObserver_get_TargetName
 		return L_2;
 	}
 }
-// Method Definition Index: 106911
+// Method Definition Index: 103090
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 VuAreaTargetObserver_get_TargetSize_m769BD6497DE36FBFE5FB300BBF50A1C284DC519A (VuAreaTargetObserver_t1717B3835A4247B6BD4DC80886D957D3D373D7E0* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -14320,7 +14320,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B
 		return L_2;
 	}
 }
-// Method Definition Index: 106912
+// Method Definition Index: 103091
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F738 VuAreaTargetObserver_get_BoundingBox_m1D990B3F80FB5615F721F693E50839B9F2929703 (VuAreaTargetObserver_t1717B3835A4247B6BD4DC80886D957D3D373D7E0* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -14340,7 +14340,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F
 		return L_2;
 	}
 }
-// Method Definition Index: 106913
+// Method Definition Index: 103092
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAreaTargetObserver_get_RequiresExternalPositions_mF39DBFB3825E42AF15ACA8B4EA6136709A162CCB (VuAreaTargetObserver_t1717B3835A4247B6BD4DC80886D957D3D373D7E0* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -14359,7 +14359,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAreaTargetObserver_get_RequiresExterna
 		return L_2;
 	}
 }
-// Method Definition Index: 106914
+// Method Definition Index: 103093
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAreaTargetObserver_t1717B3835A4247B6BD4DC80886D957D3D373D7E0* VuAreaTargetObserver_Create_m35775E0E03298E132E4D0E45E9CB90F2C6DD296D (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, VuAreaTargetConfig_tD971B1CCF77D100334D94B9D7DE92726C074245B* ___1_config, int32_t* ___2_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -14404,7 +14404,7 @@ IL_0025:
 		return (VuAreaTargetObserver_t1717B3835A4247B6BD4DC80886D957D3D373D7E0*)NULL;
 	}
 }
-// Method Definition Index: 106915
+// Method Definition Index: 103094
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAreaTargetObserver_t1717B3835A4247B6BD4DC80886D957D3D373D7E0* VuAreaTargetObserver_Create_mE23CB1A8C19072842FEB8443D8999F2527E36111 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, VuAreaTargetCloudConfig_t137432DDFC9E9B0E63AF4BC7775C733961B7D22E* ___1_config, int32_t* ___2_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -14449,7 +14449,7 @@ IL_0025:
 		return (VuAreaTargetObserver_t1717B3835A4247B6BD4DC80886D957D3D373D7E0*)NULL;
 	}
 }
-// Method Definition Index: 106916
+// Method Definition Index: 103095
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAreaTargetObserver__ctor_m95BB06D33CEA4D396CCBCA38C1CC4C39B8861160 (VuAreaTargetObserver_t1717B3835A4247B6BD4DC80886D957D3D373D7E0* __this, VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, intptr_t ___1_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -14459,7 +14459,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAreaTargetObserver__ctor_m95BB06D33CEA
 		return;
 	}
 }
-// Method Definition Index: 106917
+// Method Definition Index: 103096
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAreaTargetObserver_SetExternal2DPosition_mC3454E764982CA9EB22B950C608204708A57E482 (VuAreaTargetObserver_t1717B3835A4247B6BD4DC80886D957D3D373D7E0* __this, VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 ___0_position, float ___1_horizontalAccuracy, const RuntimeMethod* method) 
 {
 	{
@@ -14478,7 +14478,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAreaTargetObserver_SetExternal2DPositi
 		return L_8;
 	}
 }
-// Method Definition Index: 106918
+// Method Definition Index: 103097
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuAreaTargetObserver_SetExternal3DPosition_m02534A880844DC5C5689535F295FD7DFA88B1DCA (VuAreaTargetObserver_t1717B3835A4247B6BD4DC80886D957D3D373D7E0* __this, VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 ___0_position, float ___1_horizontalAccuracy, float ___2_verticalAccuracy, const RuntimeMethod* method) 
 {
 	{
@@ -14592,7 +14592,7 @@ IL2CPP_EXTERN_C void VuAreaTargetObservationTargetInfo_tCE7D509D755C8A57C2A3E29E
 	il2cpp_codegen_marshal_free_bstring(marshaled.___name);
 	marshaled.___name = NULL;
 }
-// Method Definition Index: 106919
+// Method Definition Index: 103098
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObservationTargetInfo_vuAreaTargetObservationGetTargetInfo_mD00C41DF100ACC84974907742EDDC70B7FB79938 (intptr_t ___0_observation, Internal_tB99E20FCF4717F0373A528DF93AA1415CC29B089* ___1_targetInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, Internal_tB99E20FCF4717F0373A528DF93AA1415CC29B089*);
@@ -14614,7 +14614,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObservationTargetInfo_vuA
 
 	return returnValue;
 }
-// Method Definition Index: 106920
+// Method Definition Index: 103099
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAreaTargetObservationTargetInfo_tCE7D509D755C8A57C2A3E29ED92CB34A22DA64A8 VuAreaTargetObservationTargetInfo_Create_m469FFC29D662E9016B951FB51CDE95A69B71C78D (intptr_t ___0_observationHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -14692,7 +14692,7 @@ IL_0015:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106923
+// Method Definition Index: 103102
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObservation_vuAreaTargetObservationGetStatusInfo_m349945CBEFB8F1356F5A5AE5DD9EDE796C0AE749 (intptr_t ___0_observation, int32_t* ___1_statusInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -14714,7 +14714,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObservation_vuAreaTargetO
 
 	return returnValue;
 }
-// Method Definition Index: 106924
+// Method Definition Index: 103103
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObservation_get_StatusInfo_m3BE649EF68EB416F1CBFACBFE2A62F1200CE6315 (VuAreaTargetObservation_t6C5F7FA1B5517CFC1B486BCD09C21B552B60C052* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -14734,7 +14734,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuAreaTargetObservation_get_StatusInf
 		return L_2;
 	}
 }
-// Method Definition Index: 106925
+// Method Definition Index: 103104
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAreaTargetObservationTargetInfo_tCE7D509D755C8A57C2A3E29ED92CB34A22DA64A8 VuAreaTargetObservation_get_TargetInfo_m1640C231FA762A220473AAE310B94DD1C9C11356 (VuAreaTargetObservation_t6C5F7FA1B5517CFC1B486BCD09C21B552B60C052* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -14754,7 +14754,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAreaTargetObservationTargetInfo_tCE7D509D75
 		return L_2;
 	}
 }
-// Method Definition Index: 106926
+// Method Definition Index: 103105
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAreaTargetObservation__ctor_m5277405D88DF952DEB1336A88347B75EFA1FBE30 (VuAreaTargetObservation_t6C5F7FA1B5517CFC1B486BCD09C21B552B60C052* __this, const RuntimeMethod* method) 
 {
 	{
@@ -14762,7 +14762,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAreaTargetObservation__ctor_m5277405D8
 		return;
 	}
 }
-// Method Definition Index: 106927
+// Method Definition Index: 103106
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAreaTargetObservation_UnregisterObservation_m6F9CFAC96D553EB339B189C375F67402A387B65E (VuAreaTargetObservation_t6C5F7FA1B5517CFC1B486BCD09C21B552B60C052* __this, const RuntimeMethod* method) 
 {
 	{
@@ -14822,7 +14822,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAreaTargetObservation_UnregisterObserv
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106950
+// Method Definition Index: 103129
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuEngineGetCameraController_mA615210DC28BC1DFD992493FD3C0474AF8F233FD (intptr_t ___0_engineHandle, intptr_t* ___1_controllerHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -14844,7 +14844,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuEngineGetCameraC
 
 	return returnValue;
 }
-// Method Definition Index: 106951
+// Method Definition Index: 103130
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerGetVideoModes_m8524E9012AAC16E9521D033646A89D7F57A339E0 (intptr_t ___0_controllerHandle, intptr_t ___1_cameraVideoModeList, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t);
@@ -14866,7 +14866,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106952
+// Method Definition Index: 103131
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerGetActiveVideoMode_mAD3B82D13DC57F37A5AC26A060B9527248150C4F (intptr_t ___0_controllerHandle, int32_t* ___1_cameraVideoModePreset, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -14888,7 +14888,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106953
+// Method Definition Index: 103132
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerSetActiveVideoMode_m27C1C6224325188FA78A443FCA55CFEC70EB2556 (intptr_t ___0_controllerHandle, int32_t ___1_cameraVideoModePreset, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -14910,7 +14910,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106954
+// Method Definition Index: 103133
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerGetFlashMode_m0F4AD85A32A0C538B109A94EEA849E215804430D (intptr_t ___0_controllerHandle, int32_t* ___1_flashMode, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -14932,7 +14932,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106955
+// Method Definition Index: 103134
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerSetFlashMode_m3A9D4CC9F323ACA2EAC93AF5E4BB643866E505B6 (intptr_t ___0_controllerHandle, int32_t ___1_flashMode, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -14954,7 +14954,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106956
+// Method Definition Index: 103135
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerGetFocusMode_m2B067D8BA86380F9712D0E4712476E90E51172D4 (intptr_t ___0_controllerHandle, int32_t* ___1_focusMode, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -14976,7 +14976,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106957
+// Method Definition Index: 103136
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerSetFocusMode_mB6FF5A07BE7C07D55DA8517B8E86E20234CBAF79 (intptr_t ___0_controllerHandle, int32_t ___1_focusMode, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -14998,7 +14998,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106958
+// Method Definition Index: 103137
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerGetExposureMode_mCE410568A5AA456A77D818C7481C023C88A7CC0C (intptr_t ___0_controllerHandle, int32_t* ___1_exposureMode, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -15020,7 +15020,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106959
+// Method Definition Index: 103138
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerSetExposureMode_mD63AA83A030FC8704D2FA17BAEB266B851813B97 (intptr_t ___0_controllerHandle, int32_t ___1_exposureMode, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -15042,7 +15042,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106960
+// Method Definition Index: 103139
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerIsFocusModeSupported_m293E5D14DE5C3D5100047768CDAFC57B36BB924E (intptr_t ___0_controllerHandle, int32_t ___1_focusMode, int32_t* ___2_supported, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t, int32_t*);
@@ -15064,7 +15064,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106961
+// Method Definition Index: 103140
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerIsExposureModeSupported_m84E2A1ACB8E4FF61ACF49EA301B638A857D767EA (intptr_t ___0_controllerHandle, int32_t ___1_exposureMode, int32_t* ___2_supported, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t, int32_t*);
@@ -15086,7 +15086,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106962
+// Method Definition Index: 103141
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerIsFlashModeSupported_mFC5A0417C74DDFA653F87016ABF6D816457E9FC6 (intptr_t ___0_controllerHandle, int32_t* ___1_supported, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -15108,7 +15108,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106963
+// Method Definition Index: 103142
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerGetFocusRegion_m3810CC712AFBF98B5762A0706501C184E9325D33 (intptr_t ___0_controllerHandle, VuCameraRegionOfInterest_tCB9FC7BD040469C4B8FEB640DD26BD8776937B8F* ___1_focusROI, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuCameraRegionOfInterest_tCB9FC7BD040469C4B8FEB640DD26BD8776937B8F*);
@@ -15130,7 +15130,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106964
+// Method Definition Index: 103143
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerSetFocusRegion_mEE33FF7F93090AD01AE6A5447EFAD7D29E3EC9F2 (intptr_t ___0_controllerHandle, VuCameraRegionOfInterest_tCB9FC7BD040469C4B8FEB640DD26BD8776937B8F ___1_focusROI, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuCameraRegionOfInterest_tCB9FC7BD040469C4B8FEB640DD26BD8776937B8F);
@@ -15152,7 +15152,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106965
+// Method Definition Index: 103144
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerGetExposureRegion_mE12A3EE85E67FD3E53364A5840586FF9D9D44755 (intptr_t ___0_controllerHandle, VuCameraRegionOfInterest_tCB9FC7BD040469C4B8FEB640DD26BD8776937B8F* ___1_focusROI, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuCameraRegionOfInterest_tCB9FC7BD040469C4B8FEB640DD26BD8776937B8F*);
@@ -15174,7 +15174,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106966
+// Method Definition Index: 103145
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerSetExposureRegion_m26FC31A1B0427EDA5A1D65838448C4253851A3F2 (intptr_t ___0_controllerHandle, VuCameraRegionOfInterest_tCB9FC7BD040469C4B8FEB640DD26BD8776937B8F ___1_exposureROI, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuCameraRegionOfInterest_tCB9FC7BD040469C4B8FEB640DD26BD8776937B8F);
@@ -15196,7 +15196,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106967
+// Method Definition Index: 103146
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerIsFocusRegionSupported_m91B9AD5442F8285ED35C22ECF5732A01164AB312 (intptr_t ___0_controllerHandle, int32_t* ___1_isFocusRegionSupported, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -15218,7 +15218,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106968
+// Method Definition Index: 103147
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerIsExposureRegionSupported_mDDB3256EE16D86D735A5F052D7F2F51C42EA922E (intptr_t ___0_controllerHandle, int32_t* ___1_isExposureRegionSupported, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -15240,7 +15240,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106969
+// Method Definition Index: 103148
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerGetRegisteredImageFormats_m2C9EAC7A7AF060C59E4DDED30B0447B00585DD92 (intptr_t ___0_controllerHandle, intptr_t ___1_imageFormatListHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t);
@@ -15262,7 +15262,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106970
+// Method Definition Index: 103149
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerRegisterImageFormat_mFB701B773618BCFCD6B20D0936A4164B999CE729 (intptr_t ___0_controllerHandle, int32_t ___1_pixelFormat, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -15284,7 +15284,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106971
+// Method Definition Index: 103150
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraControllerUnregisterImageFormat_mBF64AE3AEE396DA818C03A0140FF5C21ADA185E8 (intptr_t ___0_controllerHandle, int32_t ___1_pixelFormat, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -15306,7 +15306,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_vuCameraController
 
 	return returnValue;
 }
-// Method Definition Index: 106972
+// Method Definition Index: 103151
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_get_FocusMode_m7943AAF5FD26C50A92ED05142FBBAC0E9188DD4D (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -15326,7 +15326,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_get_FocusMode_m794
 		return L_2;
 	}
 }
-// Method Definition Index: 106973
+// Method Definition Index: 103152
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_get_ExposureMode_mF5677192F8BEFB934071287320E15273138328FA (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -15346,7 +15346,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_get_ExposureMode_m
 		return L_2;
 	}
 }
-// Method Definition Index: 106974
+// Method Definition Index: 103153
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_get_Flash_m530F11B5EA4240E98A8659E53A5E636C80B91537 (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -15365,7 +15365,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_get_Flash_m530F11B5EA
 		return L_2;
 	}
 }
-// Method Definition Index: 106975
+// Method Definition Index: 103154
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_get_FocusRegionSupported_m78E9A51785C4492E0D43B3DC49ACBA717D7E094D (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -15384,7 +15384,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_get_FocusRegionSuppor
 		return L_2;
 	}
 }
-// Method Definition Index: 106976
+// Method Definition Index: 103155
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_get_ExposureRegionSupported_mBE6F4F8E9362B5DAF829AA15B558587E42AC68C6 (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -15403,7 +15403,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_get_ExposureRegionSup
 		return L_2;
 	}
 }
-// Method Definition Index: 106977
+// Method Definition Index: 103156
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_get_ActiveVideoModePreset_m020DFE3872298C8E78464D1C3708D3A085B96A15 (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -15423,7 +15423,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraController_get_ActiveVideoMod
 		return L_2;
 	}
 }
-// Method Definition Index: 106978
+// Method Definition Index: 103157
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuCameraController_get_RegisteredImageFormats_mF24E2145E19E42CDDBED9D33931443E416C2B41F (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -15550,7 +15550,7 @@ IL_0059:
 		return L_19;
 	}
 }
-// Method Definition Index: 106979
+// Method Definition Index: 103158
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* VuCameraController_Create_m976F3ED88014E8116900C79D758BBFF6D3A8BF83 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -15588,7 +15588,7 @@ IL_001a:
 		return L_6;
 	}
 }
-// Method Definition Index: 106980
+// Method Definition Index: 103159
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraController__ctor_m222F6462CEEEE479C1898F98C44003F05B7B79EA (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, intptr_t ___1_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -15598,7 +15598,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraController__ctor_m222F6462CEEEE4
 		return;
 	}
 }
-// Method Definition Index: 106981
+// Method Definition Index: 103160
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_SetFocusMode_mD872D5BB436C08EDCF0B36A474C6F8A3AE4471F0 (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, int32_t ___0_mode, const RuntimeMethod* method) 
 {
 	{
@@ -15611,7 +15611,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_SetFocusMode_mD872D5B
 		return L_3;
 	}
 }
-// Method Definition Index: 106982
+// Method Definition Index: 103161
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_SetExposureMode_m1164E46A56F15C1EA95F764651F65DC126ED2C52 (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, int32_t ___0_mode, const RuntimeMethod* method) 
 {
 	{
@@ -15624,7 +15624,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_SetExposureMode_m1164
 		return L_3;
 	}
 }
-// Method Definition Index: 106983
+// Method Definition Index: 103162
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_SetFlash_m44F07CE9905E3DE5C78EFDC1F37C8642665A4F04 (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, bool ___0_flash, const RuntimeMethod* method) 
 {
 	{
@@ -15639,7 +15639,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_SetFlash_m44F07CE9905
 		return L_4;
 	}
 }
-// Method Definition Index: 106984
+// Method Definition Index: 103163
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_IsFocusModeSupported_m35D8ED8B3B407D2FA7FCDEDEDD1AF27E5A7B5059 (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, int32_t ___0_mode, const RuntimeMethod* method) 
 {
 	int32_t V_0 = 0;
@@ -15665,7 +15665,7 @@ IL_001a:
 		return (bool)0;
 	}
 }
-// Method Definition Index: 106985
+// Method Definition Index: 103164
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_IsExposureModeSupported_m0915992A38952B0EAA68B3A5035E1CDF0DEBDCD2 (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, int32_t ___0_mode, const RuntimeMethod* method) 
 {
 	int32_t V_0 = 0;
@@ -15691,7 +15691,7 @@ IL_001a:
 		return (bool)0;
 	}
 }
-// Method Definition Index: 106986
+// Method Definition Index: 103165
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_IsFlashSupported_m7CF2AAFD3037C8E8102E69C4BE331E47FE9A0003 (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, const RuntimeMethod* method) 
 {
 	int32_t V_0 = 0;
@@ -15716,7 +15716,7 @@ IL_0019:
 		return (bool)0;
 	}
 }
-// Method Definition Index: 106987
+// Method Definition Index: 103166
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Nullable_1_t8738E3AE4399CAB1DE7E9FF766F5E5029648A8BD VuCameraController_GetFocusRegion_mF68B90889D8C9A255B3D0AE05101D80C12BBF390 (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -15753,7 +15753,7 @@ IL_0017:
 		return L_4;
 	}
 }
-// Method Definition Index: 106988
+// Method Definition Index: 103167
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_SetFocusRegion_mC3A9ACE4CD1F49AC4BFEF9B0D125A0996E0A2443 (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, VuCameraRegionOfInterest_tCB9FC7BD040469C4B8FEB640DD26BD8776937B8F ___0_region, const RuntimeMethod* method) 
 {
 	{
@@ -15766,7 +15766,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_SetFocusRegion_mC3A9A
 		return L_3;
 	}
 }
-// Method Definition Index: 106989
+// Method Definition Index: 103168
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Nullable_1_t8738E3AE4399CAB1DE7E9FF766F5E5029648A8BD VuCameraController_GetExposureRegion_mF943C2A660A1C7770D85FF3C5A330FF89D11C29D (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -15803,7 +15803,7 @@ IL_0017:
 		return L_4;
 	}
 }
-// Method Definition Index: 106990
+// Method Definition Index: 103169
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_SetExposureRegion_mE9155E26172EC8D71B7CDC4E9E02CCA7A7814197 (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, VuCameraRegionOfInterest_tCB9FC7BD040469C4B8FEB640DD26BD8776937B8F ___0_region, const RuntimeMethod* method) 
 {
 	{
@@ -15816,7 +15816,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_SetExposureRegion_mE9
 		return L_3;
 	}
 }
-// Method Definition Index: 106991
+// Method Definition Index: 103170
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuCameraController_GetVideoModes_mBB01D1422716B663FEF55C90DD24C621E1A874E6 (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -15942,7 +15942,7 @@ IL_0056:
 		return L_18;
 	}
 }
-// Method Definition Index: 106992
+// Method Definition Index: 103171
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Nullable_1_t64DCBAB200C84CEB1B77792EE9CC7514699F1315 VuCameraController_GetActiveVideoMode_mCF4A143EFA34102640E610BDB4BD6223D9E43A73 (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -16003,7 +16003,7 @@ IL_001a:
 		return L_12;
 	}
 }
-// Method Definition Index: 106993
+// Method Definition Index: 103172
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_SetActiveVideoMode_m34445955AC01EF5F38BCCAB6B575E0C8B32E96EF (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, int32_t ___0_preset, const RuntimeMethod* method) 
 {
 	{
@@ -16016,7 +16016,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_SetActiveVideoMode_m3
 		return L_3;
 	}
 }
-// Method Definition Index: 106994
+// Method Definition Index: 103173
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_RegisterImageFormat_mD14B0F785AA800BDBF2B4A236A69F7CA1667F00F (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, int32_t ___0_pixelFormat, const RuntimeMethod* method) 
 {
 	{
@@ -16029,7 +16029,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_RegisterImageFormat_m
 		return L_3;
 	}
 }
-// Method Definition Index: 106995
+// Method Definition Index: 103174
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_UnregisterImageFormat_m582143B1B2D13C5237285D74FF573A1B8484E2C0 (VuCameraController_t61C2E4BBB8DDC03D174CD79117104BB2EF3E1E6A* __this, int32_t ___0_pixelFormat, const RuntimeMethod* method) 
 {
 	{
@@ -16050,7 +16050,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCameraController_UnregisterImageFormat
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106996
+// Method Definition Index: 103175
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void U3CU3Ec__DisplayClass49_0__ctor_m54F3B87B2059209C228F663722036129FCC6A502 (U3CU3Ec__DisplayClass49_0_tFF574C0C43A1E4A0353E4D3D589507E6D5D03EBF* __this, const RuntimeMethod* method) 
 {
 	{
@@ -16058,7 +16058,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void U3CU3Ec__DisplayClass49_0__ctor_m54F3B87
 		return;
 	}
 }
-// Method Definition Index: 106997
+// Method Definition Index: 103176
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool U3CU3Ec__DisplayClass49_0_U3CGetActiveVideoModeU3Eb__0_mA8D3CAFE3D33EAB21841A5881EA766CA95058C2D (U3CU3Ec__DisplayClass49_0_tFF574C0C43A1E4A0353E4D3D589507E6D5D03EBF* __this, VuCameraVideoMode_tB492EBEB0605860CCAC237A94369C4C29011350D ___0_v, const RuntimeMethod* method) 
 {
 	{
@@ -16076,7 +16076,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool U3CU3Ec__DisplayClass49_0_U3CGetActiveVi
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 106998
+// Method Definition Index: 103177
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraVideoModeList_vuCameraVideoModeListCreate_mFF929139C7A0577195C32CF853F752539CE8FFD8 (intptr_t* ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*);
@@ -16098,7 +16098,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraVideoModeList_vuCameraVideoMo
 
 	return returnValue;
 }
-// Method Definition Index: 106999
+// Method Definition Index: 103178
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraVideoModeList_vuCameraVideoModeListGetSize_mDE376311F0C9DADFCD02300ED8146D593A4BFE17 (intptr_t ___0_listHandle, int32_t* ___1_size, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -16120,7 +16120,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraVideoModeList_vuCameraVideoMo
 
 	return returnValue;
 }
-// Method Definition Index: 107000
+// Method Definition Index: 103179
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraVideoModeList_vuCameraVideoModeListGetElement_m8F8F6A64C5B43E7CC019E41F83FFAB39FC00EFC0 (intptr_t ___0_listHandle, int32_t ___1_element, VuCameraVideoMode_tB492EBEB0605860CCAC237A94369C4C29011350D* ___2_nativeElement, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t, VuCameraVideoMode_tB492EBEB0605860CCAC237A94369C4C29011350D*);
@@ -16142,7 +16142,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraVideoModeList_vuCameraVideoMo
 
 	return returnValue;
 }
-// Method Definition Index: 107001
+// Method Definition Index: 103180
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraVideoModeList_vuCameraVideoModeListDestroy_mFADBF44C861191267CFAF7FEA886C5C740D6DEB6 (intptr_t ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -16164,7 +16164,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraVideoModeList_vuCameraVideoMo
 
 	return returnValue;
 }
-// Method Definition Index: 107002
+// Method Definition Index: 103181
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraVideoModeList__ctor_m06A366EEF4A75D692E8C727750536C08DC60DBD9 (VuCameraVideoModeList_t7471A5EC06D65CD40B7F778CAA0425A1D00FC817* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -16202,7 +16202,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraVideoModeList__ctor_m06A366EEF4A
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107003
+// Method Definition Index: 103182
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuController__ctor_m9BB6F2C48F1832127A346EA1A76B95DF0F2040A2 (VuController_t0E0C6E2A1AE9E9807712554C20C0A0B8B3BB5672* __this, VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, intptr_t ___1_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -16223,7 +16223,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuController__ctor_m9BB6F2C48F1832127A34
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107004
+// Method Definition Index: 103183
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool ConversionUtils_ToBool_m32B15CD0258ADE0FDC0F5ADDFFB3CF15843F123B (int32_t ___0_value, const RuntimeMethod* method) 
 {
 	{
@@ -16231,7 +16231,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool ConversionUtils_ToBool_m32B15CD0258ADE0F
 		return (bool)((((int32_t)L_0) == ((int32_t)1))? 1 : 0);
 	}
 }
-// Method Definition Index: 107005
+// Method Definition Index: 103184
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool ConversionUtils_ToBool_mD954A29C09DADEEE54475C570BBA1507FC20BE44 (int32_t ___0_value, const RuntimeMethod* method) 
 {
 	{
@@ -16239,7 +16239,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool ConversionUtils_ToBool_mD954A29C09DADEEE
 		return (bool)((((int32_t)L_0) == ((int32_t)1))? 1 : 0);
 	}
 }
-// Method Definition Index: 107006
+// Method Definition Index: 103185
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t ConversionUtils_ToVuBool_m52FF19D48DD34BD5271D0C862707B19D2D6FBFB7 (bool ___0_value, const RuntimeMethod* method) 
 {
 	{
@@ -16330,7 +16330,7 @@ IL2CPP_EXTERN_C void VuCylinderTargetConfig_t3F2EBE88D496CE53B39EDD0457EDD0B5688
 	il2cpp_codegen_marshal_free_bstring(marshaled.___targetName);
 	marshaled.___targetName = NULL;
 }
-// Method Definition Index: 107007
+// Method Definition Index: 103186
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuCylinderTargetConfig_Clone_m83100E8DDA6F61D88A292E3E1707DBDE72C42790 (VuCylinderTargetConfig_t3F2EBE88D496CE53B39EDD0457EDD0B5688A9A01* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -16367,7 +16367,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuCylinderTargetConfig_Clone_m
 		return L_9;
 	}
 }
-// Method Definition Index: 107008
+// Method Definition Index: 103187
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCylinderTargetConfig__ctor_m6515A482D5AFF6DBFA8BDB79879824E95DEE8E30 (VuCylinderTargetConfig_t3F2EBE88D496CE53B39EDD0457EDD0B5688A9A01* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -16406,7 +16406,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCylinderTargetConfig__ctor_m6515A482D5
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107020
+// Method Definition Index: 103199
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuEngineCreateCylinderTargetObserver_mB24F8456D357B4028F6662C9EF10F28C772163C6 (intptr_t ___0_engineHandle, intptr_t* ___1_observerHandle, VuCylinderTargetConfig_t3F2EBE88D496CE53B39EDD0457EDD0B5688A9A01* ___2_config, int32_t* ___3_errorCode, const RuntimeMethod* method) 
 {
 
@@ -16441,7 +16441,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuEngineCrea
 
 	return returnValue;
 }
-// Method Definition Index: 107021
+// Method Definition Index: 103200
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTargetObserverGetTargetUniqueId_m582BC58ACB25537B93EE6CC517A95025332AAC40 (intptr_t ___0_observerHandle, intptr_t* ___1_targetId, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -16463,7 +16463,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTa
 
 	return returnValue;
 }
-// Method Definition Index: 107022
+// Method Definition Index: 103201
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTargetObserverGetTargetName_m11A7780824F4259E53EC903FE839CDFB4BE8B879 (intptr_t ___0_observerHandle, intptr_t* ___1_targetName, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -16485,7 +16485,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTa
 
 	return returnValue;
 }
-// Method Definition Index: 107023
+// Method Definition Index: 103202
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTargetObserverSetTargetSideLength_m3163283D9BF102A8887466B19A800BB66865FEA1 (intptr_t ___0_observerHandle, float ___1_sideLength, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, float);
@@ -16507,7 +16507,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTa
 
 	return returnValue;
 }
-// Method Definition Index: 107024
+// Method Definition Index: 103203
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTargetObserverGetTargetSideLength_m7EA6EA7F2CA6B408D898B10DF029392E20DB774E (intptr_t ___0_observerHandle, float* ___1_sideLength, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, float*);
@@ -16529,7 +16529,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTa
 
 	return returnValue;
 }
-// Method Definition Index: 107025
+// Method Definition Index: 103204
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTargetObserverSetTargetTopDiameter_m5BF60C67ECA26BF32E66F7A6D4588752E82F9103 (intptr_t ___0_observerHandle, float ___1_topDiameter, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, float);
@@ -16551,7 +16551,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTa
 
 	return returnValue;
 }
-// Method Definition Index: 107026
+// Method Definition Index: 103205
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTargetObserverGetTargetTopDiameter_mE8AE4E2E7DD8375C472E7B71D9AE949F195B30FE (intptr_t ___0_observerHandle, float* ___1_topDiameter, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, float*);
@@ -16573,7 +16573,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTa
 
 	return returnValue;
 }
-// Method Definition Index: 107027
+// Method Definition Index: 103206
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTargetObserverSetTargetBottomDiameter_mC069B9C65D3900F545F15D7576460C14AF129C00 (intptr_t ___0_observerHandle, float ___1_bottomDiameter, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, float);
@@ -16595,7 +16595,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTa
 
 	return returnValue;
 }
-// Method Definition Index: 107028
+// Method Definition Index: 103207
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTargetObserverGetTargetBottomDiameter_mF4F9CE792DA47C59A420603F98190BBACEADCD00 (intptr_t ___0_observerHandle, float* ___1_bottomDiameter, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, float*);
@@ -16617,7 +16617,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTa
 
 	return returnValue;
 }
-// Method Definition Index: 107029
+// Method Definition Index: 103208
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTargetObserverGetAABB_m8E83A55853C81BC70D927EC1AFA3741CC08250F1 (intptr_t ___0_observerHandle, VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F738* ___1_bbox, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F738*);
@@ -16639,7 +16639,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTa
 
 	return returnValue;
 }
-// Method Definition Index: 107030
+// Method Definition Index: 103209
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTargetObserverSetTrackingOptimization_mC26C9EA1A311DCFF614495775E4E96A37B0CD10D (intptr_t ___0_observerHandle, int32_t ___1_optimization, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -16661,7 +16661,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTa
 
 	return returnValue;
 }
-// Method Definition Index: 107031
+// Method Definition Index: 103210
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTargetObserverGetTrackingOptimization_m10B201A45946A337B9F3055C90D101941DEDEF3C (intptr_t ___0_observerHandle, int32_t* ___1_optimization, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -16683,7 +16683,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_vuCylinderTa
 
 	return returnValue;
 }
-// Method Definition Index: 107032
+// Method Definition Index: 103211
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuCylinderTargetObserver_get_TargetUniqueID_m1D3EA97ED37D0D6D4A49481A643911D8D8CA5214 (VuCylinderTargetObserver_t98A85C778FCAFD542DC1984EA546176CB33C0FCD* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -16702,7 +16702,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuCylinderTargetObserver_get_Target
 		return L_2;
 	}
 }
-// Method Definition Index: 107033
+// Method Definition Index: 103212
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuCylinderTargetObserver_get_TargetName_m166BEFAFA22FEC5A620467CD38FD2D1A4B746D32 (VuCylinderTargetObserver_t98A85C778FCAFD542DC1984EA546176CB33C0FCD* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -16721,7 +16721,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuCylinderTargetObserver_get_Target
 		return L_2;
 	}
 }
-// Method Definition Index: 107034
+// Method Definition Index: 103213
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR float VuCylinderTargetObserver_get_TargetSideLength_m47B78F1B01C1BFAB49F4F36EF54E4AA2E1E48355 (VuCylinderTargetObserver_t98A85C778FCAFD542DC1984EA546176CB33C0FCD* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -16741,7 +16741,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR float VuCylinderTargetObserver_get_TargetSide
 		return L_2;
 	}
 }
-// Method Definition Index: 107035
+// Method Definition Index: 103214
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR float VuCylinderTargetObserver_get_TargetTopDiameter_m9E4DD7046B9E41063D71B4D08AFF12376D4CB43F (VuCylinderTargetObserver_t98A85C778FCAFD542DC1984EA546176CB33C0FCD* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -16761,7 +16761,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR float VuCylinderTargetObserver_get_TargetTopD
 		return L_2;
 	}
 }
-// Method Definition Index: 107036
+// Method Definition Index: 103215
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR float VuCylinderTargetObserver_get_TargetBottomDiameter_mE6AD6DD6AA083FBDC28DED9EB0D28F956E910871 (VuCylinderTargetObserver_t98A85C778FCAFD542DC1984EA546176CB33C0FCD* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -16781,7 +16781,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR float VuCylinderTargetObserver_get_TargetBott
 		return L_2;
 	}
 }
-// Method Definition Index: 107037
+// Method Definition Index: 103216
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F738 VuCylinderTargetObserver_get_BoundingBox_m091A338C137C4A3C3111DECB8C68E5F00FAD6BA4 (VuCylinderTargetObserver_t98A85C778FCAFD542DC1984EA546176CB33C0FCD* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -16801,7 +16801,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F
 		return L_2;
 	}
 }
-// Method Definition Index: 107038
+// Method Definition Index: 103217
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_get_TrackingOptimization_m7154080996787E6F8237BA9431BF1AC8C0E237C9 (VuCylinderTargetObserver_t98A85C778FCAFD542DC1984EA546176CB33C0FCD* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -16821,7 +16821,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObserver_get_Tracking
 		return L_2;
 	}
 }
-// Method Definition Index: 107039
+// Method Definition Index: 103218
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuCylinderTargetObserver_t98A85C778FCAFD542DC1984EA546176CB33C0FCD* VuCylinderTargetObserver_Create_mB34E5092931009F3992B21DBBC21401D05B7479A (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, VuCylinderTargetConfig_t3F2EBE88D496CE53B39EDD0457EDD0B5688A9A01* ___1_config, int32_t* ___2_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -16861,7 +16861,7 @@ IL_001d:
 		return (VuCylinderTargetObserver_t98A85C778FCAFD542DC1984EA546176CB33C0FCD*)NULL;
 	}
 }
-// Method Definition Index: 107040
+// Method Definition Index: 103219
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCylinderTargetObserver__ctor_m6F5BEA450D95B20AB7F072780AF21E04EA5EC029 (VuCylinderTargetObserver_t98A85C778FCAFD542DC1984EA546176CB33C0FCD* __this, VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, intptr_t ___1_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -16871,7 +16871,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCylinderTargetObserver__ctor_m6F5BEA45
 		return;
 	}
 }
-// Method Definition Index: 107041
+// Method Definition Index: 103220
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCylinderTargetObserver_SetTargetSideLength_mA5FA378E6E9E7592DA7426AE6E617132042D47FF (VuCylinderTargetObserver_t98A85C778FCAFD542DC1984EA546176CB33C0FCD* __this, float ___0_sideLength, const RuntimeMethod* method) 
 {
 	{
@@ -16884,7 +16884,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCylinderTargetObserver_SetTargetSideLe
 		return L_3;
 	}
 }
-// Method Definition Index: 107042
+// Method Definition Index: 103221
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCylinderTargetObserver_SetTargetTopDiameter_mC9874A1AFBFF770CCA7FE68D69B5BBF1114A319E (VuCylinderTargetObserver_t98A85C778FCAFD542DC1984EA546176CB33C0FCD* __this, float ___0_topDiameter, const RuntimeMethod* method) 
 {
 	{
@@ -16897,7 +16897,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCylinderTargetObserver_SetTargetTopDia
 		return L_3;
 	}
 }
-// Method Definition Index: 107043
+// Method Definition Index: 103222
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCylinderTargetObserver_SetTargetBottomDiameter_m3DE050049D485B828A3EE10212AF5CAC926C40EE (VuCylinderTargetObserver_t98A85C778FCAFD542DC1984EA546176CB33C0FCD* __this, float ___0_bottomDiameter, const RuntimeMethod* method) 
 {
 	{
@@ -16910,7 +16910,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCylinderTargetObserver_SetTargetBottom
 		return L_3;
 	}
 }
-// Method Definition Index: 107044
+// Method Definition Index: 103223
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCylinderTargetObserver_SetTrackingOptimization_m6D651FAC06291FB486F09353F0896F87ED926152 (VuCylinderTargetObserver_t98A85C778FCAFD542DC1984EA546176CB33C0FCD* __this, int32_t ___0_optimization, const RuntimeMethod* method) 
 {
 	{
@@ -17021,7 +17021,7 @@ IL2CPP_EXTERN_C void VuCylinderTargetObservationTargetInfo_t09B88E331A4D64498520
 	il2cpp_codegen_marshal_free_bstring(marshaled.___name);
 	marshaled.___name = NULL;
 }
-// Method Definition Index: 107045
+// Method Definition Index: 103224
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObservationTargetInfo_vuCylinderTargetObservationGetTargetInfo_m53F35EEF277A0E0C533339FD82A81FE0F5A91788 (intptr_t ___0_observation, Internal_t05541CCD3C64F71E6A662CFD0E5579D8539222EF* ___1_targetInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, Internal_t05541CCD3C64F71E6A662CFD0E5579D8539222EF*);
@@ -17043,7 +17043,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObservationTargetInfo
 
 	return returnValue;
 }
-// Method Definition Index: 107046
+// Method Definition Index: 103225
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuCylinderTargetObservationTargetInfo_t09B88E331A4D64498520D1F0DACE3824CE155196 VuCylinderTargetObservationTargetInfo_Create_m2576D93DC2199BD9D4128A8D926316F4E7574924 (intptr_t ___0_observationHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -17122,7 +17122,7 @@ IL_0015:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107049
+// Method Definition Index: 103228
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObservation_vuCylinderTargetObservationGetStatusInfo_m923A9323064D562AABE3CB4838045AA9A3B442C1 (intptr_t ___0_observation, int32_t* ___1_statusInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -17144,7 +17144,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObservation_vuCylinde
 
 	return returnValue;
 }
-// Method Definition Index: 107050
+// Method Definition Index: 103229
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObservation_get_StatusInfo_m6B9396CD1FF7CCA969633747D3956A89383668D3 (VuCylinderTargetObservation_t7FA677F5EB72D8BC3FE94DD637B034B2DF305026* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -17164,7 +17164,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCylinderTargetObservation_get_Statu
 		return L_2;
 	}
 }
-// Method Definition Index: 107051
+// Method Definition Index: 103230
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuCylinderTargetObservationTargetInfo_t09B88E331A4D64498520D1F0DACE3824CE155196 VuCylinderTargetObservation_get_TargetInfo_m0849F0B7601B676714C0754AC374A234DC558E37 (VuCylinderTargetObservation_t7FA677F5EB72D8BC3FE94DD637B034B2DF305026* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -17184,7 +17184,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuCylinderTargetObservationTargetInfo_t09B88E
 		return L_2;
 	}
 }
-// Method Definition Index: 107052
+// Method Definition Index: 103231
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCylinderTargetObservation__ctor_mEB9C0D20472219471AD132CEB65091C0C5B3907C (VuCylinderTargetObservation_t7FA677F5EB72D8BC3FE94DD637B034B2DF305026* __this, const RuntimeMethod* method) 
 {
 	{
@@ -17192,7 +17192,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCylinderTargetObservation__ctor_mEB9C0
 		return;
 	}
 }
-// Method Definition Index: 107053
+// Method Definition Index: 103232
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCylinderTargetObservation_UnregisterObservation_m3D196809F17609B9D127777D97EDE85C3BBD9B37 (VuCylinderTargetObservation_t7FA677F5EB72D8BC3FE94DD637B034B2DF305026* __this, const RuntimeMethod* method) 
 {
 	{
@@ -17272,7 +17272,7 @@ IL2CPP_EXTERN_C void VuDatabaseTargetInfo_tACF0C984E38A6AA4F6FB07B5AAEFEA516A651
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107054
+// Method Definition Index: 103233
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuDatabaseTargetInfoList_vuDatabaseTargetInfoListCreate_m9B8240427A9D3217AB57CC05B3848E574C30E11E (intptr_t* ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*);
@@ -17294,7 +17294,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuDatabaseTargetInfoList_vuDatabaseTa
 
 	return returnValue;
 }
-// Method Definition Index: 107055
+// Method Definition Index: 103234
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuDatabaseTargetInfoList_vuDatabaseTargetInfoListGetSize_m40478D85FC8BE536B14B972807BE4433EDD432BA (intptr_t ___0_listHandle, int32_t* ___1_size, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -17316,7 +17316,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuDatabaseTargetInfoList_vuDatabaseTa
 
 	return returnValue;
 }
-// Method Definition Index: 107056
+// Method Definition Index: 103235
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuDatabaseTargetInfoList_vuDatabaseTargetInfoListGetElement_m826C21B1DD9A1AA97D80B4AE6490C13A93C5B367 (intptr_t ___0_listHandle, int32_t ___1_element, Internal_t07525C53CD14856125D6BEA745EC2C88C2E78D27* ___2_targetInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t, Internal_t07525C53CD14856125D6BEA745EC2C88C2E78D27*);
@@ -17338,7 +17338,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuDatabaseTargetInfoList_vuDatabaseTa
 
 	return returnValue;
 }
-// Method Definition Index: 107057
+// Method Definition Index: 103236
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuDatabaseTargetInfoList_vuDatabaseTargetInfoListDestroy_m15F28B6A7F6D74009B266B5A15F54C77C5E966F0 (intptr_t ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -17360,7 +17360,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuDatabaseTargetInfoList_vuDatabaseTa
 
 	return returnValue;
 }
-// Method Definition Index: 107058
+// Method Definition Index: 103237
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuDatabaseTargetInfoList__ctor_mBAC3C11B0732B22D56B9DA0D5BA06369FCF2B849 (VuDatabaseTargetInfoList_tDE98F25127CEF67614FA7102FB9809A733B5F897* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -17390,7 +17390,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuDatabaseTargetInfoList__ctor_mBAC3C11B
 		return;
 	}
 }
-// Method Definition Index: 107059
+// Method Definition Index: 103238
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuDatabaseTargetInfo_tACF0C984E38A6AA4F6FB07B5AAEFEA516A651E6E VuDatabaseTargetInfoList_GetElement_m274D8D6301ED7B70D4BB66327C7159C1ABC5B385 (VuDatabaseTargetInfoList_tDE98F25127CEF67614FA7102FB9809A733B5F897* __this, Internal_t07525C53CD14856125D6BEA745EC2C88C2E78D27 ___0_nativeElement, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -17459,7 +17459,7 @@ IL2CPP_EXTERN_C void VuDevicePoseConfig_t252CDE8459C8ACF606D90A85CC15487FF0498D9
 IL2CPP_EXTERN_C void VuDevicePoseConfig_t252CDE8459C8ACF606D90A85CC15487FF0498D98_marshal_com_cleanup(VuDevicePoseConfig_t252CDE8459C8ACF606D90A85CC15487FF0498D98_marshaled_com& marshaled)
 {
 }
-// Method Definition Index: 107060
+// Method Definition Index: 103239
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuDevicePoseConfig_Clone_m8E3A166C907EA213FA666FFB8E0F0114EFA3E7C2 (VuDevicePoseConfig_t252CDE8459C8ACF606D90A85CC15487FF0498D98* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -17482,7 +17482,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuDevicePoseConfig_Clone_m8E3A
 		return L_3;
 	}
 }
-// Method Definition Index: 107061
+// Method Definition Index: 103240
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuDevicePoseConfig__ctor_m2187CF1EEA0E753E123A40B47188500C2959FDE2 (VuDevicePoseConfig_t252CDE8459C8ACF606D90A85CC15487FF0498D98* __this, const RuntimeMethod* method) 
 {
 	{
@@ -17507,7 +17507,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuDevicePoseConfig__ctor_m2187CF1EEA0E75
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107064
+// Method Definition Index: 103243
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuDevicePoseObserver_vuEngineCreateDevicePoseObserver_m19DAAF8D3CC05D2F5798E1561FB8B6DE9CCB1BAA (intptr_t ___0_engineHandle, intptr_t* ___1_observerHandle, VuDevicePoseConfig_t252CDE8459C8ACF606D90A85CC15487FF0498D98* ___2_config, int32_t* ___3_errorCode, const RuntimeMethod* method) 
 {
 
@@ -17531,7 +17531,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuDevicePoseObserver_vuEngineCreateDe
 
 	return returnValue;
 }
-// Method Definition Index: 107065
+// Method Definition Index: 103244
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuDevicePoseObserver_vuDevicePoseObserverSetStaticMode_m9548332AF0EA01A822803050D73DC3F186F96440 (intptr_t ___0_observer, int32_t ___1_staticModeEnabled, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -17553,7 +17553,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuDevicePoseObserver_vuDevicePoseObse
 
 	return returnValue;
 }
-// Method Definition Index: 107066
+// Method Definition Index: 103245
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuDevicePoseObserver_vuDevicePoseObserverGetStaticMode_mDBA87DD3B2E2A626C51AF9CA332C4E6D85F18300 (intptr_t ___0_observer, int32_t* ___1_staticModeEnabled, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -17575,7 +17575,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuDevicePoseObserver_vuDevicePoseObse
 
 	return returnValue;
 }
-// Method Definition Index: 107067
+// Method Definition Index: 103246
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuDevicePoseObserver_t36BA3483DB1767014AD76D40E651818BB2742C83* VuDevicePoseObserver_Create_m47CD9CD0FB2CD90EA237C21DBFB70A996D546705 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, VuDevicePoseConfig_t252CDE8459C8ACF606D90A85CC15487FF0498D98* ___1_config, int32_t* ___2_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -17615,7 +17615,7 @@ IL_001d:
 		return (VuDevicePoseObserver_t36BA3483DB1767014AD76D40E651818BB2742C83*)NULL;
 	}
 }
-// Method Definition Index: 107068
+// Method Definition Index: 103247
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuDevicePoseObserver_get_StaticMode_m8ED2310FD7E7A28977D2C93DD6F0C8821641CF10 (VuDevicePoseObserver_t36BA3483DB1767014AD76D40E651818BB2742C83* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -17634,7 +17634,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuDevicePoseObserver_get_StaticMode_m8ED
 		return L_2;
 	}
 }
-// Method Definition Index: 107069
+// Method Definition Index: 103248
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuDevicePoseObserver__ctor_m29EBA46B0F7E42A9A0E18A56AE32DAD63A9C1245 (VuDevicePoseObserver_t36BA3483DB1767014AD76D40E651818BB2742C83* __this, VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, intptr_t ___1_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -17644,7 +17644,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuDevicePoseObserver__ctor_m29EBA46B0F7E
 		return;
 	}
 }
-// Method Definition Index: 107070
+// Method Definition Index: 103249
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuDevicePoseObserver_SetStaticMode_m9EA1732A0ECC80A1677DB49621ACC1CA9F6B72A5 (VuDevicePoseObserver_t36BA3483DB1767014AD76D40E651818BB2742C83* __this, bool ___0_value, const RuntimeMethod* method) 
 {
 	{
@@ -17673,7 +17673,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuDevicePoseObserver_SetStaticMode_m9EA1
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107072
+// Method Definition Index: 103251
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuDevicePoseObservation_vuDevicePoseObservationGetStatusInfo_m1E9C69BDB0C767236BBAC6DE1112C561E0B4FD96 (intptr_t ___0_observationHandle, int32_t* ___1_statusInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -17695,7 +17695,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuDevicePoseObservation_vuDevicePoseO
 
 	return returnValue;
 }
-// Method Definition Index: 107073
+// Method Definition Index: 103252
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuDevicePoseObservation_get_StatusInfo_m8127BA7E6F06F7801949D6DD4261C33B30A1F713 (VuDevicePoseObservation_t19D1459DC0204F40658AA0AB08FCD3FA2BF9ED7E* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -17748,7 +17748,7 @@ IL_0033:
 		return L_8;
 	}
 }
-// Method Definition Index: 107074
+// Method Definition Index: 103253
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuDevicePoseObservation__ctor_m5D524092E05262E803840051EC90A495DCA63487 (VuDevicePoseObservation_t19D1459DC0204F40658AA0AB08FCD3FA2BF9ED7E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -17756,7 +17756,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuDevicePoseObservation__ctor_m5D524092E
 		return;
 	}
 }
-// Method Definition Index: 107075
+// Method Definition Index: 103254
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuDevicePoseObservation_UnregisterObservation_m54E6169F69FB5CD87721CE1F959F8542E122E30F (VuDevicePoseObservation_t19D1459DC0204F40658AA0AB08FCD3FA2BF9ED7E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -17892,7 +17892,7 @@ IL2CPP_EXTERN_C void VuDriverConfig_t2662511AF8B3E2F8D7B6A0FA84067C8DB1DDF949_ma
 	il2cpp_codegen_marshal_free(marshaled.___driverName);
 	marshaled.___driverName = NULL;
 }
-// Method Definition Index: 107076
+// Method Definition Index: 103255
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuDriverConfig_get_FileDriverLibName_m175EBCA0DDD1136A0C37F86C1D8890DBA77F0350 (const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -17956,7 +17956,7 @@ IL_0035:
 		IL2CPP_RAISE_MANAGED_EXCEPTION(L_3, ((RuntimeMethod*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&VuDriverConfig_get_FileDriverLibName_m175EBCA0DDD1136A0C37F86C1D8890DBA77F0350_RuntimeMethod_var)));
 	}
 }
-// Method Definition Index: 107077
+// Method Definition Index: 103256
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuDriverConfig_Clone_mFF3A609B2C33F779F107337F37812578674BC590 (VuDriverConfig_t2662511AF8B3E2F8D7B6A0FA84067C8DB1DDF949* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -17980,7 +17980,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuDriverConfig_Clone_mFF3A609B
 		return L_3;
 	}
 }
-// Method Definition Index: 107078
+// Method Definition Index: 103257
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuDriverConfig__ctor_mA18CCBA203E2B5C18E647083FD41F051837C59FC (VuDriverConfig_t2662511AF8B3E2F8D7B6A0FA84067C8DB1DDF949* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -18041,7 +18041,7 @@ IL2CPP_EXTERN_C  void DelegatePInvokeWrapper_VuErrorHandlerNative_t76EFF64EEB222
 	il2cppPInvokeFunc(___0_errorCode, ___1_clientData);
 
 }
-// Method Definition Index: 107079
+// Method Definition Index: 103258
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuErrorHandlerNative__ctor_mCFA4331EA4F6978F9DA74D87B568BAFBE5F41F4A (VuErrorHandlerNative_t76EFF64EEB222893E701A15D26F0932D53D2065E* __this, RuntimeObject* ___0_object, intptr_t ___1_method, const RuntimeMethod* method) 
 {
 	__this->___method_ptr = (intptr_t)il2cpp_codegen_get_method_pointer((RuntimeMethod*)___1_method);
@@ -18070,13 +18070,13 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuErrorHandlerNative__ctor_mCFA4331EA4F6
 	}
 	__this->___extra_arg = (intptr_t)&VuErrorHandlerNative_Invoke_m61C2C80DCF528A88F8DED8A5C7E633055DC7F5C4_Multicast;
 }
-// Method Definition Index: 107080
+// Method Definition Index: 103259
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuErrorHandlerNative_Invoke_m61C2C80DCF528A88F8DED8A5C7E633055DC7F5C4 (VuErrorHandlerNative_t76EFF64EEB222893E701A15D26F0932D53D2065E* __this, int32_t ___0_errorCode, intptr_t ___1_clientData, const RuntimeMethod* method) 
 {
 	typedef void (*FunctionPointerType) (RuntimeObject*, int32_t, intptr_t, const RuntimeMethod*);
 	((FunctionPointerType)__this->___invoke_impl)((Il2CppObject*)__this->___method_code, ___0_errorCode, ___1_clientData, reinterpret_cast<RuntimeMethod*>(__this->___method));
 }
-// Method Definition Index: 107081
+// Method Definition Index: 103260
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuErrorHandlerNative_BeginInvoke_m6A07DBCA37F28FF20695C6462E9EDC6E6069D8EA (VuErrorHandlerNative_t76EFF64EEB222893E701A15D26F0932D53D2065E* __this, int32_t ___0_errorCode, intptr_t ___1_clientData, AsyncCallback_t7FEF460CBDCFB9C5FA2EF776984778B9A4145F4C* ___2_callback, RuntimeObject* ___3_object, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -18090,7 +18090,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuErrorHandlerNative_BeginInvo
 	__d_args[1] = Box(il2cpp_defaults.int_class, &___1_clientData);
 	return (RuntimeObject*)il2cpp_codegen_delegate_begin_invoke((RuntimeDelegate*)__this, __d_args, (RuntimeDelegate*)___2_callback, (RuntimeObject*)___3_object);
 }
-// Method Definition Index: 107082
+// Method Definition Index: 103261
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuErrorHandlerNative_EndInvoke_m04647C2B8EE451C008506E3FC36E2527B92F7C07 (VuErrorHandlerNative_t76EFF64EEB222893E701A15D26F0932D53D2065E* __this, RuntimeObject* ___0_result, const RuntimeMethod* method) 
 {
 	il2cpp_codegen_delegate_end_invoke((Il2CppAsyncResult*) ___0_result, 0);
@@ -18149,7 +18149,7 @@ IL2CPP_EXTERN_C void VuErrorHandlerConfig_t07C6AC0DB931B38629FB6972791EF33AB321A
 IL2CPP_EXTERN_C void VuErrorHandlerConfig_t07C6AC0DB931B38629FB6972791EF33AB321A620_marshal_com_cleanup(VuErrorHandlerConfig_t07C6AC0DB931B38629FB6972791EF33AB321A620_marshaled_com& marshaled)
 {
 }
-// Method Definition Index: 107083
+// Method Definition Index: 103262
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuErrorHandlerConfig_Clone_m9711A37D570E5CD017EAE9984AE54D56F4CEA412 (VuErrorHandlerConfig_t07C6AC0DB931B38629FB6972791EF33AB321A620* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -18173,7 +18173,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuErrorHandlerConfig_Clone_m97
 		return L_3;
 	}
 }
-// Method Definition Index: 107084
+// Method Definition Index: 103263
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuErrorHandlerConfig__ctor_m0CD2D9FA5019970350424145775076BC5B794A15 (VuErrorHandlerConfig_t07C6AC0DB931B38629FB6972791EF33AB321A620* __this, const RuntimeMethod* method) 
 {
 	{
@@ -18216,7 +18216,7 @@ IL2CPP_EXTERN_C void VuFusionProviderConfig_t1A57334CDE856B5A35E971075443D08A896
 IL2CPP_EXTERN_C void VuFusionProviderConfig_t1A57334CDE856B5A35E971075443D08A896C000F_marshal_com_cleanup(VuFusionProviderConfig_t1A57334CDE856B5A35E971075443D08A896C000F_marshaled_com& marshaled)
 {
 }
-// Method Definition Index: 107085
+// Method Definition Index: 103264
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuFusionProviderConfig_Clone_m97E4621D01F275C29D5F9A55F25CE43C5D0D3FE3 (VuFusionProviderConfig_t1A57334CDE856B5A35E971075443D08A896C000F* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -18235,7 +18235,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuFusionProviderConfig_Clone_m
 		return L_1;
 	}
 }
-// Method Definition Index: 107086
+// Method Definition Index: 103265
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuFusionProviderConfig__ctor_mB2A82E5F59DA7A9342C023FABE27CC6CBF92C837 (VuFusionProviderConfig_t1A57334CDE856B5A35E971075443D08A896C000F* __this, const RuntimeMethod* method) 
 {
 	{
@@ -18366,7 +18366,7 @@ IL2CPP_EXTERN_C void VuInternalConfig_t5C1B5CD4F782B4DB97AAC954C88CF9AB82FE761A_
 IL2CPP_EXTERN_C void VuInternalConfig_t5C1B5CD4F782B4DB97AAC954C88CF9AB82FE761A_marshal_com_cleanup(VuInternalConfig_t5C1B5CD4F782B4DB97AAC954C88CF9AB82FE761A_marshaled_com& marshaled)
 {
 }
-// Method Definition Index: 107087
+// Method Definition Index: 103266
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuInternalConfig_Clone_mEC48ECEC734A7D5B440E06F3C1B7E06FD24C95A9 (VuInternalConfig_t5C1B5CD4F782B4DB97AAC954C88CF9AB82FE761A* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -18429,7 +18429,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuInternalConfig_Clone_mEC48EC
 		return L_23;
 	}
 }
-// Method Definition Index: 107088
+// Method Definition Index: 103267
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuInternalConfig_Equals_m9AFFF7D159210E07B0DDEB759FFEA58E01D8EA44 (VuInternalConfig_t5C1B5CD4F782B4DB97AAC954C88CF9AB82FE761A* __this, RuntimeObject* ___0_obj, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -18474,7 +18474,7 @@ IL_0018:
 		return L_6;
 	}
 }
-// Method Definition Index: 107089
+// Method Definition Index: 103268
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuInternalConfig_Equals_m0A56C88CCD5317ACB70E80AFBDFD71AA98BA7CF4 (VuInternalConfig_t5C1B5CD4F782B4DB97AAC954C88CF9AB82FE761A* __this, VuInternalConfig_t5C1B5CD4F782B4DB97AAC954C88CF9AB82FE761A* ___0_other, const RuntimeMethod* method) 
 {
 	{
@@ -18600,7 +18600,7 @@ IL_00af:
 		return (bool)0;
 	}
 }
-// Method Definition Index: 107090
+// Method Definition Index: 103269
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuInternalConfig_GetHashCode_m9442123DB4BFDA74F1F0AC06F3A577B237C352C9 (VuInternalConfig_t5C1B5CD4F782B4DB97AAC954C88CF9AB82FE761A* __this, const RuntimeMethod* method) 
 {
 	{
@@ -18619,7 +18619,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuInternalConfig_GetHashCode_m9442123
 		return ((int32_t)(((int32_t)il2cpp_codegen_multiply(((int32_t)(((int32_t)il2cpp_codegen_multiply(((int32_t)(((int32_t)il2cpp_codegen_multiply(((int32_t)(((int32_t)il2cpp_codegen_multiply(((int32_t)(((int32_t)il2cpp_codegen_multiply(((int32_t)(((int32_t)il2cpp_codegen_multiply(((int32_t)(((int32_t)il2cpp_codegen_multiply(((int32_t)(((int32_t)il2cpp_codegen_multiply(((int32_t)(((int32_t)il2cpp_codegen_multiply(((int32_t)(((int32_t)il2cpp_codegen_multiply(((int32_t)(((int32_t)il2cpp_codegen_multiply((int32_t)L_0, ((int32_t)397)))^(int32_t)L_1)), ((int32_t)397)))^(int32_t)L_2)), ((int32_t)397)))^(int32_t)L_3)), ((int32_t)397)))^(int32_t)L_4)), ((int32_t)397)))^(int32_t)L_5)), ((int32_t)397)))^(int32_t)L_6)), ((int32_t)397)))^(int32_t)L_7)), ((int32_t)397)))^(int32_t)L_8)), ((int32_t)397)))^(int32_t)L_9)), ((int32_t)397)))^(int32_t)L_10)), ((int32_t)397)))^(int32_t)L_11));
 	}
 }
-// Method Definition Index: 107091
+// Method Definition Index: 103270
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuInternalConfig__ctor_m95988B83B636B984280C81585EA407CA7E2B7247 (VuInternalConfig_t5C1B5CD4F782B4DB97AAC954C88CF9AB82FE761A* __this, const RuntimeMethod* method) 
 {
 	{
@@ -18664,7 +18664,7 @@ IL2CPP_EXTERN_C void VuLicenseConfig_t464FBBE01CFA33FB3FC314ECAD3003749F86908C_m
 	il2cpp_codegen_marshal_free(marshaled.___key);
 	marshaled.___key = NULL;
 }
-// Method Definition Index: 107092
+// Method Definition Index: 103271
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuLicenseConfig_Clone_m20FA5B2B6BE1E0020842D54E3EA02E20F8EA009D (VuLicenseConfig_t464FBBE01CFA33FB3FC314ECAD3003749F86908C* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -18684,7 +18684,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuLicenseConfig_Clone_m20FA5B2
 		return L_1;
 	}
 }
-// Method Definition Index: 107093
+// Method Definition Index: 103272
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuLicenseConfig__ctor_m165BFB7378DB39B87ED912712DAA1D1FE9FD3705 (VuLicenseConfig_t464FBBE01CFA33FB3FC314ECAD3003749F86908C* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -18746,7 +18746,7 @@ IL2CPP_EXTERN_C void VuPlatformAndroidConfig_t113117D34DC87813ECB7FE5E4FCA8E01DB
 IL2CPP_EXTERN_C void VuPlatformAndroidConfig_t113117D34DC87813ECB7FE5E4FCA8E01DB83BB63_marshal_com_cleanup(VuPlatformAndroidConfig_t113117D34DC87813ECB7FE5E4FCA8E01DB83BB63_marshaled_com& marshaled)
 {
 }
-// Method Definition Index: 107094
+// Method Definition Index: 103273
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuPlatformAndroidConfig_Clone_m3E9F055DDE6ABAB920C37D006E0BF39CBB35C248 (VuPlatformAndroidConfig_t113117D34DC87813ECB7FE5E4FCA8E01DB83BB63* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -18769,7 +18769,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuPlatformAndroidConfig_Clone_
 		return L_3;
 	}
 }
-// Method Definition Index: 107095
+// Method Definition Index: 103274
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuPlatformAndroidConfig__ctor_m9F277629E8288B17AF40432BF152CA55256F771D (VuPlatformAndroidConfig_t113117D34DC87813ECB7FE5E4FCA8E01DB83BB63* __this, const RuntimeMethod* method) 
 {
 	{
@@ -18823,7 +18823,7 @@ IL2CPP_EXTERN_C void VuPlatformiOSConfig_tE9598BE377891A7D031AF1D38AD92511264441
 	il2cpp_codegen_marshal_free(marshaled.___appGroup);
 	marshaled.___appGroup = NULL;
 }
-// Method Definition Index: 107096
+// Method Definition Index: 103275
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuPlatformiOSConfig_Clone_m5E7E8D7BF68889C36C8812BFD7F27F06334E1442 (VuPlatformiOSConfig_tE9598BE377891A7D031AF1D38AD925112644419D* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -18847,7 +18847,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuPlatformiOSConfig_Clone_m5E7
 		return L_3;
 	}
 }
-// Method Definition Index: 107097
+// Method Definition Index: 103276
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuPlatformiOSConfig__ctor_m2C6D9509C99595EEEE794972E4F06BFB232A30B1 (VuPlatformiOSConfig_tE9598BE377891A7D031AF1D38AD925112644419D* __this, const RuntimeMethod* method) 
 {
 	{
@@ -18902,7 +18902,7 @@ IL2CPP_EXTERN_C void VuPlatformLuminConfig_tF00FFE1587F2E229879DEBD3DF0C2AA68EE2
 IL2CPP_EXTERN_C void VuPlatformLuminConfig_tF00FFE1587F2E229879DEBD3DF0C2AA68EE215C6_marshal_com_cleanup(VuPlatformLuminConfig_tF00FFE1587F2E229879DEBD3DF0C2AA68EE215C6_marshaled_com& marshaled)
 {
 }
-// Method Definition Index: 107098
+// Method Definition Index: 103277
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuPlatformLuminConfig_Clone_m55BF66B96EC9CCD892DCD4C048F6A49E0B963942 (VuPlatformLuminConfig_tF00FFE1587F2E229879DEBD3DF0C2AA68EE215C6* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -18925,7 +18925,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuPlatformLuminConfig_Clone_m5
 		return L_3;
 	}
 }
-// Method Definition Index: 107099
+// Method Definition Index: 103278
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuPlatformLuminConfig__ctor_m826E701A5C03FBCB7C6AA2D5974FDCBE8FC1F7EA (VuPlatformLuminConfig_tF00FFE1587F2E229879DEBD3DF0C2AA68EE215C6* __this, const RuntimeMethod* method) 
 {
 	{
@@ -18969,7 +18969,7 @@ IL2CPP_EXTERN_C void VuPlatformUWPConfig_t9A0735E45D5DD65F5AC3D3327EAA7DE6BA7947
 IL2CPP_EXTERN_C void VuPlatformUWPConfig_t9A0735E45D5DD65F5AC3D3327EAA7DE6BA7947BE_marshal_com_cleanup(VuPlatformUWPConfig_t9A0735E45D5DD65F5AC3D3327EAA7DE6BA7947BE_marshaled_com& marshaled)
 {
 }
-// Method Definition Index: 107100
+// Method Definition Index: 103279
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuPlatformUWPConfig_Clone_m19051D12D7BC5BF936C2E4783417307756AC45C4 (VuPlatformUWPConfig_t9A0735E45D5DD65F5AC3D3327EAA7DE6BA7947BE* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -18988,7 +18988,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuPlatformUWPConfig_Clone_m190
 		return L_1;
 	}
 }
-// Method Definition Index: 107101
+// Method Definition Index: 103280
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuPlatformUWPConfig__ctor_m35A366692D165673AE050A472FDD20C6BD64AA4A (VuPlatformUWPConfig_t9A0735E45D5DD65F5AC3D3327EAA7DE6BA7947BE* __this, const RuntimeMethod* method) 
 {
 	{
@@ -19032,7 +19032,7 @@ IL2CPP_EXTERN_C void VuPluginConfig_t7AC12416C8389FE6AFBC6F4D5607D4D4EA040FD6_ma
 	il2cpp_codegen_marshal_free(marshaled.___pluginDirectory);
 	marshaled.___pluginDirectory = NULL;
 }
-// Method Definition Index: 107102
+// Method Definition Index: 103281
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuPluginConfig_Clone_mB6400894873869308A20B9AC3F98DCD6E562BFBB (VuPluginConfig_t7AC12416C8389FE6AFBC6F4D5607D4D4EA040FD6* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -19052,7 +19052,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuPluginConfig_Clone_mB6400894
 		return L_1;
 	}
 }
-// Method Definition Index: 107103
+// Method Definition Index: 103282
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuPluginConfig__ctor_mC0E7609348971FD451CCE77C45AF2E217DFF071E (VuPluginConfig_t7AC12416C8389FE6AFBC6F4D5607D4D4EA040FD6* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -19120,7 +19120,7 @@ IL2CPP_EXTERN_C void VuSoftwareContextConfig_t619C093E5C07D959C9D4218B61B46C2077
 	il2cpp_codegen_marshal_free_bstring(marshaled.___softwareVersion);
 	marshaled.___softwareVersion = NULL;
 }
-// Method Definition Index: 107104
+// Method Definition Index: 103283
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuSoftwareContextConfig__ctor_mF16CFC175611210BF17F7DBA8343760159E26B81 (VuSoftwareContextConfig_t619C093E5C07D959C9D4218B61B46C2077BDF5CB* __this, const RuntimeMethod* method) 
 {
 	il2cpp::utils::ExceptionSupportStack<RuntimeObject*, 1> __active_exceptions;
@@ -19159,7 +19159,7 @@ IL_0022:
 		return;
 	}
 }
-// Method Definition Index: 107105
+// Method Definition Index: 103284
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuSoftwareContextConfig_Clone_mB03DD4E32297CE73F68266E07F70F036EE70CB73 (VuSoftwareContextConfig_t619C093E5C07D959C9D4218B61B46C2077BDF5CB* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -19225,7 +19225,7 @@ IL2CPP_EXTERN_C void VuDeviceCalibrationConfig_tAC65E6AA47BD1DD51146724C6656CEEF
 IL2CPP_EXTERN_C void VuDeviceCalibrationConfig_tAC65E6AA47BD1DD51146724C6656CEEFACFB3752_marshal_com_cleanup(VuDeviceCalibrationConfig_tAC65E6AA47BD1DD51146724C6656CEEFACFB3752_marshaled_com& marshaled)
 {
 }
-// Method Definition Index: 107106
+// Method Definition Index: 103285
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuDeviceCalibrationConfig_Clone_m4A4AB14DA7B11620A46A3CE967FC3DFE5A2B1980 (VuDeviceCalibrationConfig_tAC65E6AA47BD1DD51146724C6656CEEFACFB3752* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -19244,7 +19244,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuDeviceCalibrationConfig_Clon
 		return L_1;
 	}
 }
-// Method Definition Index: 107107
+// Method Definition Index: 103286
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuDeviceCalibrationConfig_Equals_m1582B8E8B763830E6D679CF99069BFD34658E297 (VuDeviceCalibrationConfig_tAC65E6AA47BD1DD51146724C6656CEEFACFB3752* __this, RuntimeObject* ___0_obj, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -19289,7 +19289,7 @@ IL_0018:
 		return L_6;
 	}
 }
-// Method Definition Index: 107108
+// Method Definition Index: 103287
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuDeviceCalibrationConfig_Equals_m3756F78C9657AFFE12BAA7B68636E38FCD30FD9F (VuDeviceCalibrationConfig_tAC65E6AA47BD1DD51146724C6656CEEFACFB3752* __this, VuDeviceCalibrationConfig_tAC65E6AA47BD1DD51146724C6656CEEFACFB3752* ___0_other, const RuntimeMethod* method) 
 {
 	{
@@ -19300,7 +19300,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuDeviceCalibrationConfig_Equals_m3756F7
 		return (bool)((((int32_t)L_0) == ((int32_t)L_2))? 1 : 0);
 	}
 }
-// Method Definition Index: 107109
+// Method Definition Index: 103288
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuDeviceCalibrationConfig__ctor_m596622E7AEFC2BD0B1B29258340F30F016D7A8AA (VuDeviceCalibrationConfig_tAC65E6AA47BD1DD51146724C6656CEEFACFB3752* __this, const RuntimeMethod* method) 
 {
 	{
@@ -19316,7 +19316,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuDeviceCalibrationConfig__ctor_m596622E
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107115
+// Method Definition Index: 103294
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetCreate_m2D68967AB1987456CEBA3127B799E060A4D3513C (intptr_t* ___0_configSetHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*);
@@ -19338,7 +19338,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetCr
 
 	return returnValue;
 }
-// Method Definition Index: 107116
+// Method Definition Index: 103295
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetDestroy_mD86FAAE20381A524A9D449D4F8712C33D0014FA7 (intptr_t ___0_configSetHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -19360,7 +19360,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetDe
 
 	return returnValue;
 }
-// Method Definition Index: 107117
+// Method Definition Index: 103296
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetGetSize_m2BB03A352A54B401F582627D99FA8E010911C2A1 (intptr_t ___0_configSetHandle, int32_t* ___1_size, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -19382,7 +19382,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetGe
 
 	return returnValue;
 }
-// Method Definition Index: 107118
+// Method Definition Index: 103297
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetAddDriverConfig_m1627E3E230D2135F2D1A4D899E3D42A086E1C080 (intptr_t ___0_configSetHandle, VuDriverConfig_t2662511AF8B3E2F8D7B6A0FA84067C8DB1DDF949* ___1_driverConfig, const RuntimeMethod* method) 
 {
 
@@ -19417,7 +19417,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetAd
 
 	return returnValue;
 }
-// Method Definition Index: 107119
+// Method Definition Index: 103298
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetAddErrorHandlerConfig_mABF3FE80503B4E6BB136758CE279D89DC559D145 (intptr_t ___0_configSetHandle, VuErrorHandlerConfig_t07C6AC0DB931B38629FB6972791EF33AB321A620* ___1_errorHandlerConfig, const RuntimeMethod* method) 
 {
 
@@ -19452,7 +19452,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetAd
 
 	return returnValue;
 }
-// Method Definition Index: 107120
+// Method Definition Index: 103299
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetAddFusionProviderConfig_m5FCA543B44A5C792D735279784FE4D4A710C8218 (intptr_t ___0_configSetHandle, VuFusionProviderConfig_t1A57334CDE856B5A35E971075443D08A896C000F* ___1_fusionProviderConfig, const RuntimeMethod* method) 
 {
 
@@ -19476,7 +19476,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetAd
 
 	return returnValue;
 }
-// Method Definition Index: 107121
+// Method Definition Index: 103300
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetAddInternalConfig_m74B8246618F5CDA9D4F04143D4B785E40DE80353 (intptr_t ___0_configSetHandle, VuInternalConfig_t5C1B5CD4F782B4DB97AAC954C88CF9AB82FE761A* ___1_internalConfig, const RuntimeMethod* method) 
 {
 
@@ -19500,7 +19500,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetAd
 
 	return returnValue;
 }
-// Method Definition Index: 107122
+// Method Definition Index: 103301
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetAddLicenseConfig_mCB9A09A67A80511EBE13C7E403D4196CE57242E5 (intptr_t ___0_configSetHandle, VuLicenseConfig_t464FBBE01CFA33FB3FC314ECAD3003749F86908C* ___1_licenseConfig, const RuntimeMethod* method) 
 {
 
@@ -19535,7 +19535,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetAd
 
 	return returnValue;
 }
-// Method Definition Index: 107123
+// Method Definition Index: 103302
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetAddPlatformAndroidConfig_mCB8C6F959BE57F4EF8F899E457CC2DC7E0CA2816 (intptr_t ___0_configSetHandle, VuPlatformAndroidConfig_t113117D34DC87813ECB7FE5E4FCA8E01DB83BB63* ___1_platformAndroidConfig, const RuntimeMethod* method) 
 {
 
@@ -19559,7 +19559,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetAd
 
 	return returnValue;
 }
-// Method Definition Index: 107124
+// Method Definition Index: 103303
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetAddPlatformLuminConfig_mD46B42B66E8B9BC0500DA4691AD255861713E07B (intptr_t ___0_configSetHandle, VuPlatformLuminConfig_tF00FFE1587F2E229879DEBD3DF0C2AA68EE215C6* ___1_platformLuminConfig, const RuntimeMethod* method) 
 {
 
@@ -19583,7 +19583,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetAd
 
 	return returnValue;
 }
-// Method Definition Index: 107125
+// Method Definition Index: 103304
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetAddPluginConfig_mEA6666A42DF1973EE2848536DE9729C1E3BDEAAE (intptr_t ___0_configSetHandle, VuPluginConfig_t7AC12416C8389FE6AFBC6F4D5607D4D4EA040FD6* ___1_pluginConfig, const RuntimeMethod* method) 
 {
 
@@ -19618,7 +19618,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetAd
 
 	return returnValue;
 }
-// Method Definition Index: 107126
+// Method Definition Index: 103305
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetAddSoftwareContextConfig_mD9D715FE9BBA57E0C4F10B4C0FE53FD029A1C4FB (intptr_t ___0_configSetHandle, Internal_tDF7421D5A4C3EF78C7AA95FD9B3DDF8C38617261* ___1_softwareContextConfig, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, Internal_tDF7421D5A4C3EF78C7AA95FD9B3DDF8C38617261*);
@@ -19640,7 +19640,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetAd
 
 	return returnValue;
 }
-// Method Definition Index: 107127
+// Method Definition Index: 103306
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetAddDeviceCalibrationConfig_m4A5BA261BEA4D318CEFA209703DE40C81B941485 (intptr_t ___0_configSetHandle, VuDeviceCalibrationConfig_tAC65E6AA47BD1DD51146724C6656CEEFACFB3752* ___1_deviceCalibrationConfig, const RuntimeMethod* method) 
 {
 
@@ -19664,7 +19664,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_vuEngineConfigSetAd
 
 	return returnValue;
 }
-// Method Definition Index: 107128
+// Method Definition Index: 103307
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuEngineConfigSet_get_NativeHandle_m370E69108C0FB84F94406D63AEA917D839DAD9DA (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* __this, const RuntimeMethod* method) 
 {
 	{
@@ -19672,7 +19672,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuEngineConfigSet_get_NativeHandle_m
 		return L_0;
 	}
 }
-// Method Definition Index: 107129
+// Method Definition Index: 103308
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_get_Size_m312644D4722D6EEA5E467DAA0C8923580AB896B2 (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* __this, const RuntimeMethod* method) 
 {
 	int32_t V_0 = 0;
@@ -19684,7 +19684,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngineConfigSet_get_Size_m312644D47
 		return L_2;
 	}
 }
-// Method Definition Index: 107130
+// Method Definition Index: 103309
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngineConfigSet_get_Configs_m89293672869ED4CB570917EF140ABAC052AD9474 (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -19704,7 +19704,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngineConfigSet_get_Configs_
 		return L_2;
 	}
 }
-// Method Definition Index: 107131
+// Method Definition Index: 103310
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* VuEngineConfigSet_Create_mE4349F8903785B8FB031163AB740871170E491B1 (const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -19735,7 +19735,7 @@ IL_0011:
 		return (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61*)NULL;
 	}
 }
-// Method Definition Index: 107132
+// Method Definition Index: 103311
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngineConfigSet__ctor_mCCA83C2911E47D722149375642B7ACEB6CD532C3 (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* __this, intptr_t ___0_nativeHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -19756,7 +19756,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngineConfigSet__ctor_mCCA83C2911E47D7
 		return;
 	}
 }
-// Method Definition Index: 107133
+// Method Definition Index: 103312
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngineConfigSet_Finalize_mBE4798B20EBEF30040693E08F1BA0302DC338955 (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* __this, const RuntimeMethod* method) 
 {
 	{
@@ -19785,7 +19785,7 @@ IL_0010:
 		return;
 	}
 }
-// Method Definition Index: 107134
+// Method Definition Index: 103313
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngineConfigSet_Dispose_mFB6729DF95C6967C2E91E89E499CF6674FA9E2E2 (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -19801,7 +19801,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngineConfigSet_Dispose_mFB6729DF95C69
 		return;
 	}
 }
-// Method Definition Index: 107135
+// Method Definition Index: 103314
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngineConfigSet_Dispose_m88551471D4357FC9033902192E3B5657EB069113 (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* __this, bool ___0_disposing, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -19848,7 +19848,7 @@ IL_003f:
 		return;
 	}
 }
-// Method Definition Index: 107136
+// Method Definition Index: 103315
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngineConfigSet_AddDriverConfig_m6B8512328D23A79E622455DC2A87469527977445 (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* __this, VuDriverConfig_t2662511AF8B3E2F8D7B6A0FA84067C8DB1DDF949* ___0_config, const RuntimeMethod* method) 
 {
 	bool G_B2_0 = false;
@@ -19879,7 +19879,7 @@ IL_001b:
 		return G_B2_0;
 	}
 }
-// Method Definition Index: 107137
+// Method Definition Index: 103316
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngineConfigSet_AddErrorHandlerConfig_m6C5AF3E0874B1068E312844E43708078BC4B6D48 (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* __this, VuErrorHandlerConfig_t07C6AC0DB931B38629FB6972791EF33AB321A620* ___0_config, const RuntimeMethod* method) 
 {
 	bool G_B2_0 = false;
@@ -19910,7 +19910,7 @@ IL_001b:
 		return G_B2_0;
 	}
 }
-// Method Definition Index: 107138
+// Method Definition Index: 103317
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngineConfigSet_AddFusionProviderConfig_m65C4296E2FE35098AF640FB97CB094C74CCB9E3A (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* __this, VuFusionProviderConfig_t1A57334CDE856B5A35E971075443D08A896C000F* ___0_config, const RuntimeMethod* method) 
 {
 	bool G_B2_0 = false;
@@ -19941,7 +19941,7 @@ IL_001b:
 		return G_B2_0;
 	}
 }
-// Method Definition Index: 107139
+// Method Definition Index: 103318
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngineConfigSet_AddInternalConfig_mA2E1915B0E83DA524614187157A448A1FF3DF69B (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* __this, VuInternalConfig_t5C1B5CD4F782B4DB97AAC954C88CF9AB82FE761A* ___0_config, const RuntimeMethod* method) 
 {
 	bool G_B2_0 = false;
@@ -19972,7 +19972,7 @@ IL_001b:
 		return G_B2_0;
 	}
 }
-// Method Definition Index: 107140
+// Method Definition Index: 103319
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngineConfigSet_AddLicenseConfig_mD247B359556D46A17B97289AEF43F71D85E8DC2A (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* __this, VuLicenseConfig_t464FBBE01CFA33FB3FC314ECAD3003749F86908C* ___0_config, const RuntimeMethod* method) 
 {
 	bool G_B2_0 = false;
@@ -20003,7 +20003,7 @@ IL_001b:
 		return G_B2_0;
 	}
 }
-// Method Definition Index: 107141
+// Method Definition Index: 103320
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngineConfigSet_AddPlatformAndroidConfig_mCB2AC00C7F2D2C65A14A8D1936E941881566954C (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* __this, VuPlatformAndroidConfig_t113117D34DC87813ECB7FE5E4FCA8E01DB83BB63* ___0_config, const RuntimeMethod* method) 
 {
 	bool G_B2_0 = false;
@@ -20034,7 +20034,7 @@ IL_001b:
 		return G_B2_0;
 	}
 }
-// Method Definition Index: 107142
+// Method Definition Index: 103321
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngineConfigSet_AddPlatformLuminConfig_mC7997777536E015F17714BE69CEDE8140AA6ABFA (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* __this, VuPlatformLuminConfig_tF00FFE1587F2E229879DEBD3DF0C2AA68EE215C6* ___0_config, const RuntimeMethod* method) 
 {
 	bool G_B2_0 = false;
@@ -20065,7 +20065,7 @@ IL_001b:
 		return G_B2_0;
 	}
 }
-// Method Definition Index: 107143
+// Method Definition Index: 103322
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngineConfigSet_AddPluginConfig_m4E5048BEB72185B941CD3CE77B2F63A4E061A0C5 (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* __this, VuPluginConfig_t7AC12416C8389FE6AFBC6F4D5607D4D4EA040FD6* ___0_config, const RuntimeMethod* method) 
 {
 	bool G_B2_0 = false;
@@ -20096,7 +20096,7 @@ IL_001b:
 		return G_B2_0;
 	}
 }
-// Method Definition Index: 107144
+// Method Definition Index: 103323
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngineConfigSet_AddSoftwareContextConfig_mBF14F04C2598BE08FCF33C5D15A9E664FB488048 (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* __this, VuSoftwareContextConfig_t619C093E5C07D959C9D4218B61B46C2077BDF5CB* ___0_config, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -20184,7 +20184,7 @@ IL_0051:
 		return L_13;
 	}
 }
-// Method Definition Index: 107145
+// Method Definition Index: 103324
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngineConfigSet_AddDeviceCalibrationConfig_m19AA3AC08AAC76A7C2993EA3DE4317EEC119151D (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* __this, VuDeviceCalibrationConfig_tAC65E6AA47BD1DD51146724C6656CEEFACFB3752* ___0_config, const RuntimeMethod* method) 
 {
 	bool G_B2_0 = false;
@@ -20215,7 +20215,7 @@ IL_001b:
 		return G_B2_0;
 	}
 }
-// Method Definition Index: 107146
+// Method Definition Index: 103325
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngineConfigSet_AddConfig_m2C11458B92180D820A846067E8642E67524BC540 (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* __this, RuntimeObject* ___0_config, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -20319,7 +20319,7 @@ IL2CPP_EXTERN_C void VuLibraryVersionInfo_t3DA1A838E8FE952E830C4928E5458D33900DB
 	il2cpp_codegen_marshal_free_bstring(marshaled.___build);
 	marshaled.___build = NULL;
 }
-// Method Definition Index: 107148
+// Method Definition Index: 103327
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuLibraryVersionInfo_t3DA1A838E8FE952E830C4928E5458D33900DB9CC VuLibraryVersionInfo_Create_m6A6AFAB69EFFAA1DB862A334CBA81E8E1D193C12 (Internal_t40235E8D1E97E2C7693D27363EE060972ACE8D06 ___0_internalInfo, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -20374,7 +20374,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuLibraryVersionInfo_t3DA1A838E8FE952E830C492
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107193
+// Method Definition Index: 103372
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineCreate_m5DA62969239A0D4D756E76D310D7F68D2E8B46BB (intptr_t* ___0_engineHandle, intptr_t ___1_engineConfigSetHandle, int32_t* ___2_errorCode, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*, intptr_t, int32_t*);
@@ -20396,7 +20396,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineCreate_m5DA62969239A
 
 	return returnValue;
 }
-// Method Definition Index: 107194
+// Method Definition Index: 103373
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineStart_m3513E82A3F8834197D51600DF65F27983D1B5564 (intptr_t ___0_engineHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -20418,7 +20418,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineStart_m3513E82A3F883
 
 	return returnValue;
 }
-// Method Definition Index: 107195
+// Method Definition Index: 103374
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineStop_m528A4802AABC862523F1DCA1AE42796A02F84843 (intptr_t ___0_engineHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -20440,7 +20440,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineStop_m528A4802AABC86
 
 	return returnValue;
 }
-// Method Definition Index: 107196
+// Method Definition Index: 103375
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineDestroy_m2413C7DE2478CD826E08189CF4769816D78E424F (intptr_t ___0_engineHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -20462,7 +20462,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineDestroy_m2413C7DE247
 
 	return returnValue;
 }
-// Method Definition Index: 107197
+// Method Definition Index: 103376
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineIsRunning_m7FA4CCACC7FE713DA3E7F6E6FA6455E695E8D86C (intptr_t ___0_engineHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -20484,7 +20484,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineIsRunning_m7FA4CCACC
 
 	return returnValue;
 }
-// Method Definition Index: 107198
+// Method Definition Index: 103377
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineAcquireLatestState_mABE8EF5E000DC769DBF8C0FADE97C1536C0FD78E (intptr_t ___0_engineHandle, intptr_t* ___1_stateHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -20506,7 +20506,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineAcquireLatestState_m
 
 	return returnValue;
 }
-// Method Definition Index: 107199
+// Method Definition Index: 103378
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineClearAreaTargetObserverCloudCache_m7A97C5EFFCCECB62FE4B44E07D42EE449720BBC7 (intptr_t ___0_engineHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -20528,7 +20528,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineClearAreaTargetObser
 
 	return returnValue;
 }
-// Method Definition Index: 107200
+// Method Definition Index: 103379
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineClearModelTargetObserverDetectionCache_mA09BB58AC0E774B2334C4C5469D6032B7267AC85 (intptr_t ___0_engineHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -20550,7 +20550,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineClearModelTargetObse
 
 	return returnValue;
 }
-// Method Definition Index: 107201
+// Method Definition Index: 103380
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Internal_t40235E8D1E97E2C7693D27363EE060972ACE8D06 VuEngine_vuEngineGetLibraryVersionInfo_mDF1971DA7691AD225933F68B52C8AA4AB7061A41 (const RuntimeMethod* method) 
 {
 	typedef Internal_t40235E8D1E97E2C7693D27363EE060972ACE8D06 (CDECL *PInvokeFunc) ();
@@ -20572,7 +20572,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Internal_t40235E8D1E97E2C7693D27363EE060972AC
 
 	return returnValue;
 }
-// Method Definition Index: 107202
+// Method Definition Index: 103381
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineGetDatabaseTargetInfo_mA7D031402ABA00364AEB6F07488EC526094554B7 (intptr_t ___0_engineHandle, String_t* ___1_databasePath, intptr_t ___2_targetInfosHandle, int32_t* ___3_errorCode, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, char*, intptr_t, int32_t*);
@@ -20600,7 +20600,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineGetDatabaseTargetInf
 
 	return returnValue;
 }
-// Method Definition Index: 107203
+// Method Definition Index: 103382
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineSetMaximumSimultaneousTrackedImages_m4E43D1CE0D37E2A3D79831DF727EB56C794F6748 (intptr_t ___0_engineHandle, int32_t ___1_maxNumberOfTargets, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -20622,7 +20622,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineSetMaximumSimultaneo
 
 	return returnValue;
 }
-// Method Definition Index: 107204
+// Method Definition Index: 103383
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineGetMaximumSimultaneousTrackedImages_m722E727DE9A7FD54473EAE79ACD6651E023FE7FE (intptr_t ___0_engineHandle, int32_t* ___1_maxNumberOfTargets, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -20644,7 +20644,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineGetMaximumSimultaneo
 
 	return returnValue;
 }
-// Method Definition Index: 107205
+// Method Definition Index: 103384
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineSetModelTargetRecoWhileExtendedTracked_mD14CD360248570BDB8FE08CBDD7CC442ED43A590 (intptr_t ___0_engineHandle, int32_t ___1_enable, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -20666,7 +20666,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineSetModelTargetRecoWh
 
 	return returnValue;
 }
-// Method Definition Index: 107206
+// Method Definition Index: 103385
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineGetModelTargetRecoWhileExtendedTracked_mAC53C78DDA4E1BBFEDF4C19BAD703CA9C9CADA33 (intptr_t ___0_engineHandle, int32_t* ___1_enabled, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -20688,7 +20688,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineGetModelTargetRecoWh
 
 	return returnValue;
 }
-// Method Definition Index: 107207
+// Method Definition Index: 103386
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineResetWorldTracking_mD3D7156864A2D74CF3EDF88AB4820168B4318F26 (intptr_t ___0_engineHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -20710,7 +20710,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineResetWorldTracking_m
 
 	return returnValue;
 }
-// Method Definition Index: 107208
+// Method Definition Index: 103387
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineGetBuildPreset_m15F428436A941B259100BE51F9178D38A6F36480 (int32_t* ___0_engineHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (int32_t*);
@@ -20732,7 +20732,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineGetBuildPreset_m15F4
 
 	return returnValue;
 }
-// Method Definition Index: 107209
+// Method Definition Index: 103388
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineGetData_m02397B938777F8C3033C37AD778F51C04FCC4C9B (intptr_t ___0_engineHandle, int32_t ___1_key, intptr_t* ___2_data, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t, intptr_t*);
@@ -20754,7 +20754,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_vuEngineGetData_m02397B93877
 
 	return returnValue;
 }
-// Method Definition Index: 107210
+// Method Definition Index: 103389
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuEngine_get_NativeHandle_m627B2FB5C12F7BEDA0A6FEF45800E2536E9BC595 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	{
@@ -20762,7 +20762,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuEngine_get_NativeHandle_m627B2FB5C
 		return L_0;
 	}
 }
-// Method Definition Index: 107211
+// Method Definition Index: 103390
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuLibraryVersionInfo_t3DA1A838E8FE952E830C4928E5458D33900DB9CC VuEngine_get_VersionInfo_mEAF49F8251EBEB3E0DB3B1D98E3BD2A30AE46784 (const RuntimeMethod* method) 
 {
 	{
@@ -20773,7 +20773,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuLibraryVersionInfo_t3DA1A838E8FE952E830C492
 		return L_1;
 	}
 }
-// Method Definition Index: 107212
+// Method Definition Index: 103391
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngine_get_Running_m969B20C900EDA72DEE2F77F95A84492C21AA5353 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	{
@@ -20785,7 +20785,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngine_get_Running_m969B20C900EDA72DEE
 		return L_2;
 	}
 }
-// Method Definition Index: 107213
+// Method Definition Index: 103392
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_get_PlatformController_m01A2A2C12F47EC37F1917AC74D2504235103B6AA (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -20804,7 +20804,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_get_PlatformControlle
 		return L_1;
 	}
 }
-// Method Definition Index: 107214
+// Method Definition Index: 103393
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_get_CameraController_mFB8483FFAAFCCB6926A13486ED4AD8DC30F78D3A (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -20823,7 +20823,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_get_CameraController_
 		return L_1;
 	}
 }
-// Method Definition Index: 107215
+// Method Definition Index: 103394
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_get_RenderController_m9C3A0E750700BFB5A2CE28E82DA0301BA4E2B3B4 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -20842,7 +20842,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_get_RenderController_
 		return L_1;
 	}
 }
-// Method Definition Index: 107216
+// Method Definition Index: 103395
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_get_SessionRecorderController_mA9F456A4F21CBDF14C13C30DA6C9EF069F3CBE7A (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -20861,7 +20861,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_get_SessionRecorderCo
 		return L_1;
 	}
 }
-// Method Definition Index: 107217
+// Method Definition Index: 103396
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_get_AreaTargetCaptureController_mB9879DABE3934F0209DFD49991816A1A44962B51 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -20880,7 +20880,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_get_AreaTargetCapture
 		return L_1;
 	}
 }
-// Method Definition Index: 107218
+// Method Definition Index: 103397
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_get_ValidationAreaCaptureController_m9BB07AE294F7C9CC882E212F4BF29DD73B1B5341 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -20899,7 +20899,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_get_ValidationAreaCap
 		return L_1;
 	}
 }
-// Method Definition Index: 107219
+// Method Definition Index: 103398
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_get_UploadController_m299531A7BD37507CC1A96F949582E8464EBB0BF7 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -20918,7 +20918,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_get_UploadController_
 		return L_1;
 	}
 }
-// Method Definition Index: 107220
+// Method Definition Index: 103399
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_get_Observers_mCC29F68AE50D9B5100F47098E2B01D311A6F4E2C (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -20938,7 +20938,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_get_Observers_mCC29F6
 		return L_2;
 	}
 }
-// Method Definition Index: 107221
+// Method Definition Index: 103400
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_get_MaximumSimultaneousTrackedImages_mA4CD17625F53EF3EB7D1F6CEC9307BFDF257C0B8 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -20958,7 +20958,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_get_MaximumSimultaneousTrack
 		return L_2;
 	}
 }
-// Method Definition Index: 107222
+// Method Definition Index: 103401
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngine_get_ModelTargetRecoWhileExtendedTracked_m98FC1E11B8C52F111EC7BD5C6A820A5ED00CEB7A (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -20977,7 +20977,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngine_get_ModelTargetRecoWhileExtende
 		return L_2;
 	}
 }
-// Method Definition Index: 107223
+// Method Definition Index: 103402
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* VuEngine_Create_mD8290625D18062D5E22F34A810BF8B1746761967 (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* ___0_engineConfigSet, int32_t* ___1_errorCode, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -21037,7 +21037,7 @@ IL_0024:
 		return (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8*)NULL;
 	}
 }
-// Method Definition Index: 107224
+// Method Definition Index: 103403
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngine__ctor_mAE7DB597962D7D90FF9F8134D76B73E954CD01DD (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, intptr_t ___0_nativeHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -21075,7 +21075,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngine__ctor_mAE7DB597962D7D90FF9F8134
 		return;
 	}
 }
-// Method Definition Index: 107225
+// Method Definition Index: 103404
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngine_Finalize_m2D2B5303FF79BAD83755CCDBBDDCA09E385248BE (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	{
@@ -21104,7 +21104,7 @@ IL_0010:
 		return;
 	}
 }
-// Method Definition Index: 107226
+// Method Definition Index: 103405
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngine_Dispose_mE4754DE8D65EB72AA1B82E055E823EE4BA57DC52 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -21120,7 +21120,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngine_Dispose_mE4754DE8D65EB72AA1B82E
 		return;
 	}
 }
-// Method Definition Index: 107227
+// Method Definition Index: 103406
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngine_Dispose_mE051F276B91DE50656AEAB7E6D29A87038E747DE (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, bool ___0_disposing, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -21259,7 +21259,7 @@ IL_00c0:
 		return;
 	}
 }
-// Method Definition Index: 107228
+// Method Definition Index: 103407
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngine_Start_m5D4161408CE679AA5182A62C44FB204101BB05B8 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	{
@@ -21271,7 +21271,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngine_Start_m5D4161408CE679AA5182A62C
 		return L_2;
 	}
 }
-// Method Definition Index: 107229
+// Method Definition Index: 103408
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngine_Stop_m39BD84F5D5380C529E9DA484DE691C484E5E8917 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	{
@@ -21283,7 +21283,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngine_Stop_m39BD84F5D5380C529E9DA484D
 		return L_2;
 	}
 }
-// Method Definition Index: 107230
+// Method Definition Index: 103409
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_AcquireLatestState_m716D0F7F655DE298B693489B6E796A1A5CE90FEE (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -21316,7 +21316,7 @@ IL_001e:
 		return (RuntimeObject*)NULL;
 	}
 }
-// Method Definition Index: 107231
+// Method Definition Index: 103410
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngine_RegisterState_m64F3D7954881F5B6FD8357318613AB7F58909620 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuState_tADB584CDCD23BE0F1F19F40F4473AD4746FA4D41* ___0_state, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -21333,7 +21333,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngine_RegisterState_m64F3D7954881F5B6
 		return;
 	}
 }
-// Method Definition Index: 107232
+// Method Definition Index: 103411
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngine_UnregisterState_m71928D35562867092533EAE5693765B71F71FBB5 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuState_tADB584CDCD23BE0F1F19F40F4473AD4746FA4D41* ___0_state, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -21351,7 +21351,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngine_UnregisterState_m71928D35562867
 		return;
 	}
 }
-// Method Definition Index: 107234
+// Method Definition Index: 103413
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateAnchorObserver_mB668AF1F7035793C68CE89CAE113E838C3F6CFA4 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuAnchorObserverConfig_tB1FFF4DB4C5CBA736658A3059FDC4CB846F86F68* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21362,7 +21362,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateAnchorObserver_
 		return L_2;
 	}
 }
-// Method Definition Index: 107235
+// Method Definition Index: 103414
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateAreaTargetObserver_mF14044BC2A9890B3D67843F8DD80E4070F11EDB0 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuAreaTargetConfig_tD971B1CCF77D100334D94B9D7DE92726C074245B* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21373,7 +21373,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateAreaTargetObser
 		return L_2;
 	}
 }
-// Method Definition Index: 107236
+// Method Definition Index: 103415
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateAreaTargetObserver_m3D4F45D90D681F699D0EFD68D7D41355C870A526 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuAreaTargetCloudConfig_t137432DDFC9E9B0E63AF4BC7775C733961B7D22E* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21384,7 +21384,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateAreaTargetObser
 		return L_2;
 	}
 }
-// Method Definition Index: 107237
+// Method Definition Index: 103416
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateBarcodeObserver_mC44442439DB522B9C8C09DA27D2D91DED7192B0E (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuBarcodeConfig_t7BBE8BDFEF266F4A644D5CC10FBDFCCD59C3D215* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21395,7 +21395,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateBarcodeObserver
 		return L_2;
 	}
 }
-// Method Definition Index: 107238
+// Method Definition Index: 103417
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateCloudImageTargetObserver_m811E5042A5C2B45F592CED5AA06AB3085C27D502 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuCloudImageTargetConfig_t276D3850EAC283504E0A8F3BC7843F0C06AB1D3A* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21407,7 +21407,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateCloudImageTarge
 		return L_3;
 	}
 }
-// Method Definition Index: 107239
+// Method Definition Index: 103418
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateCylinderTargetObserver_m9C32AD5C3545FFAA89B0F2AFEDE8D3F0444CCF51 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuCylinderTargetConfig_t3F2EBE88D496CE53B39EDD0457EDD0B5688A9A01* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21418,7 +21418,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateCylinderTargetO
 		return L_2;
 	}
 }
-// Method Definition Index: 107240
+// Method Definition Index: 103419
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateDevicePoseObserver_m280BE48E1689AF43FC8AD5D9AC8597D4AD4552B3 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuDevicePoseConfig_t252CDE8459C8ACF606D90A85CC15487FF0498D98* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21429,7 +21429,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateDevicePoseObser
 		return L_2;
 	}
 }
-// Method Definition Index: 107241
+// Method Definition Index: 103420
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateIlluminationObserver_m58709D8F4DC33CD2B97BEE68198A7471646455D5 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuIlluminationConfig_tE319FEC110E45EA5BBD24BCA5C47949631090DED* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21440,7 +21440,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateIlluminationObs
 		return L_2;
 	}
 }
-// Method Definition Index: 107242
+// Method Definition Index: 103421
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateImageTargetObserver_m1CA0CEAACA0BBE2A2FDC71D194F027F3656078BA (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuImageTargetConfig_t25590C62A801ADF575C35845BD19AFCA56C4E5BB* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21451,7 +21451,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateImageTargetObse
 		return L_2;
 	}
 }
-// Method Definition Index: 107243
+// Method Definition Index: 103422
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateImageTargetObserver_m2F69FD5C12EF5212A4B2B509048A42E05639AEDA (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuImageTargetFileConfig_t0DBF0616087882D633299B00705047B582E2E62F* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21462,7 +21462,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateImageTargetObse
 		return L_2;
 	}
 }
-// Method Definition Index: 107244
+// Method Definition Index: 103423
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateImageTargetObserver_mC17A26E451E3913CF67873A962347B17BBC04522 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuImageTargetBufferConfig_tD6B007897A16BFAEE6E31AC34B10701F2B881E20* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21473,7 +21473,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateImageTargetObse
 		return L_2;
 	}
 }
-// Method Definition Index: 107245
+// Method Definition Index: 103424
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateImageTargetObserver_m11770A25861EF44C42A47DE78486E5295782883A (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuImageTargetCloudObservationConfig_t906C72EB5814386E0C2A972A1DB23B1E74A01F4B* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21484,7 +21484,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateImageTargetObse
 		return L_2;
 	}
 }
-// Method Definition Index: 107246
+// Method Definition Index: 103425
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateMeshObserver_mDA09DFC15B7CA2449503261B3F3CDF6D89AD2786 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuMeshAreaTargetCaptureConfig_tFDD783BC0716E69FBC055E884F382CE5D1F4CC58* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21495,7 +21495,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateMeshObserver_mD
 		return L_2;
 	}
 }
-// Method Definition Index: 107247
+// Method Definition Index: 103426
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateMeshObserver_m9DD2477B36DCC440246337C94392A80CC52616F8 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuMeshAreaTargetConfig_t084B4A94A81A244E79482550B92F95280F556D5A* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21506,7 +21506,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateMeshObserver_m9
 		return L_2;
 	}
 }
-// Method Definition Index: 107248
+// Method Definition Index: 103427
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateMeshObserver_mB3792CF557DC554CB4A0AA81C5E2F02A3AD8A689 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuMeshModelTargetConfig_t0A7870793F1A65B15DCEA9C7FC03AC82A2B76E39* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21517,7 +21517,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateMeshObserver_mB
 		return L_2;
 	}
 }
-// Method Definition Index: 107249
+// Method Definition Index: 103428
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateModelTargetObserver_m619CBAEAB35ABF84B50B3EA37EE908030128EC09 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuModelTargetConfig_tC75BF231CA68EB68D8F36200C4B117222DF72A51* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21528,7 +21528,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateModelTargetObse
 		return L_2;
 	}
 }
-// Method Definition Index: 107250
+// Method Definition Index: 103429
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateModelTargetObserver_mBF0D6D6B75EC0F99E832BA94200367964BFE5652 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuModelTargetBufferConfig_t24E09804D10DF2793D4BFB284914A7A7C0035EDC* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21539,7 +21539,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateModelTargetObse
 		return L_2;
 	}
 }
-// Method Definition Index: 107251
+// Method Definition Index: 103430
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateMultiTargetObserver_m398C06B97912221BFE816E8F2468E784628C37E9 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuMultiTargetConfig_tE55C18544BB21521E6D0A49F562487D2296C6981* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21550,7 +21550,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateMultiTargetObse
 		return L_2;
 	}
 }
-// Method Definition Index: 107252
+// Method Definition Index: 103431
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateValidationAreaObserver_mAB20D95EA51C6F99CBD13ADED895010303ECC9E2 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuValidationAreaConfig_tE751FB3FD9B3F3E7443651A0ECAB71EF9381528D* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21561,7 +21561,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateValidationAreaO
 		return L_2;
 	}
 }
-// Method Definition Index: 107253
+// Method Definition Index: 103432
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateValidationAreaObserver_mC2EB2B3CCF4BB88B2E309CEB232A4F5CDC12AD28 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuValidationAreaBufferConfig_tE96FFA63D81203A9345F404A1C84C50375BBCD7D* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21572,7 +21572,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateValidationAreaO
 		return L_2;
 	}
 }
-// Method Definition Index: 107254
+// Method Definition Index: 103433
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateValidationAreaObserver_mD0BE57B505FDB60DFB82F34CFF3FAEC9E00D7E8E (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuValidationAreaFileConfig_tD0C591E40E9B2966C7A044D360EF1AA93EF3A13B* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21583,7 +21583,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateValidationAreaO
 		return L_2;
 	}
 }
-// Method Definition Index: 107255
+// Method Definition Index: 103434
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateVuMarkObserver_mE6C4FA919E60A88C21CAA9D2A232073EBD3AEE59 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuVuMarkConfig_t2531D6411F5A67EC08D0FC8945B1F71DBD4BDCD8* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	{
@@ -21594,7 +21594,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_CreateVuMarkObserver_
 		return L_2;
 	}
 }
-// Method Definition Index: 107256
+// Method Definition Index: 103435
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_GetObserverById_mF6969B9A2A195B0C50E539830E864439596C8C15 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, int32_t ___0_id, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -21614,7 +21614,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_GetObserverById_mF696
 		return L_3;
 	}
 }
-// Method Definition Index: 107257
+// Method Definition Index: 103436
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngine_RegisterObserver_mCCB1222A2FBFD2BA68CCE43E3F92F8F2343FF85A (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuObserver_t90742BFE20A846DDA5C7064512EC0D4C4B0F0B80* ___0_observer, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -21635,7 +21635,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngine_RegisterObserver_mCCB1222A2FBFD
 		return;
 	}
 }
-// Method Definition Index: 107258
+// Method Definition Index: 103437
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngine_UnregisterObserver_mEBFE7411C1611FCEE91BD4FAD7639907ADBFC47A (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, VuObserver_t90742BFE20A846DDA5C7064512EC0D4C4B0F0B80* ___0_observer, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -21656,7 +21656,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuEngine_UnregisterObserver_mEBFE7411C16
 		return;
 	}
 }
-// Method Definition Index: 107259
+// Method Definition Index: 103438
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngine_ClearAreaTargetObserverCloudCache_m38A25372B47B65E2CC18A7FF842B5199FF5E6B55 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	{
@@ -21668,7 +21668,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngine_ClearAreaTargetObserverCloudCac
 		return L_2;
 	}
 }
-// Method Definition Index: 107260
+// Method Definition Index: 103439
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngine_ClearModelTargetObserverDetectionCache_m40954A20CA7EF0371EF41B1F869233739556CB97 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	{
@@ -21680,7 +21680,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngine_ClearModelTargetObserverDetecti
 		return L_2;
 	}
 }
-// Method Definition Index: 107261
+// Method Definition Index: 103440
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuEngine_GetDatabaseTargetInfo_mFFA8BE4CB4A83070DBB99AF5928001007B25D2E8 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, String_t* ___0_databasePath, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -21810,7 +21810,7 @@ IL_005b:
 		return L_21;
 	}
 }
-// Method Definition Index: 107262
+// Method Definition Index: 103441
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngine_SetMaximumSimultaneousTrackedImages_mF3E5C6E57DDE7DECBF3CCBB9D81B7A44D4265F96 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, int32_t ___0_maxNumberOfTargets, const RuntimeMethod* method) 
 {
 	{
@@ -21823,7 +21823,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngine_SetMaximumSimultaneousTrackedIm
 		return L_3;
 	}
 }
-// Method Definition Index: 107263
+// Method Definition Index: 103442
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngine_SetModelTargetRecoWhileExtendedTracked_m64B20740A633D34D5A571B3B47474FAB9A39228C (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, bool ___0_enable, const RuntimeMethod* method) 
 {
 	{
@@ -21838,7 +21838,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngine_SetModelTargetRecoWhileExtended
 		return L_4;
 	}
 }
-// Method Definition Index: 107264
+// Method Definition Index: 103443
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngine_ResetWorldTracking_mD63525C7A429402A6FBEB35A6E9042049ECC95FA (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	{
@@ -21850,7 +21850,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngine_ResetWorldTracking_mD63525C7A42
 		return L_2;
 	}
 }
-// Method Definition Index: 107265
+// Method Definition Index: 103444
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngine_GetData_m89378A1DCFF8F9BD998BA31E26A8A0A46AB5E5FD (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, int32_t ___0_key, intptr_t* ___1_data, const RuntimeMethod* method) 
 {
 	{
@@ -21862,7 +21862,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuEngine_GetData_m89378A1DCFF8F9BD998BA3
 		return (bool)((!(((uint32_t)L_3) <= ((uint32_t)0)))? 1 : 0);
 	}
 }
-// Method Definition Index: 107266
+// Method Definition Index: 103445
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuEngine_GetBuildPreset_m2E1D042CB5C0C1749A115528DBF29A1AFEF25FCA (const RuntimeMethod* method) 
 {
 	int32_t V_0 = 0;
@@ -21920,7 +21920,7 @@ IL2CPP_EXTERN_C void VuIlluminationConfig_tE319FEC110E45EA5BBD24BCA5C47949631090
 IL2CPP_EXTERN_C void VuIlluminationConfig_tE319FEC110E45EA5BBD24BCA5C47949631090DED_marshal_com_cleanup(VuIlluminationConfig_tE319FEC110E45EA5BBD24BCA5C47949631090DED_marshaled_com& marshaled)
 {
 }
-// Method Definition Index: 107271
+// Method Definition Index: 103450
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuIlluminationConfig_Clone_m14ED12D89D599059DFB2019635E51BAAAC11F655 (VuIlluminationConfig_tE319FEC110E45EA5BBD24BCA5C47949631090DED* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -21939,7 +21939,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuIlluminationConfig_Clone_m14
 		return L_1;
 	}
 }
-// Method Definition Index: 107272
+// Method Definition Index: 103451
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuIlluminationConfig__ctor_mE52C2BA5F1F9E5D1B9A4B57852116FCB854F266C (VuIlluminationConfig_tE319FEC110E45EA5BBD24BCA5C47949631090DED* __this, const RuntimeMethod* method) 
 {
 	{
@@ -21964,7 +21964,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuIlluminationConfig__ctor_mE52C2BA5F1F9
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107273
+// Method Definition Index: 103452
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuIlluminationObserver_vuEngineCreateIlluminationObserver_mE6AC7324FC268343980A18AF92E9A4A7851D1503 (intptr_t ___0_engineHandle, intptr_t* ___1_observerHandle, VuIlluminationConfig_tE319FEC110E45EA5BBD24BCA5C47949631090DED* ___2_config, int32_t* ___3_errorCode, const RuntimeMethod* method) 
 {
 
@@ -21988,7 +21988,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuIlluminationObserver_vuEngineCreate
 
 	return returnValue;
 }
-// Method Definition Index: 107274
+// Method Definition Index: 103453
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuIlluminationObserver_t6868834B36D4001D02B773E7FD5AD9CC9F7AFF81* VuIlluminationObserver_Create_mF9182838CD528917727A1AA250882F296BE83A9F (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, VuIlluminationConfig_tE319FEC110E45EA5BBD24BCA5C47949631090DED* ___1_config, int32_t* ___2_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -22028,7 +22028,7 @@ IL_001d:
 		return (VuIlluminationObserver_t6868834B36D4001D02B773E7FD5AD9CC9F7AFF81*)NULL;
 	}
 }
-// Method Definition Index: 107275
+// Method Definition Index: 103454
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuIlluminationObserver__ctor_m0641835AF6C7542C871B06860C5D6C2806E2EF91 (VuIlluminationObserver_t6868834B36D4001D02B773E7FD5AD9CC9F7AFF81* __this, VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, intptr_t ___1_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -22100,7 +22100,7 @@ IL2CPP_EXTERN_C void VuIlluminationObservationInfo_tACC60DB06AFE0921FA86B03BA92B
 IL2CPP_EXTERN_C void VuIlluminationObservationInfo_tACC60DB06AFE0921FA86B03BA92B631955318588_marshal_com_cleanup(VuIlluminationObservationInfo_tACC60DB06AFE0921FA86B03BA92B631955318588_marshaled_com& marshaled)
 {
 }
-// Method Definition Index: 107276
+// Method Definition Index: 103455
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuIlluminationObservationInfo_vuIlluminationObservationGetInfo_m961F3B957417FC5370AC09FF6E68A3FF8FA8975D (intptr_t ___0_observation, Internal_t6F7FFAB6187E7B51A0768D996FD9663AE9B937A6* ___1_info, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, Internal_t6F7FFAB6187E7B51A0768D996FD9663AE9B937A6*);
@@ -22122,7 +22122,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuIlluminationObservationInfo_vuIllum
 
 	return returnValue;
 }
-// Method Definition Index: 107277
+// Method Definition Index: 103456
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuIlluminationObservationInfo_tACC60DB06AFE0921FA86B03BA92B631955318588 VuIlluminationObservationInfo_Create_m6EF3C081C79160EF1509D08249A97D1F10A33E97 (intptr_t ___0_observationHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -22253,7 +22253,7 @@ IL_0064:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107279
+// Method Definition Index: 103458
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuIlluminationObservationInfo_tACC60DB06AFE0921FA86B03BA92B631955318588 VuIlluminationObservation_get_Info_m0B4D01933EF19C2C7E22F102720785F6344D6BEF (VuIlluminationObservation_t5FFE93C224D9B05EE788DABD93C179B56339C766* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -22273,7 +22273,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuIlluminationObservationInfo_tACC60DB06AFE09
 		return L_2;
 	}
 }
-// Method Definition Index: 107280
+// Method Definition Index: 103459
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuIlluminationObservation__ctor_mF8DA5FD17485DAE95777FB3E237E22091C7D2194 (VuIlluminationObservation_t5FFE93C224D9B05EE788DABD93C179B56339C766* __this, const RuntimeMethod* method) 
 {
 	{
@@ -22281,7 +22281,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuIlluminationObservation__ctor_mF8DA5FD
 		return;
 	}
 }
-// Method Definition Index: 107281
+// Method Definition Index: 103460
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuIlluminationObservation_UnregisterObservation_m9868FA6AE4DFF89D78133B6EB6B8C69CF58E72D8 (VuIlluminationObservation_t5FFE93C224D9B05EE788DABD93C179B56339C766* __this, const RuntimeMethod* method) 
 {
 	{
@@ -22315,7 +22315,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuIlluminationObservation_UnregisterObse
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107286
+// Method Definition Index: 103465
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImage_vuImageGetImageInfo_m5975B11FE4B08BAB1BDEDF9074DECBF3F49EE75F (intptr_t ___0_image, VuImageInfo_t597DCA831455477423A97DDC162B8207255C5968* ___1_imageInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuImageInfo_t597DCA831455477423A97DDC162B8207255C5968*);
@@ -22337,7 +22337,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImage_vuImageGetImageInfo_m5975B11F
 
 	return returnValue;
 }
-// Method Definition Index: 107287
+// Method Definition Index: 103466
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImage_vuImageAcquireReference_mE8F6F65263489B3873DB970B00B6D9F81F03A75D (intptr_t ___0_image, intptr_t* ___1_imageOut, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -22359,7 +22359,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImage_vuImageAcquireReference_mE8F6
 
 	return returnValue;
 }
-// Method Definition Index: 107288
+// Method Definition Index: 103467
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImage_vuImageRelease_m3442CB7BD352FEA85F92D4A7EC8466973C0D787B (intptr_t ___0_image, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -22381,7 +22381,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImage_vuImageRelease_m3442CB7BD352F
 
 	return returnValue;
 }
-// Method Definition Index: 107289
+// Method Definition Index: 103468
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuImageInfo_t597DCA831455477423A97DDC162B8207255C5968 VuImage_get_ImageInfo_mED51F4EBA6060D07ACB7719D8B83408A389941F9 (VuImage_t49A34202F052984691206C1BB87CCC42158BC341* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -22435,7 +22435,7 @@ IL_0033:
 		return L_8;
 	}
 }
-// Method Definition Index: 107290
+// Method Definition Index: 103469
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImage_get_Width_mB20D68AAE4D3980EA1B413737D7B0F73A9116099 (VuImage_t49A34202F052984691206C1BB87CCC42158BC341* __this, const RuntimeMethod* method) 
 {
 	{
@@ -22445,7 +22445,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImage_get_Width_mB20D68AAE4D3980EA1
 		return L_1;
 	}
 }
-// Method Definition Index: 107291
+// Method Definition Index: 103470
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImage_get_Height_mF8E8116CE123FEDEC739E70F8C61C9672D31C51D (VuImage_t49A34202F052984691206C1BB87CCC42158BC341* __this, const RuntimeMethod* method) 
 {
 	{
@@ -22455,7 +22455,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImage_get_Height_mF8E8116CE123FEDEC
 		return L_1;
 	}
 }
-// Method Definition Index: 107292
+// Method Definition Index: 103471
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImage_get_PixelFormat_mD57187D6F6D447778A15E594497A4FF8D285FB5A (VuImage_t49A34202F052984691206C1BB87CCC42158BC341* __this, const RuntimeMethod* method) 
 {
 	{
@@ -22465,7 +22465,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImage_get_PixelFormat_mD57187D6F6D4
 		return L_1;
 	}
 }
-// Method Definition Index: 107293
+// Method Definition Index: 103472
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImage__ctor_m2C42765C11BE5BFE4CB3690B27F5CD372D1B8BD9 (VuImage_t49A34202F052984691206C1BB87CCC42158BC341* __this, intptr_t ___0_nativeHandle, bool ___1_ownsNativeData, const RuntimeMethod* method) 
 {
 	{
@@ -22477,7 +22477,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImage__ctor_m2C42765C11BE5BFE4CB3690B2
 		return;
 	}
 }
-// Method Definition Index: 107294
+// Method Definition Index: 103473
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImage__ctor_mE0F0C2E5C2D40447DD37F5FE94DC1C8E973C5F43 (VuImage_t49A34202F052984691206C1BB87CCC42158BC341* __this, VuImage_t49A34202F052984691206C1BB87CCC42158BC341* ___0_source, const RuntimeMethod* method) 
 {
 	{
@@ -22505,7 +22505,7 @@ IL_0024:
 		return;
 	}
 }
-// Method Definition Index: 107295
+// Method Definition Index: 103474
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImage_Finalize_m908A2DEBB63D76B90C33590D8A2D5D3F82F14001 (VuImage_t49A34202F052984691206C1BB87CCC42158BC341* __this, const RuntimeMethod* method) 
 {
 	{
@@ -22534,7 +22534,7 @@ IL_0010:
 		return;
 	}
 }
-// Method Definition Index: 107296
+// Method Definition Index: 103475
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImage_Dispose_m46E95843CE0B558BFCC3F8CC07F28D1DF6059B45 (VuImage_t49A34202F052984691206C1BB87CCC42158BC341* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -22550,7 +22550,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImage_Dispose_m46E95843CE0B558BFCC3F8C
 		return;
 	}
 }
-// Method Definition Index: 107297
+// Method Definition Index: 103476
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImage_Dispose_mE47657396B44CA1960EDB24F7E390970CBFA4B58 (VuImage_t49A34202F052984691206C1BB87CCC42158BC341* __this, bool ___0_disposing, const RuntimeMethod* method) 
 {
 	{
@@ -22607,7 +22607,7 @@ IL_0041:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107298
+// Method Definition Index: 103477
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageList_vuImageListCreate_mFD1FBB800C8DE509E567B79799CA3E69C587F009 (intptr_t* ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*);
@@ -22629,7 +22629,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageList_vuImageListCreate_mFD1FBB
 
 	return returnValue;
 }
-// Method Definition Index: 107299
+// Method Definition Index: 103478
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageList_vuImageListGetSize_m5351D7916B0B17D9B9209C83A42633AD379AEC89 (intptr_t ___0_listHandle, int32_t* ___1_size, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -22651,7 +22651,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageList_vuImageListGetSize_m5351D
 
 	return returnValue;
 }
-// Method Definition Index: 107300
+// Method Definition Index: 103479
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageList_vuImageListGetElement_m2EFBAC9E2F02888538E41733F3A117AA2A8BEE81 (intptr_t ___0_listHandle, int32_t ___1_element, intptr_t* ___2_elementHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t, intptr_t*);
@@ -22673,7 +22673,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageList_vuImageListGetElement_m2E
 
 	return returnValue;
 }
-// Method Definition Index: 107301
+// Method Definition Index: 103480
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageList_vuImageListDestroy_m0E4B9980ACAD709718F478EA82F6A1049FE5FC01 (intptr_t ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -22695,7 +22695,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageList_vuImageListDestroy_m0E4B9
 
 	return returnValue;
 }
-// Method Definition Index: 107302
+// Method Definition Index: 103481
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImageList__ctor_m2273EBC88132823D16870D0656020CB0415A9BAE (VuImageList_t1F8118F666056C1F29B9CD58B5AE0D4A93D7EDCC* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -22733,7 +22733,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImageList__ctor_m2273EBC88132823D16870
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107303
+// Method Definition Index: 103482
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImagePixelFormatList_vuImagePixelFormatListCreate_mE7F622F1C0A6C090047BA8489FCBD934AE27627D (intptr_t* ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*);
@@ -22755,7 +22755,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImagePixelFormatList_vuImagePixelFo
 
 	return returnValue;
 }
-// Method Definition Index: 107304
+// Method Definition Index: 103483
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImagePixelFormatList_vuImagePixelFormatListGetSize_mA0162C3B0C9E446368CF76EEBFF1FDEC8612AB9B (intptr_t ___0_listHandle, int32_t* ___1_size, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -22777,7 +22777,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImagePixelFormatList_vuImagePixelFo
 
 	return returnValue;
 }
-// Method Definition Index: 107305
+// Method Definition Index: 103484
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImagePixelFormatList_vuImagePixelFormatListGetElement_m9ACFD329E3DFEED68738E260D5F669E9F1BF454D (intptr_t ___0_listHandle, int32_t ___1_element, int32_t* ___2_elementHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t, int32_t*);
@@ -22799,7 +22799,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImagePixelFormatList_vuImagePixelFo
 
 	return returnValue;
 }
-// Method Definition Index: 107306
+// Method Definition Index: 103485
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImagePixelFormatList_vuImagePixelFormatListDestroy_m55F25E8F07221B72D93B3503CD54C0D1B169B8FF (intptr_t ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -22821,7 +22821,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImagePixelFormatList_vuImagePixelFo
 
 	return returnValue;
 }
-// Method Definition Index: 107307
+// Method Definition Index: 103486
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImagePixelFormatList__ctor_m750C5C52E30F297632E0C711989C9FAF706D3479 (VuImagePixelFormatList_t1F9CFA6B5E757A80F014C3F157F90D0CA0B33834* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -22923,7 +22923,7 @@ IL2CPP_EXTERN_C void VuImageTargetConfig_t25590C62A801ADF575C35845BD19AFCA56C4E5
 	il2cpp_codegen_marshal_free(marshaled.___targetName);
 	marshaled.___targetName = NULL;
 }
-// Method Definition Index: 107308
+// Method Definition Index: 103487
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuImageTargetConfig_Clone_mD114C0ECBDDACD2732CB1D2BDD79573F12E3DA79 (VuImageTargetConfig_t25590C62A801ADF575C35845BD19AFCA56C4E5BB* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -22960,7 +22960,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuImageTargetConfig_Clone_mD11
 		return L_9;
 	}
 }
-// Method Definition Index: 107309
+// Method Definition Index: 103488
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImageTargetConfig__ctor_m18626EDA08BB6541AB1A7E7F2DC8E9AC6519DC10 (VuImageTargetConfig_t25590C62A801ADF575C35845BD19AFCA56C4E5BB* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -23063,7 +23063,7 @@ IL2CPP_EXTERN_C void VuImageTargetFileConfig_t0DBF0616087882D633299B00705047B582
 	il2cpp_codegen_marshal_free(marshaled.___targetName);
 	marshaled.___targetName = NULL;
 }
-// Method Definition Index: 107310
+// Method Definition Index: 103489
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuImageTargetFileConfig_Clone_m3D88D60812E75FE281FBE6AB1451ACC5398E810D (VuImageTargetFileConfig_t0DBF0616087882D633299B00705047B582E2E62F* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -23100,7 +23100,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuImageTargetFileConfig_Clone_
 		return L_9;
 	}
 }
-// Method Definition Index: 107311
+// Method Definition Index: 103490
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImageTargetFileConfig__ctor_mE36ACA7705A87AD102BBB1E03EF3AA54880CBFE4 (VuImageTargetFileConfig_t0DBF0616087882D633299B00705047B582E2E62F* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -23220,7 +23220,7 @@ IL2CPP_EXTERN_C void VuImageTargetBufferConfig_tD6B007897A16BFAEE6E31AC34B10701F
 	il2cpp_codegen_marshal_free(marshaled.___targetName);
 	marshaled.___targetName = NULL;
 }
-// Method Definition Index: 107312
+// Method Definition Index: 103491
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuImageTargetBufferConfig_Clone_m62B9CBA35AF5F854A5499713FDC0C96BAD505F91 (VuImageTargetBufferConfig_tD6B007897A16BFAEE6E31AC34B10701F2B881E20* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -23264,7 +23264,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuImageTargetBufferConfig_Clon
 		return L_13;
 	}
 }
-// Method Definition Index: 107313
+// Method Definition Index: 103492
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImageTargetBufferConfig__ctor_m20E9760CE97961097A846B84936289E34F7BF732 (VuImageTargetBufferConfig_tD6B007897A16BFAEE6E31AC34B10701F2B881E20* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -23305,7 +23305,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImageTargetBufferConfig__ctor_m20E9760
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107314
+// Method Definition Index: 103493
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuImageTargetCloudObservationConfig_Clone_mEEE2BB45BF1B8CE5CAD5C319FE3AE424780A1578 (VuImageTargetCloudObservationConfig_t906C72EB5814386E0C2A972A1DB23B1E74A01F4B* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -23337,7 +23337,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuImageTargetCloudObservationC
 		return L_7;
 	}
 }
-// Method Definition Index: 107315
+// Method Definition Index: 103494
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImageTargetCloudObservationConfig__ctor_m8C7848BFE88809734365C102B763DE105EC2820B (VuImageTargetCloudObservationConfig_t906C72EB5814386E0C2A972A1DB23B1E74A01F4B* __this, const RuntimeMethod* method) 
 {
 	{
@@ -23374,7 +23374,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImageTargetCloudObservationConfig__cto
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107323
+// Method Definition Index: 103502
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuEngineCreateImageTargetObserver_m85DAC762DD09C2757E167D64476DC1E842780933 (intptr_t ___0_engineHandle, intptr_t* ___1_observerHandle, VuImageTargetConfig_t25590C62A801ADF575C35845BD19AFCA56C4E5BB* ___2_config, int32_t* ___3_errorCode, const RuntimeMethod* method) 
 {
 
@@ -23409,7 +23409,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuEngineCreateI
 
 	return returnValue;
 }
-// Method Definition Index: 107324
+// Method Definition Index: 103503
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuEngineCreateImageTargetObserverFromFileConfig_mC3A2903AE51313D77723AC5FD41D24D56140B125 (intptr_t ___0_engineHandle, intptr_t* ___1_observerHandle, VuImageTargetFileConfig_t0DBF0616087882D633299B00705047B582E2E62F* ___2_config, int32_t* ___3_errorCode, const RuntimeMethod* method) 
 {
 
@@ -23444,7 +23444,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuEngineCreateI
 
 	return returnValue;
 }
-// Method Definition Index: 107325
+// Method Definition Index: 103504
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuEngineCreateImageTargetObserverFromBufferConfig_mB79315B7709AA381E297AAC1CD67346F786D1275 (intptr_t ___0_engineHandle, intptr_t* ___1_observerHandle, VuImageTargetBufferConfig_tD6B007897A16BFAEE6E31AC34B10701F2B881E20* ___2_config, int32_t* ___3_errorCode, const RuntimeMethod* method) 
 {
 
@@ -23479,7 +23479,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuEngineCreateI
 
 	return returnValue;
 }
-// Method Definition Index: 107326
+// Method Definition Index: 103505
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuEngineCreateImageTargetObserverFromCloudObservation_m51B09B1C6E8909DEA71C8FE6A776A3AE7B3D4161 (intptr_t ___0_engineHandle, intptr_t* ___1_observerHandle, Internal_t45CE21458B2C05516202220F090F5C5DA33C4CDB* ___2_config, int32_t* ___3_errorCode, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*, Internal_t45CE21458B2C05516202220F090F5C5DA33C4CDB*, int32_t*);
@@ -23501,7 +23501,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuEngineCreateI
 
 	return returnValue;
 }
-// Method Definition Index: 107327
+// Method Definition Index: 103506
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuImageTargetObserverGetTargetUniqueId_mCD810535AC94F46FEFA3796E11513C57EACB429A (intptr_t ___0_observerHandle, intptr_t* ___1_targetId, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -23523,7 +23523,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuImageTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107328
+// Method Definition Index: 103507
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuImageTargetObserverGetTargetName_m276D3E8AFAA59DA4643DB1566D7AAC9F79C64613 (intptr_t ___0_observerHandle, intptr_t* ___1_targetName, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -23545,7 +23545,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuImageTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107329
+// Method Definition Index: 103508
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuImageTargetObserverSetTargetScale_mB89B2D0A4DD1183C1527A4CE691EB9288D3CE9C2 (intptr_t ___0_observerHandle, float ___1_scale, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, float);
@@ -23567,7 +23567,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuImageTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107330
+// Method Definition Index: 103509
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuImageTargetObserverGetTargetSize_m67EC81390CE3C31C2433694F65F58517018B8F02 (intptr_t ___0_observerHandle, VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8* ___1_targetSize, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8*);
@@ -23589,7 +23589,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuImageTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107331
+// Method Definition Index: 103510
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuImageTargetObserverGetAABB_m1B31091C0DA5D3026D6ABBCC3DEBE67EE6DDDDB4 (intptr_t ___0_observerHandle, VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F738* ___1_bbox, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F738*);
@@ -23611,7 +23611,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuImageTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107332
+// Method Definition Index: 103511
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuImageTargetObserverSetTrackingOptimization_mD6F493850CD6EA2A8A737779B05689B77F42899A (intptr_t ___0_observerHandle, int32_t ___1_optimization, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -23633,7 +23633,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuImageTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107333
+// Method Definition Index: 103512
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuImageTargetObserverGetTrackingOptimization_mDE52C4D604353DEA0D2B12912B6081F11FA5CB7B (intptr_t ___0_observerHandle, int32_t* ___1_optimization, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -23655,7 +23655,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_vuImageTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107334
+// Method Definition Index: 103513
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuImageTargetObserver_get_TargetUniqueID_m0B56DFB1A3B63C9D45A3639B2F37B732088E8C21 (VuImageTargetObserver_tE8B91D8CA8EA161A97B5907E122B7AF0015D35DC* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -23674,7 +23674,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuImageTargetObserver_get_TargetUni
 		return L_2;
 	}
 }
-// Method Definition Index: 107335
+// Method Definition Index: 103514
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuImageTargetObserver_get_TargetName_mDBF31FD55F9CBDC13CB1A6324C2D6E18D4AFAA36 (VuImageTargetObserver_tE8B91D8CA8EA161A97B5907E122B7AF0015D35DC* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -23693,7 +23693,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuImageTargetObserver_get_TargetNam
 		return L_2;
 	}
 }
-// Method Definition Index: 107336
+// Method Definition Index: 103515
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 VuImageTargetObserver_get_TargetSize_m701126CDCC5B47C3B0A4ED4410139A6ABF5444DA (VuImageTargetObserver_tE8B91D8CA8EA161A97B5907E122B7AF0015D35DC* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -23713,7 +23713,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4
 		return L_2;
 	}
 }
-// Method Definition Index: 107337
+// Method Definition Index: 103516
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F738 VuImageTargetObserver_get_BoundingBox_m2933E9716E7C1A1B28FBAA798C8354DB22FC80B0 (VuImageTargetObserver_tE8B91D8CA8EA161A97B5907E122B7AF0015D35DC* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -23733,7 +23733,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F
 		return L_2;
 	}
 }
-// Method Definition Index: 107338
+// Method Definition Index: 103517
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_get_TrackingOptimization_m9B6331408B51191166678967A375825649FBC862 (VuImageTargetObserver_tE8B91D8CA8EA161A97B5907E122B7AF0015D35DC* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -23753,7 +23753,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObserver_get_TrackingOpt
 		return L_2;
 	}
 }
-// Method Definition Index: 107339
+// Method Definition Index: 103518
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuImageTargetObserver_tE8B91D8CA8EA161A97B5907E122B7AF0015D35DC* VuImageTargetObserver_Create_mF6E1A6199FF9ED32190F41FF7C84A2A84961BD26 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, VuImageTargetConfig_t25590C62A801ADF575C35845BD19AFCA56C4E5BB* ___1_config, int32_t* ___2_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -23793,7 +23793,7 @@ IL_001d:
 		return (VuImageTargetObserver_tE8B91D8CA8EA161A97B5907E122B7AF0015D35DC*)NULL;
 	}
 }
-// Method Definition Index: 107340
+// Method Definition Index: 103519
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuImageTargetObserver_tE8B91D8CA8EA161A97B5907E122B7AF0015D35DC* VuImageTargetObserver_Create_m6A414537BE51C42C6C76D15697176E743FF600FF (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, VuImageTargetFileConfig_t0DBF0616087882D633299B00705047B582E2E62F* ___1_config, int32_t* ___2_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -23833,7 +23833,7 @@ IL_001d:
 		return (VuImageTargetObserver_tE8B91D8CA8EA161A97B5907E122B7AF0015D35DC*)NULL;
 	}
 }
-// Method Definition Index: 107341
+// Method Definition Index: 103520
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuImageTargetObserver_tE8B91D8CA8EA161A97B5907E122B7AF0015D35DC* VuImageTargetObserver_Create_m38081E23A09ACFE58BACCE83F04410F374839E3A (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, VuImageTargetBufferConfig_tD6B007897A16BFAEE6E31AC34B10701F2B881E20* ___1_config, int32_t* ___2_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -23873,7 +23873,7 @@ IL_001d:
 		return (VuImageTargetObserver_tE8B91D8CA8EA161A97B5907E122B7AF0015D35DC*)NULL;
 	}
 }
-// Method Definition Index: 107342
+// Method Definition Index: 103521
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuImageTargetObserver_tE8B91D8CA8EA161A97B5907E122B7AF0015D35DC* VuImageTargetObserver_Create_m1C48752F9DB28113FD1FE7059A080D216B6B6EBF (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, VuImageTargetCloudObservationConfig_t906C72EB5814386E0C2A972A1DB23B1E74A01F4B* ___1_config, int32_t* ___2_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -23939,7 +23939,7 @@ IL_0066:
 		return (VuImageTargetObserver_tE8B91D8CA8EA161A97B5907E122B7AF0015D35DC*)NULL;
 	}
 }
-// Method Definition Index: 107343
+// Method Definition Index: 103522
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImageTargetObserver__ctor_m61C9F44AC42158D7989790EA9017A571A65DB0F0 (VuImageTargetObserver_tE8B91D8CA8EA161A97B5907E122B7AF0015D35DC* __this, VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, intptr_t ___1_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -23949,7 +23949,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImageTargetObserver__ctor_m61C9F44AC42
 		return;
 	}
 }
-// Method Definition Index: 107344
+// Method Definition Index: 103523
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuImageTargetObserver_SetTargetScale_m18B00EF415C50291C84E6E72CFFC72F2AFC2B137 (VuImageTargetObserver_tE8B91D8CA8EA161A97B5907E122B7AF0015D35DC* __this, float ___0_scale, const RuntimeMethod* method) 
 {
 	{
@@ -23962,7 +23962,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuImageTargetObserver_SetTargetScale_m18
 		return L_3;
 	}
 }
-// Method Definition Index: 107345
+// Method Definition Index: 103524
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuImageTargetObserver_SetTrackingOptimization_mD048867C2B991C49B03FE5F49A12980474866B8A (VuImageTargetObserver_tE8B91D8CA8EA161A97B5907E122B7AF0015D35DC* __this, int32_t ___0_optimization, const RuntimeMethod* method) 
 {
 	{
@@ -24059,7 +24059,7 @@ IL2CPP_EXTERN_C void VuImageTargetObservationTargetInfo_t080329AC4C25613825B482D
 	il2cpp_codegen_marshal_free_bstring(marshaled.___name);
 	marshaled.___name = NULL;
 }
-// Method Definition Index: 107346
+// Method Definition Index: 103525
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObservationTargetInfo_vuImageTargetObservationGetTargetInfo_m04B7FC02646BC9837F0C9FEF3495B4452EC0D693 (intptr_t ___0_observation, Internal_tA69F19F267D5DA72D1B8B133BE39AD501D72BDAA* ___1_targetInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, Internal_tA69F19F267D5DA72D1B8B133BE39AD501D72BDAA*);
@@ -24081,7 +24081,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObservationTargetInfo_vu
 
 	return returnValue;
 }
-// Method Definition Index: 107347
+// Method Definition Index: 103526
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuImageTargetObservationTargetInfo_t080329AC4C25613825B482DEEE364CD37930FCDC VuImageTargetObservationTargetInfo_Create_m5A18873E281D03C977BD2A831A7BC8BD1B77F1D1 (intptr_t ___0_observationHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -24154,7 +24154,7 @@ IL_0015:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107350
+// Method Definition Index: 103529
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObservation_vuImageTargetObservationGetStatusInfo_m00487804A941B6A6AD38520EC01A138916B52725 (intptr_t ___0_observation, int32_t* ___1_statusInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -24176,7 +24176,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObservation_vuImageTarge
 
 	return returnValue;
 }
-// Method Definition Index: 107351
+// Method Definition Index: 103530
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObservation_get_StatusInfo_mD49A70DD0F32906A1D71C27018EFEEC97D5AF02E (VuImageTargetObservation_t3AB4605AD101E5AF1E276886E3652A49694AE43E* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -24196,7 +24196,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuImageTargetObservation_get_StatusIn
 		return L_2;
 	}
 }
-// Method Definition Index: 107352
+// Method Definition Index: 103531
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuImageTargetObservationTargetInfo_t080329AC4C25613825B482DEEE364CD37930FCDC VuImageTargetObservation_get_TargetInfo_mCB883FEA8D38DC673963B9F59F35925AD1C12719 (VuImageTargetObservation_t3AB4605AD101E5AF1E276886E3652A49694AE43E* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -24216,7 +24216,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuImageTargetObservationTargetInfo_t080329AC4
 		return L_2;
 	}
 }
-// Method Definition Index: 107353
+// Method Definition Index: 103532
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImageTargetObservation__ctor_mA2CF56D0EE105919EE8E453D71D63DC740F29199 (VuImageTargetObservation_t3AB4605AD101E5AF1E276886E3652A49694AE43E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -24224,7 +24224,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImageTargetObservation__ctor_mA2CF56D0
 		return;
 	}
 }
-// Method Definition Index: 107354
+// Method Definition Index: 103533
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuImageTargetObservation_UnregisterObservation_mDF2D570C78AA3A4243521C26225B22BD6274EA40 (VuImageTargetObservation_t3AB4605AD101E5AF1E276886E3652A49694AE43E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -24290,7 +24290,7 @@ IL2CPP_EXTERN_C void VuCloudImageTargetConfig_t276D3850EAC283504E0A8F3BC7843F0C0
 	il2cpp_codegen_marshal_free(marshaled.___secretAuth);
 	marshaled.___secretAuth = NULL;
 }
-// Method Definition Index: 107355
+// Method Definition Index: 103534
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuCloudImageTargetConfig_Clone_m153FE0BBF5AF6E6A25DA83136C94C50127C8338A (VuCloudImageTargetConfig_t276D3850EAC283504E0A8F3BC7843F0C06AB1D3A* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -24319,7 +24319,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuCloudImageTargetConfig_Clone
 		return L_5;
 	}
 }
-// Method Definition Index: 107356
+// Method Definition Index: 103535
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetConfig__ctor_mEFD0E09702719382BB5BD7C0D487874BA82459A8 (VuCloudImageTargetConfig_t276D3850EAC283504E0A8F3BC7843F0C06AB1D3A* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -24404,7 +24404,7 @@ void VuCloudImageTargetObservationsHandler_Invoke_mF82A630633D085072A615F077FD53
 	NullCheck(___0_observations);
 	GenericInterfaceActionInvoker1< RuntimeObject* >::Invoke(method, ___0_observations, ___1_clientData);
 }
-// Method Definition Index: 107357
+// Method Definition Index: 103536
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetObservationsHandler__ctor_mAD050FB54E4FFC088D96717F7F518D3296A335CF (VuCloudImageTargetObservationsHandler_t20E6B9EF172EB454BA058C66F487DFCD8BF13225* __this, RuntimeObject* ___0_object, intptr_t ___1_method, const RuntimeMethod* method) 
 {
 	__this->___method_ptr = (intptr_t)il2cpp_codegen_get_method_pointer((RuntimeMethod*)___1_method);
@@ -24457,13 +24457,13 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetObservationsHandler__c
 	}
 	__this->___extra_arg = (intptr_t)&VuCloudImageTargetObservationsHandler_Invoke_mF82A630633D085072A615F077FD53081706A0160_Multicast;
 }
-// Method Definition Index: 107358
+// Method Definition Index: 103537
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetObservationsHandler_Invoke_mF82A630633D085072A615F077FD53081706A0160 (VuCloudImageTargetObservationsHandler_t20E6B9EF172EB454BA058C66F487DFCD8BF13225* __this, RuntimeObject* ___0_observations, RuntimeObject* ___1_clientData, const RuntimeMethod* method) 
 {
 	typedef void (*FunctionPointerType) (RuntimeObject*, RuntimeObject*, RuntimeObject*, const RuntimeMethod*);
 	((FunctionPointerType)__this->___invoke_impl)((Il2CppObject*)__this->___method_code, ___0_observations, ___1_clientData, reinterpret_cast<RuntimeMethod*>(__this->___method));
 }
-// Method Definition Index: 107359
+// Method Definition Index: 103538
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuCloudImageTargetObservationsHandler_BeginInvoke_m57D626149B353FD20069B07F00E886D2C6D05B1A (VuCloudImageTargetObservationsHandler_t20E6B9EF172EB454BA058C66F487DFCD8BF13225* __this, RuntimeObject* ___0_observations, RuntimeObject* ___1_clientData, AsyncCallback_t7FEF460CBDCFB9C5FA2EF776984778B9A4145F4C* ___2_callback, RuntimeObject* ___3_object, const RuntimeMethod* method) 
 {
 	void *__d_args[3] = {0};
@@ -24471,7 +24471,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuCloudImageTargetObservations
 	__d_args[1] = ___1_clientData;
 	return (RuntimeObject*)il2cpp_codegen_delegate_begin_invoke((RuntimeDelegate*)__this, __d_args, (RuntimeDelegate*)___2_callback, (RuntimeObject*)___3_object);
 }
-// Method Definition Index: 107360
+// Method Definition Index: 103539
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetObservationsHandler_EndInvoke_mAAD9507A017C7A4BB72335AD23AB2B032B3A3A57 (VuCloudImageTargetObservationsHandler_t20E6B9EF172EB454BA058C66F487DFCD8BF13225* __this, RuntimeObject* ___0_result, const RuntimeMethod* method) 
 {
 	il2cpp_codegen_delegate_end_invoke((Il2CppAsyncResult*) ___0_result, 0);
@@ -24505,7 +24505,7 @@ void VuCloudImageTargetQueryErrorHandler_Invoke_mFEC4E8E7EE7B919F8C16C0DD0B43189
 	typedef void (*FunctionPointerType) (int32_t, RuntimeObject*, const RuntimeMethod*);
 	((FunctionPointerType)__this->___method_ptr)(___0_queryError, ___1_clientData, method);
 }
-// Method Definition Index: 107361
+// Method Definition Index: 103540
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetQueryErrorHandler__ctor_m698F0946A14E3D84D092F9636B3A0B48C295B606 (VuCloudImageTargetQueryErrorHandler_tDF650A2D26612C8C3E50791D7E17E7258F63DED2* __this, RuntimeObject* ___0_object, intptr_t ___1_method, const RuntimeMethod* method) 
 {
 	__this->___method_ptr = (intptr_t)il2cpp_codegen_get_method_pointer((RuntimeMethod*)___1_method);
@@ -24534,13 +24534,13 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetQueryErrorHandler__cto
 	}
 	__this->___extra_arg = (intptr_t)&VuCloudImageTargetQueryErrorHandler_Invoke_mFEC4E8E7EE7B919F8C16C0DD0B43189412981FE7_Multicast;
 }
-// Method Definition Index: 107362
+// Method Definition Index: 103541
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetQueryErrorHandler_Invoke_mFEC4E8E7EE7B919F8C16C0DD0B43189412981FE7 (VuCloudImageTargetQueryErrorHandler_tDF650A2D26612C8C3E50791D7E17E7258F63DED2* __this, int32_t ___0_queryError, RuntimeObject* ___1_clientData, const RuntimeMethod* method) 
 {
 	typedef void (*FunctionPointerType) (RuntimeObject*, int32_t, RuntimeObject*, const RuntimeMethod*);
 	((FunctionPointerType)__this->___invoke_impl)((Il2CppObject*)__this->___method_code, ___0_queryError, ___1_clientData, reinterpret_cast<RuntimeMethod*>(__this->___method));
 }
-// Method Definition Index: 107363
+// Method Definition Index: 103542
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuCloudImageTargetQueryErrorHandler_BeginInvoke_m51CBC1940BF3510E41935F502D2D5A614CA27F7F (VuCloudImageTargetQueryErrorHandler_tDF650A2D26612C8C3E50791D7E17E7258F63DED2* __this, int32_t ___0_queryError, RuntimeObject* ___1_clientData, AsyncCallback_t7FEF460CBDCFB9C5FA2EF776984778B9A4145F4C* ___2_callback, RuntimeObject* ___3_object, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -24554,7 +24554,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuCloudImageTargetQueryErrorHa
 	__d_args[1] = ___1_clientData;
 	return (RuntimeObject*)il2cpp_codegen_delegate_begin_invoke((RuntimeDelegate*)__this, __d_args, (RuntimeDelegate*)___2_callback, (RuntimeObject*)___3_object);
 }
-// Method Definition Index: 107364
+// Method Definition Index: 103543
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetQueryErrorHandler_EndInvoke_m9AB4EEFA50B01913399ADCB9C5B3942B620BDEAC (VuCloudImageTargetQueryErrorHandler_tDF650A2D26612C8C3E50791D7E17E7258F63DED2* __this, RuntimeObject* ___0_result, const RuntimeMethod* method) 
 {
 	il2cpp_codegen_delegate_end_invoke((Il2CppAsyncResult*) ___0_result, 0);
@@ -24581,7 +24581,7 @@ extern "C" void CDECL ReversePInvokeWrapper_VuCloudImageTargetObserver_HandleQue
 	VuCloudImageTargetObserver_HandleQueryError_m457E52E7A90C36D4BFA825AFBEDE5C48034B84FD(___0_error, ___1_clientData, NULL);
 
 }
-// Method Definition Index: 107367
+// Method Definition Index: 103546
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCloudImageTargetObserver_vuEngineCreateCloudImageTargetObserver_mE33936E58FDF65A14E9DCCDD1904CFF40A2FBE56 (intptr_t ___0_engineHandle, intptr_t* ___1_observerHandle, VuCloudImageTargetConfig_t276D3850EAC283504E0A8F3BC7843F0C06AB1D3A* ___2_config, int32_t* ___3_errorCode, const RuntimeMethod* method) 
 {
 
@@ -24616,7 +24616,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCloudImageTargetObserver_vuEngineCr
 
 	return returnValue;
 }
-// Method Definition Index: 107368
+// Method Definition Index: 103547
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCloudImageTargetObserver_vuCloudImageTargetObserverRegisterHandlers_m0456AC00A0BE7AEDCCEF219E180D164677CB7D8E (intptr_t ___0_observerHandle, VuCloudImageTargetObservationsHandlerNative_tE8B9A84AA216524A84FA6B5AF67D91333CFF08BB* ___1_observationHandler, VuCloudImageTargetQueryErrorHandlerNative_tF17220399F29B00F23FEA41A03EF0F504955EC67* ___2_errorHandler, intptr_t ___3_clientData, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, Il2CppMethodPointer, Il2CppMethodPointer, intptr_t);
@@ -24644,7 +24644,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCloudImageTargetObserver_vuCloudIma
 
 	return returnValue;
 }
-// Method Definition Index: 107369
+// Method Definition Index: 103548
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCloudImageTargetObserver_vuCloudImageTargetObserverIsRequesting_mB118E8E75691A49BABB662E2F6FDD56840348FF8 (intptr_t ___0_observerHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -24666,7 +24666,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCloudImageTargetObserver_vuCloudIma
 
 	return returnValue;
 }
-// Method Definition Index: 107370
+// Method Definition Index: 103549
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCloudImageTargetObserver_get_Requesting_mDF00AD0D5471B11F25CC18BE27886CC9E84488DF (VuCloudImageTargetObserver_t52DD3125C9E80F6B640C686CEB6640EE92A9B6CC* __this, const RuntimeMethod* method) 
 {
 	{
@@ -24678,7 +24678,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCloudImageTargetObserver_get_Requestin
 		return L_2;
 	}
 }
-// Method Definition Index: 107371
+// Method Definition Index: 103550
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuCloudImageTargetObserver_t52DD3125C9E80F6B640C686CEB6640EE92A9B6CC* VuCloudImageTargetObserver_Create_mACFC4CBE65ADEBD6B59DDF2E5014589C4E18FB99 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, ObservationManager_t99938AFA7E9803564F4E20B3E0B9BB3B0C0E251C* ___1_observationManager, VuCloudImageTargetConfig_t276D3850EAC283504E0A8F3BC7843F0C06AB1D3A* ___2_config, int32_t* ___3_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -24719,7 +24719,7 @@ IL_001e:
 		return (VuCloudImageTargetObserver_t52DD3125C9E80F6B640C686CEB6640EE92A9B6CC*)NULL;
 	}
 }
-// Method Definition Index: 107372
+// Method Definition Index: 103551
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetObserver__ctor_mC45389061A2089F63865C25516A13DD7B452B83B (VuCloudImageTargetObserver_t52DD3125C9E80F6B640C686CEB6640EE92A9B6CC* __this, VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, ObservationManager_t99938AFA7E9803564F4E20B3E0B9BB3B0C0E251C* ___1_observationManager, intptr_t ___2_nativeHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -24775,7 +24775,7 @@ IL_0073:
 		return;
 	}
 }
-// Method Definition Index: 107373
+// Method Definition Index: 103552
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetObserver_HandleObservations_mFF4D5D104658E28566F34729D345C85F0E3BE84A (intptr_t ___0_observationsHandle, intptr_t ___1_clientData, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -24910,7 +24910,7 @@ IL_005d:
 		return;
 	}
 }
-// Method Definition Index: 107374
+// Method Definition Index: 103553
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetObserver_HandleQueryError_m457E52E7A90C36D4BFA825AFBEDE5C48034B84FD (int32_t ___0_error, intptr_t ___1_clientData, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -24958,7 +24958,7 @@ IL_001f:
 		return;
 	}
 }
-// Method Definition Index: 107375
+// Method Definition Index: 103554
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetObserver_Dispose_m307F7E51DC6A22AC6AEA3D79099483EA44E38A7E (VuCloudImageTargetObserver_t52DD3125C9E80F6B640C686CEB6640EE92A9B6CC* __this, bool ___0_disposing, const RuntimeMethod* method) 
 {
 	{
@@ -25006,7 +25006,7 @@ IL_003d:
 		return;
 	}
 }
-// Method Definition Index: 107376
+// Method Definition Index: 103555
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuCloudImageTargetObserver_RegisterHandlers_mED8B1E92ECD42691AC97FAC2085B1C80DB79F572 (VuCloudImageTargetObserver_t52DD3125C9E80F6B640C686CEB6640EE92A9B6CC* __this, VuCloudImageTargetObservationsHandler_t20E6B9EF172EB454BA058C66F487DFCD8BF13225* ___0_observationHandler, VuCloudImageTargetQueryErrorHandler_tDF650A2D26612C8C3E50791D7E17E7258F63DED2* ___1_errorHandler, RuntimeObject* ___2_clientData, const RuntimeMethod* method) 
 {
 	{
@@ -25058,7 +25058,7 @@ IL2CPP_EXTERN_C  void DelegatePInvokeWrapper_VuCloudImageTargetObservationsHandl
 	il2cppPInvokeFunc(___0_observations, ___1_clientData);
 
 }
-// Method Definition Index: 107377
+// Method Definition Index: 103556
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetObservationsHandlerNative__ctor_m97D8FF77EB2AF291760B1896C3A637B7AF9444DF (VuCloudImageTargetObservationsHandlerNative_tE8B9A84AA216524A84FA6B5AF67D91333CFF08BB* __this, RuntimeObject* ___0_object, intptr_t ___1_method, const RuntimeMethod* method) 
 {
 	__this->___method_ptr = (intptr_t)il2cpp_codegen_get_method_pointer((RuntimeMethod*)___1_method);
@@ -25087,13 +25087,13 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetObservationsHandlerNat
 	}
 	__this->___extra_arg = (intptr_t)&VuCloudImageTargetObservationsHandlerNative_Invoke_m37DF583FAB3008B29AFC79B533D94813E6EE0D26_Multicast;
 }
-// Method Definition Index: 107378
+// Method Definition Index: 103557
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetObservationsHandlerNative_Invoke_m37DF583FAB3008B29AFC79B533D94813E6EE0D26 (VuCloudImageTargetObservationsHandlerNative_tE8B9A84AA216524A84FA6B5AF67D91333CFF08BB* __this, intptr_t ___0_observations, intptr_t ___1_clientData, const RuntimeMethod* method) 
 {
 	typedef void (*FunctionPointerType) (RuntimeObject*, intptr_t, intptr_t, const RuntimeMethod*);
 	((FunctionPointerType)__this->___invoke_impl)((Il2CppObject*)__this->___method_code, ___0_observations, ___1_clientData, reinterpret_cast<RuntimeMethod*>(__this->___method));
 }
-// Method Definition Index: 107379
+// Method Definition Index: 103558
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuCloudImageTargetObservationsHandlerNative_BeginInvoke_m3B127D172510DC3F4E3735570F5AC46548B11EE1 (VuCloudImageTargetObservationsHandlerNative_tE8B9A84AA216524A84FA6B5AF67D91333CFF08BB* __this, intptr_t ___0_observations, intptr_t ___1_clientData, AsyncCallback_t7FEF460CBDCFB9C5FA2EF776984778B9A4145F4C* ___2_callback, RuntimeObject* ___3_object, const RuntimeMethod* method) 
 {
 	void *__d_args[3] = {0};
@@ -25101,7 +25101,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuCloudImageTargetObservations
 	__d_args[1] = Box(il2cpp_defaults.int_class, &___1_clientData);
 	return (RuntimeObject*)il2cpp_codegen_delegate_begin_invoke((RuntimeDelegate*)__this, __d_args, (RuntimeDelegate*)___2_callback, (RuntimeObject*)___3_object);
 }
-// Method Definition Index: 107380
+// Method Definition Index: 103559
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetObservationsHandlerNative_EndInvoke_mF1339AE8735B229BA1795FA17CE5DC67889441AF (VuCloudImageTargetObservationsHandlerNative_tE8B9A84AA216524A84FA6B5AF67D91333CFF08BB* __this, RuntimeObject* ___0_result, const RuntimeMethod* method) 
 {
 	il2cpp_codegen_delegate_end_invoke((Il2CppAsyncResult*) ___0_result, 0);
@@ -25142,7 +25142,7 @@ IL2CPP_EXTERN_C  void DelegatePInvokeWrapper_VuCloudImageTargetQueryErrorHandler
 	il2cppPInvokeFunc(___0_queryError, ___1_clientData);
 
 }
-// Method Definition Index: 107381
+// Method Definition Index: 103560
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetQueryErrorHandlerNative__ctor_m11B76C02AA3532EFE44D51178B2AB120F95F8C12 (VuCloudImageTargetQueryErrorHandlerNative_tF17220399F29B00F23FEA41A03EF0F504955EC67* __this, RuntimeObject* ___0_object, intptr_t ___1_method, const RuntimeMethod* method) 
 {
 	__this->___method_ptr = (intptr_t)il2cpp_codegen_get_method_pointer((RuntimeMethod*)___1_method);
@@ -25171,13 +25171,13 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetQueryErrorHandlerNativ
 	}
 	__this->___extra_arg = (intptr_t)&VuCloudImageTargetQueryErrorHandlerNative_Invoke_mF0B14317468649B5943CBB9727CF19C5306E413A_Multicast;
 }
-// Method Definition Index: 107382
+// Method Definition Index: 103561
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetQueryErrorHandlerNative_Invoke_mF0B14317468649B5943CBB9727CF19C5306E413A (VuCloudImageTargetQueryErrorHandlerNative_tF17220399F29B00F23FEA41A03EF0F504955EC67* __this, int32_t ___0_queryError, intptr_t ___1_clientData, const RuntimeMethod* method) 
 {
 	typedef void (*FunctionPointerType) (RuntimeObject*, int32_t, intptr_t, const RuntimeMethod*);
 	((FunctionPointerType)__this->___invoke_impl)((Il2CppObject*)__this->___method_code, ___0_queryError, ___1_clientData, reinterpret_cast<RuntimeMethod*>(__this->___method));
 }
-// Method Definition Index: 107383
+// Method Definition Index: 103562
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuCloudImageTargetQueryErrorHandlerNative_BeginInvoke_m0FB8F3F94CDEB3AA4FC73B9D0186DE0E05918296 (VuCloudImageTargetQueryErrorHandlerNative_tF17220399F29B00F23FEA41A03EF0F504955EC67* __this, int32_t ___0_queryError, intptr_t ___1_clientData, AsyncCallback_t7FEF460CBDCFB9C5FA2EF776984778B9A4145F4C* ___2_callback, RuntimeObject* ___3_object, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -25191,7 +25191,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuCloudImageTargetQueryErrorHa
 	__d_args[1] = Box(il2cpp_defaults.int_class, &___1_clientData);
 	return (RuntimeObject*)il2cpp_codegen_delegate_begin_invoke((RuntimeDelegate*)__this, __d_args, (RuntimeDelegate*)___2_callback, (RuntimeObject*)___3_object);
 }
-// Method Definition Index: 107384
+// Method Definition Index: 103563
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetQueryErrorHandlerNative_EndInvoke_mF5C6145D7140CF6A4CDBE439A9B0A84281BD0222 (VuCloudImageTargetQueryErrorHandlerNative_tF17220399F29B00F23FEA41A03EF0F504955EC67* __this, RuntimeObject* ___0_result, const RuntimeMethod* method) 
 {
 	il2cpp_codegen_delegate_end_invoke((Il2CppAsyncResult*) ___0_result, 0);
@@ -25260,7 +25260,7 @@ IL2CPP_EXTERN_C void VuCloudImageTargetObservationTargetInfo_tA5722359C01D4BA60F
 	il2cpp_codegen_marshal_free_bstring(marshaled.___metadata);
 	marshaled.___metadata = NULL;
 }
-// Method Definition Index: 107385
+// Method Definition Index: 103564
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCloudImageTargetObservationTargetInfo_vuCloudImageTargetObservationGetTargetInfo_m7483A59EC84AED3080C2D64762ED8D445796E6F0 (intptr_t ___0_observationHandle, Internal_t8B6966AED61EE1F853B6DC871928540C9E436FA6* ___1_targetInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, Internal_t8B6966AED61EE1F853B6DC871928540C9E436FA6*);
@@ -25282,7 +25282,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCloudImageTargetObservationTargetIn
 
 	return returnValue;
 }
-// Method Definition Index: 107386
+// Method Definition Index: 103565
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuCloudImageTargetObservationTargetInfo_tA5722359C01D4BA60FB0E90466A3A00759F8552F VuCloudImageTargetObservationTargetInfo_Create_mE269D970E76C10B9ED724BA0675ED225FC0289D1 (intptr_t ___0_observationHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -25355,7 +25355,7 @@ IL_0015:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107388
+// Method Definition Index: 103567
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuCloudImageTargetObservationTargetInfo_tA5722359C01D4BA60FB0E90466A3A00759F8552F VuCloudImageTargetObservation_get_TargetInfo_m6CE53A39502F0386D0F0F484C9A9C93B64BBD49A (VuCloudImageTargetObservation_tCB004D276110D8489760FF0357EE0D0F22BD8930* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -25375,7 +25375,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuCloudImageTargetObservationTargetInfo_tA572
 		return L_2;
 	}
 }
-// Method Definition Index: 107389
+// Method Definition Index: 103568
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetObservation__ctor_m02DF9199B19E805CBD19AF99B6FEBAB8CDA6CA8F (VuCloudImageTargetObservation_tCB004D276110D8489760FF0357EE0D0F22BD8930* __this, const RuntimeMethod* method) 
 {
 	{
@@ -25383,7 +25383,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetObservation__ctor_m02D
 		return;
 	}
 }
-// Method Definition Index: 107390
+// Method Definition Index: 103569
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetObservation_UnregisterObservation_mD35D4CBBA9F84C8702247EBFBB95D52866581CC6 (VuCloudImageTargetObservation_tCB004D276110D8489760FF0357EE0D0F22BD8930* __this, const RuntimeMethod* method) 
 {
 	{
@@ -25401,7 +25401,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCloudImageTargetObservation_Unregister
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107391
+// Method Definition Index: 103570
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 MathUtils_vuZeroVector2F_m08CF61666ADF3D50B3CE7F5DBE7EFCB33A008526 (const RuntimeMethod* method) 
 {
 	typedef VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 (CDECL *PInvokeFunc) ();
@@ -25423,7 +25423,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4
 
 	return returnValue;
 }
-// Method Definition Index: 107392
+// Method Definition Index: 103571
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 MathUtils_vuOneVector2F_mAA453A998095D8893BDC6585BA85CDE8BD78A85B (const RuntimeMethod* method) 
 {
 	typedef VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 (CDECL *PInvokeFunc) ();
@@ -25445,7 +25445,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4
 
 	return returnValue;
 }
-// Method Definition Index: 107393
+// Method Definition Index: 103572
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 MathUtils_vuZeroVector3F_mBAB1CE2260F7D04ED11D7D2A51EFAB876403F44A (const RuntimeMethod* method) 
 {
 	typedef VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 (CDECL *PInvokeFunc) ();
@@ -25467,7 +25467,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B
 
 	return returnValue;
 }
-// Method Definition Index: 107394
+// Method Definition Index: 103573
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 MathUtils_vuOneVector3F_m0E3270543FD264DB2A44CB514AF32336A9D95A2A (const RuntimeMethod* method) 
 {
 	typedef VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 (CDECL *PInvokeFunc) ();
@@ -25489,7 +25489,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B
 
 	return returnValue;
 }
-// Method Definition Index: 107395
+// Method Definition Index: 103574
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2FDA14245 MathUtils_vuZeroVector4F_m197737CB914253A831B82753C14CCC06E961B632 (const RuntimeMethod* method) 
 {
 	typedef VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2FDA14245 (CDECL *PInvokeFunc) ();
@@ -25511,7 +25511,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2F
 
 	return returnValue;
 }
-// Method Definition Index: 107396
+// Method Definition Index: 103575
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2FDA14245 MathUtils_vuOneVector4F_mB40A2F22BFC0CE6508D8E3C7A74CA3A48D0C34D7 (const RuntimeMethod* method) 
 {
 	typedef VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2FDA14245 (CDECL *PInvokeFunc) ();
@@ -25533,7 +25533,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2F
 
 	return returnValue;
 }
-// Method Definition Index: 107397
+// Method Definition Index: 103576
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8 MathUtils_vuZeroVector8F_mEFC57C154E83801DA1AA2C07B403051DEDDA9BFF (const RuntimeMethod* method) 
 {
 	typedef VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8 (CDECL *PInvokeFunc) ();
@@ -25555,7 +25555,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE7
 
 	return returnValue;
 }
-// Method Definition Index: 107398
+// Method Definition Index: 103577
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8 MathUtils_vuOneVector8F_mEE87A7BBBDAA38C331CC51F904F07DD85F9A7CCE (const RuntimeMethod* method) 
 {
 	typedef VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8 (CDECL *PInvokeFunc) ();
@@ -25577,7 +25577,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE7
 
 	return returnValue;
 }
-// Method Definition Index: 107399
+// Method Definition Index: 103578
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix33F_t2623D6358F8D194B85AE59D801C90267F1B8B697 MathUtils_vuZeroMatrix33F_m35E4488E428CDEBDF24CD3FE87D470616B2CC8CD (const RuntimeMethod* method) 
 {
 	typedef VuMatrix33F_t2623D6358F8D194B85AE59D801C90267F1B8B697 (CDECL *PInvokeFunc) ();
@@ -25599,7 +25599,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix33F_t2623D6358F8D194B85AE59D801C90267
 
 	return returnValue;
 }
-// Method Definition Index: 107400
+// Method Definition Index: 103579
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix33F_t2623D6358F8D194B85AE59D801C90267F1B8B697 MathUtils_vuIdentityMatrix33F_m12A93E9327BFFC26656F8499EBDC1FABD4271A6F (const RuntimeMethod* method) 
 {
 	typedef VuMatrix33F_t2623D6358F8D194B85AE59D801C90267F1B8B697 (CDECL *PInvokeFunc) ();
@@ -25621,7 +25621,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix33F_t2623D6358F8D194B85AE59D801C90267
 
 	return returnValue;
 }
-// Method Definition Index: 107401
+// Method Definition Index: 103580
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 MathUtils_vuZeroMatrix44F_m9CDCAE97A9E715B4FFB86D2E86F3D49F21058391 (const RuntimeMethod* method) 
 {
 	typedef VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 (CDECL *PInvokeFunc) ();
@@ -25643,7 +25643,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30F
 
 	return returnValue;
 }
-// Method Definition Index: 107402
+// Method Definition Index: 103581
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 MathUtils_vuIdentityMatrix44F_mC5CC3E2B50795D6EAEE7D6DF99F08DA716B54D2C (const RuntimeMethod* method) 
 {
 	typedef VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 (CDECL *PInvokeFunc) ();
@@ -25665,7 +25665,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30F
 
 	return returnValue;
 }
-// Method Definition Index: 107403
+// Method Definition Index: 103582
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 MathUtils_get_ZeroVector2F_mAA58F7AF86F691763FF6EECD08944FB83B89A7CE (const RuntimeMethod* method) 
 {
 	{
@@ -25674,7 +25674,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4
 		return L_0;
 	}
 }
-// Method Definition Index: 107404
+// Method Definition Index: 103583
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 MathUtils_get_IdentityVector2F_mE79EB92C76C2D4948D1C3A532D9A2AAB09D244EC (const RuntimeMethod* method) 
 {
 	{
@@ -25683,7 +25683,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4
 		return L_0;
 	}
 }
-// Method Definition Index: 107405
+// Method Definition Index: 103584
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 MathUtils_get_ZeroVector3F_m6586C8506FF21EA10EF4A53E983327C2250F9B8F (const RuntimeMethod* method) 
 {
 	{
@@ -25692,7 +25692,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B
 		return L_0;
 	}
 }
-// Method Definition Index: 107406
+// Method Definition Index: 103585
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 MathUtils_get_IdentityVector3F_mC77F4C7964516C75B8AD0A38EE08DC2623AC4117 (const RuntimeMethod* method) 
 {
 	{
@@ -25701,7 +25701,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B
 		return L_0;
 	}
 }
-// Method Definition Index: 107407
+// Method Definition Index: 103586
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2FDA14245 MathUtils_get_ZeroVector4F_m546E4B5BD39F0CE89B59AF55A5038B59878D758D (const RuntimeMethod* method) 
 {
 	{
@@ -25710,7 +25710,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2F
 		return L_0;
 	}
 }
-// Method Definition Index: 107408
+// Method Definition Index: 103587
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2FDA14245 MathUtils_get_IdentityVector4F_mF59FF0FD0E29E6A104B6E5A88C4E82034DE8D1D4 (const RuntimeMethod* method) 
 {
 	{
@@ -25719,7 +25719,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2F
 		return L_0;
 	}
 }
-// Method Definition Index: 107409
+// Method Definition Index: 103588
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8 MathUtils_get_ZeroVector8F_m5A4AF0F3A3AB874572246634E967BE30B2D6E494 (const RuntimeMethod* method) 
 {
 	{
@@ -25728,7 +25728,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE7
 		return L_0;
 	}
 }
-// Method Definition Index: 107410
+// Method Definition Index: 103589
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8 MathUtils_get_IdentityVector8F_m166872F016BAA0601F1345DDE1F2DB367B082972 (const RuntimeMethod* method) 
 {
 	{
@@ -25737,7 +25737,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE7
 		return L_0;
 	}
 }
-// Method Definition Index: 107411
+// Method Definition Index: 103590
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix33F_t2623D6358F8D194B85AE59D801C90267F1B8B697 MathUtils_get_ZeroMatrix33F_mD6EFDD2AC8272A4B16BD9C8876DE10080FDE2B2B (const RuntimeMethod* method) 
 {
 	{
@@ -25746,7 +25746,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix33F_t2623D6358F8D194B85AE59D801C90267
 		return L_0;
 	}
 }
-// Method Definition Index: 107412
+// Method Definition Index: 103591
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix33F_t2623D6358F8D194B85AE59D801C90267F1B8B697 MathUtils_get_IdentityMatrix33F_m3963A222499FDADDD1650397D777FAE4B0AA5132 (const RuntimeMethod* method) 
 {
 	{
@@ -25755,7 +25755,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix33F_t2623D6358F8D194B85AE59D801C90267
 		return L_0;
 	}
 }
-// Method Definition Index: 107413
+// Method Definition Index: 103592
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 MathUtils_get_ZeroMatrix44F_mFAE6C5B60F40A0F2408C085073F85CD2FDFD80C6 (const RuntimeMethod* method) 
 {
 	{
@@ -25764,7 +25764,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30F
 		return L_0;
 	}
 }
-// Method Definition Index: 107414
+// Method Definition Index: 103593
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 MathUtils_get_IdentityMatrix44F_m5D01555E77977D31B5E4390A06D96F7CA4AB0DC9 (const RuntimeMethod* method) 
 {
 	{
@@ -25789,7 +25789,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30F
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107415
+// Method Definition Index: 103594
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuMeshAreaTargetCaptureConfig_Clone_m0A97B70606B70153F5E1891F01DB3DBAA76BEA10 (VuMeshAreaTargetCaptureConfig_tFDD783BC0716E69FBC055E884F382CE5D1F4CC58* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -25813,7 +25813,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuMeshAreaTargetCaptureConfig_
 		return L_3;
 	}
 }
-// Method Definition Index: 107416
+// Method Definition Index: 103595
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMeshAreaTargetCaptureConfig__ctor_m6B51439EC9B456EEFD5D4A9B76308D59050B0B48 (VuMeshAreaTargetCaptureConfig_tFDD783BC0716E69FBC055E884F382CE5D1F4CC58* __this, const RuntimeMethod* method) 
 {
 	{
@@ -25830,7 +25830,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMeshAreaTargetCaptureConfig__ctor_m6B5
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107417
+// Method Definition Index: 103596
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Internal_t6131E0FD15A0D5DE78D58D983B4D6DA9A9267BF0 Internal_Create_m600F71F836D3343A5A69505B8BEC223142DE0246 (VuMeshAreaTargetCaptureConfig_tFDD783BC0716E69FBC055E884F382CE5D1F4CC58* ___0_config, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -25905,7 +25905,7 @@ IL_0025:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107418
+// Method Definition Index: 103597
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuMeshAreaTargetConfig_Clone_m3D907ADAAFB890A56A817EEC0A6594AFF7D726B3 (VuMeshAreaTargetConfig_t084B4A94A81A244E79482550B92F95280F556D5A* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -25934,7 +25934,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuMeshAreaTargetConfig_Clone_m
 		return L_5;
 	}
 }
-// Method Definition Index: 107419
+// Method Definition Index: 103598
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMeshAreaTargetConfig__ctor_m1D325AD055A79237FD6D6022037E5BB86436E28D (VuMeshAreaTargetConfig_t084B4A94A81A244E79482550B92F95280F556D5A* __this, const RuntimeMethod* method) 
 {
 	{
@@ -26000,7 +26000,7 @@ IL2CPP_EXTERN_C void Internal_t15FBCCDF2ADBF4F80DF2E832C3D9A1EC36056117_marshal_
 	il2cpp_codegen_marshal_free(marshaled.___occlusionMeshPath);
 	marshaled.___occlusionMeshPath = NULL;
 }
-// Method Definition Index: 107420
+// Method Definition Index: 103599
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Internal_t15FBCCDF2ADBF4F80DF2E832C3D9A1EC36056117 Internal_Create_mA5AF15853A3D2D57EB7BE930F2ADFACECC7E179F (VuMeshAreaTargetConfig_t084B4A94A81A244E79482550B92F95280F556D5A* ___0_config, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -26080,7 +26080,7 @@ IL_0025:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107421
+// Method Definition Index: 103600
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuMeshModelTargetConfig_Clone_m4E701A0374CC3A5BE526F9AA55C334210D1AB310 (VuMeshModelTargetConfig_t0A7870793F1A65B15DCEA9C7FC03AC82A2B76E39* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -26104,7 +26104,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuMeshModelTargetConfig_Clone_
 		return L_3;
 	}
 }
-// Method Definition Index: 107422
+// Method Definition Index: 103601
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMeshModelTargetConfig__ctor_m4CDD0F5815A38455B2572E6CB91D48ED35486267 (VuMeshModelTargetConfig_t0A7870793F1A65B15DCEA9C7FC03AC82A2B76E39* __this, const RuntimeMethod* method) 
 {
 	{
@@ -26121,7 +26121,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMeshModelTargetConfig__ctor_m4CDD0F581
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107423
+// Method Definition Index: 103602
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Internal_t2461E480BC1A96B4363BAEB9DBE43B0C57C84498 Internal_Create_m0110ED44F8401FF1B162CC922F7F0E8F80AEAB39 (VuMeshModelTargetConfig_t0A7870793F1A65B15DCEA9C7FC03AC82A2B76E39* ___0_config, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -26188,7 +26188,7 @@ IL_0025:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107424
+// Method Definition Index: 103603
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMeshObserver_vuEngineCreateMeshObserverFromAreaTargetCaptureConfig_mD05C916E679D1AA7E160A6AC4757A7739BCFBCBE (intptr_t ___0_engine, intptr_t* ___1_observer, Internal_t6131E0FD15A0D5DE78D58D983B4D6DA9A9267BF0* ___2_config, int32_t* ___3_errorCode, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*, Internal_t6131E0FD15A0D5DE78D58D983B4D6DA9A9267BF0*, int32_t*);
@@ -26210,7 +26210,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMeshObserver_vuEngineCreateMeshObse
 
 	return returnValue;
 }
-// Method Definition Index: 107425
+// Method Definition Index: 103604
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMeshObserver_vuEngineCreateMeshObserverFromAreaTargetConfig_m4ECEBEA28B321995C2A826324A4A2DE59A07613A (intptr_t ___0_engine, intptr_t* ___1_observer, Internal_t15FBCCDF2ADBF4F80DF2E832C3D9A1EC36056117* ___2_config, int32_t* ___3_errorCode, const RuntimeMethod* method) 
 {
 
@@ -26239,7 +26239,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMeshObserver_vuEngineCreateMeshObse
 
 	return returnValue;
 }
-// Method Definition Index: 107426
+// Method Definition Index: 103605
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMeshObserver_vuEngineCreateMeshObserverFromModelTargetConfig_mB4D0231D2F0D329041CF7478C2853FA8B1E28615 (intptr_t ___0_engine, intptr_t* ___1_observer, Internal_t2461E480BC1A96B4363BAEB9DBE43B0C57C84498* ___2_config, int32_t* ___3_errorCode, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*, Internal_t2461E480BC1A96B4363BAEB9DBE43B0C57C84498*, int32_t*);
@@ -26261,7 +26261,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMeshObserver_vuEngineCreateMeshObse
 
 	return returnValue;
 }
-// Method Definition Index: 107427
+// Method Definition Index: 103606
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMeshObserver_vuEngineGetMeshObservers_m88E7ED8C2294E9BD41D308E0D11A9B1D294CD8B0 (intptr_t ___0_engine, intptr_t ___1_observerList, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t);
@@ -26283,7 +26283,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMeshObserver_vuEngineGetMeshObserve
 
 	return returnValue;
 }
-// Method Definition Index: 107428
+// Method Definition Index: 103607
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMeshObserver__ctor_mEFA2F3851A2271672683701965AA14CFB00EF159 (VuMeshObserver_t767974E5F59082BFFB212E9D4C1EFBCC081C597B* __this, VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, intptr_t ___1_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -26293,7 +26293,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMeshObserver__ctor_mEFA2F3851A22716726
 		return;
 	}
 }
-// Method Definition Index: 107429
+// Method Definition Index: 103608
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMeshObserver_t767974E5F59082BFFB212E9D4C1EFBCC081C597B* VuMeshObserver_Create_mCA1B212D1389FF931FB568E7B1B98CB1833872CB (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, VuMeshAreaTargetCaptureConfig_tFDD783BC0716E69FBC055E884F382CE5D1F4CC58* ___1_config, int32_t* ___2_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -26338,7 +26338,7 @@ IL_0025:
 		return (VuMeshObserver_t767974E5F59082BFFB212E9D4C1EFBCC081C597B*)NULL;
 	}
 }
-// Method Definition Index: 107430
+// Method Definition Index: 103609
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMeshObserver_t767974E5F59082BFFB212E9D4C1EFBCC081C597B* VuMeshObserver_Create_mC6C1F27693F01C31BCE5BD4C26D18EDB3411E50A (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, VuMeshAreaTargetConfig_t084B4A94A81A244E79482550B92F95280F556D5A* ___1_config, int32_t* ___2_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -26383,7 +26383,7 @@ IL_0025:
 		return (VuMeshObserver_t767974E5F59082BFFB212E9D4C1EFBCC081C597B*)NULL;
 	}
 }
-// Method Definition Index: 107431
+// Method Definition Index: 103610
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMeshObserver_t767974E5F59082BFFB212E9D4C1EFBCC081C597B* VuMeshObserver_Create_mDDBCDF9479EFD5B65A3258CD9C1B84312F9D1AE9 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, VuMeshModelTargetConfig_t0A7870793F1A65B15DCEA9C7FC03AC82A2B76E39* ___1_config, int32_t* ___2_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -26444,7 +26444,7 @@ IL_0025:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107432
+// Method Definition Index: 103611
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMeshObservationBlock_tE6EB4D4BD9AA468CDB198D07F697FFD717E04963 Internal_ToVuMeshObservationBlock_m10BE20355A6D990CFDF25906BA7F13EE33F05CF1 (Internal_t7C7CF7D6B073EDC2EB46F9DCD98CF2586ABFB0E3* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -26494,7 +26494,7 @@ IL2CPP_EXTERN_C  VuMeshObservationBlock_tE6EB4D4BD9AA468CDB198D07F697FFD717E0496
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107433
+// Method Definition Index: 103612
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMeshObservationBlockList_vuMeshObservationBlockListGetSize_m56D73D26A440EAE6FD29B8826060368576408D77 (intptr_t ___0_list, int32_t* ___1_listSize, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -26516,7 +26516,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMeshObservationBlockList_vuMeshObse
 
 	return returnValue;
 }
-// Method Definition Index: 107434
+// Method Definition Index: 103613
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMeshObservationBlockList_vuMeshObservationBlockListGetElement_m62D0706C7B503A3480A09B50A668E29CFB22516A (intptr_t ___0_list, int32_t ___1_element, Internal_t7C7CF7D6B073EDC2EB46F9DCD98CF2586ABFB0E3* ___2_block, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t, Internal_t7C7CF7D6B073EDC2EB46F9DCD98CF2586ABFB0E3*);
@@ -26538,7 +26538,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMeshObservationBlockList_vuMeshObse
 
 	return returnValue;
 }
-// Method Definition Index: 107435
+// Method Definition Index: 103614
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMeshObservationBlockList__ctor_m061E23B2FBAA4F2A7F90772A2E74ABEFC6BE7A76 (VuMeshObservationBlockList_t9B89E02EF13DFB8ED2F2A615E170BDF55343DCEB* __this, intptr_t ___0_nativeHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -26639,7 +26639,7 @@ IL2CPP_EXTERN_C void VuMeshObservationInfo_t17B8971862B18EE83FE90575CDD2B841B7F2
 IL2CPP_EXTERN_C void VuMeshObservationInfo_t17B8971862B18EE83FE90575CDD2B841B7F21863_marshal_com_cleanup(VuMeshObservationInfo_t17B8971862B18EE83FE90575CDD2B841B7F21863_marshaled_com& marshaled)
 {
 }
-// Method Definition Index: 107436
+// Method Definition Index: 103615
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMeshObservationInfo_vuMeshObservationGetInfo_m00CC99A328FC1C2C1128939527D56910B7C6DD2A (intptr_t ___0_observation, Internal_tE976CBBF431C7B61CC8EF419905538416274DEF4* ___1_targetInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, Internal_tE976CBBF431C7B61CC8EF419905538416274DEF4*);
@@ -26661,7 +26661,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMeshObservationInfo_vuMeshObservati
 
 	return returnValue;
 }
-// Method Definition Index: 107437
+// Method Definition Index: 103616
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMeshObservationInfo_t17B8971862B18EE83FE90575CDD2B841B7F21863 VuMeshObservationInfo_Create_mF6DC6BD79EB825275655BA31CAE7877F86D3A070 (intptr_t ___0_observationHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -26814,7 +26814,7 @@ IL_0061:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107440
+// Method Definition Index: 103619
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMeshObservation_vuMeshObservationGetStatusInfo_m5FD7E4197C30539C57BE1A43BA666C55FF6AAED4 (intptr_t ___0_observation, int32_t* ___1_statusInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -26836,7 +26836,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMeshObservation_vuMeshObservationGe
 
 	return returnValue;
 }
-// Method Definition Index: 107441
+// Method Definition Index: 103620
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMeshObservation_get_StatusInfo_mCCD5757192EE44326A8CB2D06544B099BD79968B (VuMeshObservation_t5039E4475600A15ABA41B845D2757C3BFC535D79* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -26856,7 +26856,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMeshObservation_get_StatusInfo_mCCD
 		return L_2;
 	}
 }
-// Method Definition Index: 107442
+// Method Definition Index: 103621
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMeshObservationInfo_t17B8971862B18EE83FE90575CDD2B841B7F21863 VuMeshObservation_get_Info_m59796346D6D973BEEA8054BC15CC6A04783413DC (VuMeshObservation_t5039E4475600A15ABA41B845D2757C3BFC535D79* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -26876,7 +26876,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMeshObservationInfo_t17B8971862B18EE83FE905
 		return L_2;
 	}
 }
-// Method Definition Index: 107443
+// Method Definition Index: 103622
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMeshObservation__ctor_m6DA6914E526A2FDF219F317D5AB69EBE91C658B8 (VuMeshObservation_t5039E4475600A15ABA41B845D2757C3BFC535D79* __this, const RuntimeMethod* method) 
 {
 	{
@@ -26884,7 +26884,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMeshObservation__ctor_m6DA6914E526A2FD
 		return;
 	}
 }
-// Method Definition Index: 107444
+// Method Definition Index: 103623
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMeshObservation_UnregisterObservation_m98414A94161F95A201FEC7C9843E6C7AC1BE4979 (VuMeshObservation_t5039E4475600A15ABA41B845D2757C3BFC535D79* __this, const RuntimeMethod* method) 
 {
 	{
@@ -26986,7 +26986,7 @@ IL2CPP_EXTERN_C void VuModelTargetConfig_tC75BF231CA68EB68D8F36200C4B117222DF72A
 	il2cpp_codegen_marshal_free(marshaled.___activeGuideViewName);
 	marshaled.___activeGuideViewName = NULL;
 }
-// Method Definition Index: 107445
+// Method Definition Index: 103624
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuModelTargetConfig_Clone_m29AC15FFB378A8BD42B5B3D631ED3AD143BFD4E4 (VuModelTargetConfig_tC75BF231CA68EB68D8F36200C4B117222DF72A51* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -27032,7 +27032,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuModelTargetConfig_Clone_m29A
 		return L_13;
 	}
 }
-// Method Definition Index: 107446
+// Method Definition Index: 103625
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuModelTargetConfig__ctor_m523C6761733C02FFFCAED50A389896E2ADC91945 (VuModelTargetConfig_tC75BF231CA68EB68D8F36200C4B117222DF72A51* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -27153,7 +27153,7 @@ IL2CPP_EXTERN_C void VuModelTargetBufferConfig_t24E09804D10DF2793D4BFB284914A7A7
 	il2cpp_codegen_marshal_free(marshaled.___activeGuideViewName);
 	marshaled.___activeGuideViewName = NULL;
 }
-// Method Definition Index: 107447
+// Method Definition Index: 103626
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuModelTargetBufferConfig_Clone_m2B6136A26ED94EC4047CD0B27E3A1382F6B51623 (VuModelTargetBufferConfig_t24E09804D10DF2793D4BFB284914A7A7C0035EDC* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -27202,7 +27202,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuModelTargetBufferConfig_Clon
 		return L_15;
 	}
 }
-// Method Definition Index: 107448
+// Method Definition Index: 103627
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuModelTargetBufferConfig__ctor_mB586CAAC5E2B771D6F2B9B638DB7FA39D8F26B41 (VuModelTargetBufferConfig_t24E09804D10DF2793D4BFB284914A7A7C0035EDC* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -27240,7 +27240,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuModelTargetBufferConfig__ctor_mB586CAA
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107464
+// Method Definition Index: 103643
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuEngineCreateModelTargetObserver_m8EBA94328D9BF6E7EFB2261A8C45419B0DBF3E66 (intptr_t ___0_engineHandle, intptr_t* ___1_observerHandle, VuModelTargetConfig_tC75BF231CA68EB68D8F36200C4B117222DF72A51* ___2_config, int32_t* ___3_errorCode, const RuntimeMethod* method) 
 {
 
@@ -27275,7 +27275,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuEngineCreateM
 
 	return returnValue;
 }
-// Method Definition Index: 107465
+// Method Definition Index: 103644
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuEngineCreateModelTargetObserverFromBufferConfig_mEEBA04D813F934E02D28845F22F0C787842333C3 (intptr_t ___0_engineHandle, intptr_t* ___1_observerHandle, VuModelTargetBufferConfig_t24E09804D10DF2793D4BFB284914A7A7C0035EDC* ___2_config, int32_t* ___3_errorCode, const RuntimeMethod* method) 
 {
 
@@ -27310,7 +27310,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuEngineCreateM
 
 	return returnValue;
 }
-// Method Definition Index: 107466
+// Method Definition Index: 103645
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetObserverGetTargetUniqueId_m8BF741149B59CAFCF730944022074346DBFEEE6E (intptr_t ___0_observerHandle, intptr_t* ___1_targetId, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -27332,7 +27332,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107467
+// Method Definition Index: 103646
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetObserverGetTargetName_m8BB456E5BD2FF8E4D01E2D6E010FABE6ADDB4083 (intptr_t ___0_observerHandle, intptr_t* ___1_targetName, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -27354,7 +27354,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107468
+// Method Definition Index: 103647
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetObserverSetTargetScale_mA2BECBCC8DA95E26019D3D14C8B6BE9442D4F78A (intptr_t ___0_observerHandle, float ___1_scale, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, float);
@@ -27376,7 +27376,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107469
+// Method Definition Index: 103648
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetObserverGetTargetSize_m4B6DFEDBD2EEA9843CD728E42388BCA549ED22AC (intptr_t ___0_observerHandle, VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5* ___1_targetSize, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5*);
@@ -27398,7 +27398,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107470
+// Method Definition Index: 103649
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetObserverGetGuideViews_mB30000A99C470F427BC6DB2E330434317C02E496 (intptr_t ___0_observerHandle, intptr_t ___1_list, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t);
@@ -27420,7 +27420,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107471
+// Method Definition Index: 103650
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetObserverSetTrackingOptimization_m6EBCAFEBB3889A5F2D562F28456B6B7C177FC54A (intptr_t ___0_observerHandle, int32_t ___1_optimization, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -27442,7 +27442,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107472
+// Method Definition Index: 103651
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetObserverGetTrackingOptimization_mEB3C04E838B6C38D18D682399582573E2925EA19 (intptr_t ___0_observerHandle, int32_t* ___1_optimization, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -27464,7 +27464,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107473
+// Method Definition Index: 103652
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetObserverGetAABB_mA90F03B2C5E72C017E8F1CF46305DA00A46CA027 (intptr_t ___0_observerHandle, VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F738* ___1_bbox, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F738*);
@@ -27486,7 +27486,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107474
+// Method Definition Index: 103653
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetObserverSetActiveGuideViewName_mE72BC7DC5660B31EB4D6B8674C27D7BBC7A2870D (intptr_t ___0_observerHandle, intptr_t ___1_name, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t);
@@ -27508,7 +27508,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107475
+// Method Definition Index: 103654
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetObserverGetActiveGuideViewName_m5E590568D966F8DAEEB0A79F299AA70DF107786A (intptr_t ___0_observerHandle, intptr_t* ___1_name, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -27530,7 +27530,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107476
+// Method Definition Index: 103655
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetObserverGetAvailableStateInfos_m56D58B11662E7A8D70D8A13BA36C38AE42788260 (intptr_t ___0_observerHandle, intptr_t ___1_list, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t);
@@ -27552,7 +27552,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107477
+// Method Definition Index: 103656
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetObserverSetActiveStateName_mB5F70A5961181556D4FD39EC131DAD6D94A35E5E (intptr_t ___0_observerHandle, intptr_t ___1_name, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t);
@@ -27574,7 +27574,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107478
+// Method Definition Index: 103657
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetObserverGetActiveStateName_m40D52AFF42E575E05B673C0CC5D81D4BBD74CADA (intptr_t ___0_observerHandle, intptr_t* ___1_name, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -27596,7 +27596,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107479
+// Method Definition Index: 103658
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetObserverReset_mCD7501FABD3884A1E9CCF5E68D3610B503908E22 (intptr_t ___0_observerHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -27618,7 +27618,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107480
+// Method Definition Index: 103659
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetObserverIsAdvanced_mE10673BDE7EC2101B9776163D45099DB44514825 (intptr_t ___0_observerHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -27640,7 +27640,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107481
+// Method Definition Index: 103660
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetObserverGetGuideViewForAdvanced_m663113175CE1C2DD96AB27202A9CB71E56A8F56F (intptr_t ___0_observerHandle, intptr_t* ___1_guideView, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -27662,7 +27662,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_vuModelTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107482
+// Method Definition Index: 103661
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuModelTargetObserver_get_TargetUniqueID_mCBBB25B1FBC0CFA15B497A0F19C078848B4C446E (VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -27681,7 +27681,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuModelTargetObserver_get_TargetUni
 		return L_2;
 	}
 }
-// Method Definition Index: 107483
+// Method Definition Index: 103662
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuModelTargetObserver_get_TargetName_m1EB742BDEF3918A556D1365B57176075F340F61A (VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -27700,7 +27700,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuModelTargetObserver_get_TargetNam
 		return L_2;
 	}
 }
-// Method Definition Index: 107484
+// Method Definition Index: 103663
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 VuModelTargetObserver_get_TargetSize_m8C7B2547137D7E3A650C5D2E7288F639500C23AB (VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -27720,7 +27720,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B
 		return L_2;
 	}
 }
-// Method Definition Index: 107485
+// Method Definition Index: 103664
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F738 VuModelTargetObserver_get_BoundingBox_m4D5025B786E424EF2E0140801A81AC31BE0F27E6 (VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -27740,7 +27740,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F
 		return L_2;
 	}
 }
-// Method Definition Index: 107486
+// Method Definition Index: 103665
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_get_TrackingOptimization_m0B5A87CFDB144281794A1C296FF53590972F9051 (VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -27760,7 +27760,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObserver_get_TrackingOpt
 		return L_2;
 	}
 }
-// Method Definition Index: 107487
+// Method Definition Index: 103666
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuModelTargetObserver_get_GuideViews_mB8F9EC805D1B751E6AF4EE2FA9DEDDF99CC996BF (VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -27923,7 +27923,7 @@ IL_0097:
 		return L_25;
 	}
 }
-// Method Definition Index: 107488
+// Method Definition Index: 103667
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuModelTargetObserver_get_ActiveGuideViewName_mAD0FF4FA0D72C432635C6ED68345B1BA971581B7 (VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -27956,7 +27956,7 @@ IL_0011:
 		return L_3;
 	}
 }
-// Method Definition Index: 107489
+// Method Definition Index: 103668
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuModelTargetObserver_get_AvailableStates_mA494794FA18055E7B5B9AC3D0D1B62E5A5E4A4E7 (VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -28087,7 +28087,7 @@ IL_0068:
 		return L_19;
 	}
 }
-// Method Definition Index: 107490
+// Method Definition Index: 103669
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuModelTargetObserver_get_ActiveStateName_m0EAA3C3A12F6F6FAB6535ABF8ABD43206E47137B (VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -28106,7 +28106,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuModelTargetObserver_get_ActiveSta
 		return L_2;
 	}
 }
-// Method Definition Index: 107491
+// Method Definition Index: 103670
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuModelTargetObserver_get_IsAdvanced_mFE76EE47416B23FC2F9D1E65F4583D3A80FF80BF (VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F* __this, const RuntimeMethod* method) 
 {
 	{
@@ -28118,7 +28118,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuModelTargetObserver_get_IsAdvanced_mFE
 		return L_2;
 	}
 }
-// Method Definition Index: 107492
+// Method Definition Index: 103671
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuModelTargetObserver_Reset_m889F137CB10D70F14D84C28331B7E3A972D65A2A (VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F* __this, const RuntimeMethod* method) 
 {
 	{
@@ -28130,7 +28130,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuModelTargetObserver_Reset_m889F137CB10
 		return L_2;
 	}
 }
-// Method Definition Index: 107493
+// Method Definition Index: 103672
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F* VuModelTargetObserver_Create_m3D502BABB5EDA887E29F11BA42E727980B578F50 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, VuModelTargetConfig_tC75BF231CA68EB68D8F36200C4B117222DF72A51* ___1_config, int32_t* ___2_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -28170,7 +28170,7 @@ IL_001d:
 		return (VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F*)NULL;
 	}
 }
-// Method Definition Index: 107494
+// Method Definition Index: 103673
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F* VuModelTargetObserver_Create_mB18A4900FD210346447BFFCEDEC90290AFEC2D0E (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, VuModelTargetBufferConfig_t24E09804D10DF2793D4BFB284914A7A7C0035EDC* ___1_config, int32_t* ___2_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -28210,7 +28210,7 @@ IL_001d:
 		return (VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F*)NULL;
 	}
 }
-// Method Definition Index: 107495
+// Method Definition Index: 103674
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuModelTargetObserver__ctor_m887357AECA03A4E9CD840E28FD02A6B05C034D47 (VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F* __this, VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, intptr_t ___1_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -28220,7 +28220,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuModelTargetObserver__ctor_m887357AECA0
 		return;
 	}
 }
-// Method Definition Index: 107496
+// Method Definition Index: 103675
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuModelTargetObserver_Dispose_m2B0E8B54F3A4E57890D3BA57DEE3D89A3557F814 (VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F* __this, bool ___0_disposing, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -28326,7 +28326,7 @@ IL_0047:
 		return;
 	}
 }
-// Method Definition Index: 107497
+// Method Definition Index: 103676
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuModelTargetObserver_SetTargetScale_m74A8D85538C9B4FEA83A162D13D6757F5EF6DF8C (VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F* __this, float ___0_scale, const RuntimeMethod* method) 
 {
 	{
@@ -28339,7 +28339,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuModelTargetObserver_SetTargetScale_m74
 		return L_3;
 	}
 }
-// Method Definition Index: 107498
+// Method Definition Index: 103677
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuModelTargetObserver_SetTrackingOptimization_m610D2A2A61D96D743C11D67C05B67781511D200A (VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F* __this, int32_t ___0_optimization, const RuntimeMethod* method) 
 {
 	{
@@ -28352,7 +28352,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuModelTargetObserver_SetTrackingOptimiz
 		return L_3;
 	}
 }
-// Method Definition Index: 107499
+// Method Definition Index: 103678
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuModelTargetObserver_SetActiveGuideViewName_m4F9DD1CE2008F850460F12B1226A30CC7A25798B (VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F* __this, String_t* ___0_name, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -28406,7 +28406,7 @@ IL_0022:
 		return L_7;
 	}
 }
-// Method Definition Index: 107500
+// Method Definition Index: 103679
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuModelTargetObserver_SetActiveStateName_m5A1B489530F640C57168C6862568F38347C83AA8 (VuModelTargetObserver_tF9703A6C4A943C3D15532CAB5C5BFAB39ECAB05F* __this, String_t* ___0_name, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -28468,7 +28468,7 @@ IL_0022:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107507
+// Method Definition Index: 103686
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGuideView_vuGuideViewGetName_m43EBFE7CC913B5A06D1D8943258EA20F4DCA58B3 (intptr_t ___0_guideViewHandle, intptr_t* ___1_name, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -28490,7 +28490,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGuideView_vuGuideViewGetName_m43EBF
 
 	return returnValue;
 }
-// Method Definition Index: 107508
+// Method Definition Index: 103687
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGuideView_vuGuideViewGetIntrinsics_m3531378B57AF4D714A71B38A163500C5385DD1DE (intptr_t ___0_guideViewHandle, Internal_t7138D8451AA79A2CA363C5F85C9E358C21F66652* ___1_cameraIntrinsics, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, Internal_t7138D8451AA79A2CA363C5F85C9E358C21F66652*);
@@ -28512,7 +28512,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGuideView_vuGuideViewGetIntrinsics_
 
 	return returnValue;
 }
-// Method Definition Index: 107509
+// Method Definition Index: 103688
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGuideView_vuGuideViewGetPose_m122C67F2547FDE47DEA60B78BAF0E0C8D3377EBE (intptr_t ___0_guideViewHandle, VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6* ___1_pose, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6*);
@@ -28534,7 +28534,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGuideView_vuGuideViewGetPose_m122C6
 
 	return returnValue;
 }
-// Method Definition Index: 107510
+// Method Definition Index: 103689
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGuideView_vuGuideViewSetPose_m49A07801F6033B242531891C44676D5B8664655B (intptr_t ___0_guideViewHandle, VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6* ___1_pose, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6*);
@@ -28556,7 +28556,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGuideView_vuGuideViewSetPose_m49A07
 
 	return returnValue;
 }
-// Method Definition Index: 107511
+// Method Definition Index: 103690
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGuideView_vuGuideViewGetImage_m5DA799BA164CC73AF53263341D66D13019C94D01 (intptr_t ___0_guideViewHandle, intptr_t* ___1_image, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -28578,7 +28578,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGuideView_vuGuideViewGetImage_m5DA7
 
 	return returnValue;
 }
-// Method Definition Index: 107512
+// Method Definition Index: 103691
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGuideView_vuGuideViewIsImageOutdated_m17094EB2AC936153A252C36BED29B2948B0AC553 (intptr_t ___0_guideViewHandle, int32_t* ___1_outdated, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -28600,7 +28600,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGuideView_vuGuideViewIsImageOutdate
 
 	return returnValue;
 }
-// Method Definition Index: 107513
+// Method Definition Index: 103692
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuGuideView_get_NativeHandle_m0D5E9C894650B38FC31E76BE5E2D07BD795684BE (VuGuideView_t22784C893660E074220AD4496EE5D3CAE6A205E7* __this, const RuntimeMethod* method) 
 {
 	{
@@ -28608,7 +28608,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuGuideView_get_NativeHandle_m0D5E9C
 		return L_0;
 	}
 }
-// Method Definition Index: 107514
+// Method Definition Index: 103693
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuGuideView_get_Name_m7EE5DB7113D72F0C5EFA9C6006311E8ED9465E22 (VuGuideView_t22784C893660E074220AD4496EE5D3CAE6A205E7* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -28641,7 +28641,7 @@ IL_0017:
 		return (String_t*)NULL;
 	}
 }
-// Method Definition Index: 107515
+// Method Definition Index: 103694
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuGuideView_get_CameraIntrinsics_mDB12D24D1FDB7EEF70644DAB9DF73CC51C86A835 (VuGuideView_t22784C893660E074220AD4496EE5D3CAE6A205E7* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -28689,7 +28689,7 @@ IL_002e:
 		return L_6;
 	}
 }
-// Method Definition Index: 107516
+// Method Definition Index: 103695
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 VuGuideView_get_Pose_m93A9DDFD3F191B6690322F6239454F24C0D78C3F (VuGuideView_t22784C893660E074220AD4496EE5D3CAE6A205E7* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -28709,7 +28709,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30F
 		return L_2;
 	}
 }
-// Method Definition Index: 107517
+// Method Definition Index: 103696
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuGuideView_get_Image_m0E553E4B1AC2CAC6138F69E4D1DE788768194130 (VuGuideView_t22784C893660E074220AD4496EE5D3CAE6A205E7* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -28767,7 +28767,7 @@ IL_0037:
 		return L_7;
 	}
 }
-// Method Definition Index: 107518
+// Method Definition Index: 103697
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuGuideView_get_IsImageOutdated_m277AA6568E77B3B3C45703F9E7D58246312E6AD3 (VuGuideView_t22784C893660E074220AD4496EE5D3CAE6A205E7* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -28786,7 +28786,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuGuideView_get_IsImageOutdated_m277AA65
 		return L_2;
 	}
 }
-// Method Definition Index: 107519
+// Method Definition Index: 103698
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuGuideView_t22784C893660E074220AD4496EE5D3CAE6A205E7* VuGuideView_Create_m884F1DBEAB0F939B4E7226625D3DD27D67ED52B3 (intptr_t ___0_nativeHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -28802,7 +28802,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuGuideView_t22784C893660E074220AD4496EE5D3CA
 		return L_1;
 	}
 }
-// Method Definition Index: 107520
+// Method Definition Index: 103699
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGuideView__ctor_mE1C61E4DD985A2418CA0C95403CD6EBA39D39670 (VuGuideView_t22784C893660E074220AD4496EE5D3CAE6A205E7* __this, intptr_t ___0_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -28812,7 +28812,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGuideView__ctor_mE1C61E4DD985A2418CA0C
 		return;
 	}
 }
-// Method Definition Index: 107521
+// Method Definition Index: 103700
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGuideView_Finalize_m91178B1817AB14E525012875F68AF0E9715DC2CD (VuGuideView_t22784C893660E074220AD4496EE5D3CAE6A205E7* __this, const RuntimeMethod* method) 
 {
 	{
@@ -28841,7 +28841,7 @@ IL_0010:
 		return;
 	}
 }
-// Method Definition Index: 107522
+// Method Definition Index: 103701
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGuideView_Dispose_mE929B8E0FD4A7EEA338A3281FAF6F47E6968D24C (VuGuideView_t22784C893660E074220AD4496EE5D3CAE6A205E7* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -28857,7 +28857,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGuideView_Dispose_mE929B8E0FD4A7EEA338
 		return;
 	}
 }
-// Method Definition Index: 107523
+// Method Definition Index: 103702
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGuideView_Dispose_mFA778281D6A2363901A2D2878850C5E473D9519E (VuGuideView_t22784C893660E074220AD4496EE5D3CAE6A205E7* __this, bool ___0_disposing, const RuntimeMethod* method) 
 {
 	VuImage_t49A34202F052984691206C1BB87CCC42158BC341* G_B2_0 = NULL;
@@ -28902,7 +28902,7 @@ IL_0022:
 		return;
 	}
 }
-// Method Definition Index: 107524
+// Method Definition Index: 103703
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuGuideView_SetPose_m8B01F359798F2AC67311E2D59C4C53064C97C613 (VuGuideView_t22784C893660E074220AD4496EE5D3CAE6A205E7* __this, VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 ___0_pose, const RuntimeMethod* method) 
 {
 	bool G_B5_0 = false;
@@ -28970,7 +28970,7 @@ IL_002d:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107525
+// Method Definition Index: 103704
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGuideViewList_vuGuideViewListCreate_mFAC22025E331787AA29DA937CD361D79EAFB4F36 (intptr_t* ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*);
@@ -28992,7 +28992,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGuideViewList_vuGuideViewListCreate
 
 	return returnValue;
 }
-// Method Definition Index: 107526
+// Method Definition Index: 103705
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGuideViewList_vuGuideViewListGetSize_m9BC24058C7F14CE1DF912F212B9B1E4B99FE9330 (intptr_t ___0_listHandle, int32_t* ___1_size, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -29014,7 +29014,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGuideViewList_vuGuideViewListGetSiz
 
 	return returnValue;
 }
-// Method Definition Index: 107527
+// Method Definition Index: 103706
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGuideViewList_vuGuideViewListGetElement_m123158C0D05F03C49E4492A882D93DD57B18C8F9 (intptr_t ___0_listHandle, int32_t ___1_element, intptr_t* ___2_observationHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t, intptr_t*);
@@ -29036,7 +29036,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGuideViewList_vuGuideViewListGetEle
 
 	return returnValue;
 }
-// Method Definition Index: 107528
+// Method Definition Index: 103707
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGuideViewList_vuGuideViewListDestroy_m36C2FDF8D45F3CD6D4E86C4BC95961DEBCA090EE (intptr_t ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -29058,7 +29058,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGuideViewList_vuGuideViewListDestro
 
 	return returnValue;
 }
-// Method Definition Index: 107529
+// Method Definition Index: 103708
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGuideViewList__ctor_mEC6B4C7616B0B1A65B1206739CCB10972564D994 (VuGuideViewList_tE81B414CDF9EA72559153A58E1716FB32E379BF6* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -29088,7 +29088,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGuideViewList__ctor_mEC6B4C7616B0B1A65
 		return;
 	}
 }
-// Method Definition Index: 107530
+// Method Definition Index: 103709
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuGuideView_t22784C893660E074220AD4496EE5D3CAE6A205E7* VuGuideViewList_GetElement_mFBF569C408A89D9B3BC0FF4C43CEC24D0B8EBBCD (VuGuideViewList_tE81B414CDF9EA72559153A58E1716FB32E379BF6* __this, intptr_t ___0_nativeElement, const RuntimeMethod* method) 
 {
 	{
@@ -29134,7 +29134,7 @@ IL2CPP_EXTERN_C void VuModelTargetStateInfo_t9B26867D304B04B7A64BDD5F340CA2BFA37
 	il2cpp_codegen_marshal_free_bstring(marshaled.___StateName);
 	marshaled.___StateName = NULL;
 }
-// Method Definition Index: 107531
+// Method Definition Index: 103710
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuModelTargetStateInfo__ctor_m941B6D72E5528DE18E2F43378681BB33511A525F (VuModelTargetStateInfo_t9B26867D304B04B7A64BDD5F340CA2BFA372F117* __this, Internal_tC39EF96EA6E743D30BC0AA0AC43D892DAC293461 ___0_info, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -29177,7 +29177,7 @@ IL2CPP_EXTERN_C  void VuModelTargetStateInfo__ctor_m941B6D72E5528DE18E2F43378681
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107532
+// Method Definition Index: 103711
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetStateInfoList_vuModelTargetStateInfoListCreate_mB3875A55A9AC750E9E698FB8F547E17D75098E19 (intptr_t* ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*);
@@ -29199,7 +29199,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetStateInfoList_vuModelTar
 
 	return returnValue;
 }
-// Method Definition Index: 107533
+// Method Definition Index: 103712
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetStateInfoList_vuModelTargetStateInfoListGetSize_m2646CEEB6BC86E8D9EE5092102C46BBEA399C511 (intptr_t ___0_listHandle, int32_t* ___1_size, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -29221,7 +29221,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetStateInfoList_vuModelTar
 
 	return returnValue;
 }
-// Method Definition Index: 107534
+// Method Definition Index: 103713
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetStateInfoList_vuModelTargetStateInfoListGetElement_m4F0C653C9C4E922E96EEAF247757531132B42F69 (intptr_t ___0_listHandle, int32_t ___1_element, Internal_tC39EF96EA6E743D30BC0AA0AC43D892DAC293461* ___2_stateInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t, Internal_tC39EF96EA6E743D30BC0AA0AC43D892DAC293461*);
@@ -29243,7 +29243,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetStateInfoList_vuModelTar
 
 	return returnValue;
 }
-// Method Definition Index: 107535
+// Method Definition Index: 103714
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetStateInfoList_vuModelTargetStateInfoListDestroy_m9492F21104366F7F2419DAD3C5AC5FC8EE4B0493 (intptr_t ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -29265,7 +29265,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetStateInfoList_vuModelTar
 
 	return returnValue;
 }
-// Method Definition Index: 107536
+// Method Definition Index: 103715
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuModelTargetStateInfoList__ctor_mF8D7969A640DBF8951096A0B235C7F521000AC0B (VuModelTargetStateInfoList_tAB4BA282BA49F4A0DE5C754225C3654737AD8BA3* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -29295,7 +29295,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuModelTargetStateInfoList__ctor_mF8D796
 		return;
 	}
 }
-// Method Definition Index: 107537
+// Method Definition Index: 103716
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuModelTargetStateInfo_t9B26867D304B04B7A64BDD5F340CA2BFA372F117 VuModelTargetStateInfoList_GetElement_m5EEAFFD4873A076359B47BDFB6DD1034BDA9DC98 (VuModelTargetStateInfoList_tAB4BA282BA49F4A0DE5C754225C3654737AD8BA3* __this, Internal_tC39EF96EA6E743D30BC0AA0AC43D892DAC293461 ___0_info, const RuntimeMethod* method) 
 {
 	{
@@ -29418,7 +29418,7 @@ IL2CPP_EXTERN_C void VuModelTargetObservationTargetInfo_tD46229257539FC5D4D8C13E
 	il2cpp_codegen_marshal_free_bstring(marshaled.___activeStateName);
 	marshaled.___activeStateName = NULL;
 }
-// Method Definition Index: 107538
+// Method Definition Index: 103717
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObservationTargetInfo_vuModelTargetObservationGetTargetInfo_m06CAD0C6BD2CBFEAF06B4D52613832F5CC8EADD9 (intptr_t ___0_observation, Internal_t61F6592B5F3C9CCF0CEF5942D376E6E7B6B97815* ___1_targetInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, Internal_t61F6592B5F3C9CCF0CEF5942D376E6E7B6B97815*);
@@ -29440,7 +29440,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObservationTargetInfo_vu
 
 	return returnValue;
 }
-// Method Definition Index: 107539
+// Method Definition Index: 103718
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuModelTargetObservationTargetInfo_tD46229257539FC5D4D8C13E82B31A2F6E2C1BA0D VuModelTargetObservationTargetInfo_Create_mFF799573198F588BCE42018AE4938AF41421E29B (intptr_t ___0_observationHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -29556,7 +29556,7 @@ IL2CPP_EXTERN_C void VuModelTargetObservationStateInfo_t666552B708DC28D2B4403221
 	il2cpp_codegen_marshal_free_bstring(marshaled.___stateName);
 	marshaled.___stateName = NULL;
 }
-// Method Definition Index: 107540
+// Method Definition Index: 103719
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObservationStateInfo_vuModelTargetObservationGetStateInfo_mA98DE4B67FCD4168CE69B2906F1D533BB713C6F5 (intptr_t ___0_observation, Internal_t36421AB45E313096130AC9E17BB8E376EC20B3E5* ___1_stateInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, Internal_t36421AB45E313096130AC9E17BB8E376EC20B3E5*);
@@ -29578,7 +29578,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObservationStateInfo_vuM
 
 	return returnValue;
 }
-// Method Definition Index: 107541
+// Method Definition Index: 103720
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuModelTargetObservationStateInfo_t666552B708DC28D2B4403221691C349801D49539 VuModelTargetObservationStateInfo_Create_m1D9EF598B1E5A18EE3FEA965DB66136E829D5E07 (intptr_t ___0_observationHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -29636,7 +29636,7 @@ IL_0015:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107545
+// Method Definition Index: 103724
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObservation_vuModelTargetObservationGetStatusInfo_mEBA4EEF838D28182A4DDDE85AEA38D82765C4FDD (intptr_t ___0_observation, int32_t* ___1_statusInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -29658,7 +29658,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObservation_vuModelTarge
 
 	return returnValue;
 }
-// Method Definition Index: 107546
+// Method Definition Index: 103725
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObservation_get_StatusInfo_mA07F0A86FFF954E8A25D20D1937D7035612037C5 (VuModelTargetObservation_t1B913DE0CF8A82CD29127F487B9F145467DA56EB* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -29678,7 +29678,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuModelTargetObservation_get_StatusIn
 		return L_2;
 	}
 }
-// Method Definition Index: 107547
+// Method Definition Index: 103726
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuModelTargetObservationTargetInfo_tD46229257539FC5D4D8C13E82B31A2F6E2C1BA0D VuModelTargetObservation_get_TargetInfo_mF95442AC0A2370F8E03DA6D9BF7DD24B25952463 (VuModelTargetObservation_t1B913DE0CF8A82CD29127F487B9F145467DA56EB* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -29698,7 +29698,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuModelTargetObservationTargetInfo_tD46229257
 		return L_2;
 	}
 }
-// Method Definition Index: 107548
+// Method Definition Index: 103727
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuModelTargetObservationStateInfo_t666552B708DC28D2B4403221691C349801D49539 VuModelTargetObservation_get_StateInfo_mC7BD87FAE920E65C55BFD2C182514FB7515F9F87 (VuModelTargetObservation_t1B913DE0CF8A82CD29127F487B9F145467DA56EB* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -29718,7 +29718,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuModelTargetObservationStateInfo_t666552B708
 		return L_2;
 	}
 }
-// Method Definition Index: 107549
+// Method Definition Index: 103728
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuModelTargetObservation__ctor_mA963B37964C6A756E9271AD76C236AEB5AEFB3DB (VuModelTargetObservation_t1B913DE0CF8A82CD29127F487B9F145467DA56EB* __this, const RuntimeMethod* method) 
 {
 	{
@@ -29726,7 +29726,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuModelTargetObservation__ctor_mA963B379
 		return;
 	}
 }
-// Method Definition Index: 107550
+// Method Definition Index: 103729
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuModelTargetObservation_UnregisterObservation_mC546A074814A529386B9DD5BA2E0410B4C5D67B9 (VuModelTargetObservation_t1B913DE0CF8A82CD29127F487B9F145467DA56EB* __this, const RuntimeMethod* method) 
 {
 	{
@@ -29748,7 +29748,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuModelTargetObservation_UnregisterObser
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107551
+// Method Definition Index: 103730
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void MonoPInvokeCallbackAttribute__ctor_m292A9EEAEC8894B428FCF351FCE2E80643A3C753 (MonoPInvokeCallbackAttribute_tC49B7B91B20A707698C7813848D351012F6F9AF0* __this, Type_t* ___0_type, const RuntimeMethod* method) 
 {
 	{
@@ -29820,7 +29820,7 @@ IL2CPP_EXTERN_C void VuMultiTargetConfig_tE55C18544BB21521E6D0A49F562487D2296C69
 	il2cpp_codegen_marshal_free(marshaled.___targetName);
 	marshaled.___targetName = NULL;
 }
-// Method Definition Index: 107552
+// Method Definition Index: 103731
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuMultiTargetConfig_Clone_m75105C4554F78256E05CCE04C1375CF7B797C47F (VuMultiTargetConfig_tE55C18544BB21521E6D0A49F562487D2296C6981* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -29853,7 +29853,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuMultiTargetConfig_Clone_m751
 		return L_7;
 	}
 }
-// Method Definition Index: 107553
+// Method Definition Index: 103732
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMultiTargetConfig__ctor_m0B9E782ACF01E9A846763F8B6061FDFB2AD2F281 (VuMultiTargetConfig_tE55C18544BB21521E6D0A49F562487D2296C6981* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -29891,7 +29891,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMultiTargetConfig__ctor_m0B9E782ACF01E
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107560
+// Method Definition Index: 103739
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObserver_vuEngineCreateMultiTargetObserver_m5D2EB1E5D7BAEE2D70352812B953D1E3D9FC00C8 (intptr_t ___0_engineHandle, intptr_t* ___1_observerHandle, VuMultiTargetConfig_tE55C18544BB21521E6D0A49F562487D2296C6981* ___2_config, int32_t* ___3_errorCode, const RuntimeMethod* method) 
 {
 
@@ -29926,7 +29926,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObserver_vuEngineCreateM
 
 	return returnValue;
 }
-// Method Definition Index: 107561
+// Method Definition Index: 103740
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObserver_vuMultiTargetObserverGetTargetUniqueId_m8FBDB4A339C3F7B316122B14D5681A81BEB3ED0A (intptr_t ___0_observerHandle, intptr_t* ___1_targetId, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -29948,7 +29948,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObserver_vuMultiTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107562
+// Method Definition Index: 103741
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObserver_vuMultiTargetObserverGetTargetName_m348F73F7B35155CE7E94406C07C93936D4286889 (intptr_t ___0_observerHandle, intptr_t* ___1_targetName, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -29970,7 +29970,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObserver_vuMultiTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107563
+// Method Definition Index: 103742
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObserver_vuMultiTargetObserverGetTargetSize_mDB917A090D2A882F51CE8ABE42D5C64DC50093F1 (intptr_t ___0_observerHandle, VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5* ___1_targetSize, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5*);
@@ -29992,7 +29992,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObserver_vuMultiTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107564
+// Method Definition Index: 103743
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObserver_vuMultiTargetObserverGetAABB_mB4CF9D99212B2F75F9918E6E8A05A078905086DF (intptr_t ___0_observerHandle, VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F738* ___1_bbox, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F738*);
@@ -30014,7 +30014,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObserver_vuMultiTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107565
+// Method Definition Index: 103744
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObserver_vuMultiTargetObserverSetTrackingOptimization_m059DCFB13C93BE56569DCDCC44A2847478765E18 (intptr_t ___0_observerHandle, int32_t ___1_optimization, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -30036,7 +30036,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObserver_vuMultiTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107566
+// Method Definition Index: 103745
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObserver_vuMultiTargetObserverGetTrackingOptimization_m1F9BA35655F36C56ABE4DCA67526070353F41290 (intptr_t ___0_observerHandle, int32_t* ___1_optimization, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -30058,7 +30058,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObserver_vuMultiTargetOb
 
 	return returnValue;
 }
-// Method Definition Index: 107567
+// Method Definition Index: 103746
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuMultiTargetObserver_get_TargetUniqueID_m3E622FA8519E6C3E7CA31F760393F1E6197C236A (VuMultiTargetObserver_tDB76317B9B764BB8CC78159F5DC28CDAD9A83CB3* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -30077,7 +30077,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuMultiTargetObserver_get_TargetUni
 		return L_2;
 	}
 }
-// Method Definition Index: 107568
+// Method Definition Index: 103747
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuMultiTargetObserver_get_TargetName_m0A18D339825A1ADA1E69077B4F5459F4EEDBFC21 (VuMultiTargetObserver_tDB76317B9B764BB8CC78159F5DC28CDAD9A83CB3* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -30096,7 +30096,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuMultiTargetObserver_get_TargetNam
 		return L_2;
 	}
 }
-// Method Definition Index: 107569
+// Method Definition Index: 103748
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 VuMultiTargetObserver_get_TargetSize_m3E5424F6CA817D51E4D432AF7424B8224D2509B1 (VuMultiTargetObserver_tDB76317B9B764BB8CC78159F5DC28CDAD9A83CB3* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -30116,7 +30116,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B
 		return L_2;
 	}
 }
-// Method Definition Index: 107570
+// Method Definition Index: 103749
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F738 VuMultiTargetObserver_get_BoundingBox_m823D1C29B1B796EC68D5C2A162396A96A06BF023 (VuMultiTargetObserver_tDB76317B9B764BB8CC78159F5DC28CDAD9A83CB3* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -30136,7 +30136,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F
 		return L_2;
 	}
 }
-// Method Definition Index: 107571
+// Method Definition Index: 103750
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObserver_get_TrackingOptimization_m935019665D585D63955CF2A99239ABF914B2822B (VuMultiTargetObserver_tDB76317B9B764BB8CC78159F5DC28CDAD9A83CB3* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -30156,7 +30156,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObserver_get_TrackingOpt
 		return L_2;
 	}
 }
-// Method Definition Index: 107572
+// Method Definition Index: 103751
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMultiTargetObserver_tDB76317B9B764BB8CC78159F5DC28CDAD9A83CB3* VuMultiTargetObserver_Create_mCB4667335ADFB761C84E4664DDC095A51B2F2E6A (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, VuMultiTargetConfig_tE55C18544BB21521E6D0A49F562487D2296C6981* ___1_config, int32_t* ___2_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -30196,7 +30196,7 @@ IL_001d:
 		return (VuMultiTargetObserver_tDB76317B9B764BB8CC78159F5DC28CDAD9A83CB3*)NULL;
 	}
 }
-// Method Definition Index: 107573
+// Method Definition Index: 103752
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMultiTargetObserver__ctor_mF483E1DEF69F602B8A7A76ED4858A3170DAC14AC (VuMultiTargetObserver_tDB76317B9B764BB8CC78159F5DC28CDAD9A83CB3* __this, VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, intptr_t ___1_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -30206,7 +30206,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMultiTargetObserver__ctor_mF483E1DEF69
 		return;
 	}
 }
-// Method Definition Index: 107574
+// Method Definition Index: 103753
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuMultiTargetObserver_SetTrackingOptimization_m89FF7D2E1F139BFA0CE8E0093297FE43FF901DE1 (VuMultiTargetObserver_tDB76317B9B764BB8CC78159F5DC28CDAD9A83CB3* __this, int32_t ___0_optimization, const RuntimeMethod* method) 
 {
 	{
@@ -30293,7 +30293,7 @@ IL2CPP_EXTERN_C void VuMultiTargetObservationTargetInfo_t4D90ADE4A864D67940C51CC
 	il2cpp_codegen_marshal_free_bstring(marshaled.___name);
 	marshaled.___name = NULL;
 }
-// Method Definition Index: 107575
+// Method Definition Index: 103754
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObservationTargetInfo_vuMultiTargetObservationGetTargetInfo_m05EA85E26AFDF3CAFED1A2D086DC49A18C8DB40A (intptr_t ___0_observation, Internal_tBB9B17EB345AF1A9F0CE07AAF6AAB912FC686E52* ___1_targetInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, Internal_tBB9B17EB345AF1A9F0CE07AAF6AAB912FC686E52*);
@@ -30315,7 +30315,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObservationTargetInfo_vu
 
 	return returnValue;
 }
-// Method Definition Index: 107576
+// Method Definition Index: 103755
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMultiTargetObservationTargetInfo_t4D90ADE4A864D67940C51CC53BDAB37B9299A7FA VuMultiTargetObservationTargetInfo_Create_mDA7884F7422C0BB873970F0331718F8BD5BFC993 (intptr_t ___0_observationHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -30382,7 +30382,7 @@ IL_0015:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107579
+// Method Definition Index: 103758
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObservation_vuMultiTargetObservationGetStatusInfo_mDB596B36209F582E9D580807A860AB045C836789 (intptr_t ___0_observation, int32_t* ___1_statusInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -30404,7 +30404,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObservation_vuMultiTarge
 
 	return returnValue;
 }
-// Method Definition Index: 107580
+// Method Definition Index: 103759
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObservation_get_StatusInfo_mCF2F14E80298258A4CB4F34D65812C4D5F3B4ED5 (VuMultiTargetObservation_t3CB6ACB75EC3BCD48905A46006F77FDFC02DB333* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -30424,7 +30424,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMultiTargetObservation_get_StatusIn
 		return L_2;
 	}
 }
-// Method Definition Index: 107581
+// Method Definition Index: 103760
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMultiTargetObservationTargetInfo_t4D90ADE4A864D67940C51CC53BDAB37B9299A7FA VuMultiTargetObservation_get_TargetInfo_mC5233CCFDDCF0881D52D61AE620B17C2F7D3CC94 (VuMultiTargetObservation_t3CB6ACB75EC3BCD48905A46006F77FDFC02DB333* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -30444,7 +30444,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMultiTargetObservationTargetInfo_t4D90ADE4A
 		return L_2;
 	}
 }
-// Method Definition Index: 107582
+// Method Definition Index: 103761
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMultiTargetObservation__ctor_mA88A7F59CAE3097F1C27162A8DB9A4F90C15209D (VuMultiTargetObservation_t3CB6ACB75EC3BCD48905A46006F77FDFC02DB333* __this, const RuntimeMethod* method) 
 {
 	{
@@ -30452,7 +30452,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMultiTargetObservation__ctor_mA88A7F59
 		return;
 	}
 }
-// Method Definition Index: 107583
+// Method Definition Index: 103762
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMultiTargetObservation_UnregisterObservation_m0518351265ED2412F9E32E2A30F995F0CD88BA54 (VuMultiTargetObservation_t3CB6ACB75EC3BCD48905A46006F77FDFC02DB333* __this, const RuntimeMethod* method) 
 {
 	{
@@ -30472,7 +30472,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMultiTargetObservation_UnregisterObser
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107601
+// Method Definition Index: 103780
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void ObservationManager__ctor_mD7C0E51F2B4717B1B9AD3EF061D7257117EDB792 (ObservationManager_t99938AFA7E9803564F4E20B3E0B9BB3B0C0E251C* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31065,7 +31065,7 @@ IL_027d:
 		return;
 	}
 }
-// Method Definition Index: 107602
+// Method Definition Index: 103781
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void ObservationManager_Dispose_m45933E0432E69391D374DB5B51CFEBC5D02EE682 (ObservationManager_t99938AFA7E9803564F4E20B3E0B9BB3B0C0E251C* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31148,7 +31148,7 @@ IL_003b:
 		return;
 	}
 }
-// Method Definition Index: 107603
+// Method Definition Index: 103782
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuObservation_tF3C656C117A5A9B97D03528A95D6C91587107631* ObservationManager_RegisterObservation_mF16164FAEA7E9F9115620088C3BC3B2BA5DD6F6B (ObservationManager_t99938AFA7E9803564F4E20B3E0B9BB3B0C0E251C* __this, intptr_t ___0_nativeHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31179,7 +31179,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuObservation_tF3C656C117A5A9B97D03528A95D6C9
 		return L_6;
 	}
 }
-// Method Definition Index: 107604
+// Method Definition Index: 103783
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void ObservationManager_UnregisterObservation_mC99FFA546CC509AB650587CAF097530B05BFDD4E (ObservationManager_t99938AFA7E9803564F4E20B3E0B9BB3B0C0E251C* __this, VuObservation_tF3C656C117A5A9B97D03528A95D6C91587107631* ___0_observation, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31215,7 +31215,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void ObservationManager_UnregisterObservation
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107613
+// Method Definition Index: 103792
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void U3CU3Ec__cctor_mECDD2B57C1F1130BAB5F40EBF7500409E84228BF (const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31232,7 +31232,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void U3CU3Ec__cctor_mECDD2B57C1F1130BAB5F40EB
 		return;
 	}
 }
-// Method Definition Index: 107614
+// Method Definition Index: 103793
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void U3CU3Ec__ctor_mEC08503B50954E0AC851000920170BF9A950F96E (U3CU3Ec_tBA4A06FB3057AE7FCB174D5F92BDB7E507CA30D2* __this, const RuntimeMethod* method) 
 {
 	{
@@ -31240,7 +31240,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void U3CU3Ec__ctor_mEC08503B50954E0AC85100092
 		return;
 	}
 }
-// Method Definition Index: 107615
+// Method Definition Index: 103794
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuImageTargetObservation_t3AB4605AD101E5AF1E276886E3652A49694AE43E* U3CU3Ec_U3C_ctorU3Eb__3_0_m0CAB4684A28DC3D286435895118D1FB2EA823E92 (U3CU3Ec_tBA4A06FB3057AE7FCB174D5F92BDB7E507CA30D2* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31255,7 +31255,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuImageTargetObservation_t3AB4605AD101E5AF1E2
 		return L_0;
 	}
 }
-// Method Definition Index: 107616
+// Method Definition Index: 103795
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuCylinderTargetObservation_t7FA677F5EB72D8BC3FE94DD637B034B2DF305026* U3CU3Ec_U3C_ctorU3Eb__3_1_m9DC94FD7DE36393AC75974C1F4364315BF197240 (U3CU3Ec_tBA4A06FB3057AE7FCB174D5F92BDB7E507CA30D2* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31270,7 +31270,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuCylinderTargetObservation_t7FA677F5EB72D8BC
 		return L_0;
 	}
 }
-// Method Definition Index: 107617
+// Method Definition Index: 103796
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMultiTargetObservation_t3CB6ACB75EC3BCD48905A46006F77FDFC02DB333* U3CU3Ec_U3C_ctorU3Eb__3_2_mDFB507FDE3AA99C4915A9DC0C336EB83E05D494A (U3CU3Ec_tBA4A06FB3057AE7FCB174D5F92BDB7E507CA30D2* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31285,7 +31285,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMultiTargetObservation_t3CB6ACB75EC3BCD4890
 		return L_0;
 	}
 }
-// Method Definition Index: 107618
+// Method Definition Index: 103797
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMarkObservation_tEE285297DFDC63B5B046BAC5B7B428C0192BEF6D* U3CU3Ec_U3C_ctorU3Eb__3_3_mD80CA56E247E0A2B16014760BA94D8AC9E4CDFF1 (U3CU3Ec_tBA4A06FB3057AE7FCB174D5F92BDB7E507CA30D2* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31300,7 +31300,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMarkObservation_tEE285297DFDC63B5B046BAC5B7
 		return L_0;
 	}
 }
-// Method Definition Index: 107619
+// Method Definition Index: 103798
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuModelTargetObservation_t1B913DE0CF8A82CD29127F487B9F145467DA56EB* U3CU3Ec_U3C_ctorU3Eb__3_4_m5FC4357C82DD89D2CCC5A5FD20F36E324DE85286 (U3CU3Ec_tBA4A06FB3057AE7FCB174D5F92BDB7E507CA30D2* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31315,7 +31315,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuModelTargetObservation_t1B913DE0CF8A82CD291
 		return L_0;
 	}
 }
-// Method Definition Index: 107620
+// Method Definition Index: 103799
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAreaTargetObservation_t6C5F7FA1B5517CFC1B486BCD09C21B552B60C052* U3CU3Ec_U3C_ctorU3Eb__3_5_mEDD265928D0E7EECCEA73D896CE21BFE16513168 (U3CU3Ec_tBA4A06FB3057AE7FCB174D5F92BDB7E507CA30D2* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31330,7 +31330,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAreaTargetObservation_t6C5F7FA1B5517CFC1B48
 		return L_0;
 	}
 }
-// Method Definition Index: 107621
+// Method Definition Index: 103800
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuDevicePoseObservation_t19D1459DC0204F40658AA0AB08FCD3FA2BF9ED7E* U3CU3Ec_U3C_ctorU3Eb__3_6_m4DE6C9B33188BBBA3C137BA6DFD0C85B01B4EF16 (U3CU3Ec_tBA4A06FB3057AE7FCB174D5F92BDB7E507CA30D2* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31345,7 +31345,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuDevicePoseObservation_t19D1459DC0204F40658A
 		return L_0;
 	}
 }
-// Method Definition Index: 107622
+// Method Definition Index: 103801
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAnchorObservation_tF6F1E740942499347743325836B52BD3202EAA48* U3CU3Ec_U3C_ctorU3Eb__3_7_m4894AEA1008F42AA4BDFD47148C40764DB8824F1 (U3CU3Ec_tBA4A06FB3057AE7FCB174D5F92BDB7E507CA30D2* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31360,7 +31360,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAnchorObservation_tF6F1E7409424993477433258
 		return L_0;
 	}
 }
-// Method Definition Index: 107623
+// Method Definition Index: 103802
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuCloudImageTargetObservation_tCB004D276110D8489760FF0357EE0D0F22BD8930* U3CU3Ec_U3C_ctorU3Eb__3_8_m102C0322474DC9E2D7D39CD9AB2BA2832875577C (U3CU3Ec_tBA4A06FB3057AE7FCB174D5F92BDB7E507CA30D2* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31375,7 +31375,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuCloudImageTargetObservation_tCB004D276110D8
 		return L_0;
 	}
 }
-// Method Definition Index: 107624
+// Method Definition Index: 103803
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuIlluminationObservation_t5FFE93C224D9B05EE788DABD93C179B56339C766* U3CU3Ec_U3C_ctorU3Eb__3_9_mBB027480AF51C04CA60D657F81C9F664251B7AE9 (U3CU3Ec_tBA4A06FB3057AE7FCB174D5F92BDB7E507CA30D2* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31390,7 +31390,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuIlluminationObservation_t5FFE93C224D9B05EE7
 		return L_0;
 	}
 }
-// Method Definition Index: 107625
+// Method Definition Index: 103804
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuValidationAreaObservation_t62F283EEC2923949690C4660DB8BEA67D9B6E2A6* U3CU3Ec_U3C_ctorU3Eb__3_10_m0495B153C304C411F0885F4517597AC020074527 (U3CU3Ec_tBA4A06FB3057AE7FCB174D5F92BDB7E507CA30D2* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31405,7 +31405,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuValidationAreaObservation_t62F283EEC2923949
 		return L_0;
 	}
 }
-// Method Definition Index: 107626
+// Method Definition Index: 103805
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMeshObservation_t5039E4475600A15ABA41B845D2757C3BFC535D79* U3CU3Ec_U3C_ctorU3Eb__3_11_m3EC1F4DFDCD608E215C9FC724F2FC2D82A26EC5A (U3CU3Ec_tBA4A06FB3057AE7FCB174D5F92BDB7E507CA30D2* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31420,7 +31420,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMeshObservation_t5039E4475600A15ABA41B845D2
 		return L_0;
 	}
 }
-// Method Definition Index: 107627
+// Method Definition Index: 103806
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuBarcodeObservation_t41BAEE3EF4C17E5A612ED2B497A97002D3C20381* U3CU3Ec_U3C_ctorU3Eb__3_12_mC3B3BF5A50793C2EAEC7DD7188C23ECC9FE7870D (U3CU3Ec_tBA4A06FB3057AE7FCB174D5F92BDB7E507CA30D2* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31451,7 +31451,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuBarcodeObservation_t41BAEE3EF4C17E5A612ED2B
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107633
+// Method Definition Index: 103812
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObserver_vuObserverGetId_mC289123933F84503B433BDCD1811B9772CFD0D84 (intptr_t ___0_observerHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -31473,7 +31473,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObserver_vuObserverGetId_mC28912393
 
 	return returnValue;
 }
-// Method Definition Index: 107634
+// Method Definition Index: 103813
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObserver_vuObserverGetType_m323F855E6BD1824944A0ABDADB974ECFD8FBF346 (intptr_t ___0_observerHandle, int32_t* ___1_type, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -31495,7 +31495,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObserver_vuObserverGetType_m323F855
 
 	return returnValue;
 }
-// Method Definition Index: 107635
+// Method Definition Index: 103814
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObserver_vuObserverIsActivated_m0D4EC3A23973F240256FD9B13ACFF8F4E450804D (intptr_t ___0_observerHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -31517,7 +31517,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObserver_vuObserverIsActivated_m0D4
 
 	return returnValue;
 }
-// Method Definition Index: 107636
+// Method Definition Index: 103815
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObserver_vuObserverActivate_mA56112A5AB98924CE9132A25B4A4F4BFDD57F1D6 (intptr_t ___0_observerHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -31539,7 +31539,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObserver_vuObserverActivate_mA56112
 
 	return returnValue;
 }
-// Method Definition Index: 107637
+// Method Definition Index: 103816
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObserver_vuObserverDeactivate_mCC7FF226E94693DA57740552CA5F68515ACCDB70 (intptr_t ___0_observerHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -31561,7 +31561,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObserver_vuObserverDeactivate_mCC7F
 
 	return returnValue;
 }
-// Method Definition Index: 107638
+// Method Definition Index: 103817
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObserver_vuObserverDestroy_mF7364EB9BFE1314E26BD8C4C1AA6356C4D207D91 (intptr_t ___0_observer, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -31583,7 +31583,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObserver_vuObserverDestroy_mF7364EB
 
 	return returnValue;
 }
-// Method Definition Index: 107639
+// Method Definition Index: 103818
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuObserver_get_NativeHandle_m0DF9843ED5DCA1A40CD3A38E73C34795D6B68642 (VuObserver_t90742BFE20A846DDA5C7064512EC0D4C4B0F0B80* __this, const RuntimeMethod* method) 
 {
 	{
@@ -31591,7 +31591,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuObserver_get_NativeHandle_m0DF9843
 		return L_0;
 	}
 }
-// Method Definition Index: 107640
+// Method Definition Index: 103819
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObserver_get_Id_mA8C3FE4D8F2844C66CBB6C24EF14024B0EC44042 (VuObserver_t90742BFE20A846DDA5C7064512EC0D4C4B0F0B80* __this, const RuntimeMethod* method) 
 {
 	{
@@ -31599,7 +31599,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObserver_get_Id_mA8C3FE4D8F2844C66C
 		return L_0;
 	}
 }
-// Method Definition Index: 107641
+// Method Definition Index: 103820
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObserver_get_ObserverType_m46FEEB329D2E704D04ED9A4E25E6B9066D338C95 (VuObserver_t90742BFE20A846DDA5C7064512EC0D4C4B0F0B80* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31619,7 +31619,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObserver_get_ObserverType_m46FEEB32
 		return L_2;
 	}
 }
-// Method Definition Index: 107642
+// Method Definition Index: 103821
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuObserver_get_Activated_m9E890C4E44890E4C07AA2102B12867900F0F9296 (VuObserver_t90742BFE20A846DDA5C7064512EC0D4C4B0F0B80* __this, const RuntimeMethod* method) 
 {
 	{
@@ -31631,7 +31631,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuObserver_get_Activated_m9E890C4E44890E
 		return L_2;
 	}
 }
-// Method Definition Index: 107643
+// Method Definition Index: 103822
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObserver__ctor_m14A92E7A2530C86E878562CFC19EC42D65112112 (VuObserver_t90742BFE20A846DDA5C7064512EC0D4C4B0F0B80* __this, VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, intptr_t ___1_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -31651,7 +31651,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObserver__ctor_m14A92E7A2530C86E878562
 		return;
 	}
 }
-// Method Definition Index: 107644
+// Method Definition Index: 103823
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObserver_Finalize_m88668DBC8CEA2E479C84AA0DD9874840C071312E (VuObserver_t90742BFE20A846DDA5C7064512EC0D4C4B0F0B80* __this, const RuntimeMethod* method) 
 {
 	{
@@ -31680,7 +31680,7 @@ IL_0010:
 		return;
 	}
 }
-// Method Definition Index: 107645
+// Method Definition Index: 103824
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObserver_Dispose_m0029224E592A47AF397497DFAC7EC1EC4E028547 (VuObserver_t90742BFE20A846DDA5C7064512EC0D4C4B0F0B80* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31696,7 +31696,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObserver_Dispose_m0029224E592A47AF3974
 		return;
 	}
 }
-// Method Definition Index: 107646
+// Method Definition Index: 103825
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObserver_Dispose_m3DAD264FB8C2458D761FD024F21A5376CFA0A268 (VuObserver_t90742BFE20A846DDA5C7064512EC0D4C4B0F0B80* __this, bool ___0_disposing, const RuntimeMethod* method) 
 {
 	{
@@ -31724,7 +31724,7 @@ IL_0013:
 		return;
 	}
 }
-// Method Definition Index: 107647
+// Method Definition Index: 103826
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuObserver_Activate_mB3EE3FD495580E8F84AE8B8BF4C4DAD5BF3F8856 (VuObserver_t90742BFE20A846DDA5C7064512EC0D4C4B0F0B80* __this, const RuntimeMethod* method) 
 {
 	{
@@ -31736,7 +31736,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuObserver_Activate_mB3EE3FD495580E8F84A
 		return L_2;
 	}
 }
-// Method Definition Index: 107648
+// Method Definition Index: 103827
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuObserver_Deactivate_mA5D6645A5F85F372E2FBA435857C65449F20C8B9 (VuObserver_t90742BFE20A846DDA5C7064512EC0D4C4B0F0B80* __this, const RuntimeMethod* method) 
 {
 	{
@@ -31780,7 +31780,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuObserver_Deactivate_mA5D6645A5F85F372E
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107652
+// Method Definition Index: 103831
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObservation_vuObservationGetType_mC1E8FDE337C36E926A59B6D03DC07D5AC71EC6C5 (intptr_t ___0_observation, int32_t* ___1_observationType, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -31802,7 +31802,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObservation_vuObservationGetType_mC
 
 	return returnValue;
 }
-// Method Definition Index: 107653
+// Method Definition Index: 103832
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObservation_vuObservationGetObserverId_m48FAE9DA084B90778A73D0AAE35A54B8AF30513C (intptr_t ___0_observation, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -31824,7 +31824,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObservation_vuObservationGetObserve
 
 	return returnValue;
 }
-// Method Definition Index: 107654
+// Method Definition Index: 103833
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuObservation_get_NativeHandle_m2D08BF2A7AEA86F35765D87E4AF46542C0AA541F (VuObservation_tF3C656C117A5A9B97D03528A95D6C91587107631* __this, const RuntimeMethod* method) 
 {
 	{
@@ -31832,7 +31832,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuObservation_get_NativeHandle_m2D08
 		return L_0;
 	}
 }
-// Method Definition Index: 107655
+// Method Definition Index: 103834
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObservation_get_ObserverId_m3B012578A6260B048E2F6D2FD71EEF8736AFEFEE (VuObservation_tF3C656C117A5A9B97D03528A95D6C91587107631* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31870,7 +31870,7 @@ IL_0023:
 		return L_6;
 	}
 }
-// Method Definition Index: 107656
+// Method Definition Index: 103835
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObservation_get_ObservationType_m58DC771B5E963526D9FD48B27C764DE505FC2E63 (VuObservation_tF3C656C117A5A9B97D03528A95D6C91587107631* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31890,7 +31890,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObservation_get_ObservationType_m58
 		return L_2;
 	}
 }
-// Method Definition Index: 107657
+// Method Definition Index: 103836
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObservation_GetObservationType_m4770228627CDF25E2E443656101EBA80518FBF13 (intptr_t ___0_nativeHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -31910,7 +31910,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObservation_GetObservationType_m477
 		return L_2;
 	}
 }
-// Method Definition Index: 107658
+// Method Definition Index: 103837
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObservation__ctor_m81F1087E180A9B41AFAD882FCC0445D76E7E4B8C (VuObservation_tF3C656C117A5A9B97D03528A95D6C91587107631* __this, const RuntimeMethod* method) 
 {
 	{
@@ -31918,7 +31918,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObservation__ctor_m81F1087E180A9B41AFA
 		return;
 	}
 }
-// Method Definition Index: 107659
+// Method Definition Index: 103838
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObservation_RegisterObservation_mB7B47EE07C44AB1046C401C56606442BB7D1FAE6 (VuObservation_tF3C656C117A5A9B97D03528A95D6C91587107631* __this, intptr_t ___0_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -31927,7 +31927,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObservation_RegisterObservation_mB7B47
 		return;
 	}
 }
-// Method Definition Index: 107660
+// Method Definition Index: 103839
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObservation_UnregisterObservation_m141E1195B89A96D4DDCB00DC3E39B098A668BF66 (VuObservation_tF3C656C117A5A9B97D03528A95D6C91587107631* __this, const RuntimeMethod* method) 
 {
 	{
@@ -31937,7 +31937,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObservation_UnregisterObservation_m141
 		return;
 	}
 }
-// Method Definition Index: 107661
+// Method Definition Index: 103840
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObservation_Dispose_m7CBDC10CA0AAC412266D5C044F6B0027E9BA400E (VuObservation_tF3C656C117A5A9B97D03528A95D6C91587107631* __this, const RuntimeMethod* method) 
 {
 	{
@@ -31966,7 +31966,7 @@ IL_0018:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107668
+// Method Definition Index: 103847
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObservationWithPose_vuObservationGetPoseInfo_mAFB4982C2A96507379924D798B8BC26D34ABE58F (intptr_t ___0_observation, VuPoseInfo_tA45511F53B0CB7C75C0C4C0F6CD81A0F62F6BA7F* ___1_poseInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuPoseInfo_tA45511F53B0CB7C75C0C4C0F6CD81A0F62F6BA7F*);
@@ -31988,7 +31988,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObservationWithPose_vuObservationGe
 
 	return returnValue;
 }
-// Method Definition Index: 107669
+// Method Definition Index: 103848
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuPoseInfo_tA45511F53B0CB7C75C0C4C0F6CD81A0F62F6BA7F VuObservationWithPose_get_PoseInfo_mF34D1567C7B7AE099E16406AA4E3ABE8F4099598 (VuObservationWithPose_t7CB001702D2148903982E3FE5526303194BA19ED* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -32042,7 +32042,7 @@ IL_0033:
 		return L_8;
 	}
 }
-// Method Definition Index: 107670
+// Method Definition Index: 103849
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObservationWithPose__ctor_m17EC32281AF1EE6DCFF47420E850FD7321B29714 (VuObservationWithPose_t7CB001702D2148903982E3FE5526303194BA19ED* __this, const RuntimeMethod* method) 
 {
 	{
@@ -32050,7 +32050,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObservationWithPose__ctor_m17EC32281AF
 		return;
 	}
 }
-// Method Definition Index: 107671
+// Method Definition Index: 103850
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObservationWithPose_UnregisterObservation_mB0A5D31E2887F0F108B728AFDF83C3C043C716D8 (VuObservationWithPose_t7CB001702D2148903982E3FE5526303194BA19ED* __this, const RuntimeMethod* method) 
 {
 	{
@@ -32068,7 +32068,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObservationWithPose_UnregisterObservat
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107672
+// Method Definition Index: 103851
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObservationList_vuObservationListCreate_m3D28C1A2953213E460565E87E8076D5E9520E035 (intptr_t* ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*);
@@ -32090,7 +32090,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObservationList_vuObservationListCr
 
 	return returnValue;
 }
-// Method Definition Index: 107673
+// Method Definition Index: 103852
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObservationList_vuObservationListGetSize_m7B812968E3B8C18B59EC8733E604350F2F54B8C4 (intptr_t ___0_listHandle, int32_t* ___1_size, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -32112,7 +32112,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObservationList_vuObservationListGe
 
 	return returnValue;
 }
-// Method Definition Index: 107674
+// Method Definition Index: 103853
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObservationList_vuObservationListGetElement_mA321C04C1534B24A60FC0D28118003E5D8C8C41C (intptr_t ___0_listHandle, int32_t ___1_element, intptr_t* ___2_observationHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t, intptr_t*);
@@ -32134,7 +32134,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObservationList_vuObservationListGe
 
 	return returnValue;
 }
-// Method Definition Index: 107675
+// Method Definition Index: 103854
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObservationList_vuObservationListDestroy_mBA25200EB9F8BAA66A29D7841D263299EE32DD11 (intptr_t ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -32156,7 +32156,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuObservationList_vuObservationListDe
 
 	return returnValue;
 }
-// Method Definition Index: 107676
+// Method Definition Index: 103855
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObservationList__ctor_m845690DD73824E13318D7EF674558AAA728A6454 (VuObservationList_t20B399EFFCF0E69CE6B59AB8F90141D8169D6336* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -32186,7 +32186,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObservationList__ctor_m845690DD73824E1
 		return;
 	}
 }
-// Method Definition Index: 107677
+// Method Definition Index: 103856
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObservationList__ctor_m6C9FF1799253B96A6DE90EE5C572E9256433301B (VuObservationList_t20B399EFFCF0E69CE6B59AB8F90141D8169D6336* __this, intptr_t ___0_nativeHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -32241,7 +32241,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuObservationList__ctor_m6C9FF1799253B96
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107681
+// Method Definition Index: 103860
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuPlatformController_vuPlatformControllerSetViewOrientation_m54EF8BDBB54BE5C8CA71CF9088E34B6B1C18A409 (intptr_t ___0_controllerHandle, int32_t ___1_orientation, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -32263,7 +32263,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuPlatformController_vuPlatformContro
 
 	return returnValue;
 }
-// Method Definition Index: 107682
+// Method Definition Index: 103861
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuPlatformController_vuEngineGetPlatformController_mEF57F57AE85E05097778EFA6E781AF08680ECA98 (intptr_t ___0_engineHandle, intptr_t* ___1_controllerHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -32285,7 +32285,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuPlatformController_vuEngineGetPlatf
 
 	return returnValue;
 }
-// Method Definition Index: 107683
+// Method Definition Index: 103862
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuPlatformController_vuPlatformControllerGetFusionProviderType_m575A7D61B0005A7B0EBB441CA5DD311EAD6DBA7C (intptr_t ___0_controllerHandle, int32_t* ___1_fusionProvider, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -32307,7 +32307,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuPlatformController_vuPlatformContro
 
 	return returnValue;
 }
-// Method Definition Index: 107684
+// Method Definition Index: 103863
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuPlatformController_vuPlatformControllerGetFusionProviderPlatformType_m7628AF2F296200258A01C4BD67A3F6FD68323977 (intptr_t ___0_controllerHandle, int32_t* ___1_fusionProviderPlatformType, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -32329,7 +32329,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuPlatformController_vuPlatformContro
 
 	return returnValue;
 }
-// Method Definition Index: 107685
+// Method Definition Index: 103864
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuPlatformController_get_FusionProviderType_mEA3B2280BE22352654A27363994847B095D0EAB7 (VuPlatformController_t1DA222538DC38F980783BCDD4175626CC58F2513* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -32349,7 +32349,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuPlatformController_get_FusionProvid
 		return L_2;
 	}
 }
-// Method Definition Index: 107686
+// Method Definition Index: 103865
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Nullable_1_tE220A83C53526D8CC3425FCF74BEF53BE27D21BE VuPlatformController_get_FusionProviderPlatformType_m242FDCEEB998DDF86A4A6314C5697E4281D47FA8 (VuPlatformController_t1DA222538DC38F980783BCDD4175626CC58F2513* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -32390,7 +32390,7 @@ IL_0026:
 		return L_5;
 	}
 }
-// Method Definition Index: 107687
+// Method Definition Index: 103866
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuPlatformController_t1DA222538DC38F980783BCDD4175626CC58F2513* VuPlatformController_Create_mBCF8089BC4DA9B3C820FA54DDCDBB2A093C10C63 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -32428,7 +32428,7 @@ IL_001a:
 		return L_6;
 	}
 }
-// Method Definition Index: 107688
+// Method Definition Index: 103867
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuPlatformController__ctor_m8C49EC70D8483BEB417951414CD7E5102826F34C (VuPlatformController_t1DA222538DC38F980783BCDD4175626CC58F2513* __this, VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, intptr_t ___1_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -32438,7 +32438,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuPlatformController__ctor_m8C49EC70D848
 		return;
 	}
 }
-// Method Definition Index: 107689
+// Method Definition Index: 103868
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuPlatformController_SetViewOrientation_m81C0860C0A34D986D7DD8D7FB4DE3231801A9A8D (VuPlatformController_t1DA222538DC38F980783BCDD4175626CC58F2513* __this, int32_t ___0_orientation, const RuntimeMethod* method) 
 {
 	{
@@ -32499,7 +32499,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuPlatformController_SetViewOrientation_
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107696
+// Method Definition Index: 103875
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderController_vuEngineGetRenderController_m4E71991F2CCD2B94CB6AAECD629C78412A3A3D16 (intptr_t ___0_engineHandle, intptr_t* ___1_controllerHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -32521,7 +32521,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderController_vuEngineGetRenderC
 
 	return returnValue;
 }
-// Method Definition Index: 107697
+// Method Definition Index: 103876
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderController_vuRenderControllerSetRenderViewConfig_m54D079237EB9E48BC5A2A8D800DBD7A5116DCDBE (intptr_t ___0_controller, VuRenderViewConfig_tAD91EC607E172EB6B0A078BAFF577CC6DBC14863* ___1_renderViewConfig, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuRenderViewConfig_tAD91EC607E172EB6B0A078BAFF577CC6DBC14863*);
@@ -32543,7 +32543,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderController_vuRenderController
 
 	return returnValue;
 }
-// Method Definition Index: 107698
+// Method Definition Index: 103877
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderController_vuRenderControllerGetRenderViewConfig_m1D1EB6843E10966AAFBE7FEF0CBAFC2B6430E082 (intptr_t ___0_controllerHandle, VuRenderViewConfig_tAD91EC607E172EB6B0A078BAFF577CC6DBC14863* ___1_renderViewConfig, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuRenderViewConfig_tAD91EC607E172EB6B0A078BAFF577CC6DBC14863*);
@@ -32565,7 +32565,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderController_vuRenderController
 
 	return returnValue;
 }
-// Method Definition Index: 107699
+// Method Definition Index: 103878
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderController_vuRenderControllerGetVideoBackgroundViewport_m06364CD80513E96527622509588D9139F4E61A4A (intptr_t ___0_controllerHandle, VuVector4I_t65CC946069BFEBE6DD456EB5F64CB85088AC4155* ___1_vbViewport, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuVector4I_t65CC946069BFEBE6DD456EB5F64CB85088AC4155*);
@@ -32587,7 +32587,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderController_vuRenderController
 
 	return returnValue;
 }
-// Method Definition Index: 107700
+// Method Definition Index: 103879
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderController_vuRenderControllerSetVideoBackgroundViewport_m54A25983195FBC2088B36B7ADB28A817460ACAEC (intptr_t ___0_controllerHandle, VuVector4I_t65CC946069BFEBE6DD456EB5F64CB85088AC4155* ___1_vbViewport, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuVector4I_t65CC946069BFEBE6DD456EB5F64CB85088AC4155*);
@@ -32609,7 +32609,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderController_vuRenderController
 
 	return returnValue;
 }
-// Method Definition Index: 107701
+// Method Definition Index: 103880
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderController_vuRenderControllerSetVideoBackgroundViewportMode_m31BAE9E6432655D2724EA1CFE26C55526BBE13B2 (intptr_t ___0_controllerHandle, int32_t ___1_vbMode, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -32631,7 +32631,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderController_vuRenderController
 
 	return returnValue;
 }
-// Method Definition Index: 107702
+// Method Definition Index: 103881
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderController_vuRenderControllerGetVideoBackgroundViewInfo_m1CA72889A68ABC5C9BEC5F7D37DFAD4CF9BE6370 (intptr_t ___0_controllerHandle, VuVideoBackgroundViewInfo_tF3100187C54D7512087BF974D06303D963883836* ___1_viewInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuVideoBackgroundViewInfo_tF3100187C54D7512087BF974D06303D963883836*);
@@ -32653,7 +32653,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderController_vuRenderController
 
 	return returnValue;
 }
-// Method Definition Index: 107703
+// Method Definition Index: 103882
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderController_vuRenderControllerUpdateVideoBackgroundTexture_m4170AF031C75DD6A47F8BC87BD0514379FF3091D (intptr_t ___0_controllerHandle, intptr_t ___1_stateHandle, VuRenderVideoBackgroundData_t00EBEFA50B8EFB8221169CBD90526EE42DD10BAF* ___2_renderVBData, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t, VuRenderVideoBackgroundData_t00EBEFA50B8EFB8221169CBD90526EE42DD10BAF*);
@@ -32675,7 +32675,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderController_vuRenderController
 
 	return returnValue;
 }
-// Method Definition Index: 107704
+// Method Definition Index: 103883
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderController_vuRenderControllerSetProjectionMatrixNearFar_m63A043B7AE452B1C922E38DB3676D74DC166092C (intptr_t ___0_controllerHandle, float ___1_nearPlane, float ___2_farPlane, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, float, float);
@@ -32697,7 +32697,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderController_vuRenderController
 
 	return returnValue;
 }
-// Method Definition Index: 107705
+// Method Definition Index: 103884
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderController_vuRenderControllerGetProjectionMatrixNearFar_m4543C03AD5E3FBC1E65BFB0A223A33CD1962EEE6 (intptr_t ___0_controllerHandle, float* ___1_nearPlane, float* ___2_farPlane, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, float*, float*);
@@ -32719,7 +32719,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderController_vuRenderController
 
 	return returnValue;
 }
-// Method Definition Index: 107706
+// Method Definition Index: 103885
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuRenderViewConfig_tAD91EC607E172EB6B0A078BAFF577CC6DBC14863 VuRenderController_get_RenderViewConfig_m0C8D1C55BC2E662662A80BC22A687ACA1D233B08 (VuRenderController_tC90E2077C143C836834DE6497BA63AAEF2422CF8* __this, const RuntimeMethod* method) 
 {
 	VuRenderViewConfig_tAD91EC607E172EB6B0A078BAFF577CC6DBC14863 V_0;
@@ -32745,7 +32745,7 @@ IL_001a:
 		return L_3;
 	}
 }
-// Method Definition Index: 107707
+// Method Definition Index: 103886
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVideoBackgroundViewInfo_tF3100187C54D7512087BF974D06303D963883836 VuRenderController_get_VideoBackgroundViewInfo_mF1EE1AE5172679F98CFB18A6A3A4CE13BCC8EBFE (VuRenderController_tC90E2077C143C836834DE6497BA63AAEF2422CF8* __this, const RuntimeMethod* method) 
 {
 	VuVideoBackgroundViewInfo_tF3100187C54D7512087BF974D06303D963883836 V_0;
@@ -32771,7 +32771,7 @@ IL_001a:
 		return L_3;
 	}
 }
-// Method Definition Index: 107708
+// Method Definition Index: 103887
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Tuple_2_t41C1CBDFAE2EF513B5B3577804A0492AB56345F1* VuRenderController_get_ProjectionMatrixNearFar_mED96257642EB011D1A2DA83ED5FD000D51711CD5 (VuRenderController_tC90E2077C143C836834DE6497BA63AAEF2422CF8* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -32807,7 +32807,7 @@ IL_001c:
 		return L_5;
 	}
 }
-// Method Definition Index: 107709
+// Method Definition Index: 103888
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuRenderController_tC90E2077C143C836834DE6497BA63AAEF2422CF8* VuRenderController_Create_m86F5C1CF681E6F1FCB8A17EA9F483A9AB64AF096 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -32845,7 +32845,7 @@ IL_001a:
 		return L_6;
 	}
 }
-// Method Definition Index: 107710
+// Method Definition Index: 103889
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuRenderController__ctor_m85D414D4FAC3287B310216F3AEDA3AFD3DA1A044 (VuRenderController_tC90E2077C143C836834DE6497BA63AAEF2422CF8* __this, VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, intptr_t ___1_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -32855,7 +32855,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuRenderController__ctor_m85D414D4FAC328
 		return;
 	}
 }
-// Method Definition Index: 107711
+// Method Definition Index: 103890
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuRenderController_SetRenderViewConfig_mDFAE121725FCDB27CD17937EC328932CA05565B3 (VuRenderController_tC90E2077C143C836834DE6497BA63AAEF2422CF8* __this, VuRenderViewConfig_tAD91EC607E172EB6B0A078BAFF577CC6DBC14863 ___0_rvConfig, const RuntimeMethod* method) 
 {
 	{
@@ -32867,7 +32867,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuRenderController_SetRenderViewConfig_m
 		return L_2;
 	}
 }
-// Method Definition Index: 107712
+// Method Definition Index: 103891
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuRenderController_SetProjectionMatrixNearFar_m5788B6EEB912C169841607BA8030708719ED762E (VuRenderController_tC90E2077C143C836834DE6497BA63AAEF2422CF8* __this, Tuple_2_t41C1CBDFAE2EF513B5B3577804A0492AB56345F1* ___0_nearFar, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -32894,7 +32894,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuRenderController_SetProjectionMatrixNe
 		return L_6;
 	}
 }
-// Method Definition Index: 107713
+// Method Definition Index: 103892
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuRenderController_SetVideoBackgroundViewportMode_m6CA2998320D43EEC91FAEFF0032489F0F773B669 (VuRenderController_tC90E2077C143C836834DE6497BA63AAEF2422CF8* __this, int32_t ___0_vbMode, const RuntimeMethod* method) 
 {
 	{
@@ -33063,7 +33063,7 @@ IL2CPP_EXTERN_C void VuRecordingConfig_tCFB3ECE34778F4DC97C6B59B10C826C5267356C6
 	il2cpp_codegen_marshal_free(marshaled.___OutputDirectory);
 	marshaled.___OutputDirectory = NULL;
 }
-// Method Definition Index: 107714
+// Method Definition Index: 103893
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuRecordingConfig_Clone_mF829580D2FAF609406896D6CC0A37133ED3DD669 (VuRecordingConfig_tCFB3ECE34778F4DC97C6B59B10C826C5267356C6* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -33107,7 +33107,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuRecordingConfig_Clone_mF8295
 		return L_13;
 	}
 }
-// Method Definition Index: 107715
+// Method Definition Index: 103894
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuRecordingConfig__ctor_m809C046AC987A30EAE2A2B370DE7317593E6A463 (VuRecordingConfig_tCFB3ECE34778F4DC97C6B59B10C826C5267356C6* __this, const RuntimeMethod* method) 
 {
 	{
@@ -33127,7 +33127,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuRecordingConfig__ctor_m809C046AC987A30
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107724
+// Method Definition Index: 103903
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_vuEngineGetSessionRecorderController_m186190BF1CF88603F2B0F961911F1244DC3C91EA (intptr_t ___0_engine, intptr_t* ___1_controller, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -33149,7 +33149,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_vuEngineG
 
 	return returnValue;
 }
-// Method Definition Index: 107725
+// Method Definition Index: 103904
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_vuSessionRecorderControllerGetDefaultRecordingDataFlags_m1BBD0A22F2937BDD9DAC8405803D902349558D40 (intptr_t ___0_controller, int32_t* ___1_dataFlags, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -33171,7 +33171,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_vuSession
 
 	return returnValue;
 }
-// Method Definition Index: 107726
+// Method Definition Index: 103905
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_vuSessionRecorderControllerGetSupportedRecordingDataFlags_mE146CB1A0F095C5ED2C19020E29417A06D5F6F35 (intptr_t ___0_controller, int32_t* ___1_dataFlags, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -33193,7 +33193,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_vuSession
 
 	return returnValue;
 }
-// Method Definition Index: 107727
+// Method Definition Index: 103906
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_vuSessionRecorderControllerGetDefaultRecordingFrameRate_m114BE0EA0236D556F16FADA2167100AD2960D5EE (intptr_t ___0_controller, int32_t* ___1_frameRate, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -33215,7 +33215,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_vuSession
 
 	return returnValue;
 }
-// Method Definition Index: 107728
+// Method Definition Index: 103907
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_vuSessionRecorderControllerGetDefaultRecordingImageScale_m6C42D43E6C24610C92D96615AA6CE92CDD3E25C3 (intptr_t ___0_controller, int32_t* ___1_imageScale, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -33237,7 +33237,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_vuSession
 
 	return returnValue;
 }
-// Method Definition Index: 107729
+// Method Definition Index: 103908
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_vuSessionRecorderControllerCreateRecording_mCEE6A191671C4D11E08CAEC0CBC572CB0945DB5E (intptr_t ___0_controller, VuRecordingConfig_tCFB3ECE34778F4DC97C6B59B10C826C5267356C6* ___1_config, intptr_t* ___2_recording, int32_t* ___3_error, const RuntimeMethod* method) 
 {
 
@@ -33272,7 +33272,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_vuSession
 
 	return returnValue;
 }
-// Method Definition Index: 107730
+// Method Definition Index: 103909
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_vuSessionRecorderControllerGetRecordings_m72F31F987C701E6CD24EB6411169C0BF7BF2EE44 (intptr_t ___0_controller, intptr_t ___1_recordingList, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t);
@@ -33294,7 +33294,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_vuSession
 
 	return returnValue;
 }
-// Method Definition Index: 107731
+// Method Definition Index: 103910
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_vuSessionRecorderControllerDestroyRecordings_mE2322CCEC3291367E024C663AAAB4275AA0B8E22 (intptr_t ___0_controller, int32_t ___1_deleteData, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -33316,7 +33316,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_vuSession
 
 	return returnValue;
 }
-// Method Definition Index: 107732
+// Method Definition Index: 103911
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_vuSessionRecorderControllerCleanRecordedData_mA4FBE99B7D3B2C77AB4A1D2BFA31281C4C300E2B (intptr_t ___0_controller, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -33338,7 +33338,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_vuSession
 
 	return returnValue;
 }
-// Method Definition Index: 107733
+// Method Definition Index: 103912
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_get_DefaultDataFlags_m9C2E45E52BC8EF492161B1B3E3FE46A4B5161A9E (VuSessionRecorderController_t134F8403457BBD733ED0314ADC34677C1D7ABE1A* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -33358,7 +33358,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_get_Defau
 		return L_2;
 	}
 }
-// Method Definition Index: 107734
+// Method Definition Index: 103913
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_get_SupportedDataFlags_m13D0F0DFC9DE49E2C5F09F6E5C15831C240ED7AB (VuSessionRecorderController_t134F8403457BBD733ED0314ADC34677C1D7ABE1A* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -33378,7 +33378,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_get_Suppo
 		return L_2;
 	}
 }
-// Method Definition Index: 107735
+// Method Definition Index: 103914
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_get_DefaultFrameRate_m624470B194B2409843EFE30EDCD91B34692D1262 (VuSessionRecorderController_t134F8403457BBD733ED0314ADC34677C1D7ABE1A* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -33398,7 +33398,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_get_Defau
 		return L_2;
 	}
 }
-// Method Definition Index: 107736
+// Method Definition Index: 103915
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_get_DefaultImageScale_mCA071295A5243DC8CAE4C0A3FB7FCFE3623EDAF5 (VuSessionRecorderController_t134F8403457BBD733ED0314ADC34677C1D7ABE1A* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -33418,7 +33418,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuSessionRecorderController_get_Defau
 		return L_2;
 	}
 }
-// Method Definition Index: 107737
+// Method Definition Index: 103916
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuSessionRecorderController_t134F8403457BBD733ED0314ADC34677C1D7ABE1A* VuSessionRecorderController_Create_m2A8915ECAE714A0FE9B286F9AE0B54D1844F60A1 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -33456,7 +33456,7 @@ IL_001a:
 		return L_6;
 	}
 }
-// Method Definition Index: 107738
+// Method Definition Index: 103917
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuSessionRecorderController__ctor_mA0C6AA8BA3A2130966D78C09C61EE14D50A8BAF4 (VuSessionRecorderController_t134F8403457BBD733ED0314ADC34677C1D7ABE1A* __this, VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, intptr_t ___1_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -33466,7 +33466,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuSessionRecorderController__ctor_mA0C6A
 		return;
 	}
 }
-// Method Definition Index: 107739
+// Method Definition Index: 103918
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuSessionRecorderController_CreateRecording_m5946885B745CFC3FDE4859E8BC17C566A0B30A33 (VuSessionRecorderController_t134F8403457BBD733ED0314ADC34677C1D7ABE1A* __this, VuRecordingConfig_tCFB3ECE34778F4DC97C6B59B10C826C5267356C6* ___0_config, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -33500,7 +33500,7 @@ IL_0019:
 		return (RuntimeObject*)NULL;
 	}
 }
-// Method Definition Index: 107740
+// Method Definition Index: 103919
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuSessionRecorderController_GetRecordings_mAAEBB12EB72DC174E6CB2016ADCBA32DB88D946B (VuSessionRecorderController_t134F8403457BBD733ED0314ADC34677C1D7ABE1A* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -33626,7 +33626,7 @@ IL_0056:
 		return L_18;
 	}
 }
-// Method Definition Index: 107741
+// Method Definition Index: 103920
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuSessionRecorderController_DestroyRecordings_m8380EBB640B33264D452EE3FBC16CF3F44CDFC6D (VuSessionRecorderController_t134F8403457BBD733ED0314ADC34677C1D7ABE1A* __this, bool ___0_deleteData, const RuntimeMethod* method) 
 {
 	{
@@ -33641,7 +33641,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuSessionRecorderController_DestroyRecor
 		return L_4;
 	}
 }
-// Method Definition Index: 107742
+// Method Definition Index: 103921
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuSessionRecorderController_CleanRecordedData_m139DC648E2A701D4CBE63863274A279538CF8EFB (VuSessionRecorderController_t134F8403457BBD733ED0314ADC34677C1D7ABE1A* __this, const RuntimeMethod* method) 
 {
 	{
@@ -33661,7 +33661,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuSessionRecorderController_CleanRecorde
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107749
+// Method Definition Index: 103928
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecording_vuRecordingStart_m707AFB1493BEDC7C98C680AFB0DD3B3F70FF0A66 (intptr_t ___0_recording, int32_t* ___1_error, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -33683,7 +33683,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecording_vuRecordingStart_m707AFB1
 
 	return returnValue;
 }
-// Method Definition Index: 107750
+// Method Definition Index: 103929
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecording_vuRecordingStop_m712E07AC06CEC385CD5A589BCF1B72DECB94A168 (intptr_t ___0_recording, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -33705,7 +33705,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecording_vuRecordingStop_m712E07AC
 
 	return returnValue;
 }
-// Method Definition Index: 107751
+// Method Definition Index: 103930
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecording_vuRecordingGetPath_m305540FFA1A04E5F895FEBFB3882FE2F4B31B332 (intptr_t ___0_recording, intptr_t* ___1_path, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -33727,7 +33727,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecording_vuRecordingGetPath_m30554
 
 	return returnValue;
 }
-// Method Definition Index: 107752
+// Method Definition Index: 103931
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecording_vuRecordingGetStatus_mDAB321E23486DF7BFD0E72044A908E4C17D23B08 (intptr_t ___0_recording, int32_t* ___1_status, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -33749,7 +33749,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecording_vuRecordingGetStatus_mDAB
 
 	return returnValue;
 }
-// Method Definition Index: 107753
+// Method Definition Index: 103932
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecording_vuRecordingGetStatusInfo_mDABD0C27E91B99A905F9D6A8920CD0E04274560E (intptr_t ___0_recording, int32_t* ___1_statusInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -33771,7 +33771,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecording_vuRecordingGetStatusInfo_
 
 	return returnValue;
 }
-// Method Definition Index: 107754
+// Method Definition Index: 103933
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecording_vuRecordingDestroy_m543621BD783B913C9342D0E476E4166FCD3F5498 (intptr_t ___0_recording, int32_t ___1_deleteData, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -33793,7 +33793,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecording_vuRecordingDestroy_m54362
 
 	return returnValue;
 }
-// Method Definition Index: 107755
+// Method Definition Index: 103934
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuRecording_get_Path_m8A980EF27D3797E700EBD485016AB1C46EA9F133 (VuRecording_t6934E4A5631203C4BA7CC0AF158C8CB33D1C4DDA* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -33812,7 +33812,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuRecording_get_Path_m8A980EF27D379
 		return L_2;
 	}
 }
-// Method Definition Index: 107756
+// Method Definition Index: 103935
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecording_get_Status_mA363605A1E08594C575C2040EBB0135FC6EC67DA (VuRecording_t6934E4A5631203C4BA7CC0AF158C8CB33D1C4DDA* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -33832,7 +33832,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecording_get_Status_mA363605A1E085
 		return L_2;
 	}
 }
-// Method Definition Index: 107757
+// Method Definition Index: 103936
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecording_get_StatusInfo_mD4A6D5A93CBEF4BF002F5180B8BDDCD40491B300 (VuRecording_t6934E4A5631203C4BA7CC0AF158C8CB33D1C4DDA* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -33852,7 +33852,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecording_get_StatusInfo_mD4A6D5A93
 		return L_2;
 	}
 }
-// Method Definition Index: 107758
+// Method Definition Index: 103937
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuRecording__ctor_mED1806003AC67CBE168B46700C290FE243168B9C (VuRecording_t6934E4A5631203C4BA7CC0AF158C8CB33D1C4DDA* __this, intptr_t ___0_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -33862,7 +33862,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuRecording__ctor_mED1806003AC67CBE168B4
 		return;
 	}
 }
-// Method Definition Index: 107759
+// Method Definition Index: 103938
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuRecording_Start_m294D6473C624D0CB15FC67BA1197466DB0926E7C (VuRecording_t6934E4A5631203C4BA7CC0AF158C8CB33D1C4DDA* __this, int32_t* ___0_error, const RuntimeMethod* method) 
 {
 	{
@@ -33875,7 +33875,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuRecording_Start_m294D6473C624D0CB15FC6
 		return L_3;
 	}
 }
-// Method Definition Index: 107760
+// Method Definition Index: 103939
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuRecording_Stop_m8F38454E1D109130F02CB17B362E784D8578BD4F (VuRecording_t6934E4A5631203C4BA7CC0AF158C8CB33D1C4DDA* __this, const RuntimeMethod* method) 
 {
 	{
@@ -33887,7 +33887,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuRecording_Stop_m8F38454E1D109130F02CB1
 		return L_2;
 	}
 }
-// Method Definition Index: 107761
+// Method Definition Index: 103940
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuRecording_Destroy_m6C93C89FA80BB421B395984B729DE5FD71DFEEEB (VuRecording_t6934E4A5631203C4BA7CC0AF158C8CB33D1C4DDA* __this, bool ___0_deleteData, const RuntimeMethod* method) 
 {
 	{
@@ -33910,7 +33910,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuRecording_Destroy_m6C93C89FA80BB421B39
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107762
+// Method Definition Index: 103941
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecordingList_vuRecordingListCreate_m9CE0EE4C8A9D388285B3B8C497C4E092E85CFF96 (intptr_t* ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t*);
@@ -33932,7 +33932,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecordingList_vuRecordingListCreate
 
 	return returnValue;
 }
-// Method Definition Index: 107763
+// Method Definition Index: 103942
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecordingList_vuRecordingListGetSize_m13D1279CB29AD0475C812C047CE6729E57AF2BAB (intptr_t ___0_listHandle, int32_t* ___1_size, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -33954,7 +33954,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecordingList_vuRecordingListGetSiz
 
 	return returnValue;
 }
-// Method Definition Index: 107764
+// Method Definition Index: 103943
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecordingList_vuRecordingListGetElement_m0EA1053E12EFE394F0F78E98E06D291C17E55857 (intptr_t ___0_listHandle, int32_t ___1_element, intptr_t* ___2_nativeElement, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t, intptr_t*);
@@ -33976,7 +33976,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecordingList_vuRecordingListGetEle
 
 	return returnValue;
 }
-// Method Definition Index: 107765
+// Method Definition Index: 103944
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecordingList_vuRecordingListDestroy_m1D177B5DC2B47CCF66DE8CF05B6D656D6B9DEC27 (intptr_t ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -33998,7 +33998,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRecordingList_vuRecordingListDestro
 
 	return returnValue;
 }
-// Method Definition Index: 107766
+// Method Definition Index: 103945
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuRecordingList__ctor_m60C6115325921C8F6357EE59A97B0F6614F5724C (VuRecordingList_t1226A1EAAD46491E098D08C821E86C184E969777* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -34028,7 +34028,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuRecordingList__ctor_m60C6115325921C8F6
 		return;
 	}
 }
-// Method Definition Index: 107767
+// Method Definition Index: 103946
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuRecording_t6934E4A5631203C4BA7CC0AF158C8CB33D1C4DDA* VuRecordingList_GetElement_mFD54384F9CEE1702527989B3FE926E0852333C39 (VuRecordingList_t1226A1EAAD46491E098D08C821E86C184E969777* __this, intptr_t ___0_nativeElement, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -34060,7 +34060,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuRecording_t6934E4A5631203C4BA7CC0AF158C8CB3
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107775
+// Method Definition Index: 103954
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 VuCameraIntrinsics_vuCameraIntrinsicsGetProjectionMatrix_m0AEA88C9ABA429C18F7DBD282223ED76CD40CEB3 (Internal_t7138D8451AA79A2CA363C5F85C9E358C21F66652* ___0_intrinsics, float ___1_nearPlane, float ___2_farPlane, int32_t ___3_rotation, const RuntimeMethod* method) 
 {
 	typedef VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 (CDECL *PInvokeFunc) (Internal_t7138D8451AA79A2CA363C5F85C9E358C21F66652*, float, float, int32_t);
@@ -34082,7 +34082,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30F
 
 	return returnValue;
 }
-// Method Definition Index: 107776
+// Method Definition Index: 103955
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 VuCameraIntrinsics_vuCameraIntrinsicsGetFov_m5CC8EF065CA0B4882EC8FB31DBE4C8AE8ACCEE01 (Internal_t7138D8451AA79A2CA363C5F85C9E358C21F66652* ___0_intrinsics, const RuntimeMethod* method) 
 {
 	typedef VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 (CDECL *PInvokeFunc) (Internal_t7138D8451AA79A2CA363C5F85C9E358C21F66652*);
@@ -34104,7 +34104,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4
 
 	return returnValue;
 }
-// Method Definition Index: 107777
+// Method Definition Index: 103956
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 VuCameraIntrinsics_get_Size_mB130F199D1F41A70D6F1A4F0545EDA3ECF557244 (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -34112,7 +34112,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4
 		return L_0;
 	}
 }
-// Method Definition Index: 107778
+// Method Definition Index: 103957
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraIntrinsics_set_Size_m9FD38646929721C6F8EA9B6D827812289B95AA9D (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 ___0_value, const RuntimeMethod* method) 
 {
 	{
@@ -34121,7 +34121,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraIntrinsics_set_Size_m9FD38646929
 		return;
 	}
 }
-// Method Definition Index: 107779
+// Method Definition Index: 103958
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 VuCameraIntrinsics_get_FocalLength_m35AFA34CCAF6560B1C9B427C88B02E0EE12D7056 (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -34129,7 +34129,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4
 		return L_0;
 	}
 }
-// Method Definition Index: 107780
+// Method Definition Index: 103959
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraIntrinsics_set_FocalLength_m201F214789D8C9B6E3C147827AB8B6B25FF30786 (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 ___0_value, const RuntimeMethod* method) 
 {
 	{
@@ -34138,7 +34138,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraIntrinsics_set_FocalLength_m201F
 		return;
 	}
 }
-// Method Definition Index: 107781
+// Method Definition Index: 103960
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 VuCameraIntrinsics_get_PrincipalPoint_m10EA6A783904A8BDD0D7BCD34AD61CF42056FB14 (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -34146,7 +34146,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4
 		return L_0;
 	}
 }
-// Method Definition Index: 107782
+// Method Definition Index: 103961
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraIntrinsics_set_PrincipalPoint_m93220B252CBB4D49A687F99924F18706D3D3844C (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 ___0_value, const RuntimeMethod* method) 
 {
 	{
@@ -34155,7 +34155,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraIntrinsics_set_PrincipalPoint_m9
 		return;
 	}
 }
-// Method Definition Index: 107783
+// Method Definition Index: 103962
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraIntrinsics_get_DistortionMode_m76C58E5D9E171776A62AE5BFD0A4EC531DDFE8B9 (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -34163,7 +34163,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraIntrinsics_get_DistortionMode
 		return L_0;
 	}
 }
-// Method Definition Index: 107784
+// Method Definition Index: 103963
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraIntrinsics_set_DistortionMode_mFA67AD43AB7E69CD4502DAB191F4F0C8C3E4DB29 (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, int32_t ___0_value, const RuntimeMethod* method) 
 {
 	{
@@ -34172,7 +34172,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraIntrinsics_set_DistortionMode_mF
 		return;
 	}
 }
-// Method Definition Index: 107785
+// Method Definition Index: 103964
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8 VuCameraIntrinsics_get_DistortionParameters_m798E15D69ABFF2E73866F3302268367155ED103D (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -34180,7 +34180,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE7
 		return L_0;
 	}
 }
-// Method Definition Index: 107786
+// Method Definition Index: 103965
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraIntrinsics_set_DistortionParameters_m68AD15787C024B87E592517854065CF2EB7745EF (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8 ___0_value, const RuntimeMethod* method) 
 {
 	{
@@ -34189,7 +34189,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraIntrinsics_set_DistortionParamet
 		return;
 	}
 }
-// Method Definition Index: 107787
+// Method Definition Index: 103966
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraIntrinsics__ctor_mAA351D3C5CA5FF408E7D4D9D834CAF7648393364 (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, Internal_t7138D8451AA79A2CA363C5F85C9E358C21F66652 ___0_intrinsics, const RuntimeMethod* method) 
 {
 	{
@@ -34212,7 +34212,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraIntrinsics__ctor_mAA351D3C5CA5FF
 		return;
 	}
 }
-// Method Definition Index: 107788
+// Method Definition Index: 103967
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 VuCameraIntrinsics_GetProjectionMatrix_mF3878D30E6BCA87DC67395E28F0AAB0083237A2A (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, Tuple_2_t41C1CBDFAE2EF513B5B3577804A0492AB56345F1* ___0_nearFarPlanes, int32_t ___1_rotation, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -34259,7 +34259,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30F
 		return L_11;
 	}
 }
-// Method Definition Index: 107789
+// Method Definition Index: 103968
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 VuCameraIntrinsics_GetCameraIntrinsicsGetFov_m0EF4A4AD02F350BB789D40D3B1424C8FBBB9DC51 (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, const RuntimeMethod* method) 
 {
 	Internal_t7138D8451AA79A2CA363C5F85C9E358C21F66652 V_0;
@@ -34306,7 +34306,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107795
+// Method Definition Index: 103974
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderState_vuStateGetRenderState_m3C823651D492717D707813CCED0948C1CC347D80 (intptr_t ___0_stateHandle, Internal_t86369877324AAF112EC5467F0FEAE9C53653DF35* ___1_renderState, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, Internal_t86369877324AAF112EC5467F0FEAE9C53653DF35*);
@@ -34328,7 +34328,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuRenderState_vuStateGetRenderState_m
 
 	return returnValue;
 }
-// Method Definition Index: 107796
+// Method Definition Index: 103975
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector4I_t65CC946069BFEBE6DD456EB5F64CB85088AC4155 VuRenderState_get_Viewport_mCF53A87F2E6E2BE5B35797428D1E1A6FEF292D51 (VuRenderState_t420BDD99E09700BE05AD76C55356636EF272D61E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -34337,7 +34337,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector4I_t65CC946069BFEBE6DD456EB5F64CB8508
 		return L_1;
 	}
 }
-// Method Definition Index: 107797
+// Method Definition Index: 103976
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 VuRenderState_get_VBProjectionMatrix_m83C0A6C50BF48A80A9ADCDEDDED8ADB530749E57 (VuRenderState_t420BDD99E09700BE05AD76C55356636EF272D61E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -34346,7 +34346,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30F
 		return L_1;
 	}
 }
-// Method Definition Index: 107798
+// Method Definition Index: 103977
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMesh_t610D23A74D378D2B8636B20835651F9FCD77FE9B VuRenderState_get_VBMesh_m4D508761AB8D7B9BDDD70A7F17F4C5099EE23317 (VuRenderState_t420BDD99E09700BE05AD76C55356636EF272D61E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -34354,7 +34354,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMesh_t610D23A74D378D2B8636B20835651F9FCD77F
 		return L_0;
 	}
 }
-// Method Definition Index: 107799
+// Method Definition Index: 103978
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 VuRenderState_get_ViewMatrix_m34909568020843AF2C1F009F9E42D1000A34E719 (VuRenderState_t420BDD99E09700BE05AD76C55356636EF272D61E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -34363,7 +34363,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30F
 		return L_1;
 	}
 }
-// Method Definition Index: 107800
+// Method Definition Index: 103979
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 VuRenderState_get_ProjectionMatrix_mC8FCE53D874AF9298608E54AAD3F525191827CC5 (VuRenderState_t420BDD99E09700BE05AD76C55356636EF272D61E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -34372,7 +34372,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30F
 		return L_1;
 	}
 }
-// Method Definition Index: 107801
+// Method Definition Index: 103980
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuRenderState__ctor_m95C437A49CE6EB8A179B9157925FA7ADC2D60A07 (VuRenderState_t420BDD99E09700BE05AD76C55356636EF272D61E* __this, VuState_tADB584CDCD23BE0F1F19F40F4473AD4746FA4D41* ___0_state, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -34435,7 +34435,7 @@ IL_0054:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107805
+// Method Definition Index: 103984
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraFrame_vuCameraFrameGetIndex_m54795244311470570956575BC274A185F00B7778 (intptr_t ___0_cameraFrame, int64_t* ___1_index, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int64_t*);
@@ -34457,7 +34457,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraFrame_vuCameraFrameGetIndex_m
 
 	return returnValue;
 }
-// Method Definition Index: 107806
+// Method Definition Index: 103985
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraFrame_vuCameraFrameGetTimestamp_m7EF622F0218D4AD5FFC32F871DE10A82BA6F5665 (intptr_t ___0_cameraFrame, int64_t* ___1_timestamp, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int64_t*);
@@ -34479,7 +34479,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraFrame_vuCameraFrameGetTimesta
 
 	return returnValue;
 }
-// Method Definition Index: 107807
+// Method Definition Index: 103986
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraFrame_vuCameraFrameGetImages_m1C9E14121FC85F4CF6E5B5E4B09E29D3B06BF8A7 (intptr_t ___0_cameraFrame, intptr_t ___1_imageList, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t);
@@ -34501,7 +34501,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuCameraFrame_vuCameraFrameGetImages_
 
 	return returnValue;
 }
-// Method Definition Index: 107808
+// Method Definition Index: 103987
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuCameraFrame_get_NativeHandle_m4E18E7EF7C58BAE1F467066D298918236D944929 (VuCameraFrame_tDA13C18C78B1E7AADBAC6AD7B1E586345DDE2E32* __this, const RuntimeMethod* method) 
 {
 	{
@@ -34509,7 +34509,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuCameraFrame_get_NativeHandle_m4E18
 		return L_0;
 	}
 }
-// Method Definition Index: 107809
+// Method Definition Index: 103988
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int64_t VuCameraFrame_get_Index_mB7B8FE618DAAAD8BB586F02E3F0AB3AE65D67AD4 (VuCameraFrame_tDA13C18C78B1E7AADBAC6AD7B1E586345DDE2E32* __this, const RuntimeMethod* method) 
 {
 	int64_t V_0 = 0;
@@ -34521,7 +34521,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int64_t VuCameraFrame_get_Index_mB7B8FE618DAA
 		return L_2;
 	}
 }
-// Method Definition Index: 107810
+// Method Definition Index: 103989
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int64_t VuCameraFrame_get_Timestamp_mB683BF6575562D150B4878C0822C7E1DE8FD9103 (VuCameraFrame_tDA13C18C78B1E7AADBAC6AD7B1E586345DDE2E32* __this, const RuntimeMethod* method) 
 {
 	int64_t V_0 = 0;
@@ -34533,7 +34533,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int64_t VuCameraFrame_get_Timestamp_mB683BF65
 		return L_2;
 	}
 }
-// Method Definition Index: 107811
+// Method Definition Index: 103990
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuCameraFrame_get_Images_m7220E4E8B62F186AEEE4B23C14C09FE8E40F7BA1 (VuCameraFrame_tDA13C18C78B1E7AADBAC6AD7B1E586345DDE2E32* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -34670,7 +34670,7 @@ IL_0070:
 		return L_21;
 	}
 }
-// Method Definition Index: 107812
+// Method Definition Index: 103991
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraFrame__ctor_m67334F01E27C572BA7D2C30E016C5EA218A1EDFF (VuCameraFrame_tDA13C18C78B1E7AADBAC6AD7B1E586345DDE2E32* __this, VuState_tADB584CDCD23BE0F1F19F40F4473AD4746FA4D41* ___0_state, intptr_t ___1_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -34683,7 +34683,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraFrame__ctor_m67334F01E27C572BA7D
 		return;
 	}
 }
-// Method Definition Index: 107813
+// Method Definition Index: 103992
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraFrame_Finalize_m670E903749241D17EFE0E5494A02B3915BB5C7E8 (VuCameraFrame_tDA13C18C78B1E7AADBAC6AD7B1E586345DDE2E32* __this, const RuntimeMethod* method) 
 {
 	{
@@ -34712,7 +34712,7 @@ IL_0010:
 		return;
 	}
 }
-// Method Definition Index: 107814
+// Method Definition Index: 103993
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraFrame_Dispose_m69FC593FB4F5E27479A507734E2441B04BE3A46D (VuCameraFrame_tDA13C18C78B1E7AADBAC6AD7B1E586345DDE2E32* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -34728,7 +34728,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraFrame_Dispose_m69FC593FB4F5E2747
 		return;
 	}
 }
-// Method Definition Index: 107815
+// Method Definition Index: 103994
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuCameraFrame_Dispose_m5CF653AB2C2FCBDE39DC12D2D674D08317AF273A (VuCameraFrame_tDA13C18C78B1E7AADBAC6AD7B1E586345DDE2E32* __this, bool ___0_disposing, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -34836,7 +34836,7 @@ IL_003c:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107821
+// Method Definition Index: 104000
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuState_vuStateHasCameraFrame_m8B7DF41C2852CF880B9236653C2D3E0734356A70 (intptr_t ___0_stateHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -34858,7 +34858,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuState_vuStateHasCameraFrame_m8B7DF4
 
 	return returnValue;
 }
-// Method Definition Index: 107822
+// Method Definition Index: 104001
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuState_vuStateGetObservations_m0D02DB054212376A0CE4453B52359D0A72904724 (intptr_t ___0_stateHandle, intptr_t ___1_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t);
@@ -34880,7 +34880,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuState_vuStateGetObservations_m0D02D
 
 	return returnValue;
 }
-// Method Definition Index: 107823
+// Method Definition Index: 104002
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuState_vuStateGetImageTargetObservations_m9E5F0F2F45C07901DEBC8DE647C51E76B4A92BF1 (intptr_t ___0_stateHandle, intptr_t ___1_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t);
@@ -34902,7 +34902,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuState_vuStateGetImageTargetObservat
 
 	return returnValue;
 }
-// Method Definition Index: 107824
+// Method Definition Index: 104003
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuState_vuStateGetCameraFrame_m86848748666E39E82CC2AD534F13BA751EA64A3D (intptr_t ___0_stateHandle, intptr_t* ___1_cameraFrameHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -34924,7 +34924,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuState_vuStateGetCameraFrame_m868487
 
 	return returnValue;
 }
-// Method Definition Index: 107825
+// Method Definition Index: 104004
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuState_vuStateGetCameraIntrinsics_mAB44AFA610DF0DFAED0D9284F528D241B4AC2D6B (intptr_t ___0_stateHandle, Internal_t7138D8451AA79A2CA363C5F85C9E358C21F66652* ___1_cameraIntrinsics, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, Internal_t7138D8451AA79A2CA363C5F85C9E358C21F66652*);
@@ -34946,7 +34946,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuState_vuStateGetCameraIntrinsics_mA
 
 	return returnValue;
 }
-// Method Definition Index: 107826
+// Method Definition Index: 104005
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuState_vuStateRelease_mAFA05EAF5310285FD16CE63DF77AD7E522E5EE57 (intptr_t ___0_stateHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t);
@@ -34968,7 +34968,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuState_vuStateRelease_mAFA05EAF53102
 
 	return returnValue;
 }
-// Method Definition Index: 107827
+// Method Definition Index: 104006
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* VuState_get_Engine_m6DED02ADE1776484572550FD662971F81B8F6F01 (VuState_tADB584CDCD23BE0F1F19F40F4473AD4746FA4D41* __this, const RuntimeMethod* method) 
 {
 	{
@@ -34976,7 +34976,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuEngine_t1F34A373F1915ADEC0EF00456B2A186075A
 		return L_0;
 	}
 }
-// Method Definition Index: 107828
+// Method Definition Index: 104007
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuState_get_NativeHandle_m38F9CCF7020CFB17E0C9E1A8FDF80057EBEE9A35 (VuState_tADB584CDCD23BE0F1F19F40F4473AD4746FA4D41* __this, const RuntimeMethod* method) 
 {
 	{
@@ -34984,7 +34984,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuState_get_NativeHandle_m38F9CCF702
 		return L_0;
 	}
 }
-// Method Definition Index: 107829
+// Method Definition Index: 104008
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuState_get_Observations_m812F9D00CBCBE4F5D25272FDAC5ED83BA922CA5A (VuState_tADB584CDCD23BE0F1F19F40F4473AD4746FA4D41* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -35083,7 +35083,7 @@ IL_004a:
 		return L_13;
 	}
 }
-// Method Definition Index: 107830
+// Method Definition Index: 104009
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuState_get_HasCameraFrame_mE3597E93632AF4391620F3414DC3FAC924F1E670 (VuState_tADB584CDCD23BE0F1F19F40F4473AD4746FA4D41* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -35123,7 +35123,7 @@ IL_0028:
 		return L_7;
 	}
 }
-// Method Definition Index: 107831
+// Method Definition Index: 104010
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuState_get_CameraFrame_m3B4C8DD908E7A6AA594F256EE73B580ABE064DF8 (VuState_tADB584CDCD23BE0F1F19F40F4473AD4746FA4D41* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -35184,7 +35184,7 @@ IL_0039:
 		return L_7;
 	}
 }
-// Method Definition Index: 107832
+// Method Definition Index: 104011
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuState_get_CameraIntrinsics_m00D60E9E875BEF15D2D7A2E6D8EF9A647D803AFC (VuState_tADB584CDCD23BE0F1F19F40F4473AD4746FA4D41* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -35245,7 +35245,7 @@ IL_0038:
 		return L_7;
 	}
 }
-// Method Definition Index: 107833
+// Method Definition Index: 104012
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuState_get_RenderState_m19FD4031B31BCDA24477F9B035982C948687936B (VuState_tADB584CDCD23BE0F1F19F40F4473AD4746FA4D41* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -35287,7 +35287,7 @@ IL_001e:
 		return L_3;
 	}
 }
-// Method Definition Index: 107834
+// Method Definition Index: 104013
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuState__ctor_m9ED692FFDC76387D75B07E03474EA845ED1D10CC (VuState_tADB584CDCD23BE0F1F19F40F4473AD4746FA4D41* __this, VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, ObservationManager_t99938AFA7E9803564F4E20B3E0B9BB3B0C0E251C* ___1_observationManager, intptr_t ___2_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -35306,7 +35306,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuState__ctor_m9ED692FFDC76387D75B07E034
 		return;
 	}
 }
-// Method Definition Index: 107835
+// Method Definition Index: 104014
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuState_Finalize_mFA776FE9B6CEABE7C3DA6618B77932A84AA02A20 (VuState_tADB584CDCD23BE0F1F19F40F4473AD4746FA4D41* __this, const RuntimeMethod* method) 
 {
 	{
@@ -35335,7 +35335,7 @@ IL_0010:
 		return;
 	}
 }
-// Method Definition Index: 107836
+// Method Definition Index: 104015
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuState_Dispose_mD2872BA379FA00128A8D4452B3FE3AE143807816 (VuState_tADB584CDCD23BE0F1F19F40F4473AD4746FA4D41* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -35351,7 +35351,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuState_Dispose_mD2872BA379FA00128A8D445
 		return;
 	}
 }
-// Method Definition Index: 107837
+// Method Definition Index: 104016
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuState_Dispose_mD537466782654FF4F2553EED241F1D06C0BB43D1 (VuState_tADB584CDCD23BE0F1F19F40F4473AD4746FA4D41* __this, bool ___0_disposing, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -35522,7 +35522,7 @@ IL2CPP_EXTERN_C void VuVuMarkConfig_t2531D6411F5A67EC08D0FC8945B1F71DBD4BDCD8_ma
 	il2cpp_codegen_marshal_free(marshaled.___templateName);
 	marshaled.___templateName = NULL;
 }
-// Method Definition Index: 107867
+// Method Definition Index: 104046
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuVuMarkConfig_Clone_m053A4CD3FFFC0100D1F7EA3DE3035B12341DC293 (VuVuMarkConfig_t2531D6411F5A67EC08D0FC8945B1F71DBD4BDCD8* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -35559,7 +35559,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuVuMarkConfig_Clone_m053A4CD3
 		return L_9;
 	}
 }
-// Method Definition Index: 107868
+// Method Definition Index: 104047
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuVuMarkConfig__ctor_mBD14FC1557DE0218EA2D077C2D88321662339F29 (VuVuMarkConfig_t2531D6411F5A67EC08D0FC8945B1F71DBD4BDCD8* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -35598,7 +35598,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuVuMarkConfig__ctor_mBD14FC1557DE0218EA
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107880
+// Method Definition Index: 104059
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuEngineCreateVuMarkObserver_mBCFA07F373352E3DAD2E743AD77FCE73FA138384 (intptr_t ___0_engineHandle, intptr_t* ___1_observerHandle, VuVuMarkConfig_t2531D6411F5A67EC08D0FC8945B1F71DBD4BDCD8* ___2_config, int32_t* ___3_errorCode, const RuntimeMethod* method) 
 {
 
@@ -35633,7 +35633,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuEngineCreateVuMark
 
 	return returnValue;
 }
-// Method Definition Index: 107881
+// Method Definition Index: 104060
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverGetTargetUniqueId_m12636C23768CC7F73E277521C96556D748EA4DBD (intptr_t ___0_observerHandle, intptr_t* ___1_targetId, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -35655,7 +35655,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverGetT
 
 	return returnValue;
 }
-// Method Definition Index: 107882
+// Method Definition Index: 104061
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverGetTemplateName_mA6876C701821F1E720467B08F204D2BFD7B475F8 (intptr_t ___0_observerHandle, intptr_t* ___1_targetName, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -35677,7 +35677,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverGetT
 
 	return returnValue;
 }
-// Method Definition Index: 107883
+// Method Definition Index: 104062
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverSetTemplateScale_m64EDF0F013177EF567FD433C46F388DC8D8287F4 (intptr_t ___0_observerHandle, float ___1_scale, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, float);
@@ -35699,7 +35699,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverSetT
 
 	return returnValue;
 }
-// Method Definition Index: 107884
+// Method Definition Index: 104063
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverGetTemplateSize_mC4E4DE328BE7F79961964836A67459B40A6189CB (intptr_t ___0_observerHandle, VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8* ___1_targetSize, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8*);
@@ -35721,7 +35721,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverGetT
 
 	return returnValue;
 }
-// Method Definition Index: 107885
+// Method Definition Index: 104064
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverGetTemplateAABB_mE17C317A8DA06229451F00D07E0D3A8BEAF43D3A (intptr_t ___0_observerHandle, VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F738* ___1_bbox, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F738*);
@@ -35743,7 +35743,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverGetT
 
 	return returnValue;
 }
-// Method Definition Index: 107886
+// Method Definition Index: 104065
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverGetUserData_mCFCD2EFFC323C3F7C6F1E0C05D5DC1BA2D2D2C15 (intptr_t ___0_observer, intptr_t* ___1_userData, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -35765,7 +35765,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverGetU
 
 	return returnValue;
 }
-// Method Definition Index: 107887
+// Method Definition Index: 104066
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverGetOrigin_mFBDCFE4A4B66F90E2C02CE4E82A1134A9506D053 (intptr_t ___0_observer, VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8* ___1_origin, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8*);
@@ -35787,7 +35787,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverGetO
 
 	return returnValue;
 }
-// Method Definition Index: 107888
+// Method Definition Index: 104067
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverGetTrackingFromRuntimeAppearance_m78172A0441818B625163B102931D7700D8CE63B1 (intptr_t ___0_observerHandle, int32_t* ___1_isEnabled, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -35809,7 +35809,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverGetT
 
 	return returnValue;
 }
-// Method Definition Index: 107889
+// Method Definition Index: 104068
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverSetTrackingFromRuntimeAppearance_m95094E267FDFC6C87618CA53F2EFB709240C2191 (intptr_t ___0_observerHandle, int32_t ___1_enable, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -35831,7 +35831,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverSetT
 
 	return returnValue;
 }
-// Method Definition Index: 107890
+// Method Definition Index: 104069
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverSetTrackingOptimization_m7129A6C6A6230153A90B34AC03E7CD4B7ABE3BEA (intptr_t ___0_observerHandle, int32_t ___1_optimization, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t);
@@ -35853,7 +35853,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverSetT
 
 	return returnValue;
 }
-// Method Definition Index: 107891
+// Method Definition Index: 104070
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverGetTrackingOptimization_mC213CCB5CBE95DA348A4AE1FD309283919B5F0E2 (intptr_t ___0_observerHandle, int32_t* ___1_optimization, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -35875,7 +35875,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_vuVuMarkObserverGetT
 
 	return returnValue;
 }
-// Method Definition Index: 107892
+// Method Definition Index: 104071
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuVuMarkObserver_get_TemplateUniqueID_m8D932A2650A7449244A1E88078D20F16B6D3BF07 (VuVuMarkObserver_tE084D0E0D20D9EC7672BE52857B79C683B94DC84* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -35894,7 +35894,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuVuMarkObserver_get_TemplateUnique
 		return L_2;
 	}
 }
-// Method Definition Index: 107893
+// Method Definition Index: 104072
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuVuMarkObserver_get_TemplateName_mB82CD0EA4854C20E3ED1EC2515ED7BA6266FE0D8 (VuVuMarkObserver_tE084D0E0D20D9EC7672BE52857B79C683B94DC84* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -35913,7 +35913,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuVuMarkObserver_get_TemplateName_m
 		return L_2;
 	}
 }
-// Method Definition Index: 107894
+// Method Definition Index: 104073
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 VuVuMarkObserver_get_TemplateSize_mC0C35BED2BB5ABE9B3A05D2F705D8D6B9B3CCABD (VuVuMarkObserver_tE084D0E0D20D9EC7672BE52857B79C683B94DC84* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -35933,7 +35933,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4
 		return L_2;
 	}
 }
-// Method Definition Index: 107895
+// Method Definition Index: 104074
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F738 VuVuMarkObserver_get_BoundingBox_mE393C7ADCD56DB0947068EC0AE99B9A7AD801910 (VuVuMarkObserver_tE084D0E0D20D9EC7672BE52857B79C683B94DC84* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -35953,7 +35953,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F
 		return L_2;
 	}
 }
-// Method Definition Index: 107896
+// Method Definition Index: 104075
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuVuMarkObserver_get_UserData_m962472926414FCAA57DEBB151AA38AB34B2D79A5 (VuVuMarkObserver_tE084D0E0D20D9EC7672BE52857B79C683B94DC84* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -35972,7 +35972,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuVuMarkObserver_get_UserData_m9624
 		return L_2;
 	}
 }
-// Method Definition Index: 107897
+// Method Definition Index: 104076
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 VuVuMarkObserver_get_Origin_m3B411F0BFD0397AED95D5207BF5674B1FF0F6403 (VuVuMarkObserver_tE084D0E0D20D9EC7672BE52857B79C683B94DC84* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -35992,7 +35992,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4
 		return L_2;
 	}
 }
-// Method Definition Index: 107898
+// Method Definition Index: 104077
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVuMarkObserver_get_TrackingFromRuntimeAppearance_m9B1575762468E380291A7F028EC407F363740963 (VuVuMarkObserver_tE084D0E0D20D9EC7672BE52857B79C683B94DC84* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -36011,7 +36011,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVuMarkObserver_get_TrackingFromRuntime
 		return L_2;
 	}
 }
-// Method Definition Index: 107899
+// Method Definition Index: 104078
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_get_TrackingOptimization_mC6E4D7193B958B80F9038CC2E48A439A848D290A (VuVuMarkObserver_tE084D0E0D20D9EC7672BE52857B79C683B94DC84* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -36031,7 +36031,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObserver_get_TrackingOptimiza
 		return L_2;
 	}
 }
-// Method Definition Index: 107900
+// Method Definition Index: 104079
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVuMarkObserver_tE084D0E0D20D9EC7672BE52857B79C683B94DC84* VuVuMarkObserver_Create_m06F1E0BE53565572A644F674824510F9D11652F4 (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, VuVuMarkConfig_t2531D6411F5A67EC08D0FC8945B1F71DBD4BDCD8* ___1_config, int32_t* ___2_error, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -36071,7 +36071,7 @@ IL_001d:
 		return (VuVuMarkObserver_tE084D0E0D20D9EC7672BE52857B79C683B94DC84*)NULL;
 	}
 }
-// Method Definition Index: 107901
+// Method Definition Index: 104080
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuVuMarkObserver__ctor_mE750EA3DCF8F1D046F28E9966795F1B5551D21B7 (VuVuMarkObserver_tE084D0E0D20D9EC7672BE52857B79C683B94DC84* __this, VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* ___0_engine, intptr_t ___1_nativeHandle, const RuntimeMethod* method) 
 {
 	{
@@ -36081,7 +36081,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuVuMarkObserver__ctor_mE750EA3DCF8F1D04
 		return;
 	}
 }
-// Method Definition Index: 107902
+// Method Definition Index: 104081
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVuMarkObserver_SetTemplateScale_mD490F4F667E9BC24655F21741D80E6348E71CCD1 (VuVuMarkObserver_tE084D0E0D20D9EC7672BE52857B79C683B94DC84* __this, float ___0_scale, const RuntimeMethod* method) 
 {
 	{
@@ -36094,7 +36094,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVuMarkObserver_SetTemplateScale_mD490F
 		return L_3;
 	}
 }
-// Method Definition Index: 107903
+// Method Definition Index: 104082
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVuMarkObserver_SetTrackingFromRuntimeAppearance_mC2C2D23053D89983CCD752D56590F89809BDBC60 (VuVuMarkObserver_tE084D0E0D20D9EC7672BE52857B79C683B94DC84* __this, bool ___0_enable, const RuntimeMethod* method) 
 {
 	{
@@ -36109,7 +36109,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVuMarkObserver_SetTrackingFromRuntimeA
 		return L_4;
 	}
 }
-// Method Definition Index: 107904
+// Method Definition Index: 104083
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVuMarkObserver_SetTrackingOptimization_m399DACDFE58572CF101386992A8EAD10695C72F9 (VuVuMarkObserver_tE084D0E0D20D9EC7672BE52857B79C683B94DC84* __this, int32_t ___0_optimization, const RuntimeMethod* method) 
 {
 	{
@@ -36234,7 +36234,7 @@ IL2CPP_EXTERN_C void VuVuMarkObservationTemplateInfo_tAD8DCB6F657F5611FD209B4CCD
 	il2cpp_codegen_marshal_free_bstring(marshaled.___userData);
 	marshaled.___userData = NULL;
 }
-// Method Definition Index: 107905
+// Method Definition Index: 104084
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObservationTemplateInfo_vuVuMarkObservationGetTemplateInfo_m0034E2B0F8247A6487DE409BAF01022A2043121D (intptr_t ___0_observation, Internal_tE6D5464580237EE11F1566B042ACAA1CD4F8B9CE* ___1_TemplateInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, Internal_tE6D5464580237EE11F1566B042ACAA1CD4F8B9CE*);
@@ -36256,7 +36256,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObservationTemplateInfo_vuVuM
 
 	return returnValue;
 }
-// Method Definition Index: 107906
+// Method Definition Index: 104085
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVuMarkObservationTemplateInfo_tAD8DCB6F657F5611FD209B4CCDCE508225F63BAF VuVuMarkObservationTemplateInfo_Create_mCF299CADADBFB235A65EFAFAF8D85BECA3B48393 (intptr_t ___0_observationHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -36382,7 +36382,7 @@ IL2CPP_EXTERN_C void VuVuMarkObservationInstanceInfo_t16C259012F500B7E2CA0C8AEE5
 	il2cpp_codegen_com_destroy_safe_array(marshaled.___buffer);
 	marshaled.___buffer = NULL;
 }
-// Method Definition Index: 107907
+// Method Definition Index: 104086
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObservationInstanceInfo_vuVuMarkObservationGetInstanceInfo_m3CB7898258F4E304AA7ECD962BABFDC95D6FCB58 (intptr_t ___0_observation, Internal_t24562F40166EA7C0E1C215AC99F00FC0B0CC7413* ___1_instanceInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, Internal_t24562F40166EA7C0E1C215AC99F00FC0B0CC7413*);
@@ -36404,7 +36404,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObservationInstanceInfo_vuVuM
 
 	return returnValue;
 }
-// Method Definition Index: 107908
+// Method Definition Index: 104087
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVuMarkObservationInstanceInfo_t16C259012F500B7E2CA0C8AEE57F8E82067DE519 VuVuMarkObservationInstanceInfo_Create_m194A3E29D91695A739826AD3DCE5D72D8D2A5500 (intptr_t ___0_observationHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -36479,7 +36479,7 @@ IL_0015:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107914
+// Method Definition Index: 104093
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObservationInfo_vuVuMarkObservationGetInfo_m9CB839163023CF1072FAAB58D22474CD82145E26 (intptr_t ___0_observation, VuVuMarkObservationInfo_t1368EB7F12FB0CE19B3631E43975A8B9DFEC0B34* ___1_info, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, VuVuMarkObservationInfo_t1368EB7F12FB0CE19B3631E43975A8B9DFEC0B34*);
@@ -36501,7 +36501,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVuMarkObservationInfo_vuVuMarkObser
 
 	return returnValue;
 }
-// Method Definition Index: 107915
+// Method Definition Index: 104094
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVuMarkObservationInfo_t1368EB7F12FB0CE19B3631E43975A8B9DFEC0B34 VuVuMarkObservationInfo_Create_m5F3C1CBD908DA1435906F581E0902DE19CDBFCF8 (intptr_t ___0_nativeHandle, const RuntimeMethod* method) 
 {
 	VuVuMarkObservationInfo_t1368EB7F12FB0CE19B3631E43975A8B9DFEC0B34 V_0;
@@ -36535,7 +36535,7 @@ IL_0015:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107916
+// Method Definition Index: 104095
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMarkObservation_vuVuMarkObservationGetStatusInfo_m21E4CFC38E38AE1A2E2D175D10D7DCA3CB95E893 (intptr_t ___0_observationHandle, int32_t* ___1_statusInfo, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, int32_t*);
@@ -36557,7 +36557,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMarkObservation_vuVuMarkObservation
 
 	return returnValue;
 }
-// Method Definition Index: 107917
+// Method Definition Index: 104096
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMarkObservation_vuVuMarkObservationGetInstanceImage_m717FABD7323C8D3F378E1E6B17733D71B0456F6B (intptr_t ___0_observationHandle, intptr_t* ___1_imageHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -36579,7 +36579,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMarkObservation_vuVuMarkObservation
 
 	return returnValue;
 }
-// Method Definition Index: 107918
+// Method Definition Index: 104097
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMarkObservation_get_StatusInfo_m41927F757A768AD98932D36158E762F28E1B518A (VuMarkObservation_tEE285297DFDC63B5B046BAC5B7B428C0192BEF6D* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -36599,7 +36599,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMarkObservation_get_StatusInfo_m419
 		return L_2;
 	}
 }
-// Method Definition Index: 107919
+// Method Definition Index: 104098
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVuMarkObservationTemplateInfo_tAD8DCB6F657F5611FD209B4CCDCE508225F63BAF VuMarkObservation_get_TemplateInfo_mEFBD7E781B40D4CB13A8931B583541DCFCB908B9 (VuMarkObservation_tEE285297DFDC63B5B046BAC5B7B428C0192BEF6D* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -36619,7 +36619,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVuMarkObservationTemplateInfo_tAD8DCB6F657F
 		return L_2;
 	}
 }
-// Method Definition Index: 107920
+// Method Definition Index: 104099
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVuMarkObservationInstanceInfo_t16C259012F500B7E2CA0C8AEE57F8E82067DE519 VuMarkObservation_get_InstanceInfo_m2B9BD12C53802E5325376FD8EEDF63EC84C5F8C6 (VuMarkObservation_tEE285297DFDC63B5B046BAC5B7B428C0192BEF6D* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -36639,7 +36639,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVuMarkObservationInstanceInfo_t16C259012F50
 		return L_2;
 	}
 }
-// Method Definition Index: 107921
+// Method Definition Index: 104100
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuMarkObservation_get_InstanceImage_mC3C8EF281854C071AAA8417C6ECBB0229B598909 (VuMarkObservation_tEE285297DFDC63B5B046BAC5B7B428C0192BEF6D* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -36674,7 +36674,7 @@ IL_0023:
 		return L_5;
 	}
 }
-// Method Definition Index: 107922
+// Method Definition Index: 104101
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMarkObservation_get_RuntimeId_m46F025E23C2A1F33F3797551E1B852C66AD0341C (VuMarkObservation_tEE285297DFDC63B5B046BAC5B7B428C0192BEF6D* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -36695,7 +36695,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMarkObservation_get_RuntimeId_m46F0
 		return L_3;
 	}
 }
-// Method Definition Index: 107923
+// Method Definition Index: 104102
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMarkObservation__ctor_mB9CC60735A8E4D1119DE4DE3C9CBC007018ADC05 (VuMarkObservation_tEE285297DFDC63B5B046BAC5B7B428C0192BEF6D* __this, const RuntimeMethod* method) 
 {
 	{
@@ -36703,7 +36703,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMarkObservation__ctor_mB9CC60735A8E4D1
 		return;
 	}
 }
-// Method Definition Index: 107924
+// Method Definition Index: 104103
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMarkObservation_UnregisterObservation_mFFDC699C0F2C46F959262D6B9FD17B1F63DDD61B (VuMarkObservation_tEE285297DFDC63B5B046BAC5B7B428C0192BEF6D* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -36782,7 +36782,7 @@ IL_0011:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107925
+// Method Definition Index: 104104
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t UnmanagedObjectWrapper_get_Ptr_m540985524180A79F5C25688B8C97BAA59801A37A (UnmanagedObjectWrapper_tE827048241A4D402AAA4E0FA6C91FD03B1E4733B* __this, const RuntimeMethod* method) 
 {
 	{
@@ -36790,7 +36790,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t UnmanagedObjectWrapper_get_Ptr_m5409
 		return L_0;
 	}
 }
-// Method Definition Index: 107926
+// Method Definition Index: 104105
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void UnmanagedObjectWrapper__ctor_mA20A5BA168218E35F6E408721E9B523EE9FE5338 (UnmanagedObjectWrapper_tE827048241A4D402AAA4E0FA6C91FD03B1E4733B* __this, intptr_t ___0_ptr, const RuntimeMethod* method) 
 {
 	{
@@ -36800,7 +36800,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void UnmanagedObjectWrapper__ctor_mA20A5BA168
 		return;
 	}
 }
-// Method Definition Index: 107927
+// Method Definition Index: 104106
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void UnmanagedObjectWrapper_Finalize_mEA6D6666840AA75268AEB6172ED57253F7AD6451 (UnmanagedObjectWrapper_tE827048241A4D402AAA4E0FA6C91FD03B1E4733B* __this, const RuntimeMethod* method) 
 {
 	{
@@ -36829,7 +36829,7 @@ IL_0010:
 		return;
 	}
 }
-// Method Definition Index: 107928
+// Method Definition Index: 104107
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void UnmanagedObjectWrapper_Dispose_m5D107187CC33796CA3B56168D201F6873C6EE5AA (UnmanagedObjectWrapper_tE827048241A4D402AAA4E0FA6C91FD03B1E4733B* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -36845,7 +36845,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void UnmanagedObjectWrapper_Dispose_m5D107187
 		return;
 	}
 }
-// Method Definition Index: 107929
+// Method Definition Index: 104108
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void UnmanagedObjectWrapper_Dispose_m7DDC19EAB1E11435BDA81FCC48D5E9E5E5253A8F (UnmanagedObjectWrapper_tE827048241A4D402AAA4E0FA6C91FD03B1E4733B* __this, bool ___0_disposing, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -36884,7 +36884,7 @@ IL_0013:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107931
+// Method Definition Index: 104110
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void NativeString__ctor_mA5B1F6B34AF26AAA04739E454D4892B97AFB84F2 (NativeString_t7DF2903A69BB3B47A5C95D81328646602CC4BF55* __this, String_t* ___0_value, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -36902,7 +36902,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void NativeString__ctor_mA5B1F6B34AF26AAA0473
 		return;
 	}
 }
-// Method Definition Index: 107932
+// Method Definition Index: 104111
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* NativeString_Clone_m182FB17E063FB51DE09B9A9E8B7E2FB11E032958 (NativeString_t7DF2903A69BB3B47A5C95D81328646602CC4BF55* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -36930,7 +36930,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* NativeString_Clone_m182FB17E06
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107933
+// Method Definition Index: 104112
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Data_t59289BF1D40EB22F76BE0B4CD3C8F7DA67B68D1F* NativeArrayOfStrings_CreateData_mFB500B213BDD45193B4F5C55ECB0C5720BAE3A7A (RuntimeObject* ___0_strings, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -37047,7 +37047,7 @@ IL_004e:
 		return L_23;
 	}
 }
-// Method Definition Index: 107934
+// Method Definition Index: 104113
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void NativeArrayOfStrings__ctor_mE4FE286D4750A8B5D05807F2F8848114737A78C5 (NativeArrayOfStrings_t6096610C81014642D0BA7DB7CDCA0CBA7A7B86E5* __this, RuntimeObject* ___0_strings, const RuntimeMethod* method) 
 {
 	{
@@ -37058,7 +37058,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void NativeArrayOfStrings__ctor_mE4FE286D4750
 		return;
 	}
 }
-// Method Definition Index: 107935
+// Method Definition Index: 104114
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void NativeArrayOfStrings__ctor_m577BB119CDFABDAE61331BB112C6B071545FF1C1 (NativeArrayOfStrings_t6096610C81014642D0BA7DB7CDCA0CBA7A7B86E5* __this, Data_t59289BF1D40EB22F76BE0B4CD3C8F7DA67B68D1F* ___0_data, const RuntimeMethod* method) 
 {
 	{
@@ -37073,7 +37073,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void NativeArrayOfStrings__ctor_m577BB119CDFA
 		return;
 	}
 }
-// Method Definition Index: 107936
+// Method Definition Index: 104115
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void NativeArrayOfStrings_Dispose_m8C2B837E0E561146937ACE3E873C8F3A9A1427D7 (NativeArrayOfStrings_t6096610C81014642D0BA7DB7CDCA0CBA7A7B86E5* __this, bool ___0_disposing, const RuntimeMethod* method) 
 {
 	{
@@ -37093,7 +37093,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void NativeArrayOfStrings_Dispose_m8C2B837E0E
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107937
+// Method Definition Index: 104116
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t Data_get_AddressesBuffer_m74DD6B9F20CACE1453C05B1F8E0246C5D5A1AAC8 (Data_t59289BF1D40EB22F76BE0B4CD3C8F7DA67B68D1F* __this, const RuntimeMethod* method) 
 {
 	{
@@ -37101,7 +37101,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t Data_get_AddressesBuffer_m74DD6B9F20
 		return L_0;
 	}
 }
-// Method Definition Index: 107938
+// Method Definition Index: 104117
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void Data__ctor_mB358698067DEB7482FE0B728EF482A67429076C6 (Data_t59289BF1D40EB22F76BE0B4CD3C8F7DA67B68D1F* __this, NativeStringU5BU5D_t9EB127FAAC1D5268394868870E4E08B6FD4202AB* ___0_nativeStrings, intptr_t ___1_addressesBuffer, const RuntimeMethod* method) 
 {
 	{
@@ -37114,7 +37114,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void Data__ctor_mB358698067DEB7482FE0B728EF48
 		return;
 	}
 }
-// Method Definition Index: 107939
+// Method Definition Index: 104118
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void Data_Dispose_m4A37249FD9B7239989A5864703B8269781574184 (Data_t59289BF1D40EB22F76BE0B4CD3C8F7DA67B68D1F* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -37169,7 +37169,7 @@ IL_0017:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107940
+// Method Definition Index: 104119
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void U3CU3Ec__cctor_m416082E4261B650AEA49EE56401D0330CF77864C (const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -37186,7 +37186,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void U3CU3Ec__cctor_m416082E4261B650AEA49EE56
 		return;
 	}
 }
-// Method Definition Index: 107941
+// Method Definition Index: 104120
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void U3CU3Ec__ctor_m15D18195B40213D952E0F49E1A2DEE932F279C32 (U3CU3Ec_t2659FD3BAFE0A88E0DD3760384955D630B2508A6* __this, const RuntimeMethod* method) 
 {
 	{
@@ -37194,7 +37194,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void U3CU3Ec__ctor_m15D18195B40213D952E0F49E1
 		return;
 	}
 }
-// Method Definition Index: 107942
+// Method Definition Index: 104121
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR NativeString_t7DF2903A69BB3B47A5C95D81328646602CC4BF55* U3CU3Ec_U3CCreateDataU3Eb__2_0_mAF24D9CEAF5D77CC2864121FC5B0ACE40E448F9D (U3CU3Ec_t2659FD3BAFE0A88E0DD3760384955D630B2508A6* __this, String_t* ___0_s, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -37210,7 +37210,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR NativeString_t7DF2903A69BB3B47A5C95D813286466
 		return L_1;
 	}
 }
-// Method Definition Index: 107943
+// Method Definition Index: 104122
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t U3CU3Ec_U3CCreateDataU3Eb__2_1_m6A2178037B1471A5BE515ADEB0DD19648F360097 (U3CU3Ec_t2659FD3BAFE0A88E0DD3760384955D630B2508A6* __this, NativeString_t7DF2903A69BB3B47A5C95D81328646602CC4BF55* ___0_s, const RuntimeMethod* method) 
 {
 	{
@@ -37229,7 +37229,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t U3CU3Ec_U3CCreateDataU3Eb__2_1_m6A21
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107948
+// Method Definition Index: 104127
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuVector2I__ctor_mC863BEC3CA75633C33F8C80C550BD5249976605D (VuVector2I_t6E61240FAD857B768B44FED1EF11930DE260E8BE* __this, int32_t ___0_x, int32_t ___1_y, const RuntimeMethod* method) 
 {
 	{
@@ -37247,7 +37247,7 @@ IL2CPP_EXTERN_C  void VuVector2I__ctor_mC863BEC3CA75633C33F8C80C550BD5249976605D
 	_thisAdjusted = reinterpret_cast<VuVector2I_t6E61240FAD857B768B44FED1EF11930DE260E8BE*>(__this + _offset);
 	VuVector2I__ctor_mC863BEC3CA75633C33F8C80C550BD5249976605D(_thisAdjusted, ___0_x, ___1_y, method);
 }
-// Method Definition Index: 107949
+// Method Definition Index: 104128
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuVector2I__ctor_m84CEFDEA432FEEC8B37FC46B725447DA1AE49F40 (VuVector2I_t6E61240FAD857B768B44FED1EF11930DE260E8BE* __this, Int32U5BU5D_t19C97395396A72ECAF310612F0760F165060314C* ___0_data, const RuntimeMethod* method) 
 {
 	{
@@ -37271,7 +37271,7 @@ IL2CPP_EXTERN_C  void VuVector2I__ctor_m84CEFDEA432FEEC8B37FC46B725447DA1AE49F40
 	_thisAdjusted = reinterpret_cast<VuVector2I_t6E61240FAD857B768B44FED1EF11930DE260E8BE*>(__this + _offset);
 	VuVector2I__ctor_m84CEFDEA432FEEC8B37FC46B725447DA1AE49F40(_thisAdjusted, ___0_data, method);
 }
-// Method Definition Index: 107950
+// Method Definition Index: 104129
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2I_t6E61240FAD857B768B44FED1EF11930DE260E8BE VuVector2I_get_Zero_m5D2F9F5A9C5923CC7C3B59B95CA81FC0C2CC78E8 (const RuntimeMethod* method) 
 {
 	{
@@ -37281,7 +37281,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2I_t6E61240FAD857B768B44FED1EF11930DE
 		return L_0;
 	}
 }
-// Method Definition Index: 107951
+// Method Definition Index: 104130
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2I_t6E61240FAD857B768B44FED1EF11930DE260E8BE VuVector2I_get_Identity_m41587F1822026EF0969DF4C37DB6E26BAE527E90 (const RuntimeMethod* method) 
 {
 	{
@@ -37291,7 +37291,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2I_t6E61240FAD857B768B44FED1EF11930DE
 		return L_0;
 	}
 }
-// Method Definition Index: 107952
+// Method Definition Index: 104131
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector2I_op_Equality_mB72424CD8291C03765E425304ACFD60BB6601B3B (VuVector2I_t6E61240FAD857B768B44FED1EF11930DE260E8BE ___0_a, VuVector2I_t6E61240FAD857B768B44FED1EF11930DE260E8BE ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -37317,7 +37317,7 @@ IL_001d:
 		return (bool)0;
 	}
 }
-// Method Definition Index: 107953
+// Method Definition Index: 104132
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector2I_op_Inequality_m6CDF83DCF38D1F401E05981C01EB9C0021407A3E (VuVector2I_t6E61240FAD857B768B44FED1EF11930DE260E8BE ___0_a, VuVector2I_t6E61240FAD857B768B44FED1EF11930DE260E8BE ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -37343,7 +37343,7 @@ IL_0020:
 		return (bool)1;
 	}
 }
-// Method Definition Index: 107954
+// Method Definition Index: 104133
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector2I_Equals_mEB5893346E834E2DDE7CF37986257248EC5CE07A (VuVector2I_t6E61240FAD857B768B44FED1EF11930DE260E8BE* __this, RuntimeObject* ___0_obj, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -37401,7 +37401,7 @@ IL2CPP_EXTERN_C  bool VuVector2I_Equals_mEB5893346E834E2DDE7CF37986257248EC5CE07
 	_returnValue = VuVector2I_Equals_mEB5893346E834E2DDE7CF37986257248EC5CE07A(_thisAdjusted, ___0_obj, method);
 	return _returnValue;
 }
-// Method Definition Index: 107955
+// Method Definition Index: 104134
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVector2I_GetHashCode_m0CE55E20A92E016C33D95D6BC9C2AC2404C9E4A6 (VuVector2I_t6E61240FAD857B768B44FED1EF11930DE260E8BE* __this, const RuntimeMethod* method) 
 {
 	{
@@ -37427,7 +37427,7 @@ IL2CPP_EXTERN_C  int32_t VuVector2I_GetHashCode_m0CE55E20A92E016C33D95D6BC9C2AC2
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107956
+// Method Definition Index: 104135
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuVector3I__ctor_m2FFD3F223C41E184FE5EBD415E94C12DDC7E210A (VuVector3I_t10B296539FF96F6C5610D6D3FBFB358806C34EA2* __this, int32_t ___0_x, int32_t ___1_y, int32_t ___2_z, const RuntimeMethod* method) 
 {
 	{
@@ -37447,7 +37447,7 @@ IL2CPP_EXTERN_C  void VuVector3I__ctor_m2FFD3F223C41E184FE5EBD415E94C12DDC7E210A
 	_thisAdjusted = reinterpret_cast<VuVector3I_t10B296539FF96F6C5610D6D3FBFB358806C34EA2*>(__this + _offset);
 	VuVector3I__ctor_m2FFD3F223C41E184FE5EBD415E94C12DDC7E210A(_thisAdjusted, ___0_x, ___1_y, ___2_z, method);
 }
-// Method Definition Index: 107957
+// Method Definition Index: 104136
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuVector3I__ctor_mE709F461BC5832B578C6FFA14EEB99BA312892F2 (VuVector3I_t10B296539FF96F6C5610D6D3FBFB358806C34EA2* __this, Int32U5BU5D_t19C97395396A72ECAF310612F0760F165060314C* ___0_data, const RuntimeMethod* method) 
 {
 	{
@@ -37476,7 +37476,7 @@ IL2CPP_EXTERN_C  void VuVector3I__ctor_mE709F461BC5832B578C6FFA14EEB99BA312892F2
 	_thisAdjusted = reinterpret_cast<VuVector3I_t10B296539FF96F6C5610D6D3FBFB358806C34EA2*>(__this + _offset);
 	VuVector3I__ctor_mE709F461BC5832B578C6FFA14EEB99BA312892F2(_thisAdjusted, ___0_data, method);
 }
-// Method Definition Index: 107958
+// Method Definition Index: 104137
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3I_t10B296539FF96F6C5610D6D3FBFB358806C34EA2 VuVector3I_get_Zero_m74527758A012D8D88666C3BA36761B7A31401130 (const RuntimeMethod* method) 
 {
 	{
@@ -37486,7 +37486,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3I_t10B296539FF96F6C5610D6D3FBFB35880
 		return L_0;
 	}
 }
-// Method Definition Index: 107959
+// Method Definition Index: 104138
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3I_t10B296539FF96F6C5610D6D3FBFB358806C34EA2 VuVector3I_get_Identity_m45299E788D29F4800826DFCA11DB2C297C3BBE55 (const RuntimeMethod* method) 
 {
 	{
@@ -37496,7 +37496,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3I_t10B296539FF96F6C5610D6D3FBFB35880
 		return L_0;
 	}
 }
-// Method Definition Index: 107960
+// Method Definition Index: 104139
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector3I_op_Equality_mFBE878C02BAC0F1FEEF616409B093EE49EAF1295 (VuVector3I_t10B296539FF96F6C5610D6D3FBFB358806C34EA2 ___0_a, VuVector3I_t10B296539FF96F6C5610D6D3FBFB358806C34EA2 ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -37532,7 +37532,7 @@ IL_002b:
 		return (bool)0;
 	}
 }
-// Method Definition Index: 107961
+// Method Definition Index: 104140
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector3I_op_Inequality_m6328E11DEECA8C6E2082AD42A33066ADA3318563 (VuVector3I_t10B296539FF96F6C5610D6D3FBFB358806C34EA2 ___0_a, VuVector3I_t10B296539FF96F6C5610D6D3FBFB358806C34EA2 ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -37568,7 +37568,7 @@ IL_002e:
 		return (bool)1;
 	}
 }
-// Method Definition Index: 107962
+// Method Definition Index: 104141
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector3I_Equals_m6603F5BF259F4AD737A46483A3B47F3FBEA9A193 (VuVector3I_t10B296539FF96F6C5610D6D3FBFB358806C34EA2* __this, RuntimeObject* ___0_obj, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -37626,7 +37626,7 @@ IL2CPP_EXTERN_C  bool VuVector3I_Equals_m6603F5BF259F4AD737A46483A3B47F3FBEA9A19
 	_returnValue = VuVector3I_Equals_m6603F5BF259F4AD737A46483A3B47F3FBEA9A193(_thisAdjusted, ___0_obj, method);
 	return _returnValue;
 }
-// Method Definition Index: 107963
+// Method Definition Index: 104142
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVector3I_GetHashCode_mFC0BF58445FE2FBF83F755695C2F0C9BFB347431 (VuVector3I_t10B296539FF96F6C5610D6D3FBFB358806C34EA2* __this, const RuntimeMethod* method) 
 {
 	{
@@ -37653,7 +37653,7 @@ IL2CPP_EXTERN_C  int32_t VuVector3I_GetHashCode_mFC0BF58445FE2FBF83F755695C2F0C9
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107964
+// Method Definition Index: 104143
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuVector4I__ctor_mB3949012EE3E276E3A96944EBB9D21C9F76E54D5 (VuVector4I_t65CC946069BFEBE6DD456EB5F64CB85088AC4155* __this, int32_t ___0_x, int32_t ___1_y, int32_t ___2_z, int32_t ___3_w, const RuntimeMethod* method) 
 {
 	{
@@ -37675,7 +37675,7 @@ IL2CPP_EXTERN_C  void VuVector4I__ctor_mB3949012EE3E276E3A96944EBB9D21C9F76E54D5
 	_thisAdjusted = reinterpret_cast<VuVector4I_t65CC946069BFEBE6DD456EB5F64CB85088AC4155*>(__this + _offset);
 	VuVector4I__ctor_mB3949012EE3E276E3A96944EBB9D21C9F76E54D5(_thisAdjusted, ___0_x, ___1_y, ___2_z, ___3_w, method);
 }
-// Method Definition Index: 107965
+// Method Definition Index: 104144
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuVector4I__ctor_m1707D19E856D72F52225506E0D4A362203326449 (VuVector4I_t65CC946069BFEBE6DD456EB5F64CB85088AC4155* __this, Int32U5BU5D_t19C97395396A72ECAF310612F0760F165060314C* ___0_data, const RuntimeMethod* method) 
 {
 	{
@@ -37709,7 +37709,7 @@ IL2CPP_EXTERN_C  void VuVector4I__ctor_m1707D19E856D72F52225506E0D4A362203326449
 	_thisAdjusted = reinterpret_cast<VuVector4I_t65CC946069BFEBE6DD456EB5F64CB85088AC4155*>(__this + _offset);
 	VuVector4I__ctor_m1707D19E856D72F52225506E0D4A362203326449(_thisAdjusted, ___0_data, method);
 }
-// Method Definition Index: 107966
+// Method Definition Index: 104145
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector4I_t65CC946069BFEBE6DD456EB5F64CB85088AC4155 VuVector4I_get_Zero_m119E544AEFAAF9A53BC95462D8EC6F20A82A0675 (const RuntimeMethod* method) 
 {
 	{
@@ -37719,7 +37719,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector4I_t65CC946069BFEBE6DD456EB5F64CB8508
 		return L_0;
 	}
 }
-// Method Definition Index: 107967
+// Method Definition Index: 104146
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector4I_t65CC946069BFEBE6DD456EB5F64CB85088AC4155 VuVector4I_get_Identity_mF0B2ECCE4DD43C6FE9AF2F7EF160B1CAF1132BA6 (const RuntimeMethod* method) 
 {
 	{
@@ -37729,7 +37729,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector4I_t65CC946069BFEBE6DD456EB5F64CB8508
 		return L_0;
 	}
 }
-// Method Definition Index: 107968
+// Method Definition Index: 104147
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector4I_op_Equality_mE4FF63AAB81B6CFEF4F4B6A231700C600459C70E (VuVector4I_t65CC946069BFEBE6DD456EB5F64CB85088AC4155 ___0_a, VuVector4I_t65CC946069BFEBE6DD456EB5F64CB85088AC4155 ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -37775,7 +37775,7 @@ IL_0039:
 		return (bool)0;
 	}
 }
-// Method Definition Index: 107969
+// Method Definition Index: 104148
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector4I_op_Inequality_mDF8C8400D2E1295750B49371CC573DDE4C7F9B09 (VuVector4I_t65CC946069BFEBE6DD456EB5F64CB85088AC4155 ___0_a, VuVector4I_t65CC946069BFEBE6DD456EB5F64CB85088AC4155 ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -37821,7 +37821,7 @@ IL_003c:
 		return (bool)1;
 	}
 }
-// Method Definition Index: 107970
+// Method Definition Index: 104149
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector4I_Equals_mB59E301B2EEA726B849BAF1A18CB8C9A18A69C8E (VuVector4I_t65CC946069BFEBE6DD456EB5F64CB85088AC4155* __this, RuntimeObject* ___0_obj, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -37879,7 +37879,7 @@ IL2CPP_EXTERN_C  bool VuVector4I_Equals_mB59E301B2EEA726B849BAF1A18CB8C9A18A69C8
 	_returnValue = VuVector4I_Equals_mB59E301B2EEA726B849BAF1A18CB8C9A18A69C8E(_thisAdjusted, ___0_obj, method);
 	return _returnValue;
 }
-// Method Definition Index: 107971
+// Method Definition Index: 104150
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVector4I_GetHashCode_m9BC992D28FB569AE237D4CFB1A569EC5A70480D6 (VuVector4I_t65CC946069BFEBE6DD456EB5F64CB85088AC4155* __this, const RuntimeMethod* method) 
 {
 	{
@@ -37907,7 +37907,7 @@ IL2CPP_EXTERN_C  int32_t VuVector4I_GetHashCode_m9BC992D28FB569AE237D4CFB1A569EC
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107972
+// Method Definition Index: 104151
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuVector2F__ctor_mA50F69888B9CB7BEA0C729A98274D80D1046C66B (VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8* __this, float ___0_x, float ___1_y, const RuntimeMethod* method) 
 {
 	{
@@ -37925,7 +37925,7 @@ IL2CPP_EXTERN_C  void VuVector2F__ctor_mA50F69888B9CB7BEA0C729A98274D80D1046C66B
 	_thisAdjusted = reinterpret_cast<VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8*>(__this + _offset);
 	VuVector2F__ctor_mA50F69888B9CB7BEA0C729A98274D80D1046C66B(_thisAdjusted, ___0_x, ___1_y, method);
 }
-// Method Definition Index: 107973
+// Method Definition Index: 104152
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuVector2F__ctor_mD1920E1C1C392CD6738E0E1DF5C03D467431A1D9 (VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8* __this, SingleU5BU5D_t89DEFE97BCEDB5857010E79ECE0F52CF6E93B87C* ___0_data, const RuntimeMethod* method) 
 {
 	{
@@ -37949,7 +37949,7 @@ IL2CPP_EXTERN_C  void VuVector2F__ctor_mD1920E1C1C392CD6738E0E1DF5C03D467431A1D9
 	_thisAdjusted = reinterpret_cast<VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8*>(__this + _offset);
 	VuVector2F__ctor_mD1920E1C1C392CD6738E0E1DF5C03D467431A1D9(_thisAdjusted, ___0_data, method);
 }
-// Method Definition Index: 107974
+// Method Definition Index: 104153
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 VuVector2F_get_Zero_mCD106EC58A33E43DEAEE3D770FEEFF861FED19C4 (const RuntimeMethod* method) 
 {
 	{
@@ -37959,7 +37959,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4
 		return L_0;
 	}
 }
-// Method Definition Index: 107975
+// Method Definition Index: 104154
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 VuVector2F_get_Identity_m0B05137534DB7CABE6ED21F7FB43F49C54CB64CA (const RuntimeMethod* method) 
 {
 	{
@@ -37969,7 +37969,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4
 		return L_0;
 	}
 }
-// Method Definition Index: 107976
+// Method Definition Index: 104155
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector2F_op_Equality_m2AC42F9254656A4B9298BF56DA1AD1B6276A62AC (VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 ___0_a, VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -37995,7 +37995,7 @@ IL_001d:
 		return (bool)0;
 	}
 }
-// Method Definition Index: 107977
+// Method Definition Index: 104156
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector2F_op_Inequality_m62A6B52B9222E6C4FF0DFF260A2FAD1AED5A440B (VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 ___0_a, VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -38021,7 +38021,7 @@ IL_0020:
 		return (bool)1;
 	}
 }
-// Method Definition Index: 107978
+// Method Definition Index: 104157
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector2F_Equals_m3E4FFA3C29081BE998AE21649889CCAF9999C16C (VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8* __this, RuntimeObject* ___0_obj, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -38079,7 +38079,7 @@ IL2CPP_EXTERN_C  bool VuVector2F_Equals_m3E4FFA3C29081BE998AE21649889CCAF9999C16
 	_returnValue = VuVector2F_Equals_m3E4FFA3C29081BE998AE21649889CCAF9999C16C(_thisAdjusted, ___0_obj, method);
 	return _returnValue;
 }
-// Method Definition Index: 107979
+// Method Definition Index: 104158
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVector2F_GetHashCode_mD6DAE6C33E0B60BAF51069C2C329E7AAA1546C07 (VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8* __this, const RuntimeMethod* method) 
 {
 	{
@@ -38109,7 +38109,7 @@ IL2CPP_EXTERN_C  int32_t VuVector2F_GetHashCode_mD6DAE6C33E0B60BAF51069C2C329E7A
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107980
+// Method Definition Index: 104159
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuVector3F__ctor_m6536390E25B53B7EE4F7FBC958E4A73935DED807 (VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5* __this, float ___0_x, float ___1_y, float ___2_z, const RuntimeMethod* method) 
 {
 	{
@@ -38129,7 +38129,7 @@ IL2CPP_EXTERN_C  void VuVector3F__ctor_m6536390E25B53B7EE4F7FBC958E4A73935DED807
 	_thisAdjusted = reinterpret_cast<VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5*>(__this + _offset);
 	VuVector3F__ctor_m6536390E25B53B7EE4F7FBC958E4A73935DED807(_thisAdjusted, ___0_x, ___1_y, ___2_z, method);
 }
-// Method Definition Index: 107981
+// Method Definition Index: 104160
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuVector3F__ctor_m38F164E71990B30C8C0C95FCF56ADEA1E9217E7C (VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5* __this, SingleU5BU5D_t89DEFE97BCEDB5857010E79ECE0F52CF6E93B87C* ___0_data, const RuntimeMethod* method) 
 {
 	{
@@ -38158,7 +38158,7 @@ IL2CPP_EXTERN_C  void VuVector3F__ctor_m38F164E71990B30C8C0C95FCF56ADEA1E9217E7C
 	_thisAdjusted = reinterpret_cast<VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5*>(__this + _offset);
 	VuVector3F__ctor_m38F164E71990B30C8C0C95FCF56ADEA1E9217E7C(_thisAdjusted, ___0_data, method);
 }
-// Method Definition Index: 107982
+// Method Definition Index: 104161
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 VuVector3F_get_Zero_m07B6C856CFD57564727066C5046EB913869473E0 (const RuntimeMethod* method) 
 {
 	{
@@ -38168,7 +38168,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B
 		return L_0;
 	}
 }
-// Method Definition Index: 107983
+// Method Definition Index: 104162
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 VuVector3F_get_Identity_m643C5F8F92AAA513AA87F695EF49AE8F0834659B (const RuntimeMethod* method) 
 {
 	{
@@ -38178,7 +38178,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B
 		return L_0;
 	}
 }
-// Method Definition Index: 107984
+// Method Definition Index: 104163
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector3F_op_Equality_m6974DD05A879FCD7D7AA44ABAC2416E8A07904B5 (VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 ___0_a, VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -38214,7 +38214,7 @@ IL_002b:
 		return (bool)0;
 	}
 }
-// Method Definition Index: 107985
+// Method Definition Index: 104164
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector3F_op_Inequality_m5F24C0F7FC270D38DE737623D2FB4CD3868488E6 (VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 ___0_a, VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -38250,7 +38250,7 @@ IL_002e:
 		return (bool)1;
 	}
 }
-// Method Definition Index: 107986
+// Method Definition Index: 104165
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 VuVector3F_op_Addition_mFFAB44A4EC95FC7B5EFB1D3CACED66562D68B1B5 (VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 ___0_a, VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -38272,7 +38272,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B
 		return L_12;
 	}
 }
-// Method Definition Index: 107987
+// Method Definition Index: 104166
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 VuVector3F_op_Subtraction_m7578C215ACE2BB76876D506B137077ED198E55BC (VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 ___0_a, VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -38294,7 +38294,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B
 		return L_12;
 	}
 }
-// Method Definition Index: 107988
+// Method Definition Index: 104167
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 VuVector3F_op_Multiply_m4E41B78420EB3315B668F28833299987D9793870 (VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 ___0_a, float ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -38313,7 +38313,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B
 		return L_9;
 	}
 }
-// Method Definition Index: 107989
+// Method Definition Index: 104168
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 VuVector3F_op_Division_mAE1E5DBE3B18462CDF3F4D5EEA57C2A1C98837E7 (VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 ___0_a, float ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -38332,7 +38332,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector3F_t0D8184FEC600D512E82695E2BE073109B
 		return L_9;
 	}
 }
-// Method Definition Index: 107990
+// Method Definition Index: 104169
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector3F_Equals_mA6B642264A2FBA9B0EE45FE2DCA42A6A073AE8FC (VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5* __this, RuntimeObject* ___0_obj, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -38390,7 +38390,7 @@ IL2CPP_EXTERN_C  bool VuVector3F_Equals_mA6B642264A2FBA9B0EE45FE2DCA42A6A073AE8F
 	_returnValue = VuVector3F_Equals_mA6B642264A2FBA9B0EE45FE2DCA42A6A073AE8FC(_thisAdjusted, ___0_obj, method);
 	return _returnValue;
 }
-// Method Definition Index: 107991
+// Method Definition Index: 104170
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVector3F_GetHashCode_m67EAAFE8603FE61CE5A35D0FD538F3736A677889 (VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5* __this, const RuntimeMethod* method) 
 {
 	{
@@ -38423,7 +38423,7 @@ IL2CPP_EXTERN_C  int32_t VuVector3F_GetHashCode_m67EAAFE8603FE61CE5A35D0FD538F37
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 107992
+// Method Definition Index: 104171
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuVector4F__ctor_m848782FE5D521A3F39CDA3752538515D425B201C (VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2FDA14245* __this, float ___0_x, float ___1_y, float ___2_z, float ___3_w, const RuntimeMethod* method) 
 {
 	{
@@ -38445,7 +38445,7 @@ IL2CPP_EXTERN_C  void VuVector4F__ctor_m848782FE5D521A3F39CDA3752538515D425B201C
 	_thisAdjusted = reinterpret_cast<VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2FDA14245*>(__this + _offset);
 	VuVector4F__ctor_m848782FE5D521A3F39CDA3752538515D425B201C(_thisAdjusted, ___0_x, ___1_y, ___2_z, ___3_w, method);
 }
-// Method Definition Index: 107993
+// Method Definition Index: 104172
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuVector4F__ctor_m3A07ACFD2E6BA1760B72C9686B19EC57BE63FBF7 (VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2FDA14245* __this, SingleU5BU5D_t89DEFE97BCEDB5857010E79ECE0F52CF6E93B87C* ___0_data, const RuntimeMethod* method) 
 {
 	{
@@ -38479,7 +38479,7 @@ IL2CPP_EXTERN_C  void VuVector4F__ctor_m3A07ACFD2E6BA1760B72C9686B19EC57BE63FBF7
 	_thisAdjusted = reinterpret_cast<VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2FDA14245*>(__this + _offset);
 	VuVector4F__ctor_m3A07ACFD2E6BA1760B72C9686B19EC57BE63FBF7(_thisAdjusted, ___0_data, method);
 }
-// Method Definition Index: 107994
+// Method Definition Index: 104173
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2FDA14245 VuVector4F_get_Zero_m59CDAECE6059C7050587E9E5CB3783D11D00AEC5 (const RuntimeMethod* method) 
 {
 	{
@@ -38489,7 +38489,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2F
 		return L_0;
 	}
 }
-// Method Definition Index: 107995
+// Method Definition Index: 104174
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2FDA14245 VuVector4F_get_Identity_mF9A47E1244022DCCE0A9D474B747369FFFDC9F66 (const RuntimeMethod* method) 
 {
 	{
@@ -38499,7 +38499,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2F
 		return L_0;
 	}
 }
-// Method Definition Index: 107996
+// Method Definition Index: 104175
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector4F_op_Equality_m567D7A666C5ADB2871B4A4D02C87B09A72698841 (VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2FDA14245 ___0_a, VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2FDA14245 ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -38545,7 +38545,7 @@ IL_0039:
 		return (bool)0;
 	}
 }
-// Method Definition Index: 107997
+// Method Definition Index: 104176
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector4F_op_Inequality_mEF0F7B1CFFB7702D1D02196212151559889E57D9 (VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2FDA14245 ___0_a, VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2FDA14245 ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -38591,7 +38591,7 @@ IL_003c:
 		return (bool)1;
 	}
 }
-// Method Definition Index: 107998
+// Method Definition Index: 104177
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector4F_Equals_m605536B1F3C5B1B78BDE6ACF258A1EB77213ADFB (VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2FDA14245* __this, RuntimeObject* ___0_obj, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -38649,7 +38649,7 @@ IL2CPP_EXTERN_C  bool VuVector4F_Equals_m605536B1F3C5B1B78BDE6ACF258A1EB77213ADF
 	_returnValue = VuVector4F_Equals_m605536B1F3C5B1B78BDE6ACF258A1EB77213ADFB(_thisAdjusted, ___0_obj, method);
 	return _returnValue;
 }
-// Method Definition Index: 107999
+// Method Definition Index: 104178
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVector4F_GetHashCode_mC32724F2D652860F0ADFCDE6F4DE24F0BFA90F91 (VuVector4F_tD36A0D6B5C1492D847703BD2D57FD4B2FDA14245* __this, const RuntimeMethod* method) 
 {
 	{
@@ -38685,7 +38685,7 @@ IL2CPP_EXTERN_C  int32_t VuVector4F_GetHashCode_mC32724F2D652860F0ADFCDE6F4DE24F
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 108000
+// Method Definition Index: 104179
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuVector8F__ctor_m2C54CAFDFF1078CBE63F4EA3FA01826F2E4B7AC4 (VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8* __this, float ___0_m0, float ___1_m1, float ___2_m2, float ___3_m3, float ___4_m4, float ___5_m5, float ___6_m6, float ___7_m7, const RuntimeMethod* method) 
 {
 	{
@@ -38715,7 +38715,7 @@ IL2CPP_EXTERN_C  void VuVector8F__ctor_m2C54CAFDFF1078CBE63F4EA3FA01826F2E4B7AC4
 	_thisAdjusted = reinterpret_cast<VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8*>(__this + _offset);
 	VuVector8F__ctor_m2C54CAFDFF1078CBE63F4EA3FA01826F2E4B7AC4(_thisAdjusted, ___0_m0, ___1_m1, ___2_m2, ___3_m3, ___4_m4, ___5_m5, ___6_m6, ___7_m7, method);
 }
-// Method Definition Index: 108001
+// Method Definition Index: 104180
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuVector8F__ctor_mDF1F9CAC8810F3ACAA8A5953B403FC18CBF32C94 (VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8* __this, SingleU5BU5D_t89DEFE97BCEDB5857010E79ECE0F52CF6E93B87C* ___0_data, const RuntimeMethod* method) 
 {
 	{
@@ -38769,7 +38769,7 @@ IL2CPP_EXTERN_C  void VuVector8F__ctor_mDF1F9CAC8810F3ACAA8A5953B403FC18CBF32C94
 	_thisAdjusted = reinterpret_cast<VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8*>(__this + _offset);
 	VuVector8F__ctor_mDF1F9CAC8810F3ACAA8A5953B403FC18CBF32C94(_thisAdjusted, ___0_data, method);
 }
-// Method Definition Index: 108002
+// Method Definition Index: 104181
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8 VuVector8F_get_Zero_mCB2BB9208E8DF57470FA2B529F578341FA47F6FE (const RuntimeMethod* method) 
 {
 	{
@@ -38779,7 +38779,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE7
 		return L_0;
 	}
 }
-// Method Definition Index: 108003
+// Method Definition Index: 104182
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8 VuVector8F_get_Identity_m8F94DDB9A33ADCD1963B0B5A35C28555144A5627 (const RuntimeMethod* method) 
 {
 	{
@@ -38789,7 +38789,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE7
 		return L_0;
 	}
 }
-// Method Definition Index: 108004
+// Method Definition Index: 104183
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector8F_op_Equality_m96E1DC18E225438E936A24033F28F8669992D03D (VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8 ___0_a, VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8 ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -38875,7 +38875,7 @@ IL_0071:
 		return (bool)0;
 	}
 }
-// Method Definition Index: 108005
+// Method Definition Index: 104184
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector8F_op_Inequality_m39370F2D380CF59812CCFAE23A0CB7B5D07623AC (VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8 ___0_a, VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8 ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -38961,7 +38961,7 @@ IL_0074:
 		return (bool)1;
 	}
 }
-// Method Definition Index: 108006
+// Method Definition Index: 104185
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuVector8F_Equals_m0C3D97C81F6D16700488BB216F637AEA65B0025E (VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8* __this, RuntimeObject* ___0_obj, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -39019,7 +39019,7 @@ IL2CPP_EXTERN_C  bool VuVector8F_Equals_m0C3D97C81F6D16700488BB216F637AEA65B0025
 	_returnValue = VuVector8F_Equals_m0C3D97C81F6D16700488BB216F637AEA65B0025E(_thisAdjusted, ___0_obj, method);
 	return _returnValue;
 }
-// Method Definition Index: 108007
+// Method Definition Index: 104186
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuVector8F_GetHashCode_m5885649ABF1F6DB86EADEBDC3B9D74E4BF1CC2D7 (VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8* __this, const RuntimeMethod* method) 
 {
 	{
@@ -39067,7 +39067,7 @@ IL2CPP_EXTERN_C  int32_t VuVector8F_GetHashCode_m5885649ABF1F6DB86EADEBDC3B9D74E
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 108008
+// Method Definition Index: 104187
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMatrix33F__ctor_m25A039E83FFDFF3C12B07DD85C354BC29BB29EBB (VuMatrix33F_t2623D6358F8D194B85AE59D801C90267F1B8B697* __this, SingleU5BU5D_t89DEFE97BCEDB5857010E79ECE0F52CF6E93B87C* ___0_data, const RuntimeMethod* method) 
 {
 	{
@@ -39126,7 +39126,7 @@ IL2CPP_EXTERN_C  void VuMatrix33F__ctor_m25A039E83FFDFF3C12B07DD85C354BC29BB29EB
 	_thisAdjusted = reinterpret_cast<VuMatrix33F_t2623D6358F8D194B85AE59D801C90267F1B8B697*>(__this + _offset);
 	VuMatrix33F__ctor_m25A039E83FFDFF3C12B07DD85C354BC29BB29EBB(_thisAdjusted, ___0_data, method);
 }
-// Method Definition Index: 108009
+// Method Definition Index: 104188
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix33F_t2623D6358F8D194B85AE59D801C90267F1B8B697 VuMatrix33F_get_Zero_m79DF198669ACE931D15016D2CD6BC91BC64360AF (const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -39143,7 +39143,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix33F_t2623D6358F8D194B85AE59D801C90267
 		return L_1;
 	}
 }
-// Method Definition Index: 108010
+// Method Definition Index: 104189
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix33F_t2623D6358F8D194B85AE59D801C90267F1B8B697 VuMatrix33F_get_Identity_m0DC5B8927D5EFE6CE7724A3FC92BE42B91B5E0DC (const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -39164,7 +39164,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix33F_t2623D6358F8D194B85AE59D801C90267
 		return L_3;
 	}
 }
-// Method Definition Index: 108011
+// Method Definition Index: 104190
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuMatrix33F_op_Equality_m88D2B9CA36523F8AC5C0DBF60FED76DBB5CB922F (VuMatrix33F_t2623D6358F8D194B85AE59D801C90267F1B8B697 ___0_a, VuMatrix33F_t2623D6358F8D194B85AE59D801C90267F1B8B697 ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -39260,7 +39260,7 @@ IL_007f:
 		return (bool)0;
 	}
 }
-// Method Definition Index: 108012
+// Method Definition Index: 104191
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuMatrix33F_op_Inequality_mA7BF5D962E62C8BC9247A2AF5637E6850EEC2C51 (VuMatrix33F_t2623D6358F8D194B85AE59D801C90267F1B8B697 ___0_a, VuMatrix33F_t2623D6358F8D194B85AE59D801C90267F1B8B697 ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -39356,7 +39356,7 @@ IL_0082:
 		return (bool)1;
 	}
 }
-// Method Definition Index: 108013
+// Method Definition Index: 104192
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuMatrix33F_Equals_mDAA0FC6CAE06EB3975AB060D82627FD6A4FD3421 (VuMatrix33F_t2623D6358F8D194B85AE59D801C90267F1B8B697* __this, RuntimeObject* ___0_obj, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -39414,7 +39414,7 @@ IL2CPP_EXTERN_C  bool VuMatrix33F_Equals_mDAA0FC6CAE06EB3975AB060D82627FD6A4FD34
 	_returnValue = VuMatrix33F_Equals_mDAA0FC6CAE06EB3975AB060D82627FD6A4FD3421(_thisAdjusted, ___0_obj, method);
 	return _returnValue;
 }
-// Method Definition Index: 108014
+// Method Definition Index: 104193
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMatrix33F_GetHashCode_m28A0F04A46A0B473F6F52343E060277B79085A14 (VuMatrix33F_t2623D6358F8D194B85AE59D801C90267F1B8B697* __this, const RuntimeMethod* method) 
 {
 	{
@@ -39465,7 +39465,7 @@ IL2CPP_EXTERN_C  int32_t VuMatrix33F_GetHashCode_m28A0F04A46A0B473F6F52343E06027
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 108015
+// Method Definition Index: 104194
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMatrix44F__ctor_m9EB36FF091105F033F834B59FE051465DF6FE61E (VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6* __this, SingleU5BU5D_t89DEFE97BCEDB5857010E79ECE0F52CF6E93B87C* ___0_data, const RuntimeMethod* method) 
 {
 	{
@@ -39559,7 +39559,7 @@ IL2CPP_EXTERN_C  void VuMatrix44F__ctor_m9EB36FF091105F033F834B59FE051465DF6FE61
 	_thisAdjusted = reinterpret_cast<VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6*>(__this + _offset);
 	VuMatrix44F__ctor_m9EB36FF091105F033F834B59FE051465DF6FE61E(_thisAdjusted, ___0_data, method);
 }
-// Method Definition Index: 108016
+// Method Definition Index: 104195
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 VuMatrix44F_get_Zero_mDFE7457F1A836108B261278DB63A8EB14515E748 (const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -39576,7 +39576,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30F
 		return L_1;
 	}
 }
-// Method Definition Index: 108017
+// Method Definition Index: 104196
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 VuMatrix44F_get_Identity_mC274BF6C8D7FBEE1CDA3CA222AC7B086EAB59F8F (const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -39597,7 +39597,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuMatrix44F_tC75A0AF8524BED265F800A953806F30F
 		return L_3;
 	}
 }
-// Method Definition Index: 108018
+// Method Definition Index: 104197
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuMatrix44F_op_Equality_m0242A2CA65A8A7953B7386FE145743E40EBB690E (VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 ___0_a, VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -39763,7 +39763,7 @@ IL_00f3:
 		return (bool)0;
 	}
 }
-// Method Definition Index: 108019
+// Method Definition Index: 104198
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuMatrix44F_op_Inequality_mF77CDDDE6757F3AD7A71BB17FA1C8DB6AEFA958E (VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 ___0_a, VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6 ___1_b, const RuntimeMethod* method) 
 {
 	{
@@ -39929,7 +39929,7 @@ IL_00f9:
 		return (bool)1;
 	}
 }
-// Method Definition Index: 108020
+// Method Definition Index: 104199
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuMatrix44F_Equals_m5FEA274551E330BE6DE3748ADA2FAE2C57EFAF16 (VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6* __this, RuntimeObject* ___0_obj, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -39987,7 +39987,7 @@ IL2CPP_EXTERN_C  bool VuMatrix44F_Equals_m5FEA274551E330BE6DE3748ADA2FAE2C57EFAF
 	_returnValue = VuMatrix44F_Equals_m5FEA274551E330BE6DE3748ADA2FAE2C57EFAF16(_thisAdjusted, ___0_obj, method);
 	return _returnValue;
 }
-// Method Definition Index: 108021
+// Method Definition Index: 104200
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuMatrix44F_GetHashCode_m2910C7834B562F0F6624E45B9EED2C57CDA933B7 (VuMatrix44F_tC75A0AF8524BED265F800A953806F30FA28B8DE6* __this, const RuntimeMethod* method) 
 {
 	{
@@ -40059,7 +40059,7 @@ IL2CPP_EXTERN_C  int32_t VuMatrix44F_GetHashCode_m2910C7834B562F0F6624E45B9EED2C
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 108022
+// Method Definition Index: 104201
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuAABB__ctor_m21FBF1271283B64F79E38CB18F32032DDC48FA43 (VuAABB_tBF8ABA143EBB3E1715EDE17B7EC021FA7122F738* __this, VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 ___0_center, VuVector3F_t0D8184FEC600D512E82695E2BE073109B24E62D5 ___1_extent, const RuntimeMethod* method) 
 {
 	{
@@ -40093,7 +40093,7 @@ IL2CPP_EXTERN_C  void VuAABB__ctor_m21FBF1271283B64F79E38CB18F32032DDC48FA43_Adj
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 108051
+// Method Definition Index: 104230
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* ValueAccessUtils_GetStringValue_m2BAAE1DC3B1B41D15DADC8AD489D85245A3E53A3 (intptr_t ___0_nativeHandle, GetStringValueDelegate_tB4D96A40A4403E90FC83510A7F934C7D57F82459* ___1_callback, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -40130,7 +40130,7 @@ IL_0016:
 		return L_5;
 	}
 }
-// Method Definition Index: 108053
+// Method Definition Index: 104232
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool ValueAccessUtils_GetBoolValue_m15133468B5BDE58EB95EBF60681B69DEBE44ED54 (intptr_t ___0_nativeHandle, GetBoolValueDelegate_tB4BDA670413BFE20F96128F92DFA647AE6B12CC4* ___1_callback, const RuntimeMethod* method) 
 {
 	int32_t V_0 = 0;
@@ -40198,7 +40198,7 @@ IL2CPP_EXTERN_C  int32_t DelegatePInvokeWrapper_GetStringValueDelegate_tB4D96A40
 
 	return returnValue;
 }
-// Method Definition Index: 108056
+// Method Definition Index: 104235
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void GetStringValueDelegate__ctor_mB8AACA1C472B2A76BE792D7EFF3AAABCA18FA880 (GetStringValueDelegate_tB4D96A40A4403E90FC83510A7F934C7D57F82459* __this, RuntimeObject* ___0_object, intptr_t ___1_method, const RuntimeMethod* method) 
 {
 	__this->___method_ptr = (intptr_t)il2cpp_codegen_get_method_pointer((RuntimeMethod*)___1_method);
@@ -40227,13 +40227,13 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void GetStringValueDelegate__ctor_mB8AACA1C47
 	}
 	__this->___extra_arg = (intptr_t)&GetStringValueDelegate_Invoke_m1008CDB56AE52CA60AD42419B9124CD33BE6D0E1_Multicast;
 }
-// Method Definition Index: 108057
+// Method Definition Index: 104236
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t GetStringValueDelegate_Invoke_m1008CDB56AE52CA60AD42419B9124CD33BE6D0E1 (GetStringValueDelegate_tB4D96A40A4403E90FC83510A7F934C7D57F82459* __this, intptr_t ___0_nativeHandle, intptr_t* ___1_stringHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (*FunctionPointerType) (RuntimeObject*, intptr_t, intptr_t*, const RuntimeMethod*);
 	return ((FunctionPointerType)__this->___invoke_impl)((Il2CppObject*)__this->___method_code, ___0_nativeHandle, ___1_stringHandle, reinterpret_cast<RuntimeMethod*>(__this->___method));
 }
-// Method Definition Index: 108058
+// Method Definition Index: 104237
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* GetStringValueDelegate_BeginInvoke_m86331638BD650F6CDD2AFD106B014C0FA7A105AA (GetStringValueDelegate_tB4D96A40A4403E90FC83510A7F934C7D57F82459* __this, intptr_t ___0_nativeHandle, intptr_t* ___1_stringHandle, AsyncCallback_t7FEF460CBDCFB9C5FA2EF776984778B9A4145F4C* ___2_callback, RuntimeObject* ___3_object, const RuntimeMethod* method) 
 {
 	void *__d_args[3] = {0};
@@ -40241,7 +40241,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* GetStringValueDelegate_BeginIn
 	__d_args[1] = Box(il2cpp_defaults.int_class, &*___1_stringHandle);
 	return (RuntimeObject*)il2cpp_codegen_delegate_begin_invoke((RuntimeDelegate*)__this, __d_args, (RuntimeDelegate*)___2_callback, (RuntimeObject*)___3_object);
 }
-// Method Definition Index: 108059
+// Method Definition Index: 104238
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t GetStringValueDelegate_EndInvoke_m591291B3674014061A42C62D9B6CD43383C2EE05 (GetStringValueDelegate_tB4D96A40A4403E90FC83510A7F934C7D57F82459* __this, intptr_t* ___0_stringHandle, RuntimeObject* ___1_result, const RuntimeMethod* method) 
 {
 	void* ___out_args[] = {
@@ -40289,7 +40289,7 @@ IL2CPP_EXTERN_C  int32_t DelegatePInvokeWrapper_GetBoolValueDelegate_tB4BDA67041
 
 	return returnValue;
 }
-// Method Definition Index: 108064
+// Method Definition Index: 104243
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void GetBoolValueDelegate__ctor_m80AB3322B3F26E49FF578C9B455646EE6ED7EF11 (GetBoolValueDelegate_tB4BDA670413BFE20F96128F92DFA647AE6B12CC4* __this, RuntimeObject* ___0_object, intptr_t ___1_method, const RuntimeMethod* method) 
 {
 	__this->___method_ptr = (intptr_t)il2cpp_codegen_get_method_pointer((RuntimeMethod*)___1_method);
@@ -40318,13 +40318,13 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void GetBoolValueDelegate__ctor_m80AB3322B3F2
 	}
 	__this->___extra_arg = (intptr_t)&GetBoolValueDelegate_Invoke_m49E9EAF29AADD822372510B773573323483BCB89_Multicast;
 }
-// Method Definition Index: 108065
+// Method Definition Index: 104244
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t GetBoolValueDelegate_Invoke_m49E9EAF29AADD822372510B773573323483BCB89 (GetBoolValueDelegate_tB4BDA670413BFE20F96128F92DFA647AE6B12CC4* __this, intptr_t ___0_nativeHandle, int32_t* ___1_value, const RuntimeMethod* method) 
 {
 	typedef int32_t (*FunctionPointerType) (RuntimeObject*, intptr_t, int32_t*, const RuntimeMethod*);
 	return ((FunctionPointerType)__this->___invoke_impl)((Il2CppObject*)__this->___method_code, ___0_nativeHandle, ___1_value, reinterpret_cast<RuntimeMethod*>(__this->___method));
 }
-// Method Definition Index: 108066
+// Method Definition Index: 104245
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* GetBoolValueDelegate_BeginInvoke_mE661CC386A732DE0F7967B462DCFB1540C2CE43E (GetBoolValueDelegate_tB4BDA670413BFE20F96128F92DFA647AE6B12CC4* __this, intptr_t ___0_nativeHandle, int32_t* ___1_value, AsyncCallback_t7FEF460CBDCFB9C5FA2EF776984778B9A4145F4C* ___2_callback, RuntimeObject* ___3_object, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -40338,7 +40338,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* GetBoolValueDelegate_BeginInvo
 	__d_args[1] = Box(VuBool_t78BE7AC331EFF92B3AF6F2705A40E7F71994093E_il2cpp_TypeInfo_var, &*___1_value);
 	return (RuntimeObject*)il2cpp_codegen_delegate_begin_invoke((RuntimeDelegate*)__this, __d_args, (RuntimeDelegate*)___2_callback, (RuntimeObject*)___3_object);
 }
-// Method Definition Index: 108067
+// Method Definition Index: 104246
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t GetBoolValueDelegate_EndInvoke_mA49E9BD8B76319FF21F91ABB46498C51B8799E5E (GetBoolValueDelegate_tB4BDA670413BFE20F96128F92DFA647AE6B12CC4* __this, int32_t* ___0_value, RuntimeObject* ___1_result, const RuntimeMethod* method) 
 {
 	void* ___out_args[] = {
@@ -40427,7 +40427,7 @@ IL2CPP_EXTERN_C void VuValidationAreaConfig_tE751FB3FD9B3F3E7443651A0ECAB71EF938
 	il2cpp_codegen_marshal_free(marshaled.___validationAreaName);
 	marshaled.___validationAreaName = NULL;
 }
-// Method Definition Index: 108076
+// Method Definition Index: 104255
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuValidationAreaConfig_Clone_m5340D5088510C9A1C13B2EDF66D1679FD00A865D (VuValidationAreaConfig_tE751FB3FD9B3F3E7443651A0ECAB71EF9381528D* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -40464,7 +40464,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuValidationAreaConfig_Clone_m
 		return L_9;
 	}
 }
-// Method Definition Index: 108077
+// Method Definition Index: 104256
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuValidationAreaConfig__ctor_mEFF4D9F74DD4DBCCD78DFA0582D99B8B1A8DE444 (VuValidationAreaConfig_tE751FB3FD9B3F3E7443651A0ECAB71EF9381528D* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -40501,7 +40501,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuValidationAreaConfig__ctor_mEFF4D9F74D
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 108078
+// Method Definition Index: 104257
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuValidationAreaFileConfig_Clone_mCF37A49851ABE05A78343A798415473D1C48FAD0 (VuValidationAreaFileConfig_tD0C591E40E9B2966C7A044D360EF1AA93EF3A13B* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -40544,7 +40544,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuValidationAreaFileConfig_Clo
 		return L_11;
 	}
 }
-// Method Definition Index: 108079
+// Method Definition Index: 104258
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuValidationAreaFileConfig__ctor_mCE72984E511E69DE290F40768A9CEF332A747C03 (VuValidationAreaFileConfig_tD0C591E40E9B2966C7A044D360EF1AA93EF3A13B* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -40652,7 +40652,7 @@ IL2CPP_EXTERN_C void Internal_t8902641E2E0645010A25F386183F10778823BC13_marshal_
 	il2cpp_codegen_marshal_free(marshaled.___validationAreaName);
 	marshaled.___validationAreaName = NULL;
 }
-// Method Definition Index: 108080
+// Method Definition Index: 104259
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Internal_t8902641E2E0645010A25F386183F10778823BC13 Internal_Create_mCA0A032B3CD5565FFBDCAF178634A458D6431324 (VuValidationAreaFileConfig_tD0C591E40E9B2966C7A044D360EF1AA93EF3A13B* ___0_config, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -40746,7 +40746,7 @@ IL_0025:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 108081
+// Method Definition Index: 104260
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuValidationAreaBufferConfig_Clone_m2BD79F5610C2A8E9C7E5905D4829BA880DADCF26 (VuValidationAreaBufferConfig_tE96FFA63D81203A9345F404A1C84C50375BBCD7D* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -40792,7 +40792,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* VuValidationAreaBufferConfig_C
 		return L_13;
 	}
 }
-// Method Definition Index: 108082
+// Method Definition Index: 104261
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuValidationAreaBufferConfig__ctor_m3101A8474D84ED10FDC297F2A0D166F523FA299A (VuValidationAreaBufferConfig_tE96FFA63D81203A9345F404A1C84C50375BBCD7D* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -40912,7 +40912,7 @@ IL2CPP_EXTERN_C void Internal_tA24C6804D22B34A9876AD24E7629EFFB78468D7B_marshal_
 	il2cpp_codegen_marshal_free(marshaled.___validationAreaName);
 	marshaled.___validationAreaName = NULL;
 }
-// Method Definition Index: 108083
+// Method Definition Index: 104262
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Internal_tA24C6804D22B34A9876AD24E7629EFFB78468D7B Internal_Create_m870D63D48A7133412809B5364410FE3B05DB3BB9 (VuValidationAreaBufferConfig_tE96FFA63D81203A9345F404A1C84C50375BBCD7D* ___0_config, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -41055,7 +41055,7 @@ IL2CPP_EXTERN_C void VuRepresentativeImageInfo_tCA6AC4EB357BA329BF1AA8E4EB08C5BB
 IL2CPP_EXTERN_C void VuRepresentativeImageInfo_tCA6AC4EB357BA329BF1AA8E4EB08C5BBAFAD483E_marshal_com_cleanup(VuRepresentativeImageInfo_tCA6AC4EB357BA329BF1AA8E4EB08C5BBAFAD483E_marshaled_com& marshaled)
 {
 }
-// Method Definition Index: 108085
+// Method Definition Index: 104264
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuRepresentativeImageInfo__ctor_mCC12A35A5A6ACC9552F23DAA6C5419474E9CB1B3 (VuRepresentativeImageInfo_tCA6AC4EB357BA329BF1AA8E4EB08C5BBAFAD483E* __this, Internal_t829107C961AD9CE4A2F067019607699F3C71061A ___0_native, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -41116,7 +41116,7 @@ IL2CPP_EXTERN_C  void VuRepresentativeImageInfo__ctor_mCC12A35A5A6ACC9552F23DAA6
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 108096
+// Method Definition Index: 104275
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuValidationAreaLabel_vuValidationAreaLabelGetName_m2837156FC467F45306440E293AA17F89E4FEB7BB (intptr_t ___0_stateHandle, intptr_t* ___1_name, const RuntimeMethod* method) 
 {
 	typedef int32_t (CDECL *PInvokeFunc) (intptr_t, intptr_t*);
@@ -41138,7 +41138,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuValidationAreaLabel_vuValidationAre
 
 	return returnValue;
 }
-// Method Definition Index: 108097
+// Method Definition Index: 104276
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuValidationAreaLabel_get_Name_m615C3283FB09B6512C6F106D0868B6C650B8DF7A (VuValidationAreaLabel_t7BE793E647F3C7E6F54F30342BE3A7530AE198CB* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41146,7 +41146,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* VuValidationAreaLabel_get_Name_m615
 		return L_0;
 	}
 }
-// Method Definition Index: 108098
+// Method Definition Index: 104277
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuValidationAreaLabel_set_Name_m96D85B5687F984B0A26280B882434D1A82496D72 (VuValidationAreaLabel_t7BE793E647F3C7E6F54F30342BE3A7530AE198CB* __this, String_t* ___0_value, const RuntimeMethod* method) 
 {
 	{
@@ -41156,7 +41156,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuValidationAreaLabel_set_Name_m96D85B56
 		return;
 	}
 }
-// Method Definition Index: 108099
+// Method Definition Index: 104278
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuValidationAreaLabel_t7BE793E647F3C7E6F54F30342BE3A7530AE198CB* VuValidationAreaLabel_Create_m45AB94E39B03E58EB66E454CC9D68B9DB9127EB9 (intptr_t ___0_nativeHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -41172,7 +41172,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR VuValidationAreaLabel_t7BE793E647F3C7E6F54F30
 		return L_1;
 	}
 }
-// Method Definition Index: 108100
+// Method Definition Index: 104279
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuValidationAreaLabel__ctor_mDF175CCA8EB781D808A16F733F790DA58D9EECD9 (VuValidationAreaLabel_t7BE793E647F3C7E6F54F30342BE3A7530AE198CB* __this, intptr_t ___0_nativeHandle, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -41196,7 +41196,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuValidationAreaLabel__ctor_mDF175CCA8EB
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
-// Method Definition Index: 107639
+// Method Definition Index: 103818
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t VuObserver_get_NativeHandle_m0DF9843ED5DCA1A40CD3A38E73C34795D6B68642_inline (VuObserver_t90742BFE20A846DDA5C7064512EC0D4C4B0F0B80* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41204,7 +41204,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t VuObserver_get_NativeHan
 		return L_0;
 	}
 }
-// Method Definition Index: 107210
+// Method Definition Index: 103389
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t VuEngine_get_NativeHandle_m627B2FB5C12F7BEDA0A6FEF45800E2536E9BC595_inline (VuEngine_t1F34A373F1915ADEC0EF00456B2A186075AEB8F8* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41212,7 +41212,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t VuEngine_get_NativeHandl
 		return L_0;
 	}
 }
-// Method Definition Index: 107808
+// Method Definition Index: 103987
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t VuCameraFrame_get_NativeHandle_m4E18E7EF7C58BAE1F467066D298918236D944929_inline (VuCameraFrame_tDA13C18C78B1E7AADBAC6AD7B1E586345DDE2E32* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41220,7 +41220,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t VuCameraFrame_get_Native
 		return L_0;
 	}
 }
-// Method Definition Index: 106832
+// Method Definition Index: 103011
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t VuHitTest_get_NativeHandle_m7B2186DD9B76493B4BFDD900927347A6285C83C2_inline (VuHitTest_tCC53DD96C343DA416D47E0152BD0B79C5C8C7FC1* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41228,7 +41228,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t VuHitTest_get_NativeHand
 		return L_0;
 	}
 }
-// Method Definition Index: 3108
+// Method Definition Index: 3106
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t OperatingSystem_get_Platform_m01AF3D6217E4031C3AA824481BBE9E2933347E26_inline (OperatingSystem_t08A94435A5C7D999B5553B6C58763A6F2E3C8557* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41236,7 +41236,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t OperatingSystem_get_Platf
 		return L_0;
 	}
 }
-// Method Definition Index: 3905
+// Method Definition Index: 3903
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR bool IntPtr_op_Equality_m7D9CDCDE9DC2A0C2C614633F4921E90187FAB271_inline (intptr_t ___0_value1, intptr_t ___1_value2, const RuntimeMethod* method) 
 {
 	{
@@ -41245,7 +41245,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR bool IntPtr_op_Equality_m7D9CDCDE
 		return (bool)((((intptr_t)L_0) == ((intptr_t)L_1))? 1 : 0);
 	}
 }
-// Method Definition Index: 107128
+// Method Definition Index: 103307
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t VuEngineConfigSet_get_NativeHandle_m370E69108C0FB84F94406D63AEA917D839DAD9DA_inline (VuEngineConfigSet_t1C698EDCA615DE5201BA070ABA21BD81877D7F61* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41253,7 +41253,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t VuEngineConfigSet_get_Na
 		return L_0;
 	}
 }
-// Method Definition Index: 107640
+// Method Definition Index: 103819
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t VuObserver_get_Id_mA8C3FE4D8F2844C66CBB6C24EF14024B0EC44042_inline (VuObserver_t90742BFE20A846DDA5C7064512EC0D4C4B0F0B80* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41261,7 +41261,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t VuObserver_get_Id_mA8C3FE
 		return L_0;
 	}
 }
-// Method Definition Index: 107654
+// Method Definition Index: 103833
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t VuObservation_get_NativeHandle_m2D08BF2A7AEA86F35765D87E4AF46542C0AA541F_inline (VuObservation_tF3C656C117A5A9B97D03528A95D6C91587107631* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41269,7 +41269,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t VuObservation_get_Native
 		return L_0;
 	}
 }
-// Method Definition Index: 8157
+// Method Definition Index: 8151
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR RuntimeObject* GCHandle_get_Target_m481F9508DA5E384D33CD1F4450060DC56BBD4CD5_inline (GCHandle_tC44F6F72EE68BD4CFABA24309DA7A179D41127DC* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41311,19 +41311,19 @@ IL_002c:
 		return L_7;
 	}
 }
-// Method Definition Index: 107358
+// Method Definition Index: 103537
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void VuCloudImageTargetObservationsHandler_Invoke_mF82A630633D085072A615F077FD53081706A0160_inline (VuCloudImageTargetObservationsHandler_t20E6B9EF172EB454BA058C66F487DFCD8BF13225* __this, RuntimeObject* ___0_observations, RuntimeObject* ___1_clientData, const RuntimeMethod* method) 
 {
 	typedef void (*FunctionPointerType) (RuntimeObject*, RuntimeObject*, RuntimeObject*, const RuntimeMethod*);
 	((FunctionPointerType)__this->___invoke_impl)((Il2CppObject*)__this->___method_code, ___0_observations, ___1_clientData, reinterpret_cast<RuntimeMethod*>(__this->___method));
 }
-// Method Definition Index: 107362
+// Method Definition Index: 103541
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void VuCloudImageTargetQueryErrorHandler_Invoke_mFEC4E8E7EE7B919F8C16C0DD0B43189412981FE7_inline (VuCloudImageTargetQueryErrorHandler_tDF650A2D26612C8C3E50791D7E17E7258F63DED2* __this, int32_t ___0_queryError, RuntimeObject* ___1_clientData, const RuntimeMethod* method) 
 {
 	typedef void (*FunctionPointerType) (RuntimeObject*, int32_t, RuntimeObject*, const RuntimeMethod*);
 	((FunctionPointerType)__this->___invoke_impl)((Il2CppObject*)__this->___method_code, ___0_queryError, ___1_clientData, reinterpret_cast<RuntimeMethod*>(__this->___method));
 }
-// Method Definition Index: 3906
+// Method Definition Index: 3904
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR bool IntPtr_op_Inequality_m90EFC9C4CAD9A33E309F2DDF98EE4E1DD253637B_inline (intptr_t ___0_value1, intptr_t ___1_value2, const RuntimeMethod* method) 
 {
 	{
@@ -41332,7 +41332,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR bool IntPtr_op_Inequality_m90EFC9
 		return (bool)((((int32_t)((((intptr_t)L_0) == ((intptr_t)L_1))? 1 : 0)) == ((int32_t)0))? 1 : 0);
 	}
 }
-// Method Definition Index: 8153
+// Method Definition Index: 8147
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR bool GCHandle_get_IsAllocated_m241908103D8D867E11CCAB73C918729825E86843_inline (GCHandle_tC44F6F72EE68BD4CFABA24309DA7A179D41127DC* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41342,7 +41342,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR bool GCHandle_get_IsAllocated_m24
 		return L_1;
 	}
 }
-// Method Definition Index: 106722
+// Method Definition Index: 102901
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t VuAreaTargetCapture_get_NativeHandle_mBD757A158BD2918C664DB5B03F6EFC82E2846130_inline (VuAreaTargetCapture_t8DA2FAB96E707D7315486F4ACC6629605843B7A6* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41350,7 +41350,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t VuAreaTargetCapture_get_
 		return L_0;
 	}
 }
-// Method Definition Index: 107778
+// Method Definition Index: 103957
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void VuCameraIntrinsics_set_Size_m9FD38646929721C6F8EA9B6D827812289B95AA9D_inline (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 ___0_value, const RuntimeMethod* method) 
 {
 	{
@@ -41359,7 +41359,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void VuCameraIntrinsics_set_Size_
 		return;
 	}
 }
-// Method Definition Index: 107780
+// Method Definition Index: 103959
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void VuCameraIntrinsics_set_FocalLength_m201F214789D8C9B6E3C147827AB8B6B25FF30786_inline (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 ___0_value, const RuntimeMethod* method) 
 {
 	{
@@ -41368,7 +41368,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void VuCameraIntrinsics_set_Focal
 		return;
 	}
 }
-// Method Definition Index: 107782
+// Method Definition Index: 103961
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void VuCameraIntrinsics_set_PrincipalPoint_m93220B252CBB4D49A687F99924F18706D3D3844C_inline (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 ___0_value, const RuntimeMethod* method) 
 {
 	{
@@ -41377,7 +41377,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void VuCameraIntrinsics_set_Princ
 		return;
 	}
 }
-// Method Definition Index: 107784
+// Method Definition Index: 103963
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void VuCameraIntrinsics_set_DistortionMode_mFA67AD43AB7E69CD4502DAB191F4F0C8C3E4DB29_inline (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, int32_t ___0_value, const RuntimeMethod* method) 
 {
 	{
@@ -41386,7 +41386,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void VuCameraIntrinsics_set_Disto
 		return;
 	}
 }
-// Method Definition Index: 107786
+// Method Definition Index: 103965
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void VuCameraIntrinsics_set_DistortionParameters_m68AD15787C024B87E592517854065CF2EB7745EF_inline (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8 ___0_value, const RuntimeMethod* method) 
 {
 	{
@@ -41395,7 +41395,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void VuCameraIntrinsics_set_Disto
 		return;
 	}
 }
-// Method Definition Index: 107777
+// Method Definition Index: 103956
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 VuCameraIntrinsics_get_Size_mB130F199D1F41A70D6F1A4F0545EDA3ECF557244_inline (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41403,7 +41403,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3
 		return L_0;
 	}
 }
-// Method Definition Index: 107779
+// Method Definition Index: 103958
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 VuCameraIntrinsics_get_FocalLength_m35AFA34CCAF6560B1C9B427C88B02E0EE12D7056_inline (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41411,7 +41411,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3
 		return L_0;
 	}
 }
-// Method Definition Index: 107781
+// Method Definition Index: 103960
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3AAA2C00C8AB4FF9E1B8 VuCameraIntrinsics_get_PrincipalPoint_m10EA6A783904A8BDD0D7BCD34AD61CF42056FB14_inline (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41419,7 +41419,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR VuVector2F_t79CCE33CCEFEED608BEE3
 		return L_0;
 	}
 }
-// Method Definition Index: 107783
+// Method Definition Index: 103962
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t VuCameraIntrinsics_get_DistortionMode_m76C58E5D9E171776A62AE5BFD0A4EC531DDFE8B9_inline (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41427,7 +41427,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t VuCameraIntrinsics_get_Di
 		return L_0;
 	}
 }
-// Method Definition Index: 107785
+// Method Definition Index: 103964
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR VuVector8F_tCEB0E4376AC6D73A3EA8E918CFC47BAE74D951B8 VuCameraIntrinsics_get_DistortionParameters_m798E15D69ABFF2E73866F3302268367155ED103D_inline (VuCameraIntrinsics_t1B88E3197C40AD22EE97FCE6A53A64B95BAF578E* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41435,7 +41435,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR VuVector8F_tCEB0E4376AC6D73A3EA8E
 		return L_0;
 	}
 }
-// Method Definition Index: 107828
+// Method Definition Index: 104007
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t VuState_get_NativeHandle_m38F9CCF7020CFB17E0C9E1A8FDF80057EBEE9A35_inline (VuState_tADB584CDCD23BE0F1F19F40F4473AD4746FA4D41* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41443,7 +41443,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t VuState_get_NativeHandle
 		return L_0;
 	}
 }
-// Method Definition Index: 107937
+// Method Definition Index: 104116
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t Data_get_AddressesBuffer_m74DD6B9F20CACE1453C05B1F8E0246C5D5A1AAC8_inline (Data_t59289BF1D40EB22F76BE0B4CD3C8F7DA67B68D1F* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41451,7 +41451,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t Data_get_AddressesBuffer
 		return L_0;
 	}
 }
-// Method Definition Index: 107925
+// Method Definition Index: 104104
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t UnmanagedObjectWrapper_get_Ptr_m540985524180A79F5C25688B8C97BAA59801A37A_inline (UnmanagedObjectWrapper_tE827048241A4D402AAA4E0FA6C91FD03B1E4733B* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41459,19 +41459,19 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t UnmanagedObjectWrapper_g
 		return L_0;
 	}
 }
-// Method Definition Index: 108057
+// Method Definition Index: 104236
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t GetStringValueDelegate_Invoke_m1008CDB56AE52CA60AD42419B9124CD33BE6D0E1_inline (GetStringValueDelegate_tB4D96A40A4403E90FC83510A7F934C7D57F82459* __this, intptr_t ___0_nativeHandle, intptr_t* ___1_stringHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (*FunctionPointerType) (RuntimeObject*, intptr_t, intptr_t*, const RuntimeMethod*);
 	return ((FunctionPointerType)__this->___invoke_impl)((Il2CppObject*)__this->___method_code, ___0_nativeHandle, ___1_stringHandle, reinterpret_cast<RuntimeMethod*>(__this->___method));
 }
-// Method Definition Index: 108065
+// Method Definition Index: 104244
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t GetBoolValueDelegate_Invoke_m49E9EAF29AADD822372510B773573323483BCB89_inline (GetBoolValueDelegate_tB4BDA670413BFE20F96128F92DFA647AE6B12CC4* __this, intptr_t ___0_nativeHandle, int32_t* ___1_value, const RuntimeMethod* method) 
 {
 	typedef int32_t (*FunctionPointerType) (RuntimeObject*, intptr_t, int32_t*, const RuntimeMethod*);
 	return ((FunctionPointerType)__this->___invoke_impl)((Il2CppObject*)__this->___method_code, ___0_nativeHandle, ___1_value, reinterpret_cast<RuntimeMethod*>(__this->___method));
 }
-// Method Definition Index: 108098
+// Method Definition Index: 104277
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void VuValidationAreaLabel_set_Name_m96D85B5687F984B0A26280B882434D1A82496D72_inline (VuValidationAreaLabel_t7BE793E647F3C7E6F54F30342BE3A7530AE198CB* __this, String_t* ___0_value, const RuntimeMethod* method) 
 {
 	{
@@ -41481,7 +41481,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void VuValidationAreaLabel_set_Na
 		return;
 	}
 }
-// Method Definition Index: 107838
+// Method Definition Index: 104017
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t VuGenericSet_1_get_NativeHandle_m6BD486107B23B4EF487DE040ED318345AE0E2935_gshared_inline (VuGenericSet_1_tDFC70F6E5EF296C8184F07747991509115BB88B3* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41489,7 +41489,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t VuGenericSet_1_get_Nativ
 		return L_0;
 	}
 }
-// Method Definition Index: 96146
+// Method Definition Index: 92325
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void Enumerator_get_Current_m51282E47C90E55BF2D96A0D329869ABC122A85A0_gshared_inline (Enumerator_t0D36BD6D63D775CDEAF8501F5A252535FFFF52CB* __this, Il2CppFullySharedGenericAny* il2cppRetVal, const RuntimeMethod* method) 
 {
 	const uint32_t SizeOf_T_t6D22409F37413B725563BF484486F55FB7202BB8 = il2cpp_codegen_sizeof(il2cpp_rgctx_data_no_init(InitializedTypeInfo(method->klass)->rgctx_data, 2));
@@ -41500,7 +41500,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void Enumerator_get_Current_m5128
 		return;
 	}
 }
-// Method Definition Index: 2186
+// Method Definition Index: 2185
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR bool Nullable_1_get_HasValue_m14F273FB376DF00D727434CDCD28AB4EDCC14C3C_gshared_inline (Nullable_1_t71C4EA4E848DBD7A4A97704069FB951159A3A339* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41508,7 +41508,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR bool Nullable_1_get_HasValue_m14F
 		return L_0;
 	}
 }
-// Method Definition Index: 108023
+// Method Definition Index: 104202
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t VuGenericList_1_get_NativeHandle_m6F15516897AA7E5F9008601AD32DE7637A3B5710_gshared_inline (VuGenericList_1_t12481597D5714D7ABBE45EF1A56AA3E52BE3B050* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41516,7 +41516,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t VuGenericList_1_get_Nati
 		return L_0;
 	}
 }
-// Method Definition Index: 11330
+// Method Definition Index: 11319
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void List_1_Add_mD4F3498FBD3BDD3F03CBCFB38041CBAC9C28CAFC_gshared_inline (List_1_tDBA89B0E21BAC58CFBD3C1F76E4668E3B562761A* __this, Il2CppFullySharedGenericAny ___0_item, const RuntimeMethod* method) 
 {
 	const uint32_t SizeOf_T_t664E2061A913AF1FEE499655BC64F0FDE10D2A5E = il2cpp_codegen_sizeof(il2cpp_rgctx_data_no_init(method->klass->rgctx_data, 9));
@@ -41559,7 +41559,7 @@ IL_0034:
 		return;
 	}
 }
-// Method Definition Index: 11319
+// Method Definition Index: 11308
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t List_1_get_Count_mD2ED26ACAF3BAF386FFEA83893BA51DB9FD8BA30_gshared_inline (List_1_tDBA89B0E21BAC58CFBD3C1F76E4668E3B562761A* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41567,7 +41567,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t List_1_get_Count_mD2ED26A
 		return L_0;
 	}
 }
-// Method Definition Index: 107596
+// Method Definition Index: 103775
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR RuntimeObject* ObservationList_1_get_Observations_m436A14504059EC546DB1A009A3790A5D7FB2D75C_gshared_inline (ObservationList_1_tA291AF303AC889D6352F3007951B8D6132BAB531* __this, const RuntimeMethod* method) 
 {
 	{
@@ -41575,7 +41575,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR RuntimeObject* ObservationList_1_
 		return (RuntimeObject*)L_0;
 	}
 }
-// Method Definition Index: 11225
+// Method Definition Index: 11214
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void Enumerator_get_Current_m26AF82C275C82180BB7F23C7E408BC1FEB9A38EE_gshared_inline (Enumerator_tB3750C37D2E2D54A46142439AF83A76EC665D9B1* __this, KeyValuePair_2_t28EF90BF7804CE5D7F99A364266351E7DC652669* il2cppRetVal, const RuntimeMethod* method) 
 {
 	const uint32_t SizeOf_KeyValuePair_2_t23F299E80A87656CF35AA5186B375FDE51A801EF = il2cpp_codegen_sizeof(il2cpp_rgctx_data_no_init(InitializedTypeInfo(method->klass)->rgctx_data, 2));
@@ -41586,7 +41586,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void Enumerator_get_Current_m26AF
 		return;
 	}
 }
-// Method Definition Index: 11311
+// Method Definition Index: 11300
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void KeyValuePair_2_get_Value_mFA1964BF56AA214EE0D491CC197F61BC9E5F1F7A_gshared_inline (KeyValuePair_2_t28EF90BF7804CE5D7F99A364266351E7DC652669* __this, Il2CppFullySharedGenericAny* il2cppRetVal, const RuntimeMethod* method) 
 {
 	const uint32_t SizeOf_TValue_tAEA6D09BCD56B8A100F4F042BC143BC0266C28B7 = il2cpp_codegen_sizeof(il2cpp_rgctx_data_no_init(InitializedTypeInfo(method->klass)->rgctx_data, 2));
@@ -41597,7 +41597,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void KeyValuePair_2_get_Value_mFA
 		return;
 	}
 }
-// Method Definition Index: 2599
+// Method Definition Index: 2597
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void Tuple_2_get_Item1_mC87072BD14E3669527D96A8739B3E5CA83FCFBD0_gshared_inline (Tuple_2_t70DF7570FDF62592ED394F88C0CA61A12E7647C8* __this, Il2CppFullySharedGenericAny* il2cppRetVal, const RuntimeMethod* method) 
 {
 	const uint32_t SizeOf_T1_t438E68562562A80BDFA84F696160C82DC56D8FD5 = il2cpp_codegen_sizeof(il2cpp_rgctx_data_no_init(method->klass->rgctx_data, 1));
@@ -41608,7 +41608,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void Tuple_2_get_Item1_mC87072BD1
 		return;
 	}
 }
-// Method Definition Index: 2600
+// Method Definition Index: 2598
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void Tuple_2_get_Item2_m7398C77129F66B0CE22A8E95CF2DD790CC693C9B_gshared_inline (Tuple_2_t70DF7570FDF62592ED394F88C0CA61A12E7647C8* __this, Il2CppFullySharedGenericAny* il2cppRetVal, const RuntimeMethod* method) 
 {
 	const uint32_t SizeOf_T2_tCB2606A95166CC5D34D54904D606F5CA9504DD44 = il2cpp_codegen_sizeof(il2cpp_rgctx_data_no_init(method->klass->rgctx_data, 2));
@@ -41619,7 +41619,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void Tuple_2_get_Item2_m7398C7712
 		return;
 	}
 }
-// Method Definition Index: 8156
+// Method Definition Index: 8150
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR bool GCHandle_CanDereferenceHandle_mAAAC42D1268CEF3FDD040A3D1574773D08140579_inline (intptr_t ___0_handle, const RuntimeMethod* method) 
 {
 	{
@@ -41627,7 +41627,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR bool GCHandle_CanDereferenceHandl
 		return (bool)((((intptr_t)((intptr_t)(L_0&((intptr_t)1)))) == ((intptr_t)((intptr_t)0)))? 1 : 0);
 	}
 }
-// Method Definition Index: 8154
+// Method Definition Index: 8148
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR RuntimeObject* GCHandle_GetRef_mAC7E58E62417209DC41C99F66BA70F0C3AA18DA8_inline (intptr_t ___0_handle, const RuntimeMethod* method) 
 {
 	{

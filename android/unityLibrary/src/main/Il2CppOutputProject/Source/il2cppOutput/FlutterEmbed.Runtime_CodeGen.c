@@ -20,10 +20,10 @@ static Il2CppMethodPointer s_methodPointers[4] =
 };
 static const int32_t s_InvokerIndices[4] = 
 {
-	11216,
-	5338,
-	12257,
-	5338,
+	11143,
+	5292,
+	12178,
+	5292,
 };
 IL2CPP_EXTERN_C const Il2CppCodeGenModule g_FlutterEmbed_Runtime_CodeGenModule;
 const Il2CppCodeGenModule g_FlutterEmbed_Runtime_CodeGenModule = 
