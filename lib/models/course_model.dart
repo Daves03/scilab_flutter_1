@@ -125,11 +125,6 @@ class CourseQuiz {
 
   int get totalQuestions => questions.length;
 
-  static const _months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-  ];
-
   String get dueDateLabel {
     if (dueDate == null) return '';
     final d = dueDate!;
@@ -138,7 +133,10 @@ class CourseQuiz {
     if (hour == 0) hour = 12;
     if (hour > 12) hour -= 12;
     final min = d.minute.toString().padLeft(2, '0');
-    return '${_months[d.month - 1]} ${d.day}, ${d.year} at $hour:$min $ampm';
+    final month = d.month.toString().padLeft(2, '0');
+    final day = d.day.toString().padLeft(2, '0');
+    final year = d.year.toString().substring(2);
+    return '$month/$day/$year at $hour:$min $ampm';
   }
 
   factory CourseQuiz.fromMap(Map<String, dynamic> data) {

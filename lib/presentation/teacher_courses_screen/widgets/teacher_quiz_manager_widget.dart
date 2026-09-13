@@ -221,7 +221,7 @@ class _QuizCard extends StatelessWidget {
                               const CustomIconWidget(iconName: 'schedule', color: Color(0xFF00D4FF), size: 10),
                               const SizedBox(width: 4),
                               Text(
-                                'Due: ${quiz.dueDate!.month}/${quiz.dueDate!.day} at ${_formatTimeOnly(quiz.dueDate!)}',
+                                'Due: ${quiz.dueDateLabel}',
                                 style: const TextStyle(
                                   fontSize: 10,
                                   color: Color(0xFF00D4FF),
@@ -987,7 +987,7 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
             Expanded(
               child: Text(
                 _selectedDueDate != null 
-                  ? 'Due: ${_selectedDueDate!.month}/${_selectedDueDate!.day}/${_selectedDueDate!.year} at ${_formatTimeOnly(_selectedDueDate!)}'
+                  ? 'Due: ${_selectedDueDate!.month.toString().padLeft(2, '0')}/${_selectedDueDate!.day.toString().padLeft(2, '0')}/${_selectedDueDate!.year.toString().substring(2)} at ${_formatTimeOnly(_selectedDueDate!)}'
                   : 'Set Due Date (Optional)',
                 style: TextStyle(
                   fontSize: 14,

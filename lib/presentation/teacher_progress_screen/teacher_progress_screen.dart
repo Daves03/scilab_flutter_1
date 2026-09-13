@@ -14,10 +14,23 @@ import 'package:provider/provider.dart';
 import '../../services/auth_service.dart';
 // ── Data models ───────────────────────────────────────────────────────────────
 
+class MissedQuiz {
+  final String quizTitle;
+  final String courseTitle;
+  final String dueDate;
+
+  const MissedQuiz({
+    required this.quizTitle,
+    required this.courseTitle,
+    required this.dueDate,
+  });
+}
+
 class StudentProgress {
   final String name;
   final String section;
   final List<QuizResult> quizResults;
+  final List<MissedQuiz> missedQuizzes;
   final List<ArLabRecord> arLabRecords;
   final String? studentNumber;
 
@@ -25,6 +38,7 @@ class StudentProgress {
     required this.name,
     required this.section,
     required this.quizResults,
+    required this.missedQuizzes,
     required this.arLabRecords,
     this.studentNumber,
   });
@@ -125,6 +139,10 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
       final attemptsSnap = await db.collection('quiz_attempts').get();
       final allAttempts = attemptsSnap.docs.map((d) => QuizAttempt.fromMap(d.id, d.data())).toList();
 
+      // 2.5 Fetch all courses to check for missed quizzes
+      final coursesSnap = await db.collection('courses').get();
+      final allCourses = coursesSnap.docs.map((d) => Course.fromMap(d.id, d.data())).toList();
+
       // 3. Fetch AR experiments to map IDs to titles (with fallback if permission denied)
       List<ArExperimentModel> arExps = [];
       try {
@@ -168,10 +186,27 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
 
          final section = u.sections.isNotEmpty ? u.sections.first : 'No Section';
 
+         List<MissedQuiz> uMissedQuizzes = [];
+         for (var course in allCourses) {
+           if (course.sections.contains(section)) {
+             for (var quiz in course.quizzes) {
+               final hasAttempted = uAttempts.any((a) => a.quizId == quiz.id);
+               if (!hasAttempted && quiz.dueDate != null && quiz.dueDate!.isBefore(DateTime.now())) {
+                 uMissedQuizzes.add(MissedQuiz(
+                   quizTitle: quiz.title,
+                   courseTitle: course.title,
+                   dueDate: _formatDate(quiz.dueDate),
+                 ));
+               }
+             }
+           }
+         }
+
          dynamicStudents.add(StudentProgress(
            name: u.name,
            section: section,
            quizResults: quizResults,
+           missedQuizzes: uMissedQuizzes,
            arLabRecords: uArRecords,
            studentNumber: u.studentNumber,
          ));
@@ -638,24 +673,51 @@ class _QuizResultsTab extends StatelessWidget {
                           ],
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0x22FFB800) : const Color(0xFFFFB800).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: isDark ? const Color(0x55FFB800) : const Color(0xFFFFB800).withOpacity(0.3)),
-                        ),
-                        child: Text(
-                          '${student.quizResults.length} Quiz${student.quizResults.length != 1 ? 'zes' : ''}',
-                          style: const TextStyle(
-                            color: Color(0xFFFFB800),
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0x22FFB800) : const Color(0xFFFFB800).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: isDark ? const Color(0x55FFB800) : const Color(0xFFFFB800).withOpacity(0.3)),
+                            ),
+                            child: Text(
+                              '${student.quizResults.length} Quiz${student.quizResults.length != 1 ? 'zes' : ''}',
+                              style: const TextStyle(
+                                color: Color(0xFFFFB800),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
-                        ),
+                          if (student.missedQuizzes.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isDark ? const Color(0x22FF4757) : const Color(0xFFFF4757).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: isDark ? const Color(0x55FF4757) : const Color(0xFFFF4757).withOpacity(0.3)),
+                              ),
+                              child: Text(
+                                '${student.missedQuizzes.length} Missed',
+                                style: const TextStyle(
+                                  color: Color(0xFFFF4757),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ],
                   ),
@@ -669,20 +731,24 @@ class _QuizResultsTab extends StatelessWidget {
   }
 
   void _showQuizDialog(BuildContext context, StudentProgress student) {
-    if (student.quizResults.isEmpty) return;
+    if (student.quizResults.isEmpty && student.missedQuizzes.isEmpty) return;
     showDialog(
       context: context,
       builder: (context) {
         final scrollController = ScrollController();
         int currentPage = 0;
         const int itemsPerPage = 6;
-        final totalItems = student.quizResults.length;
+        final allItems = [
+          ...student.quizResults,
+          ...student.missedQuizzes,
+        ];
+        final totalItems = allItems.length;
 
         return StatefulBuilder(
           builder: (context, setState) {
             final startIndex = currentPage * itemsPerPage;
             final endIndex = (startIndex + itemsPerPage < totalItems) ? startIndex + itemsPerPage : totalItems;
-            final currentItems = student.quizResults.sublist(startIndex, endIndex);
+            final currentItems = allItems.sublist(startIndex, endIndex);
 
             return Dialog(
               backgroundColor: cardColor,
@@ -730,14 +796,25 @@ class _QuizResultsTab extends StatelessWidget {
                         itemCount: currentItems.length,
                         separatorBuilder: (_, __) => const SizedBox(height: 12),
                         itemBuilder: (context, index) {
-                          return _QuizResultRow(
-                            quiz: currentItems[index],
-                            subTextColor: subTextColor,
-                            scoreColor: scoreColor,
-                            isDark: isDark,
-                            theme: theme,
-                            borderColor: borderColor,
-                          );
+                          final item = currentItems[index];
+                          if (item is QuizResult) {
+                            return _QuizResultRow(
+                              quiz: item,
+                              subTextColor: subTextColor,
+                              scoreColor: scoreColor,
+                              isDark: isDark,
+                              theme: theme,
+                              borderColor: borderColor,
+                            );
+                          } else if (item is MissedQuiz) {
+                            return _MissedQuizRow(
+                              quiz: item,
+                              subTextColor: subTextColor,
+                              isDark: isDark,
+                              theme: theme,
+                            );
+                          }
+                          return const SizedBox();
                         },
                       ),
                     ),
@@ -858,7 +935,7 @@ class _QuizResultRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '${quiz.score}/${quiz.total}',
+                'Score: ${quiz.score}/${quiz.total}',
                 style: theme.textTheme.titleMedium?.copyWith(
                   color: color,
                   fontWeight: FontWeight.w700,
@@ -1298,6 +1375,83 @@ class _ArLabRecordRow extends StatelessWidget {
               valueColor: AlwaysStoppedAnimation<Color>(color),
               minHeight: 5,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+
+class _MissedQuizRow extends StatelessWidget {
+  final MissedQuiz quiz;
+  final Color subTextColor;
+  final bool isDark;
+  final ThemeData theme;
+
+  const _MissedQuizRow({
+    required this.quiz,
+    required this.subTextColor,
+    required this.isDark,
+    required this.theme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  quiz.quizTitle,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  quiz.courseTitle,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: subTextColor,
+                  ),
+                ),
+                if (quiz.dueDate.isNotEmpty) ...[
+                  const SizedBox(height: 3),
+                  Text(
+                    'Due: ${quiz.dueDate}',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: const Color(0xFFFF4757),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(width: 14),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Missed',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: const Color(0xFFFF4757),
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(width: 6),
+              const CustomIconWidget(
+                iconName: 'warning',
+                color: Color(0xFFFF4757),
+                size: 20,
+              ),
+            ],
           ),
         ],
       ),
