@@ -205,6 +205,8 @@ class _UnityArScreenState extends State<UnityArScreen> with TickerProviderStateM
     
     if (ingredient == "BeakerEmpty") {
       message = "The beaker is still empty! Pour the bottle first.";
+    } else if (ingredient == "EmptyDish") {
+      message = "There's no liquid solution on the dish plate yet!";
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
