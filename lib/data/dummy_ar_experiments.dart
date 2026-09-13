@@ -2,7 +2,7 @@ import '../models/ar_experiment_model.dart';
 
 const List<Map<String, dynamic>> _experimentMaps = [
     {
-      'id': 'ar1',
+      'id': 'ar3',
       'title': 'Limewater Test for Carbon Dioxide',
       'topic': 'Gas Testing',
       'category': 'Chemical Reactions',
@@ -31,8 +31,9 @@ const List<Map<String, dynamic>> _experimentMaps = [
       'semanticLabel':
           'Clear glass flask with milky white liquid showing carbon dioxide limewater test',
       'steps': [
-        {'bottleTag': 'ChemicalA', 'instructionTitle': 'Step 1: Base Liquid', 'instructionDetail': 'Pour the base solution.'},
-        {'bottleTag': 'ActivatorB', 'instructionTitle': 'Step 2: Catalyst', 'instructionDetail': 'Add the activator to complete.'},
+        {'bottleTag': 'LimeWater-Bottle', 'instructionTitle': 'STEP 1: PREPARE THE INDICATOR SOLUTION', 'instructionDetail': 'Pick up the bottle containing the Limewater solution (green arrow) and carefully position it over the test tube (red arrow) to pour a sufficient amount inside.'},
+        {'bottleTag': 'Acid-Bottle', 'instructionTitle': 'STEP 2: INITIATE THE CHEMICAL REACTION', 'instructionDetail': 'Take the Hydrochloric Acid (green arrow) and slowly add it into the flask (red arrow) that already contains the Sodium Carbonate to generate carbon dioxide and initiate the chemical reaction.'},
+        {'bottleTag': 'Delivery-Tube', 'instructionTitle': 'STEP 3: CONNECT THE DELIVERY TUBE', 'instructionDetail': 'Attach the delivery tube (green arrow) to the mouth of the flask and insert the other end into the test tube containing the Limewater (red arrow) to allow the generated carbon dioxide gas to flow through.'},
       ],
     },
     {
@@ -65,13 +66,13 @@ const List<Map<String, dynamic>> _experimentMaps = [
       'semanticLabel':
           'Test tubes showing white cream and yellow precipitates from silver nitrate halide tests',
       'steps': [
-        {'bottleTag': 'DropperFill', 'instructionTitle': 'Step 1: Fill Dropper', 'instructionDetail': 'Fill the dropper with Chloride solution from the side beaker.'},
-        {'bottleTag': 'Bottle', 'instructionTitle': 'Step 2: Pour Silver Nitrate', 'instructionDetail': 'Pour the Silver Nitrate bottle into the main beaker.'},
-        {'bottleTag': 'DropperDrop', 'instructionTitle': 'Step 3: Add Chloride', 'instructionDetail': 'Drop the Chloride solution into the main beaker and observe the reaction.'},
+        {'bottleTag': 'DropperFill', 'instructionTitle': 'STEP 1: PREPARE THE SODIUM CHLORIDE (NACL) DROPPER', 'instructionDetail': 'Using a clean dropper (green arrow), aspirate a small amount of the Sodium Chloride(NaCl) solution from its container (beaker) (red arrow). Ensure the dropper is filled to a usable level.'},
+        {'bottleTag': 'Beaker-Nitrate', 'instructionTitle': 'STEP 2: TRANSFER THE SILVER NITRATE (AGNO3) SOLUTION', 'instructionDetail': 'Carefully pour the entire contents of the test tube (green arrow) containing the Silver Nitrate (AgNO3) solution into the designated large beaker (red arrow) (main beaker).'},
+        {'bottleTag': 'DropperDrop', 'instructionTitle': 'STEP 3: PERFORM THE PRECIPITATION REACTION', 'instructionDetail': 'Hold the dropper (green arrow) filled with the Sodium Chloride (NaCl) solution vertically over the large beaker (red arrow) containing the Silver Nitrate. Slowly add drop by drop while gently observing the contents of the beaker for the formation of immediately produce white solid precipitate, indicating the presence of chloride ions.'},
       ],
     },
     {
-      'id': 'ar3',
+      'id': 'ar5',
       'title': 'Conductivity Test',
       'topic': 'Electrical Conductivity',
       'category': 'Electrochemistry',
@@ -100,12 +101,15 @@ const List<Map<String, dynamic>> _experimentMaps = [
       'semanticLabel':
           'Conductivity apparatus with electrodes in solution connected to a light bulb',
       'steps': [
-        {'bottleTag': 'ElectrodeA', 'instructionTitle': 'Step 1: Setup', 'instructionDetail': 'Place the electrodes.'},
-        {'bottleTag': 'Power', 'instructionTitle': 'Step 2: Power On', 'instructionDetail': 'Connect to battery.'},
+        {'bottleTag': 'Rod1,Rod2', 'instructionTitle': 'STEP 1: PREPARE THE ELECTRODES', 'instructionDetail': 'Place the two copper rods (green arrow) inside the (red arrow) beaker filled with water, making sure they do not touch each other.'},
+        {'bottleTag': '2way-BlackWire', 'instructionTitle': 'STEP 2: CONNECT THE NEGATIVE TERMINAL', 'instructionDetail': 'Attach the black wire (green arrow) to the right copper rod (red arrow) and connect its other end to the negative (-) terminal of the battery.'},
+        {'bottleTag': 'RedWire', 'instructionTitle': 'STEP 3: CONNECT THE POSITIVE TERMINAL', 'instructionDetail': 'Connect the red wire (green arrow) to the light bulb (red arrow) and attach its other end to the positive (+) terminal of the battery.'},
+        {'bottleTag': 'blackWire', 'instructionTitle': 'STEP 4: COMPLETE THE CIRCUIT', 'instructionDetail': 'Use the remaining wire (green arrow) to connect the light bulb to the left copper rod (red arrow), completing the electrical circuit.'},
+        {'bottleTag': 'Salt-Bottle', 'instructionTitle': 'STEP 5: ADD THE ELECTROLYTE', 'instructionDetail': 'Add salt (green arrow) to the water in the beaker (red arrow) and observe the result as the light bulb turns on, indicating electrical conductivity.'},
       ],
     },
     {
-      'id': 'ar4',
+      'id': 'ar6',
       'title': 'Law of Conservation of Mass',
       'topic': 'Stoichiometry',
       'category': 'Chemical Reactions',
@@ -133,9 +137,15 @@ const List<Map<String, dynamic>> _experimentMaps = [
       'tintColorValue': 0xFF2E1510,
       'semanticLabel':
           'Laboratory balance scale with chemical flasks demonstrating conservation of mass',
+      'steps': [
+        {'bottleTag': 'Flask', 'instructionTitle': 'STEP 1: SETUP & WEIGHING', 'instructionDetail': 'Place the flask (green arrow) on the electronic scale (red arrow).'},
+        {'bottleTag': 'Vinegar-Bottle', 'instructionTitle': 'STEP 2: ADDING THE VINEGAR', 'instructionDetail': 'Pour 10g of vinegar (green arrow) into the flask (red arrow).'},
+        {'bottleTag': 'Baking-Soda', 'instructionTitle': 'STEP 3: PREPARING THE BALLOON', 'instructionDetail': 'Place a small amount of baking soda (green arrow) inside the balloon (red arrow).'},
+        {'bottleTag': 'balloon', 'instructionTitle': 'STEP 4: OBSERVATION & REACTION', 'instructionDetail': 'Secure the mouth of the balloon (green arrow) over the opening of the flask (red arrow) and observe the mass as the balloon inflates.'},
+      ],
     },
     {
-      'id': 'ar5',
+      'id': 'ar7',
       'title': 'pH Indicator Acid and Base',
       'topic': 'Acid-Base Chemistry',
       'category': 'Chemical Reactions',
@@ -163,9 +173,12 @@ const List<Map<String, dynamic>> _experimentMaps = [
       'tintColorValue': 0xFF0D2E3F,
       'semanticLabel':
           'Row of test tubes showing rainbow of colors from pH indicator acid base test',
+      'steps': [
+        {'bottleTag': 'Indicator', 'instructionTitle': 'Step 1: Add Indicator', 'instructionDetail': 'Drop the pH indicator into the test tubes.'},
+      ],
     },
     {
-      'id': 'ar6',
+      'id': 'ar1',
       'title': 'Elephant Toothpaste',
       'topic': 'Decomposition Reactions',
       'category': 'Chemical Reactions',
@@ -198,12 +211,12 @@ const List<Map<String, dynamic>> _experimentMaps = [
         {'bottleTag': 'Surf', 'instructionTitle': 'Step 1: Add Soap', 'instructionDetail': 'Pour the dish soap into the beaker.'},
         {'bottleTag': 'Peroxide', 'instructionTitle': 'Step 2: Add Peroxide', 'instructionDetail': 'Add hydrogen peroxide to the mixture.'},
         {'bottleTag': 'Dye', 'instructionTitle': 'Step 3: Add Dye', 'instructionDetail': 'Add food coloring.'},
-        {'bottleTag': 'Yeast', 'instructionTitle': 'Step 4: Add Yeast to Cylinder', 'instructionDetail': 'Pour the yeast into the cylinder with water'},
+        {'bottleTag': 'Yeast', 'instructionTitle': 'Step 4: Add Yeast to Cylinder', ' nstructionDetail': 'Pour the yeast into the cylinder with water'},
         {'bottleTag': 'Activator', 'instructionTitle': 'Step 5: Pour Yeast', 'instructionDetail': 'Pour the Cylinder with yeast last to start the reaction!'},
       ],
     },
     {
-      'id': 'ar7',
+      'id': 'ar4',
       'title': 'Flame Test',
       'topic': 'Atomic Emission Spectra',
       'category': 'Spectroscopy',
@@ -232,7 +245,9 @@ const List<Map<String, dynamic>> _experimentMaps = [
       'semanticLabel':
           'Colorful flame test showing bright orange yellow and green flames from metal salts',
       'steps': [
-        {'bottleTag': 'ElementA', 'instructionTitle': 'Step 1: Element', 'instructionDetail': 'Inspect Element A.'},
+        {'bottleTag': 'Chemical-Bottle', 'instructionTitle': 'STEP 1: PREPARE THE CHEMICAL SOLUTION', 'instructionDetail': 'Grab the liquid bottle with the indicated solution (green arrow) and carefully pour a small amount onto the dish plate (red arrow).'},
+        {'bottleTag': 'Thread', 'instructionTitle': 'STEP 2: COAT THE NICHROME WIRE', 'instructionDetail': 'Pick up the nichrome stick (green arrow) and dip it into the solution on the dish plate (red arrow) to allow the wire to absorb the chemical solution.'},
+        {'bottleTag': 'Flame-Switch', 'instructionTitle': 'STEP 3: PERFORM THE FLAME TEST', 'instructionDetail': 'Turn on the flame switch, then place the coated nichrome stick over the burner to observe the flame color produced.'},
       ],
     },
   ];
