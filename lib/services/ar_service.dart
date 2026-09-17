@@ -38,4 +38,53 @@ class ArService {
   Future<void> deleteExperiment(String id) async {
     await _db.collection(_collection).doc(id).delete();
   }
+
+  /// Stream locked experiment IDs for a specific set of sections.
+  Stream<List<String>> streamLockedExperimentsForSections(List<String> sections) {
+    if (sections.isEmpty) return Stream.value([]);
+    
+    return _db
+        .collection('ar_locks')
+        .where(FieldPath.documentId, whereIn: sections.take(10).toList())
+        .snapshots()
+        .map((snap) {
+      final Set<String> lockedIds = {};
+      for (final doc in snap.docs) {
+        final list = List<String>.from(doc.data()['lockedExperiments'] ?? []);
+        lockedIds.addAll(list);
+      }
+      return lockedIds.toList();
+    });
+  }
+
+  /// Stream a map of Section -> List of locked experiment IDs
+  Stream<Map<String, List<String>>> streamSectionLocks(List<String> sections) {
+    if (sections.isEmpty) return Stream.value({});
+    
+    return _db
+        .collection('ar_locks')
+        .where(FieldPath.documentId, whereIn: sections.take(10).toList())
+        .snapshots()
+        .map((snap) {
+      final Map<String, List<String>> map = {};
+      for (final doc in snap.docs) {
+        map[doc.id] = List<String>.from(doc.data()['lockedExperiments'] ?? []);
+      }
+      return map;
+    });
+  }
+
+  /// Toggle the lock state of an AR experiment for a specific section
+  Future<void> toggleExperimentLockForSection(String section, String experimentId, bool lock) async {
+    final docRef = _db.collection('ar_locks').doc(section);
+    if (lock) {
+      await docRef.set({
+        'lockedExperiments': FieldValue.arrayUnion([experimentId])
+      }, SetOptions(merge: true));
+    } else {
+      await docRef.set({
+        'lockedExperiments': FieldValue.arrayRemove([experimentId])
+      }, SetOptions(merge: true));
+    }
+  }
 }

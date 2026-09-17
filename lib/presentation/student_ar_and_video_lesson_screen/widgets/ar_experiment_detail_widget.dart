@@ -11,7 +11,9 @@ class ArExperimentDetailWidget extends StatefulWidget {
   final bool isInline;
   final bool isLocked;
   final bool isTeacher;
-  final ValueChanged<bool>? onToggleLock;
+  final List<String> teacherSections;
+  final Set<String> lockedSections;
+  final void Function(String section, bool locked)? onToggleSectionLock;
 
   const ArExperimentDetailWidget({
     required this.experiment,
@@ -20,7 +22,9 @@ class ArExperimentDetailWidget extends StatefulWidget {
     this.isInline = false,
     this.isLocked = false,
     this.isTeacher = false,
-    this.onToggleLock,
+    this.teacherSections = const [],
+    this.lockedSections = const {},
+    this.onToggleSectionLock,
     super.key,
   });
 
@@ -329,49 +333,52 @@ class _ArExperimentDetailWidgetState extends State<ArExperimentDetailWidget>
                 ),
                 const SizedBox(height: 28),
                 // Launch AR Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: (!widget.isTeacher && widget.isLocked) ? () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text('This lab is locked by your teacher.'),
-                              backgroundColor: const Color(0xFFFF4757),
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                          );
-                    } : widget.onRunAR,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: (!widget.isTeacher && widget.isLocked) ? Colors.grey.shade700 : const Color(0xFF00D4FF),
-                      foregroundColor: (!widget.isTeacher && widget.isLocked) ? Colors.white70 : const Color(0xFF0A1628),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
+                if (widget.isTeacher)
+                  _buildTeacherAccessControl()
+                else
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: widget.isLocked ? () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text('This lab is locked by your teacher.'),
+                                backgroundColor: const Color(0xFFFF4757),
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                            );
+                      } : widget.onRunAR,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: widget.isLocked ? Colors.grey.shade700 : const Color(0xFF00D4FF),
+                        foregroundColor: widget.isLocked ? Colors.white70 : const Color(0xFF0A1628),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        elevation: 0,
                       ),
-                      elevation: 0,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CustomIconWidget(
-                          iconName: (!widget.isTeacher && widget.isLocked) ? 'lock' : 'view_in_ar',
-                          color: (!widget.isTeacher && widget.isLocked) ? Colors.white70 : const Color(0xFF0A1628),
-                          size: 22,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          (!widget.isTeacher && widget.isLocked) ? 'Locked by Teacher' : 'Launch AR Experiment',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: (!widget.isTeacher && widget.isLocked) ? Colors.white70 : const Color(0xFF0A1628),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CustomIconWidget(
+                            iconName: widget.isLocked ? 'lock' : 'view_in_ar',
+                            color: widget.isLocked ? Colors.white70 : const Color(0xFF0A1628),
+                            size: 22,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 10),
+                          Text(
+                            widget.isLocked ? 'Locked by Teacher' : 'Launch AR Experiment',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: widget.isLocked ? Colors.white70 : const Color(0xFF0A1628),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
                     ],
                   ),
                 ),
@@ -400,6 +407,85 @@ class _ArExperimentDetailWidgetState extends State<ArExperimentDetailWidget>
             color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildTeacherAccessControl() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionLabel('Manage Access', 'admin_panel_settings'),
+        const SizedBox(height: 12),
+        if (widget.teacherSections.isEmpty)
+          Text('You are not assigned to any sections.', style: TextStyle(color: Colors.grey.shade600))
+        else
+          ...widget.teacherSections.map((section) {
+            final isLocked = widget.lockedSections.contains(section);
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  CustomIconWidget(
+                    iconName: isLocked ? 'lock' : 'lock_open',
+                    color: isLocked ? const Color(0xFFFF4757) : const Color(0xFF00D4FF),
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      section,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                  ),
+                  Switch(
+                    value: isLocked,
+                    activeColor: const Color(0xFFFF4757),
+                    inactiveThumbColor: const Color(0xFF00D4FF),
+                    onChanged: (val) {
+                      if (widget.onToggleSectionLock != null) {
+                        widget.onToggleSectionLock!(section, val);
+                      }
+                    },
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+          const SizedBox(height: 20),
+          // Still allow the teacher to launch the AR experiment to preview it
+          SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton(
+              onPressed: widget.onRunAR,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF00D4FF),
+                foregroundColor: const Color(0xFF0A1628),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                elevation: 0,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CustomIconWidget(iconName: 'view_in_ar', color: Color(0xFF0A1628), size: 22),
+                  const SizedBox(width: 10),
+                  const Text('Preview AR Experiment', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF0A1628))),
+                ],
+              ),
+            ),
+          ),
       ],
     );
   }

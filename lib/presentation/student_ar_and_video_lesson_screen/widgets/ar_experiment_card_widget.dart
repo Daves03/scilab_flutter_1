@@ -12,7 +12,6 @@ class ArExperimentCardWidget extends StatelessWidget {
   final VoidCallback onRun;
   final bool isLocked;
   final bool isTeacher;
-  final ValueChanged<bool>? onToggleLock;
 
   const ArExperimentCardWidget({
     required this.experiment,
@@ -20,7 +19,6 @@ class ArExperimentCardWidget extends StatelessWidget {
     required this.onRun,
     this.isLocked = false,
     this.isTeacher = false,
-    this.onToggleLock,
     super.key,
   });
 
@@ -67,67 +65,7 @@ class ArExperimentCardWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-                  if (isTeacher)
-                    GestureDetector(
-                      onTap: () {
-                        if (!isLocked) {
-                          showDialog(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                              backgroundColor: const Color(0xFF142240),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              title: Row(
-                                children: [
-                                  const Icon(Icons.lightbulb_outline, color: Color(0xFFFFB800)),
-                                  const SizedBox(width: 8),
-                                  const Text('Tip', style: TextStyle(color: Colors.white, fontSize: 18)),
-                                ],
-                              ),
-                              content: const Text(
-                                'Lock it if you want to focus on a specific experiment for students, so they cannot test it out if it\'s not connected to the topic yet.',
-                                style: TextStyle(color: Color(0xFF8BA3C0), fontSize: 14, height: 1.5),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(ctx),
-                                  child: const Text('Cancel', style: TextStyle(color: Color(0xFF8BA3C0))),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(ctx);
-                                    if (onToggleLock != null) {
-                                      onToggleLock!(true);
-                                    }
-                                  },
-                                  child: const Text('Lock Experiment', style: TextStyle(color: Color(0xFFFF4757), fontWeight: FontWeight.w600)),
-                                ),
-                              ],
-                            ),
-                          );
-                        } else {
-                          if (onToggleLock != null) {
-                            onToggleLock!(false);
-                          }
-                        }
-                      },
-                      child: Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: isLocked ? const Color(0xFFFF4757).withAlpha(30) : const Color(0xFF00FF88).withAlpha(30),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: isLocked ? const Color(0xFFFF4757).withAlpha(80) : const Color(0xFF00FF88).withAlpha(80)),
-                        ),
-                        child: Center(
-                          child: CustomIconWidget(
-                            iconName: isLocked ? 'lock' : 'lock_open',
-                            color: isLocked ? const Color(0xFFFF4757) : const Color(0xFF00FF88),
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                    )
-                  else if (isLocked)
+                  if (isLocked)
                     Container(
                       width: 36,
                       height: 36,
@@ -139,7 +77,7 @@ class ArExperimentCardWidget extends StatelessWidget {
                         child: CustomIconWidget(
                           iconName: 'lock',
                           color: Color(0xFFFF4757),
-                          size: 18,
+                          size: 16,
                         ),
                       ),
                     ),

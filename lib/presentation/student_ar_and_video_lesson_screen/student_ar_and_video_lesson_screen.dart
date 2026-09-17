@@ -1,6 +1,5 @@
 import 'dart:ui';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import 'dart:async';
 import 'package:go_router/go_router.dart';
 
 import '../../core/app_export.dart';
@@ -12,6 +11,7 @@ import '../student_ar_and_video_lesson_screen/widgets/ar_experiment_card_widget.
 import '../student_ar_and_video_lesson_screen/widgets/ar_experiment_detail_widget.dart';
 import '../student_ar_and_video_lesson_screen/widgets/category_filter_widget.dart';
 import '../ar_and_video_lesson_screen/widgets/video_lesson_section_widget.dart';
+import '../../services/auth_service.dart';
 
 
 
@@ -46,33 +46,42 @@ class _StudentArAndVideoLessonScreenState
 
 
 
+  Map<String, bool> _lockedStates = {};
+  StreamSubscription? _lockSub;
+
   @override
   void initState() {
     super.initState();
-    _loadLockStates();
     _entranceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
     )..forward();
+    
+    // Using post frame callback to safely access context
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _listenToLocks();
+    });
   }
 
-  Map<String, bool> _lockedStates = {};
+  void _listenToLocks() {
+    final user = AuthService.instance.currentUser;
+    if (user == null || user.sections.isEmpty) return;
 
-  Future<void> _loadLockStates() async {
-    final prefs = await SharedPreferences.getInstance();
-    final states = <String, bool>{};
-    for (final key in prefs.getKeys()) {
-      if (key.startsWith('locked_ar_')) {
-        states[key.replaceFirst('locked_ar_', '')] = prefs.getBool(key) ?? false;
+    _lockSub = context.read<ArService>().streamLockedExperimentsForSections(user.sections).listen((lockedIds) {
+      if (mounted) {
+        setState(() {
+          _lockedStates.clear();
+          for (final id in lockedIds) {
+            _lockedStates[id] = true;
+          }
+        });
       }
-    }
-    if (mounted) {
-      setState(() => _lockedStates = states);
-    }
+    });
   }
 
   @override
   void dispose() {
+    _lockSub?.cancel();
     _entranceController.dispose();
     super.dispose();
   }

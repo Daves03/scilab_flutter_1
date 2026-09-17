@@ -1,6 +1,5 @@
 import 'dart:ui';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import 'dart:async';
 import 'package:go_router/go_router.dart';
 
 import '../../core/app_export.dart';
@@ -12,6 +11,7 @@ import '../student_ar_and_video_lesson_screen/widgets/ar_experiment_card_widget.
 import '../student_ar_and_video_lesson_screen/widgets/ar_experiment_detail_widget.dart';
 import '../student_ar_and_video_lesson_screen/widgets/category_filter_widget.dart';
 import '../ar_and_video_lesson_screen/widgets/video_lesson_section_widget.dart';
+import '../../services/auth_service.dart';
 
 
 
@@ -46,41 +46,60 @@ class _TeacherArAndVideoLessonScreenState
 
 
 
+  Map<String, List<String>> _sectionLocks = {};
+  StreamSubscription? _lockSub;
+  List<String> _teacherSections = [];
+
   @override
   void initState() {
     super.initState();
-    _loadLockStates();
     _entranceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
     )..forward();
-  }
-
-  Map<String, bool> _lockedStates = {};
-
-  Future<void> _loadLockStates() async {
-    final prefs = await SharedPreferences.getInstance();
-    final states = <String, bool>{};
-    for (final key in prefs.getKeys()) {
-      if (key.startsWith('locked_ar_')) {
-        states[key.replaceFirst('locked_ar_', '')] = prefs.getBool(key) ?? false;
-      }
-    }
-    if (mounted) {
-      setState(() => _lockedStates = states);
-    }
-  }
-
-  Future<void> _toggleLockState(String experimentId, bool locked) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('locked_ar_$experimentId', locked);
-    setState(() {
-      _lockedStates[experimentId] = locked;
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _listenToLocks();
     });
+  }
+
+  void _listenToLocks() {
+    final user = AuthService.instance.currentUser;
+    if (user == null || user.sections.isEmpty) return;
+    
+    _teacherSections = user.sections;
+    _lockSub = context.read<ArService>().streamSectionLocks(user.sections).listen((locks) {
+      if (mounted) {
+        setState(() {
+          _sectionLocks = locks;
+        });
+      }
+    });
+  }
+
+  bool _isExpLocked(String expId) {
+    for (final list in _sectionLocks.values) {
+      if (list.contains(expId)) return true;
+    }
+    return false;
+  }
+
+  Set<String> _getLockedSectionsFor(String expId) {
+    final Set<String> lockedSections = {};
+    _sectionLocks.forEach((section, list) {
+      if (list.contains(expId)) lockedSections.add(section);
+    });
+    return lockedSections;
+  }
+
+  Future<void> _toggleSectionLock(String section, bool locked) async {
+    if (_selectedExperiment == null) return;
+    await context.read<ArService>().toggleExperimentLockForSection(section, _selectedExperiment!.id, locked);
   }
 
   @override
   void dispose() {
+    _lockSub?.cancel();
     _entranceController.dispose();
     super.dispose();
   }
@@ -127,8 +146,11 @@ class _TeacherArAndVideoLessonScreenState
                       if (_selectedExperiment != null)
                         ArExperimentDetailWidget(
                           experiment: _selectedExperiment!,
-                          isLocked: _lockedStates[_selectedExperiment!.id] ?? false,
+                          isLocked: _isExpLocked(_selectedExperiment!.id),
                           isTeacher: true,
+                          teacherSections: _teacherSections,
+                          lockedSections: _getLockedSectionsFor(_selectedExperiment!.id),
+                          onToggleSectionLock: _toggleSectionLock,
                           onClose: _onCloseDetail,
                           onRunAR: () => _onRunAR(_selectedExperiment!),
                         ),
@@ -188,9 +210,8 @@ class _TeacherArAndVideoLessonScreenState
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
                 child: ArExperimentCardWidget(
                   experiment: exp,
-                  isLocked: _lockedStates[exp.id] ?? false,
+                  isLocked: _isExpLocked(exp.id),
                   isTeacher: true,
-                  onToggleLock: (locked) => _toggleLockState(exp.id, locked),
                   onTap: () => _onExperimentTap(exp),
                   onRun: () => _onRunAR(exp),
                 ),
@@ -223,8 +244,11 @@ class _TeacherArAndVideoLessonScreenState
               ),
               child: ArExperimentDetailWidget(
                 experiment: _selectedExperiment!,
-                isLocked: _lockedStates[_selectedExperiment!.id] ?? false,
+                isLocked: _isExpLocked(_selectedExperiment!.id),
                 isTeacher: true,
+                teacherSections: _teacherSections,
+                lockedSections: _getLockedSectionsFor(_selectedExperiment!.id),
+                onToggleSectionLock: _toggleSectionLock,
                 onClose: _onCloseDetail,
                 onRunAR: () => _onRunAR(_selectedExperiment!),
                 isInline: true,
