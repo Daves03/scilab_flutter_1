@@ -23,7 +23,8 @@ function App() {
         setUser(currentUser);
         try {
           const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-          if (userDoc.exists() && userDoc.data().role === 'admin') {
+          const isHardcodedAdmin = currentUser.email === 'scilabar@gmail.com';
+          if (isHardcodedAdmin || (userDoc.exists() && userDoc.data().role === 'admin')) {
             setIsAdmin(true);
           } else {
             setIsAdmin(false);
