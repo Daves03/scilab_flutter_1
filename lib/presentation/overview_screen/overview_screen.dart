@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 
+import 'package:provider/provider.dart';
 import '../../core/app_export.dart';
+import '../../core/theme_provider.dart';
 import '../../routes/app_routes.dart';
 import '../../theme/app_theme.dart';
 
@@ -154,28 +156,22 @@ class _OverviewScreenState extends State<OverviewScreen>
         children: [
           _buildAnimatedBackground(),
           SafeArea(
-            child: Column(
-              children: [
-                _buildTopBar(),
-                Expanded(
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildHeroSection(),
-                        const SizedBox(height: 32),
-                        _buildStatsRow(),
-                        const SizedBox(height: 32),
-                        _buildFeaturesSection(),
-                        const SizedBox(height: 32),
-                        _buildCTASection(),
-                        const SizedBox(height: 40),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildTopBar(),
+                  _buildHeroSection(),
+                  const SizedBox(height: 32),
+                  _buildStatsRow(),
+                  const SizedBox(height: 32),
+                  _buildFeaturesSection(),
+                  const SizedBox(height: 32),
+                  _buildCTASection(),
+                  const SizedBox(height: 40),
+                ],
+              ),
             ),
           ),
         ],
@@ -233,6 +229,19 @@ class _OverviewScreenState extends State<OverviewScreen>
             ),
           ),
           const Spacer(),
+          Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child) {
+              return IconButton(
+                icon: Icon(
+                  themeProvider.isDark ? Icons.light_mode : Icons.dark_mode,
+                  color: AppTheme.textPrimary,
+                  size: 20,
+                ),
+                onPressed: () => themeProvider.toggleTheme(),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
           GestureDetector(
             onTap: () => context.go(AppRoutes.signUpLoginScreen),
             child: Container(

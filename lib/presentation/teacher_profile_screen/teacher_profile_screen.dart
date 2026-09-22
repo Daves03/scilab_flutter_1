@@ -520,6 +520,59 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                 ),
               ),
               const SizedBox(height: 24),
+              // Theme Toggle
+              Container(
+                width: double.infinity,
+                height: 52,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0xFF334A66), width: 1.5),
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(14),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(14),
+                    onTap: () {
+                      context.read<ThemeProvider>().toggleTheme();
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                isDark ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
+                                color: const Color(0xFF8BA3C0),
+                                size: 20,
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                isDark ? 'Dark Mode' : 'Light Mode',
+                                style: const TextStyle(
+                                  color: Color(0xFF8BA3C0),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Switch(
+                            value: isDark,
+                            onChanged: (value) {
+                              context.read<ThemeProvider>().toggleTheme();
+                            },
+                            activeColor: const Color(0xFF00FF88),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
               // About App Button
               SizedBox(
                 width: double.infinity,
@@ -697,12 +750,21 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                       side: const BorderSide(color: Color(0xFF334A66), width: 1.5),
                     ),
                   ),
-                  icon: const Icon(Icons.info_outline, size: 20),
-                  label: const Text(
+                  icon: Icon(
+                    Icons.info_outline,
+                    size: 20,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF8BA3C0)
+                        : Colors.grey.shade700,
+                  ),
+                  label: Text(
                     'About App & Developer',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF8BA3C0)
+                          : Colors.grey.shade700,
                     ),
                   ),
                 ),
@@ -779,12 +841,13 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                       side: const BorderSide(color: Color(0xFFFF4757), width: 1.5),
                     ),
                   ),
-                  icon: const Icon(Icons.logout, size: 20),
+                  icon: Icon(Icons.logout, size: 20, color: const Color(0xFFFF4757)),
                   label: const Text(
                     'Log Out',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
+                      color: Color(0xFFFF4757),
                     ),
                   ),
                 ),

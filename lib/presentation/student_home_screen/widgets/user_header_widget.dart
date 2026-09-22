@@ -22,12 +22,14 @@ class UserHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return ClipRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
-          color: const Color(0xFF0A1628).withAlpha(204),
+          color: Theme.of(context).scaffoldBackgroundColor.withAlpha(220),
           child: Row(
             children: [
               GestureDetector(
@@ -70,10 +72,10 @@ class UserHeaderWidget extends StatelessWidget {
                   children: [
                     Text(
                       'Hello ${context.watch<AuthService>().currentUser?.name ?? 'User'} 👋',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        color: isDark ? Colors.white : const Color(0xFF0A1628),
                       ),
                     ),
                     if (progressText != null && progressPercent != null) ...[
@@ -91,7 +93,7 @@ class UserHeaderWidget extends StatelessWidget {
                               borderRadius: BorderRadius.circular(50),
                               child: LinearProgressIndicator(
                                 value: progressPercent,
-                                backgroundColor: const Color(0xFF1E3A5F),
+                                backgroundColor: isDark ? const Color(0xFF1E3A5F) : Colors.grey.shade300,
                                 valueColor: const AlwaysStoppedAnimation<Color>(
                                   Color(0xFF00D4FF),
                                 ),
@@ -121,19 +123,19 @@ class UserHeaderWidget extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF142240),
+                    color: isDark ? const Color(0xFF142240) : Colors.white,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: const Color(0xFF1E3A5F),
+                      color: isDark ? const Color(0xFF1E3A5F) : Colors.grey.shade300,
                       width: 1,
                     ),
                   ),
                   child: Stack(
                     children: [
-                      const Center(
+                      Center(
                         child: CustomIconWidget(
                           iconName: 'notifications_outlined',
-                          color: Color(0xFF8BA3C0),
+                          color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
                           size: 22,
                         ),
                       ),

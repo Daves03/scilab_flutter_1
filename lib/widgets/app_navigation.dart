@@ -160,7 +160,9 @@ class _AppNavigationState extends State<AppNavigation> {
           child: Container(
             height: 72,
             decoration: BoxDecoration(
-              color: theme.brightness == Brightness.dark ? const Color(0xFF0A1628).withAlpha(191) : Colors.white.withAlpha(220),
+              color: theme.brightness == Brightness.dark 
+                  ? const Color(0xFF0A1628).withAlpha(191) 
+                  : theme.scaffoldBackgroundColor.withAlpha(220),
               border: Border.all(color: const Color(0x2200D4FF), width: 1),
               borderRadius: BorderRadius.circular(36),
             ),

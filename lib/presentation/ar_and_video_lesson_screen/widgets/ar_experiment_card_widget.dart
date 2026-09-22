@@ -24,7 +24,9 @@ class ArExperimentCardWidget extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: experiment.tintColor,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? experiment.tintColor
+              : Colors.white,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: const Color(0xFF00D4FF).withAlpha(20),
@@ -32,7 +34,7 @@ class ArExperimentCardWidget extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(64),
+              color: Colors.black.withAlpha(Theme.of(context).brightness == Brightness.dark ? 64 : 12),
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),

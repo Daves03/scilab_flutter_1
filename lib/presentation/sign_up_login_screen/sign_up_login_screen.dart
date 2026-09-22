@@ -3,6 +3,7 @@ import '../../routes/app_routes.dart';
 import '../../services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/theme_provider.dart';
 import './widgets/auth_hero_widget.dart';
 import './widgets/login_form_widget.dart';
 import './widgets/register_form_widget.dart';
@@ -95,6 +96,32 @@ class _SignUpLoginScreenState extends State<SignUpLoginScreen>
                   icon: Icon(Icons.arrow_back, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87, size: 20),
                   onPressed: () => context.go(AppRoutes.overviewScreen),
                 ),
+              ),
+            ),
+            Positioned(
+              top: 16,
+              right: 16,
+              child: Consumer<ThemeProvider>(
+                builder: (context, themeProvider, child) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0D2E3F).withOpacity(0.6) : Colors.white.withOpacity(0.8),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xFF00D4FF).withOpacity(0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        themeProvider.isDark ? Icons.light_mode : Icons.dark_mode,
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                        size: 20,
+                      ),
+                      onPressed: () => themeProvider.toggleTheme(),
+                    ),
+                  );
+                },
               ),
             ),
           ],
