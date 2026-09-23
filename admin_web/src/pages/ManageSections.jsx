@@ -171,7 +171,7 @@ export default function ManageSections() {
                     <Layers size={20} color="white" />
                   </div>
                   <div>
-                    <h4 style={{ margin: 0, fontSize: '1.1rem', color: 'white', textDecoration: activeTab === 'trash' ? 'line-through' : 'none' }}>
+                    <h4 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-primary)', textDecoration: activeTab === 'trash' ? 'line-through' : 'none' }}>
                       {section.name}
                     </h4>
                     <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{section.grade}</span>

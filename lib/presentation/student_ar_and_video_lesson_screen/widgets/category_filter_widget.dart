@@ -32,12 +32,12 @@ class CategoryFilterWidget extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? const Color(0xFF00D4FF)
+                    ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0))
                     : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.grey.shade200),
                 borderRadius: BorderRadius.circular(50),
                 border: Border.all(
                   color: isSelected
-                      ? const Color(0xFF00D4FF)
+                      ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0))
                       : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
                   width: 1,
                 ),
@@ -48,7 +48,7 @@ class CategoryFilterWidget extends StatelessWidget {
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
                   color: isSelected
-                      ? const Color(0xFF0A1628)
+                      ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white)
                       : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700),
                 ),
               ),

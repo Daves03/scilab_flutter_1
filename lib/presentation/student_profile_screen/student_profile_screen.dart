@@ -189,12 +189,12 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                     decoration: BoxDecoration(
                       color: isDark ? const Color(0xFF0D2E3F) : const Color(0xFFE8F9FD),
                       borderRadius: BorderRadius.circular(12.0),
-                      border: Border.all(color: isDark ? const Color(0x3300D4FF) : const Color(0xFF00D4FF).withOpacity(0.3), width: 1),
+                      border: Border.all(color: isDark ? const Color(0x3300D4FF) : const Color(0xFF1565C0).withOpacity(0.3), width: 1),
                     ),
                     child: Center(
                       child: CustomIconWidget(
                         iconName: 'person',
-                        color: Color(0xFF00D4FF),
+                        color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                         size: 20,
                       ),
                     ),
@@ -214,7 +214,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                         ),
                         Text(
                           'Student Dashboard',
-                          style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF0080A0)),
+                          style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)),
                         ),
                       ],
                     ),
@@ -222,25 +222,25 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: const Color(0x2200D4FF),
+                      color: isDark ? const Color(0x2200D4FF) : const Color(0xFF1565C0).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(50.0),
-                      border: Border.all(color: const Color(0x5500D4FF), width: 1),
+                      border: Border.all(color: isDark ? const Color(0x5500D4FF) : const Color(0xFF1565C0).withOpacity(0.2), width: 1),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const CustomIconWidget(
+                        CustomIconWidget(
                           iconName: 'school',
-                          color: Color(0xFF00D4FF),
+                          color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                           size: 13,
                         ),
-                        SizedBox(width: 4),
+                        const SizedBox(width: 4),
                         Text(
                           'Student',
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF0080A0),
+                            color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                           ),
                         ),
                       ],
@@ -291,10 +291,10 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                       height: 100,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFF00D4FF), width: 3),
-                        boxShadow: const [
+                        border: Border.all(color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0), width: 3),
+                        boxShadow: [
                           BoxShadow(
-                            color: Color(0x4400D4FF),
+                            color: isDark ? const Color(0x4400D4FF) : const Color(0xFF1565C0).withOpacity(0.3),
                             blurRadius: 15,
                             spreadRadius: 2,
                           ),
@@ -307,10 +307,10 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                           semanticLabel: 'Student profile photo',
                           errorBuilder: (_, __, ___) => Container(
                             color: const Color(0xFF0D2E3F),
-                            child: const Icon(
+                            child: Icon(
                               Icons.person,
                               size: 44,
-                              color: Color(0xFF00D4FF),
+                              color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                             ),
                           ),
                         ),
@@ -329,23 +329,23 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                       decoration: BoxDecoration(
-                        color: const Color(0x2200FF88),
+                        color: isDark ? const Color(0x2200FF88) : const Color(0xFF00994C).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(50),
-                        border: Border.all(color: const Color(0x5500FF88)),
+                        border: Border.all(color: isDark ? const Color(0x5500FF88) : const Color(0xFF00994C).withOpacity(0.3)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const CustomIconWidget(
+                          CustomIconWidget(
                             iconName: 'school_outlined',
-                            color: Color(0xFF00FF88),
+                            color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                             size: 14,
                           ),
                           const SizedBox(width: 5),
                           Text(
                             'Verified Student',
                             style: theme.textTheme.labelMedium?.copyWith(
-                              color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00A050),
+                              color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -380,7 +380,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                       label: 'Grade Level',
                       value: _gradeLevel.isEmpty ? 'Grade 9' : _gradeLevel,
                       isDark: isDark,
-                      valueColor: const Color(0xFF00FF88),
+                      valueColor: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                     ),
                     if (_schoolSection.isNotEmpty) ...[
                       const SizedBox(height: 16),
@@ -389,7 +389,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                         label: 'School Section',
                         value: _schoolSection,
                         isDark: isDark,
-                        valueColor: const Color(0xFF00D4FF),
+                        valueColor: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                       ),
                     ],
                   ],
@@ -412,7 +412,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                   color: isDark ? null : const Color(0xFFE8F9FD),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                    color: isDark ? const Color(0x3300D4FF) : const Color(0xFF00D4FF).withAlpha(80),
+                    color: isDark ? const Color(0x3300D4FF) : const Color(0xFF1565C0).withOpacity(0.3),
                     width: 1,
                   ),
                   boxShadow: isDark
@@ -433,12 +433,12 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: const Color(0x2200D4FF),
+                            color: isDark ? const Color(0x2200D4FF) : const Color(0xFF1565C0).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const CustomIconWidget(
+                          child: CustomIconWidget(
                             iconName: 'view_in_ar',
-                            color: Color(0xFF00D4FF),
+                            color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                             size: 22,
                           ),
                         ),
@@ -469,7 +469,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0x3300D4FF)),
+                        border: Border.all(color: isDark ? const Color(0x3300D4FF) : const Color(0xFF1565C0).withOpacity(0.3)),
                         boxShadow: const [
                           BoxShadow(
                             color: Color(0x22000000),
@@ -489,10 +489,10 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                           errorBuilder: (_, __, ___) => Container(
                             height: 160,
                             color: isDark ? const Color(0xFF0D2E3F) : const Color(0xFFE8F9FD),
-                            child: const Center(
+                            child: Center(
                               child: CustomIconWidget(
                                 iconName: 'view_in_ar',
-                                color: Color(0xFF00D4FF),
+                                color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                                 size: 48,
                               ),
                             ),
@@ -507,14 +507,14 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                       child: ElevatedButton.icon(
                         onPressed: _isDownloading ? null : _downloadMarker,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF00D4FF),
-                          foregroundColor: const Color(0xFF0A1628),
+                          backgroundColor: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                          foregroundColor: isDark ? const Color(0xFF0A1628) : Colors.white,
                           elevation: 4,
-                          shadowColor: const Color(0x6600D4FF),
+                          shadowColor: isDark ? const Color(0x6600D4FF) : const Color(0xFF1565C0).withOpacity(0.4),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
-                          disabledBackgroundColor: const Color(0xFF00D4FF).withAlpha(100),
+                          disabledBackgroundColor: isDark ? const Color(0xFF00D4FF).withAlpha(100) : const Color(0xFF1565C0).withAlpha(100),
                         ),
                         icon: _isDownloading
                             ? const SizedBox(
@@ -908,14 +908,14 @@ class _InfoRow extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: const Color(0x1100D4FF),
+            color: isDark ? const Color(0x1100D4FF) : const Color(0xFF1565C0).withOpacity(0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0x3300D4FF)),
+            border: Border.all(color: isDark ? const Color(0x3300D4FF) : const Color(0xFF1565C0).withOpacity(0.2)),
           ),
           child: Center(
             child: CustomIconWidget(
               iconName: icon,
-              color: const Color(0xFF00D4FF),
+              color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
               size: 20,
             ),
           ),

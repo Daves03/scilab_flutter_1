@@ -147,6 +147,8 @@ class _AppNavigationState extends State<AppNavigation> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final navAccentColor = theme.brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0);
+    
     return Padding(
       padding: EdgeInsets.only(
         left: 16,
@@ -163,7 +165,7 @@ class _AppNavigationState extends State<AppNavigation> {
               color: theme.brightness == Brightness.dark 
                   ? const Color(0xFF0A1628).withAlpha(191) 
                   : theme.scaffoldBackgroundColor.withAlpha(220),
-              border: Border.all(color: const Color(0x2200D4FF), width: 1),
+              border: Border.all(color: navAccentColor.withAlpha(34), width: 1),
               borderRadius: BorderRadius.circular(36),
             ),
           child: Row(
@@ -189,18 +191,18 @@ class _AppNavigationState extends State<AppNavigation> {
                           height: i == 2 ? 46 : 32,
                           decoration: BoxDecoration(
                             color: i == 2
-                                ? (isActive ? const Color(0xFF00D4FF) : const Color(0x2200D4FF))
+                                ? (isActive ? navAccentColor : navAccentColor.withAlpha(34))
                                 : (isActive
-                                    ? const Color(0x2200D4FF)
+                                    ? navAccentColor.withAlpha(34)
                                     : Colors.transparent),
                             borderRadius: BorderRadius.circular(i == 2 ? 23 : 16),
                             border: i == 2 
-                                ? Border.all(color: const Color(0xFF00D4FF), width: 1.5)
+                                ? Border.all(color: navAccentColor, width: 1.5)
                                 : null,
                             boxShadow: i == 2 && isActive
                                 ? [
                                     BoxShadow(
-                                      color: const Color(0xFF00D4FF).withAlpha(120),
+                                      color: navAccentColor.withAlpha(120),
                                       blurRadius: 12,
                                       offset: const Offset(0, 4),
                                     )
@@ -213,9 +215,9 @@ class _AppNavigationState extends State<AppNavigation> {
                                   ? tab.activeIcon
                                   : tab.inactiveIcon,
                               color: i == 2
-                                  ? (isActive ? const Color(0xFF0A1628) : const Color(0xFF00D4FF))
+                                  ? (isActive ? (theme.brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white) : navAccentColor)
                                   : (isActive
-                                      ? const Color(0xFF00D4FF)
+                                      ? navAccentColor
                                       : (theme.brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade500)),
                               size: i == 2 ? 26 : 22,
                             ),
@@ -230,7 +232,7 @@ class _AppNavigationState extends State<AppNavigation> {
                                 ? FontWeight.w600
                                 : FontWeight.w400,
                             color: isActive
-                                ? const Color(0xFF00D4FF)
+                                ? navAccentColor
                                 : (theme.brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade500),
                           ),
                           child: Text(tab.label),

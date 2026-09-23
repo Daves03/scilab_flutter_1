@@ -114,13 +114,13 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
                   width: 50,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: widget.course.accentColor.withAlpha(20),
+                    color: _effectiveAccentColor.withAlpha(20),
                     shape: BoxShape.circle,
                   ),
                   child: Center(
                     child: CustomIconWidget(
                       iconName: 'help_outline',
-                      color: widget.course.accentColor,
+                      color: _effectiveAccentColor,
                       size: 24,
                     ),
                   ),
@@ -169,7 +169,7 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
                           _submitQuiz();
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: widget.course.accentColor,
+                          backgroundColor: _effectiveAccentColor,
                           foregroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -202,6 +202,12 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
 
   int get _answeredCount => _selectedAnswers.length;
   int get _totalQuestions => _activeQuiz?.questions.length ?? 0;
+
+  Color get _effectiveAccentColor {
+    return widget.course.accentColor == const Color(0xFF00D4FF)
+        ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0))
+        : widget.course.accentColor;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -272,7 +278,7 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
                 isMissed: isMissed,
                 score: score,
                 percentage: pct,
-                accentColor: widget.course.accentColor,
+                accentColor: _effectiveAccentColor,
                 onStart: () => _startQuiz(quiz),
                 onRetake: () => _viewQuiz(quiz, savedAnswers[quiz.id] ?? {}),
               ),
@@ -330,7 +336,7 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: widget.course.accentColor,
+                    color: _effectiveAccentColor,
                   ),
                 ),
             ],
@@ -348,7 +354,7 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
                     : 0,
                 backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade200,
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  widget.course.accentColor,
+                  _effectiveAccentColor,
                 ),
                 minHeight: 4,
               ),
@@ -368,7 +374,7 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
                 questionNumber: index + 1,
                 selectedIndex: _selectedAnswers[q.id],
                 isSubmitted: _quizSubmitted,
-                accentColor: widget.course.accentColor,
+                accentColor: _effectiveAccentColor,
                 onSelect: (i) => _selectAnswer(q.id, i),
               );
             },
@@ -385,7 +391,7 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
                     ? _confirmSubmit
                     : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: widget.course.accentColor,
+                  backgroundColor: _effectiveAccentColor,
                   foregroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white,
                   disabledBackgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade200,
                   disabledForegroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF5A7A9A) : Colors.grey.shade500,

@@ -103,7 +103,7 @@ export default function Overview() {
         
       </div>
 
-      <h2 style={{ fontSize: '1.5rem', marginBottom: '20px', color: 'white' }}>Platform Content & Modules</h2>
+      <h2 style={{ fontSize: '1.5rem', marginBottom: '20px', color: 'var(--text-primary)' }}>Platform Content & Modules</h2>
       
       {/* Secondary KPI Grid */}
       <div className="grid-secondary" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '40px' }}>

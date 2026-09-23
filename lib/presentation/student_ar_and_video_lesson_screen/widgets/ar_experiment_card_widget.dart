@@ -34,7 +34,7 @@ class ArExperimentCardWidget extends StatelessWidget {
               : Colors.white,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: const Color(0xFF00D4FF).withAlpha(20),
+            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF).withAlpha(20) : const Color(0xFF1565C0).withAlpha(20),
             width: 1,
           ),
           boxShadow: [
@@ -62,7 +62,7 @@ class ArExperimentCardWidget extends StatelessWidget {
                     child: Center(
                       child: CustomIconWidget(
                         iconName: experiment.iconName,
-                        color: const Color(0xFF00D4FF),
+                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                         size: 24,
                       ),
                     ),
@@ -128,14 +128,14 @@ class ArExperimentCardWidget extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0x1400D4FF),
+                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0x1400D4FF) : const Color(0xFF1565C0).withOpacity(0.08),
                     borderRadius: BorderRadius.circular(50),
                   ),
                   child: Text(
                     experiment.category,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
-                      color: Color(0xFF00D4FF),
+                      color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -165,13 +165,15 @@ class ArExperimentCardWidget extends StatelessWidget {
                         end: Alignment.bottomRight,
                         colors: (!isTeacher && isLocked)
                             ? [Colors.grey.shade700, Colors.grey.shade800]
-                            : [const Color(0xFF00D4FF), const Color(0xFF0090B0)],
+                            : (Theme.of(context).brightness == Brightness.dark
+                                ? [const Color(0xFF00D4FF), const Color(0xFF0090B0)]
+                                : [const Color(0xFF1565C0), const Color(0xFF0D47A1)]),
                       ),
                       boxShadow: (!isTeacher && isLocked)
                           ? []
                           : [
                               BoxShadow(
-                                color: const Color(0xFF00D4FF).withAlpha(102),
+                                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF).withAlpha(102) : const Color(0xFF1565C0).withAlpha(102),
                                 blurRadius: 16,
                                 spreadRadius: 1,
                               ),
@@ -180,7 +182,7 @@ class ArExperimentCardWidget extends StatelessWidget {
                     child: Center(
                       child: CustomIconWidget(
                         iconName: (!isTeacher && isLocked) ? 'lock' : 'view_in_ar',
-                        color: (!isTeacher && isLocked) ? Colors.white70 : const Color(0xFF0A1628),
+                        color: (!isTeacher && isLocked) ? Colors.white70 : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white),
                         size: 22,
                       ),
                     ),

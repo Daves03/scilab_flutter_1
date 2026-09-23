@@ -291,7 +291,7 @@ class _TeacherArAndVideoLessonScreenState
             decoration: BoxDecoration(
               color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0D3F2E) : const Color(0xFFE8FDF3),
               borderRadius: BorderRadius.circular(12.0),
-              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x3300FF88) : const Color(0xFF00FF88).withOpacity(0.3), width: 1),
+              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x3300FF88) : const Color(0xFF00994C).withOpacity(0.3), width: 1),
             ),
             clipBehavior: Clip.antiAlias,
             child: Image.asset(
@@ -312,9 +312,12 @@ class _TeacherArAndVideoLessonScreenState
                     color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
                   ),
                 ),
-                const Text(
+                Text(
                   'Teacher Dashboard',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF00FF88)),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                  ),
                 ),
               ],
             ),
@@ -322,25 +325,28 @@ class _TeacherArAndVideoLessonScreenState
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: const Color(0x2200FF88),
+              color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200FF88) : const Color(0xFF00994C).withOpacity(0.1),
               borderRadius: BorderRadius.circular(50.0),
-              border: Border.all(color: const Color(0x5500FF88), width: 1),
+              border: Border.all(
+                color: Theme.of(context).brightness == Brightness.dark ? const Color(0x5500FF88) : const Color(0xFF00994C).withOpacity(0.3),
+                width: 1,
+              ),
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 CustomIconWidget(
                   iconName: 'verified',
-                  color: Color(0xFF00FF88),
+                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                   size: 13,
                 ),
-                SizedBox(width: 4),
+                const SizedBox(width: 4),
                 Text(
                   'Teacher',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF00FF88),
+                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                   ),
                 ),
               ],

@@ -36,6 +36,10 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
   @override
   Widget build(BuildContext context) {
     final course = widget.course;
+    final effectiveAccentColor = course.accentColor == const Color(0xFF00D4FF)
+        ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0))
+        : course.accentColor;
+
     return Column(
       children: [
         // ── Header ──────────────────────────────────────────────────────────
@@ -92,7 +96,7 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
                   _MetaBadge(
                     icon: 'person',
                     label: course.teacherName,
-                    color: course.accentColor,
+                    color: effectiveAccentColor,
                   ),
                   _MetaBadge(
                     icon: 'school',
@@ -112,7 +116,7 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
                         value: 0.0,
                         backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade200,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          course.accentColor,
+                          effectiveAccentColor,
                         ),
                         minHeight: 6,
                       ),
@@ -124,7 +128,7 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: course.accentColor,
+                      color: effectiveAccentColor,
                     ),
                   ),
                 ],
@@ -143,16 +147,16 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
           child: TabBar(
             controller: _tabController,
             indicator: BoxDecoration(
-              color: course.accentColor.withAlpha(30),
+              color: effectiveAccentColor.withAlpha(30),
               borderRadius: BorderRadius.circular(12.0),
               border: Border.all(
-                color: course.accentColor.withAlpha(80),
+                color: effectiveAccentColor.withAlpha(80),
                 width: 1,
               ),
             ),
             indicatorSize: TabBarIndicatorSize.tab,
             dividerColor: Colors.transparent,
-            labelColor: course.accentColor,
+            labelColor: effectiveAccentColor,
             unselectedLabelColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
             labelStyle: TextStyle(
               fontSize: 13,

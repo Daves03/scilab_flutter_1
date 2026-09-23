@@ -516,14 +516,14 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                     _loadData();
                   }
                 },
-                backgroundColor: const Color(0xFF00D4FF),
+                backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                 elevation: 8,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const CustomIconWidget(
+                child: CustomIconWidget(
                   iconName: 'person_add_outlined',
-                  color: Color(0xFF0A1628), // Dark color for contrast
+                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white,
                   size: 28,
                 ),
               ),
@@ -622,9 +622,9 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                   height: 44,
                   margin: const EdgeInsets.only(right: 8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF142240),
+                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.grey.shade100,
                     shape: BoxShape.circle,
-                    border: Border.all(color: const Color(0xFF1E3A5F)),
+                    border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
                   ),
                   child: Center(
                     child: CustomIconWidget(
@@ -652,9 +652,9 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF142240),
+                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.grey.shade100,
                         shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFF1E3A5F)),
+                        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
                       ),
                       child: Stack(
                         children: [
@@ -945,7 +945,9 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
               icon: 'groups',
               label: 'Total Students',
               value: '${_students.length}',
-              color: _currentTab == DashboardTab.allStudents ? const Color(0xFF00D4FF) : const Color(0xFF00D4FF).withAlpha(128),
+              color: _currentTab == DashboardTab.allStudents 
+                  ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0))
+                  : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)).withAlpha(128),
               onTap: () => setState(() => _currentTab = DashboardTab.allStudents),
             ),
           ),
@@ -1199,9 +1201,9 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
       child: Row(
         children: [
-          const CustomIconWidget(
+          CustomIconWidget(
             iconName: 'people_alt',
-            color: Color(0xFF00D4FF),
+            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
             size: 18,
           ),
           const SizedBox(width: 8),
@@ -1350,7 +1352,7 @@ class _StudentProgressCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF00A0D4),
+                          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                         ),
                       ),
                     ),
@@ -1421,7 +1423,7 @@ class _StudentProgressCard extends StatelessWidget {
                 icon: 'quiz',
                 label: 'Quiz Avg',
                 value: '${(student.avgQuizScore * 100).toStringAsFixed(0)}%',
-                color: const Color(0xFF00D4FF),
+                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
               ),
               const SizedBox(width: 8),
               _MiniStat(

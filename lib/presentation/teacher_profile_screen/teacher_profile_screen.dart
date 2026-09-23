@@ -189,14 +189,14 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1A2E1A) : const Color(0xFFE8F9FD),
+                      color: isDark ? const Color(0xFF1A2E1A) : const Color(0xFF00994C).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12.0),
-                      border: Border.all(color: isDark ? const Color(0x3300FF88) : const Color(0xFF00FF88).withOpacity(0.3), width: 1),
+                      border: Border.all(color: isDark ? const Color(0x3300FF88) : const Color(0xFF00994C).withOpacity(0.3), width: 1),
                     ),
-                    child: const Center(
+                    child: Center(
                       child: CustomIconWidget(
                         iconName: 'person',
-                        color: Color(0xFF00FF88),
+                        color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                         size: 20,
                       ),
                     ),
@@ -216,7 +216,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                         ),
                         Text(
                           'Teacher Dashboard',
-                          style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00A050)),
+                          style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C)),
                         ),
                       ],
                     ),
@@ -224,25 +224,25 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: const Color(0x2200FF88),
+                      color: isDark ? const Color(0x2200FF88) : const Color(0xFF00994C).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(50.0),
-                      border: Border.all(color: const Color(0x5500FF88), width: 1),
+                      border: Border.all(color: isDark ? const Color(0x5500FF88) : const Color(0xFF00994C).withOpacity(0.3), width: 1),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const CustomIconWidget(
+                        CustomIconWidget(
                           iconName: 'verified',
-                          color: Color(0xFF00FF88),
+                          color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                           size: 13,
                         ),
-                        SizedBox(width: 4),
+                        const SizedBox(width: 4),
                         Text(
                           'Teacher',
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00A050),
+                            color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                           ),
                         ),
                       ],
@@ -293,10 +293,10 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                       height: 100,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFF00FF88), width: 3),
-                        boxShadow: const [
+                        border: Border.all(color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C), width: 3),
+                        boxShadow: [
                           BoxShadow(
-                            color: Color(0x4400FF88),
+                            color: isDark ? const Color(0x4400FF88) : const Color(0xFF00994C).withOpacity(0.3),
                             blurRadius: 15,
                             spreadRadius: 2,
                           ),
@@ -309,10 +309,10 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                           semanticLabel: 'Teacher profile photo',
                           errorBuilder: (_, __, ___) => Container(
                             color: const Color(0xFF1A2E1A),
-                            child: const Icon(
+                            child: Icon(
                               Icons.person,
                               size: 44,
-                              color: Color(0xFF00FF88),
+                              color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                             ),
                           ),
                         ),
@@ -331,23 +331,23 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                       decoration: BoxDecoration(
-                        color: const Color(0x2200FF88),
+                        color: isDark ? const Color(0x2200FF88) : const Color(0xFF00994C).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(50),
-                        border: Border.all(color: const Color(0x5500FF88)),
+                        border: Border.all(color: isDark ? const Color(0x5500FF88) : const Color(0xFF00994C).withOpacity(0.3)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const CustomIconWidget(
+                          CustomIconWidget(
                             iconName: 'verified',
-                            color: Color(0xFF00FF88),
+                            color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                             size: 14,
                           ),
                           const SizedBox(width: 5),
                           Text(
                             'Verified Teacher',
                             style: theme.textTheme.labelMedium?.copyWith(
-                              color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00A050),
+                              color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -386,10 +386,10 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                           colors: [Color(0xFF1A2E1A), Color(0xFF0A1F0A)],
                         )
                       : null,
-                  color: isDark ? null : const Color(0xFFE8F9FD),
+                  color: isDark ? null : const Color(0xFF00994C).withOpacity(0.05),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                    color: isDark ? const Color(0x3300FF88) : const Color(0xFF00FF88).withAlpha(80),
+                    color: isDark ? const Color(0x3300FF88) : const Color(0xFF00994C).withOpacity(0.3),
                     width: 1,
                   ),
                   boxShadow: isDark
@@ -410,12 +410,12 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: const Color(0x2200FF88),
+                            color: isDark ? const Color(0x2200FF88) : const Color(0xFF00994C).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const CustomIconWidget(
+                          child: CustomIconWidget(
                             iconName: 'view_in_ar',
-                            color: Color(0xFF00FF88),
+                            color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                             size: 22,
                           ),
                         ),
@@ -484,14 +484,14 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                       child: ElevatedButton.icon(
                         onPressed: _isDownloading ? null : _downloadMarker,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF00FF88),
-                          foregroundColor: const Color(0xFF0A1628),
+                          backgroundColor: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                          foregroundColor: isDark ? const Color(0xFF0A1628) : Colors.white,
                           elevation: 4,
-                          shadowColor: const Color(0x6600FF88),
+                          shadowColor: isDark ? const Color(0x6600FF88) : const Color(0xFF00994C).withOpacity(0.4),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
-                          disabledBackgroundColor: const Color(0xFF00FF88).withAlpha(100),
+                          disabledBackgroundColor: isDark ? const Color(0xFF00FF88).withAlpha(100) : const Color(0xFF00994C).withAlpha(100),
                         ),
                         icon: _isDownloading
                             ? const SizedBox(
@@ -877,14 +877,14 @@ class _SectionsRow extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: const Color(0x1100FF88),
+            color: isDark ? const Color(0x1100FF88) : const Color(0xFF00994C).withOpacity(0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0x3300FF88)),
+            border: Border.all(color: isDark ? const Color(0x3300FF88) : const Color(0xFF00994C).withOpacity(0.2)),
           ),
-          child: const Center(
+          child: Center(
             child: CustomIconWidget(
               iconName: 'group_outlined',
-              color: Color(0xFF00FF88),
+              color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
               size: 20,
             ),
           ),
@@ -914,14 +914,14 @@ class _SectionsRow extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0x2200FF88),
+                          color: isDark ? const Color(0x2200FF88) : const Color(0xFF00994C).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0x5500FF88)),
+                          border: Border.all(color: isDark ? const Color(0x5500FF88) : const Color(0xFF00994C).withOpacity(0.3)),
                         ),
                         child: Text(
                           section,
                           style: theme.textTheme.labelSmall?.copyWith(
-                            color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00A050),
+                            color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -961,14 +961,14 @@ class _InfoRow extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: const Color(0x1100FF88),
+            color: isDark ? const Color(0x1100FF88) : const Color(0xFF00994C).withOpacity(0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0x3300FF88)),
+            border: Border.all(color: isDark ? const Color(0x3300FF88) : const Color(0xFF00994C).withOpacity(0.2)),
           ),
           child: Center(
             child: CustomIconWidget(
               iconName: icon,
-              color: const Color(0xFF00FF88),
+              color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
               size: 20,
             ),
           ),

@@ -69,20 +69,26 @@ class _CourseModulesManagerWidgetState
 
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx2, setDialogState) => _GlassDialog(
-          title: existing == null ? 'Attach Module / File' : 'Edit Module',
-          accentColor: widget.course.accentColor,
-          scrollable: true,
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _GlassTextField(
-                controller: titleCtrl,
-                label: 'Module Title',
-                hint: 'e.g. Introduction to Organic Compounds',
-              ),
+      builder: (ctx) {
+        final isLight = Theme.of(ctx).brightness == Brightness.light;
+        final displayAccentColor = (isLight && widget.course.accentColor == const Color(0xFF00D4FF)) 
+            ? const Color(0xFF1565C0) 
+            : widget.course.accentColor;
+
+        return StatefulBuilder(
+          builder: (ctx2, setDialogState) => _GlassDialog(
+            title: existing == null ? 'Attach Module / File' : 'Edit Module',
+            accentColor: widget.course.accentColor,
+            scrollable: true,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _GlassTextField(
+                  controller: titleCtrl,
+                  label: 'Module Title',
+                  hint: 'e.g. Introduction to Organic Compounds',
+                ),
               const SizedBox(height: 14),
               _GlassTextField(
                 controller: descCtrl,
@@ -127,10 +133,10 @@ class _CourseModulesManagerWidgetState
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF142240),
+                    color: isLight ? Colors.white : const Color(0xFF142240),
                     borderRadius: BorderRadius.circular(12.0),
                     border: Border.all(
-                      color: widget.course.accentColor.withAlpha(50),
+                      color: displayAccentColor.withAlpha(isLight ? 70 : 50),
                       width: 1,
                       style: BorderStyle.solid,
                     ),
@@ -139,7 +145,7 @@ class _CourseModulesManagerWidgetState
                     children: [
                       CustomIconWidget(
                         iconName: selectedFile != null ? 'description' : 'cloud_upload',
-                        color: widget.course.accentColor,
+                        color: displayAccentColor,
                         size: 28,
                       ),
                       const SizedBox(height: 6),
@@ -148,15 +154,15 @@ class _CourseModulesManagerWidgetState
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: widget.course.accentColor,
+                          color: displayAccentColor,
                         ),
                         textAlign: TextAlign.center,
                       ),
                       if (selectedFile == null) ...[
                         const SizedBox(height: 2),
-                        const Text(
+                        Text(
                           'PDF, DOC, PPT supported',
-                          style: TextStyle(fontSize: 11, color: Color(0xFF8BA3C0)),
+                          style: TextStyle(fontSize: 11, color: isLight ? Colors.grey.shade500 : const Color(0xFF8BA3C0)),
                         ),
                       ],
                     ],
@@ -168,25 +174,25 @@ class _CourseModulesManagerWidgetState
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'File Type',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF8BA3C0)),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: isLight ? Colors.grey.shade600 : const Color(0xFF8BA3C0)),
                   ),
                   const SizedBox(height: 6),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF142240),
+                      color: isLight ? Colors.white : const Color(0xFF142240),
                       borderRadius: BorderRadius.circular(10.0),
-                      border: Border.all(color: const Color(0xFF1E3A5F), width: 1),
+                      border: Border.all(color: isLight ? Colors.grey.shade300 : const Color(0xFF1E3A5F), width: 1),
                     ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
                         value: selectedType,
-                        dropdownColor: const Color(0xFF142240),
+                        dropdownColor: isLight ? Colors.white : const Color(0xFF142240),
                         isExpanded: true,
-                        icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF8BA3C0)),
-                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                        icon: Icon(Icons.arrow_drop_down, color: isLight ? Colors.grey.shade600 : const Color(0xFF8BA3C0)),
+                        style: TextStyle(color: isLight ? Colors.black87 : Colors.white, fontSize: 13),
                         items: const [
                           DropdownMenuItem(value: 'pdf', child: Text('PDF Document')),
                           DropdownMenuItem(value: 'doc', child: Text('Word Document (DOC/DOCX)')),
@@ -215,20 +221,20 @@ class _CourseModulesManagerWidgetState
                     children: [
                       Icon(
                         autoGenerateQuiz ? Icons.check_box : Icons.check_box_outline_blank,
-                        color: autoGenerateQuiz ? const Color(0xFF00D4FF) : Colors.grey,
+                        color: autoGenerateQuiz ? displayAccentColor : Colors.grey,
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'Auto-generate AI Quiz',
-                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white),
+                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isLight ? Colors.black87 : Colors.white),
                             ),
                             Text(
                               'Uses AI to read the PDF and create quizzes.',
-                              style: TextStyle(fontSize: 11, color: Colors.grey),
+                              style: TextStyle(fontSize: 11, color: isLight ? Colors.grey.shade600 : Colors.grey),
                             ),
                           ],
                         ),
@@ -244,13 +250,13 @@ class _CourseModulesManagerWidgetState
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Quizzes: $numQuizzes', style: const TextStyle(fontSize: 12, color: Colors.white)),
+                            Text('Quizzes: $numQuizzes', style: TextStyle(fontSize: 12, color: isLight ? Colors.black87 : Colors.white)),
                             Slider(
                               value: numQuizzes.toDouble(),
                               min: 1,
                               max: 5,
                               divisions: 4,
-                              activeColor: const Color(0xFF00D4FF),
+                              activeColor: displayAccentColor,
                               onChanged: (val) => setDialogState(() => numQuizzes = val.toInt()),
                             ),
                           ],
@@ -260,13 +266,13 @@ class _CourseModulesManagerWidgetState
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Questions/Quiz: $numQuestions', style: const TextStyle(fontSize: 12, color: Colors.white)),
+                            Text('Questions/Quiz: $numQuestions', style: TextStyle(fontSize: 12, color: isLight ? Colors.black87 : Colors.white)),
                             Slider(
                               value: numQuestions.toDouble(),
                               min: 1,
                               max: 20,
                               divisions: 19,
-                              activeColor: const Color(0xFF00D4FF),
+                              activeColor: displayAccentColor,
                               onChanged: (val) => setDialogState(() => numQuestions = val.toInt()),
                             ),
                           ],
@@ -395,7 +401,8 @@ class _CourseModulesManagerWidgetState
           },
           onCancel: () => Navigator.pop(ctx2),
         ),
-      ),
+      );
+      },
     );
   }
 
@@ -439,6 +446,11 @@ class _CourseModulesManagerWidgetState
   @override
   Widget build(BuildContext context) {
     final modules = widget.course.modules;
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final accentColor = (isLight && widget.course.accentColor == const Color(0xFF00D4FF))
+        ? const Color(0xFF1565C0)
+        : widget.course.accentColor;
+
     return Column(
       children: [
         Padding(
@@ -448,7 +460,7 @@ class _CourseModulesManagerWidgetState
             child: _AddButton(
               label: 'Attach Module / File',
               icon: 'cloud_upload',
-              color: widget.course.accentColor,
+              color: accentColor,
               onTap: _addModule,
             ),
           ),
@@ -459,7 +471,7 @@ class _CourseModulesManagerWidgetState
                   icon: 'folder_open',
                   message:
                       'No modules yet.\nTap "Attach Module / File" to upload.',
-                  color: widget.course.accentColor,
+                  color: accentColor,
                 )
               : ListView.builder(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
@@ -721,15 +733,20 @@ class _GlassDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final displayAccentColor = (isLight && accentColor == const Color(0xFF00D4FF)) 
+        ? const Color(0xFF1565C0) 
+        : accentColor;
+
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 480),
         decoration: BoxDecoration(
-          color: const Color(0xFF0F1E35),
+          color: isLight ? Colors.white : const Color(0xFF0F1E35),
           borderRadius: BorderRadius.circular(20.0),
-          border: Border.all(color: accentColor.withAlpha(60), width: 1),
+          border: Border.all(color: displayAccentColor.withAlpha(60), width: 1),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -737,13 +754,13 @@ class _GlassDialog extends StatelessWidget {
             Container(
               padding: const EdgeInsets.fromLTRB(20, 16, 12, 16),
               decoration: BoxDecoration(
-                color: accentColor.withAlpha(15),
+                color: displayAccentColor.withAlpha(15),
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(20),
                 ),
                 border: Border(
                   bottom: BorderSide(
-                    color: accentColor.withAlpha(40),
+                    color: displayAccentColor.withAlpha(40),
                     width: 1,
                   ),
                 ),
@@ -752,17 +769,17 @@ class _GlassDialog extends StatelessWidget {
                 children: [
                   CustomIconWidget(
                     iconName: 'cloud_upload',
-                    color: accentColor,
+                    color: displayAccentColor,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: isLight ? Colors.black87 : Colors.white,
                       ),
                     ),
                   ),
@@ -816,8 +833,8 @@ class _GlassDialog extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: onSave,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: accentColor,
-                        foregroundColor: const Color(0xFF0A1628),
+                        backgroundColor: displayAccentColor,
+                        foregroundColor: isLight ? Colors.white : const Color(0xFF0A1628),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(50),
                         ),
@@ -855,43 +872,44 @@ class _GlassTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF8BA3C0),
+            color: isLight ? Colors.grey.shade600 : const Color(0xFF8BA3C0),
           ),
         ),
         const SizedBox(height: 6),
         TextField(
           controller: controller,
           maxLines: maxLines,
-          style: const TextStyle(fontSize: 13, color: Colors.white),
+          style: TextStyle(fontSize: 13, color: isLight ? Colors.black87 : Colors.white),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF4A6A8A)),
+            hintStyle: TextStyle(fontSize: 12, color: isLight ? Colors.grey.shade500 : const Color(0xFF4A6A8A)),
             filled: true,
-            fillColor: const Color(0xFF142240),
+            fillColor: isLight ? Colors.white : const Color(0xFF142240),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 14,
               vertical: 12,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: const BorderSide(color: Color(0xFF1E3A5F), width: 1),
+              borderSide: BorderSide(color: isLight ? Colors.grey.shade300 : const Color(0xFF1E3A5F), width: 1),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: const BorderSide(color: Color(0xFF1E3A5F), width: 1),
+              borderSide: BorderSide(color: isLight ? Colors.grey.shade300 : const Color(0xFF1E3A5F), width: 1),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: const BorderSide(
-                color: Color(0xFF00D4FF),
+              borderSide: BorderSide(
+                color: isLight ? const Color(0xFF1565C0) : const Color(0xFF00D4FF),
                 width: 1.5,
               ),
             ),

@@ -189,12 +189,12 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
             decoration: BoxDecoration(
               color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0D2E3F) : const Color(0xFFE8F9FD),
               borderRadius: BorderRadius.circular(12.0),
-              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x3300D4FF) : const Color(0xFF00D4FF).withOpacity(0.3), width: 1),
+              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x3300D4FF) : const Color(0xFF1565C0).withOpacity(0.3), width: 1),
             ),
-            child: const Center(
+            child: Center(
               child: CustomIconWidget(
                 iconName: 'menu_book',
-                color: Color(0xFF00D4FF),
+                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                 size: 20,
               ),
             ),
@@ -214,7 +214,7 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
                 ),
                 Text(
                   '${courses.length} enrolled courses',
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF00D4FF)),
+                  style: TextStyle(fontSize: 12, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)),
                 ),
               ],
             ),
@@ -222,25 +222,25 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: const Color(0x2200D4FF),
+              color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200D4FF) : const Color(0xFF1565C0).withOpacity(0.1),
               borderRadius: BorderRadius.circular(50.0),
-              border: Border.all(color: const Color(0x5500D4FF), width: 1),
+              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x5500D4FF) : const Color(0xFF1565C0).withOpacity(0.2), width: 1),
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 CustomIconWidget(
                   iconName: 'school',
-                  color: Color(0xFF00D4FF),
+                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                   size: 13,
                 ),
-                SizedBox(width: 4),
+                const SizedBox(width: 4),
                 Text(
                   'Student',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF00D4FF),
+                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                   ),
                 ),
               ],
@@ -262,13 +262,17 @@ class _CourseListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveAccentColor = course.accentColor == const Color(0xFF00D4FF)
+        ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0))
+        : course.accentColor;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
           borderRadius: BorderRadius.circular(20.0),
-          border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? course.accentColor.withAlpha(40) : Colors.grey.shade300, width: 1),
+          border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? effectiveAccentColor.withAlpha(40) : Colors.grey.shade300, width: 1),
         ),
         padding: const EdgeInsets.all(18),
         child: Column(
@@ -280,13 +284,13 @@ class _CourseListCard extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: course.accentColor.withAlpha(Theme.of(context).brightness == Brightness.dark ? 25 : 40),
+                    color: effectiveAccentColor.withAlpha(Theme.of(context).brightness == Brightness.dark ? 25 : 40),
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                   child: Center(
                     child: CustomIconWidget(
                       iconName: course.iconName,
-                      color: course.accentColor,
+                      color: effectiveAccentColor,
                       size: 22,
                     ),
                   ),
@@ -337,7 +341,7 @@ class _CourseListCard extends StatelessWidget {
                 _InfoChip(
                   icon: 'folder_open',
                   label: '${course.modules.length} Modules',
-                  color: course.accentColor,
+                  color: effectiveAccentColor,
                 ),
               ],
             ),
@@ -351,7 +355,7 @@ class _CourseListCard extends StatelessWidget {
                       value: course.progress,
                       backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade200,
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        course.accentColor,
+                        effectiveAccentColor,
                       ),
                       minHeight: 5,
                     ),
@@ -363,7 +367,7 @@ class _CourseListCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: course.accentColor,
+                    color: effectiveAccentColor,
                   ),
                 ),
               ],

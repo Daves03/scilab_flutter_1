@@ -108,7 +108,7 @@ export default function TeacherUploads() {
                   >
                     <Trash2 size={16} />
                   </button>
-                  <h4 style={{ color: 'white', marginBottom: '4px', fontSize: '1rem', paddingRight: '32px' }}>{course.title}</h4>
+                  <h4 style={{ color: 'var(--text-primary)', marginBottom: '4px', fontSize: '1rem', paddingRight: '32px' }}>{course.title}</h4>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                     <span>{course.teacherName}</span>
                     <span>{course.grade}</span>
@@ -142,7 +142,7 @@ export default function TeacherUploads() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px' }}>
                   {activeCourse.modules.map((mod, index) => (
                     <div key={index} style={{ background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
-                      <h4 style={{ color: 'white', marginBottom: '8px', wordBreak: 'break-all' }}>{mod.title}</h4>
+                      <h4 style={{ color: 'var(--text-primary)', marginBottom: '8px', wordBreak: 'break-all' }}>{mod.title}</h4>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{mod.fileType?.toUpperCase()}</span>
                         <div style={{ display: 'flex', gap: '8px' }}>
@@ -169,7 +169,7 @@ export default function TeacherUploads() {
                   {activeCourse.quizzes.map((quiz, index) => (
                     <div key={index} style={{ background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                        <h4 style={{ color: 'white', wordBreak: 'break-all' }}>{quiz.title}</h4>
+                        <h4 style={{ color: 'var(--text-primary)', wordBreak: 'break-all' }}>{quiz.title}</h4>
                         <button onClick={() => handleDeleteQuiz(index, quiz.title)} className="btn btn-danger" style={{ padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '8px' }} title="Delete Quiz">
                           <Trash2 size={16} />
                         </button>

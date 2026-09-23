@@ -299,12 +299,12 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
                           decoration: BoxDecoration(
                             color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1A2E1A) : const Color(0xFFE8F5E9),
                             borderRadius: BorderRadius.circular(12.0),
-                            border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x3300FF88) : const Color(0xFF00FF88).withOpacity(0.3), width: 1),
+                            border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x3300FF88) : const Color(0xFF00994C).withOpacity(0.3), width: 1),
                           ),
                           child: Center(
                             child: CustomIconWidget(
                               iconName: 'insights',
-                              color: Color(0xFF00FF88),
+                              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                               size: 20,
                             ),
                           ),
@@ -324,7 +324,7 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
                               ),
                               Text(
                                 'Teacher Dashboard',
-                                style: TextStyle(fontSize: 12, color: Color(0xFF00FF88)),
+                                style: TextStyle(fontSize: 12, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C)),
                               ),
                             ],
                           ),
@@ -332,25 +332,25 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200FF88) : const Color(0xFF00FF88).withOpacity(0.1),
+                            color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200FF88) : const Color(0xFF00994C).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(50.0),
-                            border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x5500FF88) : const Color(0xFF00FF88).withOpacity(0.3), width: 1),
+                            border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x5500FF88) : const Color(0xFF00994C).withOpacity(0.3), width: 1),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               CustomIconWidget(
                                 iconName: 'verified',
-                                color: Color(0xFF00FF88),
+                                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                                 size: 13,
                               ),
-                              SizedBox(width: 4),
+                              const SizedBox(width: 4),
                               Text(
                                 'Teacher',
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF00FF88),
+                                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                                 ),
                               ),
                             ],
@@ -382,9 +382,9 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
                           dropdownColor: isDark
                               ? const Color(0xFF142240)
                               : Colors.white,
-                          icon: const CustomIconWidget(
+                          icon: CustomIconWidget(
                             iconName: 'keyboard_arrow_down',
-                            color: Color(0xFF00D4FF),
+                            color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                             size: 20,
                           ),
                           style: theme.textTheme.bodyMedium?.copyWith(
@@ -399,7 +399,7 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
                                     iconName: s == 'All Sections'
                                         ? 'groups'
                                         : 'class_',
-                                    color: const Color(0xFF00D4FF),
+                                    color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                                     size: 16,
                                   ),
                                   const SizedBox(width: 8),
@@ -438,11 +438,11 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
                           hintStyle: theme.textTheme.bodyMedium?.copyWith(
                             color: subTextColor,
                           ),
-                          prefixIcon: const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 12),
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
                             child: CustomIconWidget(
                               iconName: 'search',
-                              color: Color(0xFF00D4FF),
+                              color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                               size: 20,
                             ),
                           ),
@@ -498,11 +498,11 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
                       child: TabBar(
                         controller: _tabController,
                         indicator: BoxDecoration(
-                          color: const Color(0xFF00D4FF),
+                          color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         indicatorSize: TabBarIndicatorSize.tab,
-                        labelColor: const Color(0xFF0A1628),
+                        labelColor: isDark ? const Color(0xFF0A1628) : Colors.white,
                         unselectedLabelColor: subTextColor,
                         labelStyle: const TextStyle(
                           fontSize: 12,
@@ -629,15 +629,15 @@ class _QuizResultsTab extends StatelessWidget {
                         width: 36,
                         height: 36,
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0x2200D4FF) : const Color(0xFF00D4FF).withOpacity(0.1),
+                          color: isDark ? const Color(0x2200D4FF) : const Color(0xFF1565C0).withOpacity(0.1),
                           shape: BoxShape.circle,
-                          border: Border.all(color: isDark ? const Color(0x5500D4FF) : const Color(0xFF00D4FF).withOpacity(0.3)),
+                          border: Border.all(color: isDark ? const Color(0x5500D4FF) : const Color(0xFF1565C0).withOpacity(0.3)),
                         ),
                         child: Center(
                           child: Text(
                             student.name.isNotEmpty ? student.name[0] : '?',
-                            style: const TextStyle(
-                              color: Color(0xFF00D4FF),
+                            style: TextStyle(
+                              color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                               fontWeight: FontWeight.w700,
                               fontSize: 15,
                             ),
@@ -660,7 +660,7 @@ class _QuizResultsTab extends StatelessWidget {
                               Text(
                                 '#${student.studentNumber}',
                                 style: theme.textTheme.labelSmall?.copyWith(
-                                  color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF00A0D4),
+                                  color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -1029,15 +1029,15 @@ class _ArLabTab extends StatelessWidget {
                         width: 36,
                         height: 36,
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0x2200FF88) : const Color(0xFF00FF88).withOpacity(0.1),
+                          color: isDark ? const Color(0x2200FF88) : const Color(0xFF00994C).withOpacity(0.1),
                           shape: BoxShape.circle,
-                          border: Border.all(color: isDark ? const Color(0x5500FF88) : const Color(0xFF00FF88).withOpacity(0.3)),
+                          border: Border.all(color: isDark ? const Color(0x5500FF88) : const Color(0xFF00994C).withOpacity(0.3)),
                         ),
                         child: Center(
                           child: Text(
                             student.name.isNotEmpty ? student.name[0] : '?',
-                            style: const TextStyle(
-                              color: Color(0xFF00FF88),
+                            style: TextStyle(
+                              color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                               fontWeight: FontWeight.w700,
                               fontSize: 15,
                             ),
@@ -1060,7 +1060,7 @@ class _ArLabTab extends StatelessWidget {
                               Text(
                                 '#${student.studentNumber}',
                                 style: theme.textTheme.labelSmall?.copyWith(
-                                  color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00A050),
+                                  color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -1079,14 +1079,14 @@ class _ArLabTab extends StatelessWidget {
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0x2200FF88) : const Color(0xFF00FF88).withOpacity(0.1),
+                          color: isDark ? const Color(0x2200FF88) : const Color(0xFF00994C).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: isDark ? const Color(0x5500FF88) : const Color(0xFF00FF88).withOpacity(0.3)),
+                          border: Border.all(color: isDark ? const Color(0x5500FF88) : const Color(0xFF00994C).withOpacity(0.3)),
                         ),
                         child: Text(
                           '${student.arLabRecords.length} Experiment${student.arLabRecords.length != 1 ? 's' : ''}',
-                          style: const TextStyle(
-                            color: Color(0xFF00FF88),
+                          style: TextStyle(
+                            color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
                           ),
@@ -1263,23 +1263,36 @@ class _ArLabRecordRow extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0x2200D4FF) : const Color(0xFF00D4FF).withOpacity(0.1),
+                  color: isDark ? const Color(0x2200D4FF) : const Color(0xFF1565C0).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const CustomIconWidget(
+                child: CustomIconWidget(
                   iconName: 'view_in_ar',
-                  color: Color(0xFF00D4FF),
+                  color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                   size: 14,
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(
-                  record.experimentName,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      record.experimentName,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      record.lastAttemptDate,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: subTextColor,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               // Rubric score badge
@@ -1348,16 +1361,6 @@ class _ArLabRecordRow extends StatelessWidget {
                     color: color,
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  record.lastAttemptDate,
-                  textAlign: TextAlign.right,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: subTextColor,
                   ),
                 ),
               ),

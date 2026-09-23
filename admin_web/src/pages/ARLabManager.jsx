@@ -344,7 +344,7 @@ export default function ARLabManager() {
   };
 
   if (loading) {
-    return <div style={{ padding: '40px', color: 'white', textAlign: 'center' }}>Loading experiments...</div>;
+    return <div style={{ padding: '40px', color: 'var(--text-primary)', textAlign: 'center' }}>Loading experiments...</div>;
   }
 
   return (
@@ -389,7 +389,7 @@ export default function ARLabManager() {
                 gap: '16px'
               }}>
                 <div>
-                  <h3 style={{ margin: '0 0 8px 0', color: 'white' }}>{exp.title}</h3>
+                  <h3 style={{ margin: '0 0 8px 0', color: 'var(--text-primary)' }}>{exp.title}</h3>
                   <div style={{ display: 'flex', gap: '12px', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                     <span className="badge badge-role" style={{ background: 'rgba(0,184,255,0.1)', color: 'var(--accent-blue)' }}>{exp.category}</span>
                     <span>Topic: {exp.topic}</span>
@@ -421,7 +421,7 @@ export default function ARLabManager() {
             border: '1px solid var(--border-light)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h2 style={{ margin: 0, color: 'white' }}>Edit AR Experiment</h2>
+              <h2 style={{ margin: 0, color: 'var(--text-primary)' }}>Edit AR Experiment</h2>
               <button className="btn btn-secondary" onClick={() => setEditingExp(null)} style={{ padding: '8px' }}>
                 <X size={20} />
               </button>

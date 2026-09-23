@@ -334,6 +334,27 @@ class AuthService extends ChangeNotifier {
             snap.docs.map((d) => AppUser.fromMap(d.id, d.data())).toList());
   }
 
+  /// Counts the total number of approved students in the given sections.
+  Future<int> countStudentsInSections(List<String> sections) async {
+    if (sections.isEmpty) return 0;
+    
+    // array-contains-any limits to 10 elements
+    final chunked = sections.take(10).toList();
+    try {
+      final snapshot = await _db
+          .collection('users')
+          .where('sections', arrayContainsAny: chunked)
+          .where('role', whereIn: [UserRole.grade9.id, UserRole.grade10.id])
+          .where('status', isEqualTo: VerificationStatus.approved.id)
+          .count()
+          .get();
+      return snapshot.count ?? 0;
+    } catch (e) {
+      debugPrint('Error counting students: $e');
+      return 0;
+    }
+  }
+
   @override
   void dispose() {
     _authSub?.cancel();

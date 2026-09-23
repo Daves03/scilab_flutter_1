@@ -289,14 +289,14 @@ class _RegisterFormWidgetState extends State<RegisterFormWidget> {
                 children: _teacherSelectedSections.map((s) {
                   return Chip(
                     label: Text(s, style: TextStyle(fontSize: 12, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87)),
-                    backgroundColor: const Color(0x2200D4FF),
-                    deleteIconColor: const Color(0xFF00D4FF),
+                    backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200D4FF) : const Color(0xFF1565C0).withOpacity(0.1),
+                    deleteIconColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                     onDeleted: () {
                       setState(() {
                         _teacherSelectedSections.remove(s);
                       });
                     },
-                    side: const BorderSide(color: Color(0xFF00D4FF)),
+                    side: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)),
                   );
                 }).toList(),
               ),
@@ -309,7 +309,7 @@ class _RegisterFormWidgetState extends State<RegisterFormWidget> {
             child: ElevatedButton(
               onPressed: _isLoading ? null : _submit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00D4FF),
+                backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                 foregroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50),
@@ -348,12 +348,12 @@ class _RegisterFormWidgetState extends State<RegisterFormWidget> {
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
           decoration: BoxDecoration(
             color: isSelected
-                ? const Color(0x2200D4FF)
+                ? (Theme.of(context).brightness == Brightness.dark ? const Color(0x2200D4FF) : const Color(0xFF1565C0).withOpacity(0.1))
                 : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.grey.shade200),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: isSelected
-                  ? const Color(0xFF00D4FF)
+                  ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0))
                   : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade400),
               width: isSelected ? 1.5 : 1,
             ),
@@ -364,7 +364,7 @@ class _RegisterFormWidgetState extends State<RegisterFormWidget> {
               CustomIconWidget(
                 iconName: icon,
                 color: isSelected
-                    ? const Color(0xFF00D4FF)
+                    ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0))
                     : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
                 size: 18,
               ),
@@ -375,7 +375,7 @@ class _RegisterFormWidgetState extends State<RegisterFormWidget> {
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: isSelected
-                      ? const Color(0xFF00D4FF)
+                      ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0))
                       : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
                 ),
               ),
@@ -390,9 +390,9 @@ class _RegisterFormWidgetState extends State<RegisterFormWidget> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: const Color(0x1400D4FF),
+        color: Theme.of(context).brightness == Brightness.dark ? const Color(0x1400D4FF) : const Color(0xFF1565C0).withOpacity(0.05),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0x2900D4FF), width: 1),
+        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2900D4FF) : const Color(0xFF1565C0).withOpacity(0.15), width: 1),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
@@ -439,9 +439,9 @@ class _RegisterFormWidgetState extends State<RegisterFormWidget> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: const Color(0x1400D4FF),
+        color: Theme.of(context).brightness == Brightness.dark ? const Color(0x1400D4FF) : const Color(0xFF1565C0).withOpacity(0.05),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0x2900D4FF), width: 1),
+        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2900D4FF) : const Color(0xFF1565C0).withOpacity(0.15), width: 1),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
@@ -472,9 +472,9 @@ class _RegisterFormWidgetState extends State<RegisterFormWidget> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: const Color(0x1400D4FF),
+        color: Theme.of(context).brightness == Brightness.dark ? const Color(0x1400D4FF) : const Color(0xFF1565C0).withOpacity(0.05),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0x2900D4FF), width: 1),
+        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2900D4FF) : const Color(0xFF1565C0).withOpacity(0.15), width: 1),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
@@ -520,9 +520,9 @@ class _RegisterFormWidgetState extends State<RegisterFormWidget> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: const Color(0x1400D4FF),
+        color: Theme.of(context).brightness == Brightness.dark ? const Color(0x1400D4FF) : const Color(0xFF1565C0).withOpacity(0.05),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0x2900D4FF), width: 1),
+        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2900D4FF) : const Color(0xFF1565C0).withOpacity(0.15), width: 1),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(

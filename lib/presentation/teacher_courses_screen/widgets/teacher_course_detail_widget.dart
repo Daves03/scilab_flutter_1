@@ -1,6 +1,7 @@
 import '../../../core/app_export.dart';
 import '../../../models/course_model.dart';
 import '../../../services/course_service.dart';
+import '../../../services/auth_service.dart';
 import 'package:provider/provider.dart';
 import '../teacher_courses_screen.dart';
 import './teacher_modules_manager_widget.dart';
@@ -26,11 +27,21 @@ class CourseDetailWidget extends StatefulWidget {
 class _CourseDetailWidgetState extends State<CourseDetailWidget>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  Future<int>? _studentCountFuture;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _studentCountFuture = context.read<AuthService>().countStudentsInSections(widget.course.sections);
+  }
+
+  @override
+  void didUpdateWidget(covariant CourseDetailWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.course.sections != oldWidget.course.sections) {
+      _studentCountFuture = context.read<AuthService>().countStudentsInSections(widget.course.sections);
+    }
   }
 
   @override
@@ -48,6 +59,11 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
   @override
   Widget build(BuildContext context) {
     final course = widget.course;
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final accentColor = (isLight && course.accentColor == const Color(0xFF00D4FF))
+        ? const Color(0xFF1565C0)
+        : course.accentColor;
+
     return Column(
       children: [
         // ── Header ──────────────────────────────────────────────────────────
@@ -64,17 +80,17 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
                       width: 38,
                       height: 38,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF142240),
+                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.grey.shade100,
                         borderRadius: BorderRadius.circular(12.0),
                         border: Border.all(
-                          color: const Color(0xFF1E3A5F),
+                          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300,
                           width: 1,
                         ),
                       ),
-                      child: const Center(
+                      child: Center(
                         child: CustomIconWidget(
                           iconName: 'arrow_back',
-                          color: Color(0xFF8BA3C0),
+                          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
                           size: 18,
                         ),
                       ),
@@ -84,10 +100,10 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
                   Expanded(
                     child: Text(
                       course.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -103,12 +119,18 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
                   _MetaBadge(
                     icon: 'school',
                     label: course.grade,
-                    color: course.accentColor,
+                    color: accentColor,
                   ),
-                  _MetaBadge(
-                    icon: 'people',
-                    label: '${0} students',
-                    color: const Color(0xFF8BA3C0),
+                  FutureBuilder<int>(
+                    future: _studentCountFuture,
+                    builder: (context, snapshot) {
+                      final count = snapshot.data ?? 0;
+                      return _MetaBadge(
+                        icon: 'people',
+                        label: '$count students',
+                        color: const Color(0xFF8BA3C0),
+                      );
+                    }
                   ),
                 ],
               ),
@@ -120,23 +142,24 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: const Color(0xFF0F1E35),
+            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0F1E35) : Colors.grey.shade100,
             borderRadius: BorderRadius.circular(14.0),
+            border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? Colors.transparent : Colors.grey.shade300),
           ),
           child: TabBar(
             controller: _tabController,
             indicator: BoxDecoration(
-              color: course.accentColor.withAlpha(30),
+              color: Theme.of(context).brightness == Brightness.dark ? accentColor.withAlpha(30) : accentColor.withAlpha(50),
               borderRadius: BorderRadius.circular(12.0),
               border: Border.all(
-                color: course.accentColor.withAlpha(80),
+                color: accentColor.withAlpha(80),
                 width: 1,
               ),
             ),
             indicatorSize: TabBarIndicatorSize.tab,
             dividerColor: Colors.transparent,
-            labelColor: course.accentColor,
-            unselectedLabelColor: const Color(0xFF8BA3C0),
+            labelColor: accentColor,
+            unselectedLabelColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
             labelStyle: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -150,9 +173,9 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const CustomIconWidget(
+                    CustomIconWidget(
                       iconName: 'quiz',
-                      color: Colors.white,
+                      color: accentColor,
                       size: 16,
                     ),
                     const SizedBox(width: 6),
@@ -164,9 +187,9 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const CustomIconWidget(
+                    CustomIconWidget(
                       iconName: 'folder_open',
-                      color: Colors.white,
+                      color: accentColor,
                       size: 16,
                     ),
                     const SizedBox(width: 6),

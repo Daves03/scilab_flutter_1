@@ -22,6 +22,7 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
   Course? _selectedCourse;
   String _mainSearchQuery = '';
   final TextEditingController _mainSearchCtrl = TextEditingController();
+  Future<int>? _studentCountFuture;
 
   @override
   void initState() {
@@ -30,6 +31,11 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
       vsync: this,
       duration: const Duration(milliseconds: 500),
     )..forward();
+    
+    final currentUser = context.read<AuthService>().currentUser;
+    if (currentUser != null) {
+      _studentCountFuture = context.read<AuthService>().countStudentsInSections(currentUser.sections);
+    }
   }
 
   @override
@@ -103,8 +109,8 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
                 right: 20,
                 child: FloatingActionButton(
                   onPressed: _openCrudPanel,
-                  backgroundColor: const Color(0xFF00FF88),
-                  foregroundColor: const Color(0xFF0A1628),
+                  backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                  foregroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white,
                   tooltip: 'Manage Courses',
                   child: const Icon(Icons.edit, size: 26),
                 ),
@@ -238,7 +244,7 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
             child: Center(
               child: CustomIconWidget(
                 iconName: 'menu_book',
-                color: Color(0xFF00FF88),
+                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                 size: 20,
               ),
             ),
@@ -258,7 +264,7 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
                 ),
                 Text(
                   'Teacher Dashboard',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF00FF88)),
+                  style: TextStyle(fontSize: 12, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C)),
                 ),
               ],
             ),
@@ -270,21 +276,21 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
               borderRadius: BorderRadius.circular(50.0),
               border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x5500FF88) : const Color(0xFF00FF88).withOpacity(0.3), width: 1),
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 CustomIconWidget(
                   iconName: 'verified',
-                  color: Color(0xFF00FF88),
+                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                   size: 13,
                 ),
-                SizedBox(width: 4),
+                const SizedBox(width: 4),
                 Text(
                   'Teacher',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF00FF88),
+                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                   ),
                 ),
               ],
@@ -296,16 +302,18 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
   }
 
   Widget _buildSubtitle(List<Course> courses) {
-    final totalStudents = courses.fold<int>(
-      0,
-      (sum, c) => sum + 0,
-    );
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
-      child: Text(
-        '${courses.length} courses · $totalStudents students enrolled',
-        style: TextStyle(fontSize: 13, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
-      ),
+    return FutureBuilder<int>(
+      future: _studentCountFuture,
+      builder: (context, snapshot) {
+        final totalStudents = snapshot.data ?? 0;
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
+          child: Text(
+            '${courses.length} courses · $totalStudents students enrolled',
+            style: TextStyle(fontSize: 13, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
+          ),
+        );
+      },
     );
   }
 
@@ -644,11 +652,11 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200FF88) : const Color(0xFF00FF88).withOpacity(0.1),
+                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200FF88) : const Color(0xFF00994C).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                   child: Center(
-                    child: Icon(Icons.edit, color: Color(0xFF00FF88), size: 18),
+                    child: Icon(Icons.edit, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C), size: 18),
                   ),
                 ),
                 SizedBox(width: 12),
@@ -724,10 +732,10 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
                               padding: const EdgeInsets.all(8),
                               margin: const EdgeInsets.only(right: 8),
                               decoration: BoxDecoration(
-                                color: const Color(0x2200D4FF),
+                                color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200D4FF) : const Color(0xFF1565C0).withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
-                              child: const Icon(Icons.checklist, color: Color(0xFF00D4FF), size: 16),
+                              child: Icon(Icons.checklist, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0), size: 16),
                             ),
                           ),
                           GestureDetector(
@@ -735,17 +743,17 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF00FF88),
+                                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.add, color: Color(0xFF0A1628), size: 16),
-                                  SizedBox(width: 4),
+                                  Icon(Icons.add, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white, size: 16),
+                                  const SizedBox(width: 4),
                                   Text(
                                     'New',
-                                    style: TextStyle(color: Color(0xFF0A1628), fontSize: 12, fontWeight: FontWeight.w700),
+                                    style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white, fontSize: 12, fontWeight: FontWeight.w700),
                                   ),
                                 ],
                               ),
@@ -765,7 +773,7 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
                 decoration: BoxDecoration(
                   color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(10.0),
-                  border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200FF88) : const Color(0xFF00FF88).withOpacity(0.2), width: 1),
+                  border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200FF88) : const Color(0xFF00994C).withOpacity(0.2), width: 1),
                 ),
                 child: TextField(
                   controller: _searchCtrl,
@@ -858,7 +866,7 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
                               }
                             : null,
                         child: Container(
-                          color: isSelected ? (Theme.of(context).brightness == Brightness.dark ? const Color(0x1100D4FF) : const Color(0xFF00D4FF).withOpacity(0.1)) : Colors.transparent,
+                          color: isSelected ? (Theme.of(context).brightness == Brightness.dark ? const Color(0x1100D4FF) : const Color(0xFF1565C0).withOpacity(0.1)) : Colors.transparent,
                           child: _PanelCourseRow(
                             course: course,
                             isSelectMode: _isSelectMode,
@@ -906,8 +914,8 @@ class _PanelCourseRow extends StatelessWidget {
               height: 18,
               margin: const EdgeInsets.only(right: 12),
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFF00D4FF) : Colors.transparent,
-                border: Border.all(color: isSelected ? const Color(0xFF00D4FF) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF3A5070) : Colors.grey.shade400), width: 1.5),
+                color: isSelected ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)) : Colors.transparent,
+                border: Border.all(color: isSelected ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF3A5070) : Colors.grey.shade400), width: 1.5),
                 borderRadius: BorderRadius.circular(4.0),
               ),
               child: isSelected ? Icon(Icons.check, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white, size: 14) : null,
@@ -918,7 +926,9 @@ class _PanelCourseRow extends StatelessWidget {
               height: 10,
               margin: const EdgeInsets.only(right: 12),
               decoration: BoxDecoration(
-                color: course.accentColor,
+                color: (Theme.of(context).brightness == Brightness.light && course.accentColor == const Color(0xFF00D4FF))
+                    ? const Color(0xFF1565C0)
+                    : course.accentColor,
                 shape: BoxShape.circle,
               ),
             ),
@@ -959,13 +969,13 @@ class _PanelCourseRow extends StatelessWidget {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: const Color(0x2200D4FF),
+                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200D4FF) : const Color(0xFF1565C0).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8.0),
                 ),
-                child: const Center(
+                child: Center(
                   child: Icon(
                     Icons.edit_outlined,
-                    color: Color(0xFF00D4FF),
+                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                     size: 16,
                   ),
                 ),
@@ -1015,13 +1025,18 @@ class _CourseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final displayAccentColor = (isLight && course.accentColor == const Color(0xFF00D4FF)) 
+        ? const Color(0xFF1565C0) 
+        : course.accentColor;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+          color: isLight ? Colors.white : const Color(0xFF142240),
           borderRadius: BorderRadius.circular(20.0),
-          border: Border.all(color: course.accentColor.withOpacity(0.3), width: 1),
+          border: Border.all(color: displayAccentColor.withOpacity(0.3), width: 1),
         ),
         padding: const EdgeInsets.all(18),
         child: Column(
@@ -1033,13 +1048,13 @@ class _CourseCard extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: course.accentColor.withAlpha(25),
+                    color: displayAccentColor.withAlpha(25),
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                   child: Center(
                     child: CustomIconWidget(
                       iconName: course.iconName,
-                      color: course.accentColor,
+                      color: displayAccentColor,
                       size: 22,
                     ),
                   ),
@@ -1082,15 +1097,21 @@ class _CourseCard extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: [
-                _InfoChip(
-                  icon: 'people',
-                  label: '${0} Students',
-                  color: const Color(0xFFFFB800),
+                FutureBuilder<int>(
+                  future: context.read<AuthService>().countStudentsInSections(course.sections),
+                  builder: (context, snapshot) {
+                    final count = snapshot.data ?? 0;
+                    return _InfoChip(
+                      icon: 'people',
+                      label: '$count Students',
+                      color: const Color(0xFFFFB800),
+                    );
+                  }
                 ),
                 _InfoChip(
                   icon: 'quiz',
                   label: '${course.quizzes.length} Quizzes',
-                  color: course.accentColor,
+                  color: displayAccentColor,
                 ),
                 _InfoChip(
                   icon: 'folder_open',

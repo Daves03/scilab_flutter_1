@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
 import { 
@@ -9,12 +9,24 @@ import {
   LogOut, 
   Box,
   Menu,
-  X
+  X,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export default function Layout() {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [theme, setTheme] = useState(() => localStorage.getItem('admin-theme') || 'dark');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('admin-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
 
   const handleLogout = async () => {
     await auth.signOut();
@@ -93,6 +105,18 @@ export default function Layout() {
             <Box size={20} />
             AR Labs
           </NavLink>
+          
+          <div 
+            onClick={toggleTheme}
+            className="nav-link" 
+            style={{ width: '100%', cursor: 'pointer', marginTop: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}
+          >
+            {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />} 
+            <span style={{ marginRight: '8px' }}>{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</span>
+            <div className={`theme-toggle ${theme}`}>
+              <div className="toggle-thumb" />
+            </div>
+          </div>
         </nav>
 
         <div style={{ marginTop: 'auto', paddingTop: '24px', borderTop: '1px solid var(--border-light)' }}>

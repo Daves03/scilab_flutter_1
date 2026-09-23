@@ -298,12 +298,12 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
             decoration: BoxDecoration(
               color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0D2E3F) : const Color(0xFFE8F9FD),
               borderRadius: BorderRadius.circular(12.0),
-              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x3300D4FF) : const Color(0xFF00D4FF).withOpacity(0.3), width: 1),
+              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x3300D4FF) : const Color(0xFF1565C0).withOpacity(0.3), width: 1),
             ),
             child: Center(
               child: CustomIconWidget(
                 iconName: 'insights',
-                color: Color(0xFF00D4FF),
+                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                 size: 20,
               ),
             ),
@@ -323,7 +323,7 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
                 ),
                 Text(
                   'Student Dashboard',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF00D4FF)),
+                  style: TextStyle(fontSize: 12, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)),
                 ),
               ],
             ),
@@ -331,25 +331,25 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: const Color(0x2200D4FF),
+              color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200D4FF) : const Color(0xFF1565C0).withOpacity(0.1),
               borderRadius: BorderRadius.circular(50.0),
-              border: Border.all(color: const Color(0x5500D4FF), width: 1),
+              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x5500D4FF) : const Color(0xFF1565C0).withOpacity(0.2), width: 1),
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 CustomIconWidget(
                   iconName: 'school',
-                  color: Color(0xFF00D4FF),
+                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                   size: 13,
                 ),
-                SizedBox(width: 4),
+                const SizedBox(width: 4),
                 Text(
                   'Student',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF00D4FF),
+                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                   ),
                 ),
               ],

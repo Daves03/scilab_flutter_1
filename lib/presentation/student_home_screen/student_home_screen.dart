@@ -514,19 +514,24 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            const CustomIconWidget(iconName: 'notifications', color: Color(0xFF00D4FF), size: 24),
-                            const SizedBox(width: 10),
-                            Text(
-                              'Notifications',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                        Expanded(
+                          child: Row(
+                            children: [
+                              CustomIconWidget(iconName: 'notifications', color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0), size: 24),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'Notifications',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         Row(
                           mainAxisSize: MainAxisSize.min,
@@ -735,14 +740,14 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
           const SizedBox(height: 6),
           Row(
             children: [
-              const CustomIconWidget(iconName: 'schedule', color: Color(0xFF00D4FF), size: 16),
+              CustomIconWidget(iconName: 'schedule', color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0), size: 16),
               const SizedBox(width: 6),
               Text(
                 _formatDateTime(_philippinesTime),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: Color(0xFF00D4FF),
+                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                 ),
               ),
             ],
@@ -902,7 +907,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
               final stats = _progressStats;
               return Row(
                 children: [
-                  Expanded(child: _buildSummaryCard('Avg Quiz Score', stats['avgQuiz'] as String, 'quiz', const Color(0xFF00D4FF))),
+                  Expanded(child: _buildSummaryCard('Avg Quiz Score', stats['avgQuiz'] as String, 'quiz', Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0))),
                   const SizedBox(width: 12),
                   Expanded(child: _buildSummaryCard('Completed Labs', stats['labs'] as String, 'biotech', const Color(0xFF7C3AED))),
                 ],
@@ -1087,11 +1092,11 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
             decoration: BoxDecoration(
               color: isMissed 
                   ? const Color(0xFFFF4757).withAlpha(20) 
-                  : (isUpcoming ? const Color(0xFF00D4FF).withAlpha(20) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade50)),
+                  : (isUpcoming ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF).withAlpha(20) : const Color(0xFF1565C0).withAlpha(20)) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade50)),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: isMissed 
                   ? const Color(0xFFFF4757) 
-                  : (isUpcoming ? const Color(0xFF00D4FF) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300))),
+                  : (isUpcoming ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300))),
             ),
             child: Column(
               children: [
@@ -1102,7 +1107,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                     fontWeight: FontWeight.w600,
                     color: isMissed
                         ? const Color(0xFFFF4757)
-                        : (isUpcoming ? const Color(0xFF00D4FF) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600)),
+                        : (isUpcoming ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600)),
                   ),
                 ),
                 Text(
@@ -1112,7 +1117,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                     fontWeight: FontWeight.w700,
                     color: isMissed
                         ? const Color(0xFFFF4757)
-                        : (isUpcoming ? const Color(0xFF00D4FF) : (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87)),
+                        : (isUpcoming ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)) : (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87)),
                   ),
                 ),
               ],

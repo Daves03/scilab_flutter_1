@@ -86,6 +86,11 @@ class _CourseQuizManagerWidgetState extends State<CourseQuizManagerWidget> {
   @override
   Widget build(BuildContext context) {
     final quizzes = widget.course.quizzes;
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final accentColor = (isLight && widget.course.accentColor == const Color(0xFF00D4FF))
+        ? const Color(0xFF1565C0)
+        : widget.course.accentColor;
+
     return Column(
       children: [
         // Add quiz button
@@ -96,7 +101,7 @@ class _CourseQuizManagerWidgetState extends State<CourseQuizManagerWidget> {
             child: _AddButton(
               label: 'Create New Quiz',
               icon: 'add_circle_outline',
-              color: widget.course.accentColor,
+              color: accentColor,
               onTap: _addQuiz,
             ),
           ),
@@ -108,7 +113,7 @@ class _CourseQuizManagerWidgetState extends State<CourseQuizManagerWidget> {
                   icon: 'quiz',
                   message:
                       'No quizzes yet.\nTap "Create New Quiz" to get started.',
-                  color: widget.course.accentColor,
+                  color: accentColor,
                 )
               : ListView.builder(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
@@ -119,7 +124,7 @@ class _CourseQuizManagerWidgetState extends State<CourseQuizManagerWidget> {
                     return _QuizCard(
                       quiz: quiz,
                       isExpanded: isExpanded,
-                      accentColor: widget.course.accentColor,
+                      accentColor: accentColor,
                       onToggle: () => setState(() {
                         _expandedQuiz = isExpanded ? null : quiz;
                       }),
@@ -158,12 +163,12 @@ class _QuizCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF142240),
+        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.grey.shade100,
         borderRadius: BorderRadius.circular(16.0),
         border: Border.all(
           color: isExpanded
               ? accentColor.withAlpha(80)
-              : const Color(0xFF1E3A5F),
+              : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
           width: 1,
         ),
       ),
@@ -199,32 +204,32 @@ class _QuizCard extends StatelessWidget {
                       children: [
                         Text(
                           quiz.title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           '${quiz.questions.length} question${quiz.questions.length == 1 ? '' : 's'}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
-                            color: Color(0xFF8BA3C0),
+                            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
                           ),
                         ),
                         if (quiz.dueDate != null) ...[
                           const SizedBox(height: 2),
                           Row(
                             children: [
-                              const CustomIconWidget(iconName: 'schedule', color: Color(0xFF00D4FF), size: 10),
+                              CustomIconWidget(iconName: 'schedule', color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0), size: 10),
                               const SizedBox(width: 4),
                               Text(
                                 'Due: ${quiz.dueDateLabel}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 10,
-                                  color: Color(0xFF00D4FF),
+                                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -250,9 +255,9 @@ class _QuizCard extends StatelessWidget {
                   AnimatedRotation(
                     turns: isExpanded ? 0.5 : 0,
                     duration: const Duration(milliseconds: 200),
-                    child: const CustomIconWidget(
+                    child: CustomIconWidget(
                       iconName: 'expand_more',
-                      color: Color(0xFF8BA3C0),
+                      color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
                       size: 20,
                     ),
                   ),
@@ -265,7 +270,7 @@ class _QuizCard extends StatelessWidget {
             Container(
               height: 1,
               margin: const EdgeInsets.symmetric(horizontal: 14),
-              color: const Color(0xFF1E3A5F),
+              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300,
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 10, 14, 4),
@@ -288,9 +293,9 @@ class _QuizCard extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(14, 4, 14, 14),
                 child: Text(
                   'No questions yet. Edit the quiz to add questions.',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF8BA3C0),
+                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
                   ),
                 ),
               )
@@ -328,9 +333,9 @@ class _QuestionTile extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(14, 0, 14, 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F1E35),
+        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0F1E35) : Colors.white,
         borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: const Color(0xFF1E3A5F), width: 1),
+        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -360,10 +365,10 @@ class _QuestionTile extends StatelessWidget {
               Expanded(
                 child: Text(
                   question.question,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: Colors.white,
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
                   ),
                 ),
               ),
@@ -410,7 +415,7 @@ class _QuestionTile extends StatelessWidget {
                         fontSize: 12,
                         color: isCorrect
                             ? const Color(0xFF00FF88)
-                            : const Color(0xFF8BA3C0),
+                            : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
                         fontWeight: isCorrect
                             ? FontWeight.w600
                             : FontWeight.w400,
@@ -590,16 +595,17 @@ class _GlassTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (!compact) ...[
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF8BA3C0),
+              color: isLight ? Colors.grey.shade600 : const Color(0xFF8BA3C0),
             ),
           ),
           const SizedBox(height: 6),
@@ -607,28 +613,28 @@ class _GlassTextField extends StatelessWidget {
         TextField(
           controller: controller,
           maxLines: maxLines,
-          style: const TextStyle(fontSize: 13, color: Colors.white),
+          style: TextStyle(fontSize: 13, color: isLight ? Colors.black87 : Colors.white),
           decoration: InputDecoration(
             hintText: compact ? label : hint,
-            hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF4A6A8A)),
+            hintStyle: TextStyle(fontSize: 12, color: isLight ? Colors.grey.shade500 : const Color(0xFF4A6A8A)),
             filled: true,
-            fillColor: const Color(0xFF142240),
+            fillColor: isLight ? Colors.white : const Color(0xFF142240),
             contentPadding: EdgeInsets.symmetric(
               horizontal: 14,
               vertical: compact ? 10 : 12,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: const BorderSide(color: Color(0xFF1E3A5F), width: 1),
+              borderSide: BorderSide(color: isLight ? Colors.grey.shade300 : const Color(0xFF1E3A5F), width: 1),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: const BorderSide(color: Color(0xFF1E3A5F), width: 1),
+              borderSide: BorderSide(color: isLight ? Colors.grey.shade300 : const Color(0xFF1E3A5F), width: 1),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: const BorderSide(
-                color: Color(0xFF00D4FF),
+              borderSide: BorderSide(
+                color: isLight ? const Color(0xFF1565C0) : const Color(0xFF00D4FF),
                 width: 1.5,
               ),
             ),
@@ -967,22 +973,22 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
     }
   }
 
-  Widget _buildDueDatePicker(BuildContext context) {
+  Widget _buildDueDatePicker(BuildContext context, Color accentColor) {
     return GestureDetector(
       onTap: _pickDueDate,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: const Color(0xFF162544),
+          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF162544) : Colors.grey.shade100,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: widget.course.accentColor.withAlpha(40),
+            color: accentColor.withAlpha(40),
             width: 1,
           ),
         ),
         child: Row(
           children: [
-            CustomIconWidget(iconName: 'calendar_month', color: widget.course.accentColor, size: 20),
+            CustomIconWidget(iconName: 'calendar_month', color: accentColor, size: 20),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -991,7 +997,7 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
                   : 'Set Due Date (Optional)',
                 style: TextStyle(
                   fontSize: 14,
-                  color: _selectedDueDate != null ? Colors.white : const Color(0xFF8BA3C0),
+                  color: _selectedDueDate != null ? (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
                 ),
               ),
             ),
@@ -1010,16 +1016,21 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final accentColor = (isLight && widget.course.accentColor == const Color(0xFF00D4FF))
+        ? const Color(0xFF1565C0)
+        : widget.course.accentColor;
+
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 600),
         decoration: BoxDecoration(
-          color: const Color(0xFF0F1E35),
+          color: isLight ? Colors.white : const Color(0xFF0F1E35),
           borderRadius: BorderRadius.circular(20.0),
           border: Border.all(
-            color: widget.course.accentColor.withAlpha(60),
+            color: accentColor.withAlpha(60),
             width: 1,
           ),
         ),
@@ -1029,13 +1040,13 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
             Container(
               padding: const EdgeInsets.fromLTRB(20, 16, 12, 16),
               decoration: BoxDecoration(
-                color: widget.course.accentColor.withAlpha(15),
+                color: accentColor.withAlpha(15),
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(20),
                 ),
                 border: Border(
                   bottom: BorderSide(
-                    color: widget.course.accentColor.withAlpha(40),
+                    color: accentColor.withAlpha(40),
                     width: 1,
                   ),
                 ),
@@ -1044,17 +1055,17 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
                 children: [
                   CustomIconWidget(
                     iconName: 'quiz',
-                    color: widget.course.accentColor,
+                    color: accentColor,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       widget.existingQuiz == null ? 'Create Quiz' : 'Edit Quiz',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: isLight ? Colors.black87 : Colors.white,
                       ),
                     ),
                   ),
@@ -1080,7 +1091,7 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
                     hint: 'e.g. Quiz 1: Carbon Bonding',
                   ),
                   const SizedBox(height: 16),
-                  _buildDueDatePicker(context),
+                  _buildDueDatePicker(context, accentColor),
                   const SizedBox(height: 24),
                   Row(
                     children: [
@@ -1089,15 +1100,15 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: widget.course.accentColor,
+                          color: accentColor,
                         ),
                       ),
                       const Spacer(),
                       Text(
                         '${_questions.length} question(s)',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: Color(0xFF8BA3C0),
+                          color: isLight ? Colors.grey.shade600 : const Color(0xFF8BA3C0),
                         ),
                       ),
                     ],
@@ -1109,7 +1120,7 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
                     return _QuestionEditorCard(
                       index: index,
                       draft: draft,
-                      accentColor: widget.course.accentColor,
+                      accentColor: accentColor,
                       onRemove: () => _removeQuestion(index),
                       onCorrectChanged: (newIdx) {
                         setState(() {
@@ -1124,10 +1135,10 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: widget.course.accentColor.withAlpha(20),
+                        color: accentColor.withAlpha(20),
                         borderRadius: BorderRadius.circular(12.0),
                         border: Border.all(
-                          color: widget.course.accentColor.withAlpha(70),
+                          color: accentColor.withAlpha(70),
                           width: 1,
                         ),
                       ),
@@ -1136,7 +1147,7 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
                         children: [
                           CustomIconWidget(
                             iconName: 'add',
-                            color: widget.course.accentColor,
+                            color: accentColor,
                             size: 18,
                           ),
                           const SizedBox(width: 8),
@@ -1145,7 +1156,7 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: widget.course.accentColor,
+                              color: accentColor,
                             ),
                           ),
                         ],
@@ -1187,8 +1198,8 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
                     child: ElevatedButton(
                       onPressed: _save,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: widget.course.accentColor,
-                        foregroundColor: const Color(0xFF0A1628),
+                        backgroundColor: accentColor,
+                        foregroundColor: isLight ? Colors.white : const Color(0xFF0A1628),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(50),
                         ),
@@ -1277,13 +1288,14 @@ class _QuestionEditorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF142240),
+        color: isLight ? Colors.grey.shade50 : const Color(0xFF142240),
         borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: const Color(0xFF1E3A5F), width: 1),
+        border: Border.all(color: isLight ? Colors.grey.shade200 : const Color(0xFF1E3A5F), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1357,10 +1369,10 @@ class _QuestionEditorCard extends StatelessWidget {
                         ),
                       ),
                       child: isCorrect
-                          ? const Icon(
+                          ? Icon(
                               Icons.check,
                               size: 13,
-                              color: Color(0xFF0A1628),
+                              color: isLight ? Colors.white : const Color(0xFF0A1628),
                             )
                           : null,
                     ),

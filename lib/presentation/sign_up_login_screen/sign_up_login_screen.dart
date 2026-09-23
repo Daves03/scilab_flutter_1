@@ -208,7 +208,7 @@ class _SignUpLoginScreenState extends State<SignUpLoginScreen>
           curve: Curves.easeOutCubic,
           margin: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF00D4FF) : Colors.transparent,
+            color: isSelected ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)) : Colors.transparent,
             borderRadius: BorderRadius.circular(50),
           ),
           child: Center(
@@ -240,10 +240,10 @@ class _SignUpLoginScreenState extends State<SignUpLoginScreen>
           onTap: _toggleMode,
           child: Text(
             _isLogin ? 'Sign Up' : 'Sign In',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF00D4FF),
+              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
             ),
           ),
         ),

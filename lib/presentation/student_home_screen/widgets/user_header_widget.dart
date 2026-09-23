@@ -42,12 +42,12 @@ class UserHeaderWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: const Color(0xFF00D4FF).withAlpha(153),
+                    color: isDark ? const Color(0xFF00D4FF).withAlpha(153) : const Color(0xFF1565C0).withAlpha(153),
                     width: 2,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF00D4FF).withAlpha(51),
+                      color: isDark ? const Color(0xFF00D4FF).withAlpha(51) : const Color(0xFF1565C0).withAlpha(51),
                       blurRadius: 12,
                     ),
                   ],
@@ -84,7 +84,7 @@ class UserHeaderWidget extends StatelessWidget {
                         children: [
                           CustomIconWidget(
                             iconName: 'menu_book',
-                            color: const Color(0xFF00D4FF),
+                            color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                             size: 14,
                           ),
                           const SizedBox(width: 4),
@@ -94,8 +94,8 @@ class UserHeaderWidget extends StatelessWidget {
                               child: LinearProgressIndicator(
                                 value: progressPercent,
                                 backgroundColor: isDark ? const Color(0xFF1E3A5F) : Colors.grey.shade300,
-                                valueColor: const AlwaysStoppedAnimation<Color>(
-                                  Color(0xFF00D4FF),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                                 ),
                                 minHeight: 6,
                               ),
@@ -104,10 +104,10 @@ class UserHeaderWidget extends StatelessWidget {
                           const SizedBox(width: 6),
                           Text(
                             progressText!,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF00D4FF),
+                              color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                             ),
                           ),
                         ],
@@ -146,8 +146,8 @@ class UserHeaderWidget extends StatelessWidget {
                           child: Container(
                             width: 8,
                             height: 8,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF00D4FF),
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                               shape: BoxShape.circle,
                             ),
                           ),

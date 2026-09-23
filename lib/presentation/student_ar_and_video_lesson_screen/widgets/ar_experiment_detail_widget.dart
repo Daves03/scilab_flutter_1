@@ -143,7 +143,7 @@ class _ArExperimentDetailWidgetState extends State<ArExperimentDetailWidget>
                       child: Center(
                         child: CustomIconWidget(
                           iconName: exp.iconName,
-                          color: const Color(0xFF00D4FF),
+                          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                           size: 26,
                         ),
                       ),
@@ -277,8 +277,8 @@ class _ArExperimentDetailWidgetState extends State<ArExperimentDetailWidget>
                                   width: 6,
                                   height: 6,
                                   margin: const EdgeInsets.only(top: 7, right: 10),
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFF00D4FF),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                                     shape: BoxShape.circle,
                                   ),
                                 ),
@@ -312,18 +312,18 @@ class _ArExperimentDetailWidgetState extends State<ArExperimentDetailWidget>
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0x1400D4FF),
+                            color: Theme.of(context).brightness == Brightness.dark ? const Color(0x1400D4FF) : const Color(0xFF1565C0).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(50),
                             border: Border.all(
-                              color: const Color(0x2200D4FF),
+                              color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200D4FF) : const Color(0xFF1565C0).withOpacity(0.2),
                               width: 1,
                             ),
                           ),
                           child: Text(
                             concept,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
-                              color: Color(0xFF00D4FF),
+                              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -351,8 +351,8 @@ class _ArExperimentDetailWidgetState extends State<ArExperimentDetailWidget>
                             );
                       } : widget.onRunAR,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: widget.isLocked ? Colors.grey.shade700 : const Color(0xFF00D4FF),
-                        foregroundColor: widget.isLocked ? Colors.white70 : const Color(0xFF0A1628),
+                        backgroundColor: widget.isLocked ? Colors.grey.shade700 : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)),
+                        foregroundColor: widget.isLocked ? Colors.white70 : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(50),
                         ),
@@ -363,7 +363,7 @@ class _ArExperimentDetailWidgetState extends State<ArExperimentDetailWidget>
                         children: [
                           CustomIconWidget(
                             iconName: widget.isLocked ? 'lock' : 'view_in_ar',
-                            color: widget.isLocked ? Colors.white70 : const Color(0xFF0A1628),
+                            color: widget.isLocked ? Colors.white70 : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white),
                             size: 22,
                           ),
                           const SizedBox(width: 10),
@@ -372,7 +372,7 @@ class _ArExperimentDetailWidgetState extends State<ArExperimentDetailWidget>
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: widget.isLocked ? Colors.white70 : const Color(0xFF0A1628),
+                              color: widget.isLocked ? Colors.white70 : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white),
                             ),
                           ),
                         ],
@@ -395,7 +395,7 @@ class _ArExperimentDetailWidgetState extends State<ArExperimentDetailWidget>
       children: [
         CustomIconWidget(
           iconName: icon,
-          color: const Color(0xFF00D4FF),
+          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
           size: 16,
         ),
         const SizedBox(width: 6),
@@ -433,7 +433,7 @@ class _ArExperimentDetailWidgetState extends State<ArExperimentDetailWidget>
                 children: [
                   CustomIconWidget(
                     iconName: isLocked ? 'lock' : 'lock_open',
-                    color: isLocked ? const Color(0xFFFF4757) : const Color(0xFF00D4FF),
+                    color: isLocked ? const Color(0xFFFF4757) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)),
                     size: 20,
                   ),
                   const SizedBox(width: 12),
@@ -450,7 +450,7 @@ class _ArExperimentDetailWidgetState extends State<ArExperimentDetailWidget>
                   Switch(
                     value: isLocked,
                     activeColor: const Color(0xFFFF4757),
-                    inactiveThumbColor: const Color(0xFF00D4FF),
+                    inactiveThumbColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                     onChanged: (val) {
                       if (widget.onToggleSectionLock != null) {
                         widget.onToggleSectionLock!(section, val);
@@ -469,8 +469,8 @@ class _ArExperimentDetailWidgetState extends State<ArExperimentDetailWidget>
             child: ElevatedButton(
               onPressed: widget.onRunAR,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00D4FF),
-                foregroundColor: const Color(0xFF0A1628),
+                backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                foregroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50),
                 ),
@@ -479,9 +479,9 @@ class _ArExperimentDetailWidgetState extends State<ArExperimentDetailWidget>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const CustomIconWidget(iconName: 'view_in_ar', color: Color(0xFF0A1628), size: 22),
+                  CustomIconWidget(iconName: 'view_in_ar', color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white, size: 22),
                   const SizedBox(width: 10),
-                  const Text('Preview AR Experiment', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF0A1628))),
+                  Text('Preview AR Experiment', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white)),
                 ],
               ),
             ),

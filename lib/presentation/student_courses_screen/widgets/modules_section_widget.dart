@@ -81,7 +81,7 @@ class _ModuleCardState extends State<_ModuleCard> {
       case 'ppt':
         return const Color(0xFFFFB800);
       case 'doc':
-        return const Color(0xFF00D4FF);
+        return Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0);
       default:
         return const Color(0xFF8BA3C0);
     }

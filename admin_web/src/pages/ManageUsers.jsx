@@ -203,7 +203,7 @@ export default function ManageUsers() {
                 }).map(user => (
                   <tr key={user.id} style={{ opacity: activeTab === 'rejected' ? 0.6 : 1 }}>
                     <td>
-                      <div style={{ fontWeight: 600, color: 'white', textDecoration: activeTab === 'rejected' ? 'line-through' : 'none' }}>
+                      <div style={{ fontWeight: 600, color: 'var(--text-primary)', textDecoration: activeTab === 'rejected' ? 'line-through' : 'none' }}>
                         {user.name || 'No Name'}
                       </div>
                     </td>
@@ -376,7 +376,7 @@ export default function ManageUsers() {
             <div style={{ background: 'rgba(255, 255, 255, 0.1)', padding: '16px', borderRadius: '50%', display: 'inline-block', marginBottom: '16px' }}>
               <Key size={32} color="white" />
             </div>
-            <h2 style={{ marginBottom: '12px', color: 'white' }}>Reset Password?</h2>
+            <h2 style={{ marginBottom: '12px', color: 'var(--text-primary)' }}>Reset Password?</h2>
             <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: 1.5 }}>
               Are you sure you want to send a password reset email to <strong>"{resetConfirm.name}"</strong>? 
               <br /><br />

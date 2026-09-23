@@ -80,12 +80,12 @@ class _AuthHeroWidgetState extends State<AuthHeroWidget>
                       shape: BoxShape.circle,
                       color: const Color(0xFF0D2E3F),
                       border: Border.all(
-                        color: const Color(0xFF00D4FF).withAlpha(128),
+                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF).withAlpha(128) : const Color(0xFF1565C0).withAlpha(128),
                         width: 2,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF00D4FF).withAlpha(77),
+                          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF).withAlpha(77) : const Color(0xFF1565C0).withAlpha(77),
                           blurRadius: 24,
                           spreadRadius: 2,
                         ),

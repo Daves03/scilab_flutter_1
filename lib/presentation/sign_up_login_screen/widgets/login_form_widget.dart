@@ -177,12 +177,12 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                       height: 20,
                       decoration: BoxDecoration(
                         color: _rememberMe
-                            ? const Color(0xFF00D4FF)
+                            ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0))
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(5),
                         border: Border.all(
                           color: _rememberMe
-                              ? const Color(0xFF00D4FF)
+                              ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0))
                               : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF5A7A9A) : Colors.grey.shade400),
                           width: 1.5,
                         ),
@@ -211,7 +211,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF00D4FF),
+                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                   ),
                 ),
               ),
@@ -254,7 +254,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
             child: ElevatedButton(
               onPressed: _isLoading ? null : _submit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00D4FF),
+                backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                 foregroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50),
@@ -295,12 +295,12 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                 ),
               ),
               child: _isGoogleLoading
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 22,
                       height: 22,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
-                        color: Color(0xFF00D4FF),
+                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
                       ),
                     )
                   : Row(

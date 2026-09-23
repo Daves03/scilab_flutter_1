@@ -229,19 +229,7 @@ class _OverviewScreenState extends State<OverviewScreen>
             ),
           ),
           const Spacer(),
-          Consumer<ThemeProvider>(
-            builder: (context, themeProvider, child) {
-              return IconButton(
-                icon: Icon(
-                  themeProvider.isDark ? Icons.light_mode : Icons.dark_mode,
-                  color: AppTheme.textPrimary,
-                  size: 20,
-                ),
-                onPressed: () => themeProvider.toggleTheme(),
-              );
-            },
-          ),
-          const SizedBox(width: 8),
+
           GestureDetector(
             onTap: () => context.go(AppRoutes.signUpLoginScreen),
             child: Container(
