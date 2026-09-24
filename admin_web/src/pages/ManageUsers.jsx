@@ -117,25 +117,28 @@ export default function ManageUsers() {
       </div>
 
       <div className="glass-panel" style={{ padding: '24px' }}>
-        <div className="flex-mobile-col" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid var(--border-light)' }}>
-          <div className="tabs mobile-tabs" style={{ borderBottom: 'none', marginBottom: 0 }}>
+        <div className="flex-mobile-col" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid var(--border-light)', gap: '16px' }}>
+          <div className="tabs" style={{ borderBottom: 'none', marginBottom: 0, display: 'flex', justifyContent: 'center', width: '100%', paddingBottom: '4px' }}>
             <button 
               className={`tab ${activeTab === 'pending' ? 'active' : ''}`}
               onClick={() => setActiveTab('pending')}
+              style={{ flex: 1, textAlign: 'center', padding: '12px 4px', fontSize: '0.85rem' }}
             >
-              Pending Approvals ({activeTab === 'pending' ? users.length : '...'})
+              <span style={{ color: 'var(--accent-pending)' }}>Pending Approvals ({activeTab === 'pending' ? users.length : '...'})</span>
             </button>
             <button 
               className={`tab ${activeTab === 'approved' ? 'active' : ''}`}
               onClick={() => setActiveTab('approved')}
+              style={{ flex: 1, textAlign: 'center', padding: '12px 4px', fontSize: '0.85rem' }}
             >
-              Active Users ({activeTab === 'approved' ? users.length : '...'})
+              <span style={{ color: 'var(--accent-green)' }}>Active Users ({activeTab === 'approved' ? users.length : '...'})</span>
             </button>
             <button 
               className={`tab ${activeTab === 'rejected' ? 'active' : ''}`}
               onClick={() => setActiveTab('rejected')}
+              style={{ flex: 1, textAlign: 'center', padding: '12px 4px', fontSize: '0.85rem' }}
             >
-              Rejected ({activeTab === 'rejected' ? users.length : '...'})
+              <span style={{ color: 'var(--accent-red)' }}>Rejected Users ({activeTab === 'rejected' ? users.length : '...'})</span>
             </button>
           </div>
           

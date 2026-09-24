@@ -658,15 +658,31 @@ class _ConfirmDeleteDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final bgColor = isLight ? Colors.white : const Color(0xFF0F1E35);
+    final borderColor = isLight ? const Color(0x22FF4757) : const Color(0x44FF4757);
+    final titleColor = isLight ? const Color(0xFF1E253F) : Colors.white;
+    final textColor = isLight ? const Color(0xFF6C7B90) : const Color(0xFF8BA3C0);
+    final btnBorderColor = isLight ? Colors.grey.shade300 : const Color(0xFF3A5A7A);
+
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
         constraints: const BoxConstraints(maxWidth: 360),
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: const Color(0xFF0F1E35),
+          color: bgColor,
           borderRadius: BorderRadius.circular(20.0),
-          border: Border.all(color: const Color(0x44FF4757), width: 1),
+          border: Border.all(color: borderColor, width: 1),
+          boxShadow: isLight
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  )
+                ]
+              : null,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -679,16 +695,16 @@ class _ConfirmDeleteDialog extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: Colors.white,
+                color: titleColor,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               message,
-              style: const TextStyle(fontSize: 13, color: Color(0xFF8BA3C0)),
+              style: TextStyle(fontSize: 13, color: textColor),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
@@ -698,8 +714,8 @@ class _ConfirmDeleteDialog extends StatelessWidget {
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(
-                        color: Color(0xFF3A5A7A),
+                      side: BorderSide(
+                        color: btnBorderColor,
                         width: 1,
                       ),
                       shape: RoundedRectangleBorder(
@@ -707,10 +723,10 @@ class _ConfirmDeleteDialog extends StatelessWidget {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Cancel',
                       style: TextStyle(
-                        color: Color(0xFF8BA3C0),
+                        color: textColor,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

@@ -122,18 +122,20 @@ export default function ManageSections() {
 
       <div className="glass-panel" style={{ padding: '24px' }}>
         <div className="flex-mobile-col" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid var(--border-light)', gap: '16px' }}>
-          <div className="tabs mobile-tabs" style={{ borderBottom: 'none', marginBottom: 0 }}>
+          <div className="tabs" style={{ borderBottom: 'none', marginBottom: 0, display: 'flex', justifyContent: 'center', width: '100%', paddingBottom: '4px' }}>
             <button 
               className={`tab ${activeTab === 'active' ? 'active' : ''}`}
               onClick={() => setActiveTab('active')}
+              style={{ flex: 1, textAlign: 'center', padding: '12px 4px', fontSize: '0.85rem' }}
             >
-              Active Sections ({sections.length})
+              <span style={{ color: 'var(--accent-green)' }}>Active Sections ({sections.length})</span>
             </button>
             <button 
               className={`tab ${activeTab === 'trash' ? 'active' : ''}`}
               onClick={() => setActiveTab('trash')}
+              style={{ flex: 1, textAlign: 'center', padding: '12px 4px', fontSize: '0.85rem' }}
             >
-              Trash ({trashedSections.length})
+              <span style={{ color: 'var(--accent-red)' }}>Trash ({trashedSections.length})</span>
             </button>
           </div>
           

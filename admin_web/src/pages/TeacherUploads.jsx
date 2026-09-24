@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { collection, query, onSnapshot, doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { BookOpen, FileText, HelpCircle, Trash2, AlertTriangle } from 'lucide-react';
+import { BookOpen, FileText, HelpCircle, Trash2, AlertTriangle, Search } from 'lucide-react';
 
 export default function TeacherUploads() {
   const [courses, setCourses] = useState([]);
-  const [activeCourse, setActiveCourse] = useState(null);
+  const [activeTeacherName, setActiveTeacherName] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const q = query(collection(db, 'courses'));
@@ -17,47 +18,63 @@ export default function TeacherUploads() {
         data.push({ id: doc.id, ...doc.data() });
       });
       setCourses(data);
-      if (data.length > 0 && !activeCourse) {
-        setActiveCourse(data[0]);
-      } else if (activeCourse) {
-        // Update active course if it was modified
-        const updatedActive = data.find(c => c.id === activeCourse.id);
-        if (updatedActive) setActiveCourse(updatedActive);
+      if (data.length > 0) {
+        const uniqueTeachers = Array.from(new Set(data.map(c => c.teacherName)));
+        setActiveTeacherName(prev => {
+           if (!prev || !uniqueTeachers.includes(prev)) {
+               return uniqueTeachers[0];
+           }
+           return prev;
+        });
+      } else {
+        setActiveTeacherName(null);
       }
     });
 
     return () => unsubscribe();
   }, []);
 
-  const handleDeleteCourse = (courseId, title, e) => {
-    e.stopPropagation();
+  // Derived state
+  const teachers = Array.from(new Set(courses.map(c => c.teacherName)))
+    .filter(name => name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .map(name => {
+      return {
+        name,
+        courses: courses.filter(c => c.teacherName === name)
+      };
+    });
+  
+  const activeTeacherCourses = courses.filter(c => c.teacherName === activeTeacherName);
+
+  const handleDeleteCourse = (courseId, title) => {
     setDeleteConfirm({ type: 'course', id: courseId, name: title });
   };
 
-  const handleDeleteModule = (index, title) => {
-    setDeleteConfirm({ type: 'module', index, name: title });
+  const handleDeleteModule = (courseId, index, title) => {
+    setDeleteConfirm({ type: 'module', courseId, index, name: title });
   };
 
-  const handleDeleteQuiz = (index, title) => {
-    setDeleteConfirm({ type: 'quiz', index, name: title });
+  const handleDeleteQuiz = (courseId, index, title) => {
+    setDeleteConfirm({ type: 'quiz', courseId, index, name: title });
   };
 
   const confirmDelete = async () => {
     if (!deleteConfirm) return;
-    const { type, id, index } = deleteConfirm;
+    const { type, id, courseId, index } = deleteConfirm;
     
     try {
       if (type === 'course') {
         await deleteDoc(doc(db, 'courses', id));
-        if (activeCourse?.id === id) setActiveCourse(null);
       } else if (type === 'module') {
-        const courseRef = doc(db, 'courses', activeCourse.id);
-        const updatedModules = [...activeCourse.modules];
+        const courseRef = doc(db, 'courses', courseId);
+        const course = courses.find(c => c.id === courseId);
+        const updatedModules = [...course.modules];
         updatedModules.splice(index, 1);
         await setDoc(courseRef, { modules: updatedModules }, { merge: true });
       } else if (type === 'quiz') {
-        const courseRef = doc(db, 'courses', activeCourse.id);
-        const updatedQuizzes = [...activeCourse.quizzes];
+        const courseRef = doc(db, 'courses', courseId);
+        const course = courses.find(c => c.id === courseId);
+        const updatedQuizzes = [...course.quizzes];
         updatedQuizzes.splice(index, 1);
         await setDoc(courseRef, { quizzes: updatedQuizzes }, { merge: true });
       }
@@ -69,7 +86,8 @@ export default function TeacherUploads() {
   };
 
   return (
-    <div className="animate-fade-in flex-mobile-col" style={{ display: 'flex', gap: '24px', height: 'calc(100vh - 100px)' }}>
+    <>
+      <div className="animate-fade-in flex-mobile-col" style={{ display: 'flex', gap: '24px', height: 'calc(100vh - 100px)' }}>
       <div className="mobile-w-full" style={{ flex: '0 0 350px', display: 'flex', flexDirection: 'column' }}>
         <div className="page-header" style={{ marginBottom: '24px' }}>
           <div>
@@ -79,39 +97,43 @@ export default function TeacherUploads() {
         </div>
 
         <div className="glass-panel" style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
-          {courses.length === 0 ? (
+          <h3 style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <BookOpen size={20} color="var(--accent-orange)" /> Teachers ({teachers.length})
+          </h3>
+          <div style={{ position: 'relative', marginBottom: '16px' }}>
+            <Search size={18} color="var(--text-secondary)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+            <input 
+              type="text" 
+              placeholder="Search teachers..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="input-field"
+              style={{ paddingLeft: '38px' }}
+            />
+          </div>
+          {teachers.length === 0 ? (
             <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '20px' }}>
-              No courses found.
+              No teachers found.
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {courses.map(course => (
+              {teachers.map(teacher => (
                 <div 
-                  key={course.id}
-                  onClick={() => setActiveCourse(course)}
+                  key={teacher.name}
+                  onClick={() => setActiveTeacherName(teacher.name)}
                   style={{
                     padding: '16px',
                     borderRadius: '12px',
                     cursor: 'pointer',
-                    background: activeCourse?.id === course.id ? 'rgba(0, 212, 255, 0.1)' : 'rgba(0,0,0,0.2)',
+                    background: activeTeacherName === teacher.name ? 'rgba(0, 212, 255, 0.1)' : 'rgba(0,0,0,0.2)',
                     border: '1px solid',
-                    borderColor: activeCourse?.id === course.id ? 'var(--accent-cyan)' : 'var(--border-light)',
-                    transition: 'all 0.2s ease',
-                    position: 'relative'
+                    borderColor: activeTeacherName === teacher.name ? 'var(--accent-cyan)' : 'var(--border-light)',
+                    transition: 'all 0.2s ease'
                   }}
                 >
-                  <button
-                    onClick={(e) => handleDeleteCourse(course.id, course.title, e)}
-                    className="btn btn-danger"
-                    style={{ position: 'absolute', top: '12px', right: '12px', padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                    title="Delete Course"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                  <h4 style={{ color: 'var(--text-primary)', marginBottom: '4px', fontSize: '1rem', paddingRight: '32px' }}>{course.title}</h4>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                    <span>{course.teacherName}</span>
-                    <span>{course.grade}</span>
+                  <h4 style={{ color: 'var(--text-primary)', marginBottom: '4px', fontSize: '1rem' }}>{teacher.name}</h4>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                    <span>{teacher.courses.length} {teacher.courses.length === 1 ? 'Topic' : 'Topics'}</span>
                   </div>
                 </div>
               ))}
@@ -121,77 +143,92 @@ export default function TeacherUploads() {
       </div>
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        {activeCourse ? (
+        {activeTeacherName && activeTeacherCourses.length > 0 ? (
           <div className="glass-panel animate-fade-in" style={{ flex: 1, padding: '32px', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
-            <div style={{ marginBottom: '32px' }}>
-              <h2 style={{ fontSize: '2rem', marginBottom: '8px' }}>{activeCourse.title}</h2>
-              <div style={{ display: 'flex', gap: '16px', color: 'var(--text-secondary)' }}>
-                <span className="badge badge-role">{activeCourse.teacherName}</span>
-                <span className="badge" style={{ background: 'rgba(255,255,255,0.1)' }}>{activeCourse.subject}</span>
-                <span className="badge" style={{ background: 'rgba(255,255,255,0.1)' }}>{activeCourse.sections?.join(', ')}</span>
-              </div>
-            </div>
+            <h2 style={{ fontSize: '2rem', marginBottom: '32px', borderBottom: '1px solid var(--border-light)', paddingBottom: '16px' }}>
+              {activeTeacherName}'s Uploads
+            </h2>
+            
+            {activeTeacherCourses.map((course, index) => (
+              <div key={course.id} style={{ marginBottom: '48px', paddingBottom: '48px', borderBottom: index !== activeTeacherCourses.length - 1 ? '2px dashed var(--text-secondary)' : 'none' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '16px', marginBottom: '24px', color: 'var(--text-secondary)' }}>
+                  <span className="badge" style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.1)', fontSize: '1.1rem', color: 'var(--accent-green)', padding: '6px 12px' }}>
+                    Topic: {course.topic || course.title}
+                    <button
+                      onClick={() => handleDeleteCourse(course.id, course.title)}
+                      style={{ background: 'transparent', border: 'none', padding: 0, margin: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', color: 'var(--accent-red)' }}
+                      title="Delete Course"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </span>
+                  <span className="badge" style={{ background: 'rgba(255,255,255,0.1)', fontSize: '0.9rem', padding: '6px 12px', color: 'var(--accent-purple)' }}>Subject: {course.subject}</span>
+                  <span className="badge" style={{ background: 'rgba(255,255,255,0.1)', fontSize: '0.9rem', padding: '6px 12px', color: 'var(--accent-cyan)' }}>Section: {course.sections?.join(', ')}</span>
+                </div>
 
-            <h3 style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <FileText size={20} color="var(--accent-cyan)" /> Modules ({activeCourse.modules?.length || 0})
-            </h3>
-            <div style={{ marginBottom: '32px' }}>
-              {(!activeCourse.modules || activeCourse.modules.length === 0) ? (
-                <p>No modules uploaded yet.</p>
-              ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px' }}>
-                  {activeCourse.modules.map((mod, index) => (
-                    <div key={index} style={{ background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
-                      <h4 style={{ color: 'var(--text-primary)', marginBottom: '8px', wordBreak: 'break-all' }}>{mod.title}</h4>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{mod.fileType?.toUpperCase()}</span>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                          <a href={mod.url} target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '0.8rem' }}>View File</a>
-                          <button onClick={() => handleDeleteModule(index, mod.title)} className="btn btn-danger" style={{ padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Delete Module">
-                            <Trash2 size={16} />
-                          </button>
+                <h3 style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <FileText size={20} color="var(--accent-cyan)" /> Modules ({course.modules?.length || 0})
+                </h3>
+                <div style={{ marginBottom: '32px' }}>
+                  {(!course.modules || course.modules.length === 0) ? (
+                    <p>No modules uploaded yet.</p>
+                  ) : (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px' }}>
+                      {course.modules.map((mod, index) => (
+                        <div key={index} style={{ background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
+                          <h4 style={{ color: 'var(--text-primary)', marginBottom: '8px', wordBreak: 'break-all' }}>{mod.title}</h4>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{mod.fileType?.toUpperCase()}</span>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <a href={mod.url} target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '0.8rem' }}>View File</a>
+                              <button onClick={() => handleDeleteModule(course.id, index, mod.title)} className="btn btn-danger" style={{ padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Delete Module">
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </div>
                         </div>
-                      </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </div>
-              )}
-            </div>
 
-            <h3 style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <HelpCircle size={20} color="var(--accent-purple)" /> Quizzes ({activeCourse.quizzes?.length || 0})
-            </h3>
-            <div>
-              {(!activeCourse.quizzes || activeCourse.quizzes.length === 0) ? (
-                <p>No quizzes created yet.</p>
-              ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px' }}>
-                  {activeCourse.quizzes.map((quiz, index) => (
-                    <div key={index} style={{ background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                        <h4 style={{ color: 'var(--text-primary)', wordBreak: 'break-all' }}>{quiz.title}</h4>
-                        <button onClick={() => handleDeleteQuiz(index, quiz.title)} className="btn btn-danger" style={{ padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '8px' }} title="Delete Quiz">
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                        {quiz.questions?.length || 0} Questions • {quiz.timeLimitMinutes} mins
-                      </span>
+                <h3 style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <HelpCircle size={20} color="var(--accent-purple)" /> Quizzes ({course.quizzes?.length || 0})
+                </h3>
+                <div>
+                  {(!course.quizzes || course.quizzes.length === 0) ? (
+                    <p>No quizzes created yet.</p>
+                  ) : (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px' }}>
+                      {course.quizzes.map((quiz, index) => (
+                        <div key={index} style={{ background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                            <h4 style={{ color: 'var(--text-primary)', wordBreak: 'break-all' }}>{quiz.title}</h4>
+                            <button onClick={() => handleDeleteQuiz(course.id, index, quiz.title)} className="btn btn-danger" style={{ padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '8px' }} title="Delete Quiz">
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                            {quiz.questions?.length || 0} Questions • {quiz.timeLimitMinutes} mins
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </div>
-              )}
-            </div>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="glass-panel" style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'var(--text-secondary)' }}>
             <div style={{ textAlign: 'center' }}>
               <BookOpen size={48} color="rgba(255,255,255,0.1)" style={{ marginBottom: '16px' }} />
-              <p>Select a course to view uploads</p>
+              <p>Select a teacher to view uploads</p>
             </div>
           </div>
         )}
       </div>
+    </div>
 
       {/* Delete Confirmation Modal */}
       {deleteConfirm && (
@@ -221,6 +258,6 @@ export default function TeacherUploads() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

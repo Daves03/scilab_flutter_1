@@ -259,6 +259,8 @@ export default function ARLabManager() {
   const [experiments, setExperiments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingExp, setEditingExp] = useState(null);
+  const [textEditorModal, setTextEditorModal] = useState(null);
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [seeding, setSeeding] = useState(false);
 
   useEffect(() => {
@@ -291,8 +293,12 @@ export default function ARLabManager() {
     setSeeding(false);
   };
 
-  const handleSave = async (e) => {
+  const handleSaveClick = (e) => {
     e.preventDefault();
+    setShowSaveConfirm(true);
+  };
+
+  const confirmSave = async () => {
     if (!editingExp) return;
     try {
       await updateDoc(doc(db, 'ar_experiments', editingExp._docId), {
@@ -306,6 +312,7 @@ export default function ARLabManager() {
         steps: editingExp.steps || [],
       });
       setEditingExp(null);
+      setShowSaveConfirm(false);
     } catch (error) {
       console.error(error);
       alert('Error updating experiment: ' + error.message);
@@ -348,7 +355,8 @@ export default function ARLabManager() {
   }
 
   return (
-    <div className="animate-fade-in" style={{ paddingBottom: '60px' }}>
+    <>
+      <div className="animate-fade-in" style={{ paddingBottom: '60px' }}>
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <h1>AR Lab Content</h1>
@@ -395,7 +403,7 @@ export default function ARLabManager() {
                     <span>Topic: {exp.topic}</span>
                   </div>
                 </div>
-                <button className="btn btn-secondary mobile-w-full" onClick={() => setEditingExp({...exp})}>
+                <button className="btn btn-secondary mobile-w-full" style={{ color: 'var(--accent-green)' }} onClick={() => setEditingExp({...exp})}>
                   <Edit size={16} /> Edit Content
                 </button>
               </div>
@@ -403,34 +411,32 @@ export default function ARLabManager() {
           </div>
         )}
       </div>
+    </div>
 
-      {/* Edit Modal */}
+      {/* Edit Fullscreen View */}
       {editingExp && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.8)',
-          backdropFilter: 'blur(8px)',
-          display: 'flex', justifyContent: 'center', alignItems: 'center',
+          background: 'var(--bg-main)',
           zIndex: 1000,
-          padding: '20px'
+          overflowY: 'auto'
         }}>
-          <div className="glass-panel animate-fade-in" style={{ 
-            width: '100%', maxWidth: '800px', 
-            maxHeight: '90vh', overflowY: 'auto',
-            padding: '32px',
-            border: '1px solid var(--border-light)'
+          <div className="animate-fade-in" style={{ 
+            width: '100%', maxWidth: '1200px', margin: '0 auto',
+            minHeight: '100vh',
+            padding: '32px 24px'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
               <h2 style={{ margin: 0, color: 'var(--text-primary)' }}>Edit AR Experiment</h2>
-              <button className="btn btn-secondary" onClick={() => setEditingExp(null)} style={{ padding: '8px' }}>
-                <X size={20} />
+              <button type="button" className="btn btn-secondary" onClick={() => setEditingExp(null)} style={{ padding: '8px' }}>
+                <X size={24} />
               </button>
             </div>
 
-            <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <form onSubmit={handleSaveClick} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div className="input-group">
+              <div className="flex-mobile-col" style={{ display: 'flex', gap: '16px', width: '100%' }}>
+                <div className="input-group" style={{ flex: 1, marginBottom: 0 }}>
                   <label className="input-label">Title</label>
                   <input 
                     className="input-field" 
@@ -439,7 +445,7 @@ export default function ARLabManager() {
                     required
                   />
                 </div>
-                <div className="input-group">
+                <div className="input-group" style={{ flex: 1, marginBottom: 0 }}>
                   <label className="input-label">Topic</label>
                   <input 
                     className="input-field" 
@@ -502,9 +508,10 @@ export default function ARLabManager() {
                       <div key={`mat-${index}`} style={{ display: 'flex', gap: '8px' }}>
                         <input 
                           className="input-field" 
-                          style={{ margin: 0 }}
+                          style={{ margin: 0, cursor: 'pointer' }}
                           value={material}
-                          onChange={(e) => handleArrayChange('requiredMaterials', index, e.target.value)}
+                          readOnly
+                          onClick={() => setTextEditorModal({ title: 'Edit Material', value: material, onSave: (val) => handleArrayChange('requiredMaterials', index, val) })}
                         />
                         <button type="button" onClick={() => handleArrayRemove('requiredMaterials', index)} className="btn btn-secondary" style={{ padding: '8px' }}>
                           <X size={16} />
@@ -527,9 +534,10 @@ export default function ARLabManager() {
                       <div key={`con-${index}`} style={{ display: 'flex', gap: '8px' }}>
                         <input 
                           className="input-field" 
-                          style={{ margin: 0 }}
+                          style={{ margin: 0, cursor: 'pointer' }}
                           value={concept}
-                          onChange={(e) => handleArrayChange('relatedConcepts', index, e.target.value)}
+                          readOnly
+                          onClick={() => setTextEditorModal({ title: 'Edit Concept', value: concept, onSave: (val) => handleArrayChange('relatedConcepts', index, val) })}
                         />
                         <button type="button" onClick={() => handleArrayRemove('relatedConcepts', index)} className="btn btn-secondary" style={{ padding: '8px' }}>
                           <X size={16} />
@@ -549,22 +557,22 @@ export default function ARLabManager() {
                 </label>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {(editingExp.steps || []).map((step, index) => (
-                    <div key={`step-${index}`} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 3fr auto', gap: '8px', alignItems: 'start', background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
-                      <div>
-                        <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Bottle Tag</div>
-                        <input className="input-field" style={{ margin: 0, padding: '6px' }} value={step.bottleTag} onChange={(e) => handleStepChange(index, 'bottleTag', e.target.value)} placeholder="e.g. Surf" required />
+                    <div key={`step-${index}`} style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'flex-start', background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                      <div style={{ flex: '1 1 100px' }}>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: '500' }}>Bottle Tag</div>
+                        <input className="input-field" style={{ margin: 0, cursor: 'pointer' }} value={step.bottleTag} readOnly onClick={() => setTextEditorModal({ title: 'Edit Bottle Tag', value: step.bottleTag, onSave: (val) => handleStepChange(index, 'bottleTag', val) })} placeholder="e.g. Surf" required />
                       </div>
-                      <div>
-                        <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Title</div>
-                        <input className="input-field" style={{ margin: 0, padding: '6px' }} value={step.instructionTitle} onChange={(e) => handleStepChange(index, 'instructionTitle', e.target.value)} placeholder="e.g. Step 1: Soap" required />
+                      <div style={{ flex: '2 1 180px' }}>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: '500' }}>Title</div>
+                        <input className="input-field" style={{ margin: 0, cursor: 'pointer' }} value={step.instructionTitle} readOnly onClick={() => setTextEditorModal({ title: 'Edit Step Title', value: step.instructionTitle, onSave: (val) => handleStepChange(index, 'instructionTitle', val) })} placeholder="e.g. Step 1: Soap" required />
                       </div>
-                      <div>
-                        <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>Detail</div>
-                        <input className="input-field" style={{ margin: 0, padding: '6px' }} value={step.instructionDetail} onChange={(e) => handleStepChange(index, 'instructionDetail', e.target.value)} placeholder="Pour soap into beaker" required />
+                      <div style={{ flex: '3 1 200px' }}>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: '500' }}>Detail</div>
+                        <input className="input-field" style={{ margin: 0, cursor: 'pointer' }} value={step.instructionDetail} readOnly onClick={() => setTextEditorModal({ title: 'Edit Step Detail', value: step.instructionDetail, onSave: (val) => handleStepChange(index, 'instructionDetail', val) })} placeholder="Pour soap into beaker" required />
                       </div>
-                      <div style={{ paddingTop: '18px' }}>
-                        <button type="button" onClick={() => handleStepRemove(index)} className="btn btn-secondary" style={{ padding: '8px', height: '34px' }}>
-                          <X size={16} />
+                      <div style={{ flex: '0 0 auto', alignSelf: 'flex-end', marginTop: '4px' }}>
+                        <button type="button" onClick={() => handleStepRemove(index)} className="btn btn-secondary" style={{ padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <X size={18} />
                         </button>
                       </div>
                     </div>
@@ -590,6 +598,73 @@ export default function ARLabManager() {
           </div>
         </div>
       )}
-    </div>
+
+      {/* Mini Popup Text Editor */}
+      {textEditorModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.7)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex', justifyContent: 'center', alignItems: 'center',
+          zIndex: 1100,
+          padding: '20px'
+        }}>
+          <div className="glass-panel animate-fade-in" style={{ 
+            width: '100%', maxWidth: '500px', 
+            padding: '24px',
+            border: '1px solid var(--border-focus)',
+            boxShadow: '0 8px 32px rgba(0,212,255,0.2)'
+          }}>
+            <h3 style={{ margin: '0 0 16px 0', color: 'var(--text-primary)' }}>{textEditorModal.title}</h3>
+            <textarea
+              className="input-field"
+              value={textEditorModal.value}
+              onChange={(e) => setTextEditorModal({ ...textEditorModal, value: e.target.value })}
+              rows={4}
+              style={{ resize: 'vertical', marginBottom: '24px', fontSize: '1.05rem', lineHeight: '1.5' }}
+              autoFocus
+            />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+              <button type="button" className="btn btn-secondary" onClick={() => setTextEditorModal(null)}>Cancel</button>
+              <button type="button" className="btn btn-primary" onClick={() => {
+                textEditorModal.onSave(textEditorModal.value);
+                setTextEditorModal(null);
+              }}>
+                <Save size={16} /> Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Save Confirmation Modal */}
+      {showSaveConfirm && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.6)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex', justifyContent: 'center', alignItems: 'center',
+          zIndex: 1200,
+          padding: '20px'
+        }}>
+          <div className="glass-panel animate-fade-in" style={{ 
+            width: '100%', maxWidth: '400px', 
+            padding: '32px', textAlign: 'center'
+          }}>
+            <h2 style={{ marginBottom: '16px', color: 'var(--text-primary)' }}>Save Changes?</h2>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '32px' }}>
+              Are you sure you want to save the changes made to this experiment?
+            </p>
+            <div style={{ display: 'flex', gap: '16px' }}>
+              <button type="button" className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setShowSaveConfirm(false)}>
+                Cancel
+              </button>
+              <button type="button" className="btn btn-primary" style={{ flex: 1 }} onClick={confirmSave}>
+                Yes, Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

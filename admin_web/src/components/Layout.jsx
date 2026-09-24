@@ -18,6 +18,7 @@ export default function Layout() {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('admin-theme') || 'dark');
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -28,7 +29,11 @@ export default function Layout() {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
   };
 
-  const handleLogout = async () => {
+  const handleLogoutClick = () => {
+    setShowSignOutModal(true);
+  };
+
+  const confirmLogout = async () => {
     await auth.signOut();
     navigate('/login');
   };
@@ -38,7 +43,7 @@ export default function Layout() {
   };
 
   return (
-    <div className="app-container animate-fade-in">
+    <div className="app-container">
       {/* Mobile Header (Only visible on small screens) */}
       <div className="mobile-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -121,7 +126,7 @@ export default function Layout() {
 
         <div style={{ marginTop: 'auto', paddingTop: '24px', borderTop: '1px solid var(--border-light)' }}>
           <button 
-            onClick={handleLogout}
+            onClick={handleLogoutClick}
             className="nav-link" 
             style={{ width: '100%', background: 'transparent', border: 'none', cursor: 'pointer' }}
           >
@@ -142,6 +147,53 @@ export default function Layout() {
       <main className="main-content">
         <Outlet />
       </main>
+
+      {/* Sign Out Confirmation Modal */}
+      {showSignOutModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.75)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 1000, padding: '24px'
+        }}>
+          <div className="card" style={{ 
+            maxWidth: '400px', 
+            width: '100%', 
+            textAlign: 'center',
+            backgroundColor: 'var(--bg-main)',
+            padding: '32px',
+            borderRadius: '16px',
+            boxShadow: 'var(--shadow-lg)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+              <div style={{ background: 'rgba(255, 71, 87, 0.1)', padding: '16px', borderRadius: '50%' }}>
+                <LogOut size={32} color="var(--accent-red)" />
+              </div>
+            </div>
+            <h2 style={{ marginBottom: '8px', color: 'var(--text-primary)' }}>Sign Out</h2>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
+              Are you sure you want to sign out?
+            </p>
+            <div style={{ display: 'flex', gap: '16px' }}>
+              <button 
+                onClick={() => setShowSignOutModal(false)}
+                className="btn btn-secondary" 
+                style={{ flex: 1 }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmLogout}
+                className="btn btn-danger" 
+                style={{ flex: 1 }}
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
