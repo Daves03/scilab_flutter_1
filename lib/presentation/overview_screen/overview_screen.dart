@@ -418,7 +418,7 @@ class _OverviewScreenState extends State<OverviewScreen>
               children: [
                 Expanded(
                   child: GestureDetector(
-                    onTap: () => context.go(AppRoutes.signUpLoginScreen),
+                    onTap: () => context.go('${AppRoutes.signUpLoginScreen}?isLogin=false'),
                     child: Container(
                       height: 50,
                       decoration: BoxDecoration(
@@ -450,8 +450,9 @@ class _OverviewScreenState extends State<OverviewScreen>
                 const SizedBox(width: 12),
                 GestureDetector(
                   onTap: () {
-                    _featurePageController.animateToPage(
-                      0,
+                    final nextPage = (_currentArPreviewPage + 1) % _arPreviewImages.length;
+                    _arPreviewController.animateToPage(
+                      nextPage,
                       duration: const Duration(milliseconds: 400),
                       curve: Curves.easeOutCubic,
                     );
@@ -468,7 +469,7 @@ class _OverviewScreenState extends State<OverviewScreen>
                       ),
                     ),
                     child: const Icon(
-                      Icons.play_arrow_rounded,
+                      Icons.arrow_forward_rounded,
                       color: AppTheme.accentCyan,
                       size: 22,
                     ),
@@ -680,7 +681,7 @@ class _OverviewScreenState extends State<OverviewScreen>
             SizedBox(
               width: double.infinity,
               child: GestureDetector(
-                onTap: () => context.go(AppRoutes.signUpLoginScreen),
+                onTap: () => context.go('${AppRoutes.signUpLoginScreen}?isLogin=false'),
                 child: Container(
                   height: 52,
                   decoration: BoxDecoration(

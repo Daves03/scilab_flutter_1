@@ -9,7 +9,8 @@ import './widgets/login_form_widget.dart';
 import './widgets/register_form_widget.dart';
 
 class SignUpLoginScreen extends StatefulWidget {
-  const SignUpLoginScreen({super.key});
+  final bool initialIsLogin;
+  const SignUpLoginScreen({super.key, this.initialIsLogin = true});
 
   @override
   State<SignUpLoginScreen> createState() => _SignUpLoginScreenState();
@@ -18,13 +19,14 @@ class SignUpLoginScreen extends StatefulWidget {
 // TODO: Replace with [Riverpod/Bloc] for production auth state
 class _SignUpLoginScreenState extends State<SignUpLoginScreen>
     with SingleTickerProviderStateMixin {
-  bool _isLogin = true;
+  late bool _isLogin;
   late AnimationController _switchController;
   late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
+    _isLogin = widget.initialIsLogin;
     _switchController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),

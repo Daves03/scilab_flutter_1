@@ -138,10 +138,13 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.signUpLoginScreen,
-      pageBuilder: (context, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const SignUpLoginScreen(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      pageBuilder: (context, state) {
+        final isLoginStr = state.uri.queryParameters['isLogin'];
+        final isLogin = isLoginStr == 'false' ? false : true;
+        return CustomTransitionPage(
+          key: state.pageKey,
+          child: SignUpLoginScreen(initialIsLogin: isLogin),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(
             opacity: CurvedAnimation(
               parent: animation,
@@ -151,7 +154,8 @@ final GoRouter appRouter = GoRouter(
           );
         },
         transitionDuration: const Duration(milliseconds: 280),
-      ),
+        );
+      },
     ),
     GoRoute(
       path: AppRoutes.pendingApprovalScreen,
