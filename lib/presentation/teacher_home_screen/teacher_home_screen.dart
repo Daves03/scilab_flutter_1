@@ -21,6 +21,7 @@ class _StudentSummary {
   final String name;
   final String section;
   final String? studentNumber;
+  final String? avatarUrl;
   final double avgQuizScore; // 0.0 – 1.0
   final double avgArScore; // 0.0 – 100.0
   final int quizzesTaken;
@@ -31,6 +32,7 @@ class _StudentSummary {
     required this.name,
     required this.section,
     this.studentNumber,
+    this.avatarUrl,
     required this.avgQuizScore,
     required this.avgArScore,
     required this.quizzesTaken,
@@ -88,6 +90,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   Future<void> _loadData() async {
     try {
       final db = FirebaseFirestore.instance;
+      final teacherSections = context.read<AuthService>().currentUser?.sections ?? [];
 
       final studentsSnap = await db
           .collection('users')
@@ -95,7 +98,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
           .where('status', isEqualTo: VerificationStatus.approved.id)
           .get();
           
-      final users = studentsSnap.docs.map((d) => AppUser.fromMap(d.id, d.data())).toList();
+      final users = studentsSnap.docs
+          .map((d) => AppUser.fromMap(d.id, d.data()))
+          .where((u) => u.sections.any((sec) => teacherSections.contains(sec)))
+          .toList();
 
       final coursesSnap = await db.collection('courses').get();
       final courses = coursesSnap.docs.map((d) => Course.fromMap(d.id, d.data())).toList();
@@ -145,6 +151,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
            name: u.name,
            section: section,
            studentNumber: u.studentNumber,
+           avatarUrl: u.avatarUrl,
            avgQuizScore: avgQuizScore,
            avgArScore: avgArScore,
            quizzesTaken: uAttempts.length,
@@ -550,28 +557,51 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                 child: Container(
                   width: 48,
                   height: 48,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF7C3AED), Color(0xFF00D4FF)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF7C3AED).withAlpha(80),
-                      blurRadius: 12,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFF7C3AED).withAlpha(153),
+                      width: 2,
                     ),
-                  ],
-                ),
-                child: const Center(
-                  child: CustomIconWidget(
-                    iconName: 'school',
-                    color: Colors.white,
-                    size: 24,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF7C3AED).withAlpha(80),
+                        blurRadius: 12,
+                      ),
+                    ],
+                  ),
+                  child: ClipOval(
+                    child: Builder(
+                      builder: (context) {
+                        final avatarUrl = context.watch<AuthService>().currentUser?.avatarUrl;
+                        Widget fallback = Container(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF7C3AED), Color(0xFF00D4FF)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                          ),
+                          child: const Center(
+                            child: CustomIconWidget(
+                              iconName: 'school',
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                          ),
+                        );
+                        if (avatarUrl != null && avatarUrl.isNotEmpty) {
+                          return Image.network(
+                            avatarUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => fallback,
+                          );
+                        }
+                        return fallback;
+                      },
+                    ),
                   ),
                 ),
-              ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -1306,15 +1336,32 @@ class _StudentProgressCard extends StatelessWidget {
                   color: student.performanceColor.withAlpha(30),
                   shape: BoxShape.circle,
                 ),
-                child: Center(
-                  child: Text(
-                    student.name[0],
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: student.performanceColor,
-                    ),
-                  ),
+                child: ClipOval(
+                  child: (student.avatarUrl != null && student.avatarUrl!.isNotEmpty)
+                      ? Image.network(
+                          student.avatarUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Center(
+                            child: Text(
+                              student.name.isNotEmpty ? student.name[0] : '?',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: student.performanceColor,
+                              ),
+                            ),
+                          ),
+                        )
+                      : Center(
+                          child: Text(
+                            student.name.isNotEmpty ? student.name[0] : '?',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: student.performanceColor,
+                            ),
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(width: 10),

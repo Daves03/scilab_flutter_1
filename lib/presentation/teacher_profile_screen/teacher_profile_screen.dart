@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:go_router/go_router.dart';
 
@@ -23,6 +24,7 @@ class TeacherProfileScreen extends StatefulWidget {
 
 class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
   bool _isDownloading = false;
+  bool _isUploadingProfilePic = false;
 
   static const String _markerAssetPath =
       'assets/images/scilab_AR_marker-1785125880437.png';
@@ -31,7 +33,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
   String _email = '';
   List<String> _teacherSections = [];
 
-  final String _avatarUrl =
+  String _avatarUrl =
       'https://images.pexels.com/photos/3769021/pexels-photo-3769021.jpeg?auto=compress&cs=tinysrgb&w=400';
 
   @override
@@ -49,7 +51,54 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
       _teacherSections = (user?.sections?.isNotEmpty ?? false) 
           ? user!.sections! 
           : ['Grade 9', 'Grade 10'];
+      if (user?.avatarUrl != null && user!.avatarUrl!.isNotEmpty) {
+        _avatarUrl = user.avatarUrl!;
+      }
     });
+  }
+
+  Future<void> _uploadProfilePicture() async {
+    try {
+      const XTypeGroup typeGroup = XTypeGroup(
+        label: 'images',
+        extensions: <String>['jpg', 'jpeg', 'png', 'gif'],
+      );
+      final XFile? file = await openFile(acceptedTypeGroups: <XTypeGroup>[typeGroup]);
+      
+      if (file == null) return;
+
+      setState(() => _isUploadingProfilePic = true);
+
+      final bytes = await file.readAsBytes();
+      await context.read<AuthService>().updateProfilePicture(bytes, file.name);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Profile picture updated successfully', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+            backgroundColor: const Color(0xFF00994C),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+        _loadProfile();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to update picture: $e', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+            backgroundColor: Colors.redAccent,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isUploadingProfilePic = false);
+      }
+    }
   }
 
   Future<void> _downloadMarker() async {
@@ -161,6 +210,150 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
+              ),
+              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.w600)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showChangeNameDialog(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final controller = TextEditingController(text: _teacherName);
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF142240) : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(
+            'Change Name',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
+          ),
+          content: TextField(
+            controller: controller,
+            style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+            decoration: InputDecoration(
+              hintText: 'Enter new name',
+              hintStyle: TextStyle(color: isDark ? Colors.grey.shade500 : Colors.grey.shade400),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: isDark ? const Color(0xFF334A66) : Colors.grey.shade300),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C)),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final newName = controller.text.trim();
+                if (newName.isNotEmpty && newName != _teacherName) {
+                  Navigator.pop(dialogContext);
+                  _confirmNameChange(context, newName);
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                foregroundColor: isDark ? const Color(0xFF0A1628) : Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              child: const Text('Save', style: TextStyle(fontWeight: FontWeight.w600)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _confirmNameChange(BuildContext context, String newName) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF142240) : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(
+            'Confirm Name Change',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
+          ),
+          content: Text(
+            'Are you sure you want to change your name to "$newName"?',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.pop(dialogContext);
+                try {
+                  await context.read<AuthService>().updateName(newName);
+                  if (mounted) {
+                    setState(() {
+                      _teacherName = newName;
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('Name updated successfully', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                        backgroundColor: const Color(0xFF00994C),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Failed to update name: $e', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                        backgroundColor: Colors.redAccent,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                    );
+                  }
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                foregroundColor: isDark ? const Color(0xFF0A1628) : Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
               child: const Text('OK', style: TextStyle(fontWeight: FontWeight.w600)),
             ),
@@ -288,44 +481,81 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                 ),
                 child: Column(
                   children: [
-                    Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C), width: 3),
-                        boxShadow: [
-                          BoxShadow(
-                            color: isDark ? const Color(0x4400FF88) : const Color(0xFF00994C).withOpacity(0.3),
-                            blurRadius: 15,
-                            spreadRadius: 2,
-                          ),
-                        ],
-                      ),
-                      child: ClipOval(
-                        child: Image.network(
-                          _avatarUrl,
-                          fit: BoxFit.cover,
-                          semanticLabel: 'Teacher profile photo',
-                          errorBuilder: (_, __, ___) => Container(
-                            color: const Color(0xFF1A2E1A),
-                            child: Icon(
-                              Icons.person,
-                              size: 44,
-                              color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                    GestureDetector(
+                      onTap: _isUploadingProfilePic ? null : _uploadProfilePicture,
+                      child: Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C), width: 3),
+                          boxShadow: [
+                            BoxShadow(
+                              color: isDark ? const Color(0x4400FF88) : const Color(0xFF00994C).withOpacity(0.3),
+                              blurRadius: 15,
+                              spreadRadius: 2,
                             ),
-                          ),
+                          ],
+                        ),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            ClipOval(
+                              child: Image.network(
+                                _avatarUrl,
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                                semanticLabel: 'Teacher profile photo',
+                                errorBuilder: (_, __, ___) => Container(
+                                  color: const Color(0xFF1A2E1A),
+                                  width: 100,
+                                  height: 100,
+                                  child: Icon(
+                                    Icons.person,
+                                    size: 44,
+                                    color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            if (_isUploadingProfilePic)
+                              Container(
+                                width: 100,
+                                height: 100,
+                                decoration: const BoxDecoration(
+                                  color: Colors.black54,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Center(
+                                  child: CircularProgressIndicator(color: Colors.white),
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Text(
-                      _teacherName,
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? Colors.white : Colors.black87,
-                      ),
-                      textAlign: TextAlign.center,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            _teacherName,
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: Icon(Icons.edit, color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C), size: 20),
+                          onPressed: () => _showChangeNameDialog(context),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 8),
                     Container(

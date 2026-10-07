@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../models/user_model.dart';
@@ -303,6 +304,61 @@ class AuthService extends ChangeNotifier {
       currentUser!.hasAcceptedTerms = true;
     } catch (e) {
       debugPrint('Error accepting terms: $e');
+    } finally {
+      loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> updateName(String newName) async {
+    if (currentUser == null) return;
+    loading = true;
+    notifyListeners();
+    try {
+      await _db.collection('users').doc(currentUser!.id).update({
+        'name': newName,
+      });
+      final user = _auth.currentUser;
+      if (user != null) {
+        await user.updateDisplayName(newName);
+      }
+      currentUser!.name = newName;
+    } catch (e) {
+      debugPrint('Error updating name: $e');
+      throw AuthFailure('Failed to update name: $e');
+    } finally {
+      loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> updateProfilePicture(Uint8List fileBytes, String fileName) async {
+    if (currentUser == null) return;
+    loading = true;
+    notifyListeners();
+    try {
+      final storageRef = firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('user_avatars')
+          .child('${currentUser!.id}_$fileName');
+      
+      final uploadTask = storageRef.putData(fileBytes);
+      final snapshot = await uploadTask;
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+
+      await _db.collection('users').doc(currentUser!.id).update({
+        'avatarUrl': downloadUrl,
+      });
+
+      final user = _auth.currentUser;
+      if (user != null) {
+        await user.updatePhotoURL(downloadUrl);
+      }
+      
+      currentUser!.avatarUrl = downloadUrl;
+    } catch (e) {
+      debugPrint('Error updating profile picture: $e');
+      throw AuthFailure('Failed to update profile picture: $e');
     } finally {
       loading = false;
       notifyListeners();

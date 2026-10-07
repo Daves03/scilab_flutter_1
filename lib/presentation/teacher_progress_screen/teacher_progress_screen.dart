@@ -33,6 +33,7 @@ class StudentProgress {
   final List<MissedQuiz> missedQuizzes;
   final List<ArLabRecord> arLabRecords;
   final String? studentNumber;
+  final String? avatarUrl;
 
   const StudentProgress({
     required this.name,
@@ -41,6 +42,7 @@ class StudentProgress {
     required this.missedQuizzes,
     required this.arLabRecords,
     this.studentNumber,
+    this.avatarUrl,
   });
 }
 
@@ -133,7 +135,10 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
           .where('status', isEqualTo: VerificationStatus.approved.id)
           .get();
           
-      final users = studentsSnap.docs.map((d) => AppUser.fromMap(d.id, d.data())).toList();
+      final users = studentsSnap.docs
+          .map((d) => AppUser.fromMap(d.id, d.data()))
+          .where((u) => u.sections.any((sec) => _teacherSections.contains(sec)))
+          .toList();
 
       // 2. Fetch all quiz attempts
       final attemptsSnap = await db.collection('quiz_attempts').get();
@@ -209,6 +214,7 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
            missedQuizzes: uMissedQuizzes,
            arLabRecords: uArRecords,
            studentNumber: u.studentNumber,
+           avatarUrl: u.avatarUrl,
          ));
       }
 
@@ -633,15 +639,32 @@ class _QuizResultsTab extends StatelessWidget {
                           shape: BoxShape.circle,
                           border: Border.all(color: isDark ? const Color(0x5500D4FF) : const Color(0xFF1565C0).withOpacity(0.3)),
                         ),
-                        child: Center(
-                          child: Text(
-                            student.name.isNotEmpty ? student.name[0] : '?',
-                            style: TextStyle(
-                              color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
-                              fontWeight: FontWeight.w700,
-                              fontSize: 15,
-                            ),
-                          ),
+                        child: ClipOval(
+                          child: (student.avatarUrl != null && student.avatarUrl!.isNotEmpty)
+                              ? Image.network(
+                                  student.avatarUrl!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Center(
+                                    child: Text(
+                                      student.name.isNotEmpty ? student.name[0] : '?',
+                                      style: TextStyle(
+                                        color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : Center(
+                                  child: Text(
+                                    student.name.isNotEmpty ? student.name[0] : '?',
+                                    style: TextStyle(
+                                      color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -1033,15 +1056,32 @@ class _ArLabTab extends StatelessWidget {
                           shape: BoxShape.circle,
                           border: Border.all(color: isDark ? const Color(0x5500FF88) : const Color(0xFF00994C).withOpacity(0.3)),
                         ),
-                        child: Center(
-                          child: Text(
-                            student.name.isNotEmpty ? student.name[0] : '?',
-                            style: TextStyle(
-                              color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
-                              fontWeight: FontWeight.w700,
-                              fontSize: 15,
-                            ),
-                          ),
+                        child: ClipOval(
+                          child: (student.avatarUrl != null && student.avatarUrl!.isNotEmpty)
+                              ? Image.network(
+                                  student.avatarUrl!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Center(
+                                    child: Text(
+                                      student.name.isNotEmpty ? student.name[0] : '?',
+                                      style: TextStyle(
+                                        color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : Center(
+                                  child: Text(
+                                    student.name.isNotEmpty ? student.name[0] : '?',
+                                    style: TextStyle(
+                                      color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
                         ),
                       ),
                       const SizedBox(width: 10),
