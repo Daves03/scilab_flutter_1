@@ -197,7 +197,46 @@ class _UnityArScreenState extends State<UnityArScreen> with TickerProviderStateM
     if (uid != null && _activeExperimentId != null) {
       _activityService.markExperimentCompleted(uid, _activeExperimentId!);
     }
-    // You can also pop up your completion dialog here!
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF0A1628),
+        title: const Column(
+          children: [
+            Icon(Icons.emoji_events, color: Colors.amber, size: 50),
+            SizedBox(height: 10),
+            Text("Experiment Complete!", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: const Text(
+          "Great job! You have successfully completed this chemistry experiment.",
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Color(0xFF8BA3C0), fontSize: 16),
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: const Color(0xFF00D4FF).withValues(alpha: 0.5), width: 1.5),
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF00D4FF),
+              foregroundColor: Colors.black,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              _closeUnityAndReturnToMenu(); // Return to main menu
+            },
+            child: const Text("Finish & Exit", style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showEarlyActivatorWarning(String ingredient) {
