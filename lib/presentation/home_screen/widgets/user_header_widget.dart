@@ -21,31 +21,32 @@ class UserHeaderWidget extends StatelessWidget {
           child: Row(
             children: [
               // Avatar
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: const Color(0xFF00D4FF).withAlpha(153),
-                    width: 2,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF00D4FF).withAlpha(51),
-                      blurRadius: 12,
+              GestureDetector(
+                onTap: () => context.go('/teacher-profile-screen'),
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFF00D4FF).withAlpha(153),
+                      width: 2,
                     ),
-                  ],
-                ),
-                child: ClipOval(
-                  child: CustomImageWidget(
-                    imageUrl:
-                        'https://images.pexels.com/photos/4145153/pexels-photo-4145153.jpeg',
-                    width: 48,
-                    height: 48,
-                    fit: BoxFit.cover,
-                    semanticLabel:
-                        'Student avatar — young person studying chemistry',
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF00D4FF).withAlpha(51),
+                        blurRadius: 12,
+                      ),
+                    ],
+                  ),
+                  child: ClipOval(
+                    child: CustomImageWidget(
+                      imageUrl: context.watch<AuthService>().currentUser?.avatarUrl ?? 'https://images.pexels.com/photos/3769021/pexels-photo-3769021.jpeg?auto=compress&cs=tinysrgb&w=400',
+                      width: 48,
+                      height: 48,
+                      fit: BoxFit.cover,
+                      semanticLabel: 'Teacher avatar',
+                    ),
                   ),
                 ),
               ),

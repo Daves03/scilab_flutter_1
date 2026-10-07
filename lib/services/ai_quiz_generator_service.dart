@@ -8,7 +8,7 @@ class AiQuizGeneratorService {
   // TODO: Replace with your actual Gemini API Key from Google AI Studio
   static const String _apiKey = 'ai api here';
 
-  Future<List<CourseQuiz>?> generateQuizzesFromPdf(Uint8List pdfBytes, String moduleTitle, {int numQuizzes = 1, int numQuestions = 5}) async {
+  Future<List<CourseQuiz>?> generateQuizzesFromPdf(Uint8List pdfBytes, String moduleTitle, {int numQuizzes = 1, int numQuestions = 5, String mimeType = 'application/pdf'}) async {
     if (_apiKey == 'YOUR_GEMINI_API_KEY' || _apiKey.isEmpty) {
       print('AI API Key not set. Returning dummy quiz.');
       // Return a dummy quiz if the API key isn't set so the UI doesn't break
@@ -17,7 +17,7 @@ class AiQuizGeneratorService {
 
     try {
       final model = GenerativeModel(
-        model: 'gemini-flash-latest',
+        model: 'gemini-1.5-flash',
         apiKey: _apiKey,
         generationConfig: GenerationConfig(
           responseMimeType: 'application/json',
@@ -45,7 +45,7 @@ class AiQuizGeneratorService {
       final content = [
         Content.multi([
           TextPart(prompt),
-          DataPart('application/pdf', pdfBytes),
+          DataPart(mimeType, pdfBytes),
         ])
       ];
 

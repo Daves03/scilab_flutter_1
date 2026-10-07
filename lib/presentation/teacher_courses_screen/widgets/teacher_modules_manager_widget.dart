@@ -66,6 +66,8 @@ class _CourseModulesManagerWidgetState
     XFile? selectedFile;
     bool isGenerating = false;
     bool isUploading = false;
+    String? titleError;
+    String? descError;
 
     showDialog(
       context: context,
@@ -88,6 +90,7 @@ class _CourseModulesManagerWidgetState
                   controller: titleCtrl,
                   label: 'Module Title',
                   hint: 'e.g. Introduction to Organic Compounds',
+                  errorText: titleError,
                 ),
               const SizedBox(height: 14),
               _GlassTextField(
@@ -95,6 +98,7 @@ class _CourseModulesManagerWidgetState
                 label: 'Description',
                 hint: 'Brief description of this module',
                 maxLines: 3,
+                errorText: descError,
               ),
               const SizedBox(height: 14),
               const SizedBox(height: 12),
@@ -297,7 +301,20 @@ class _CourseModulesManagerWidgetState
             ],
           ),
           onSave: () async {
-            if (titleCtrl.text.trim().isEmpty) return;
+            setDialogState(() {
+              titleError = titleCtrl.text.trim().isEmpty ? 'Module Title is required' : null;
+              descError = descCtrl.text.trim().isEmpty ? 'Description is required' : null;
+            });
+            if (titleError != null || descError != null) return;
+
+            if (existing == null && selectedFile == null) {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please tap to attach a file first.')),
+                );
+              }
+              return;
+            }
             if (isGenerating || isUploading) return;
 
             final now = DateTime.now();
@@ -338,11 +355,16 @@ class _CourseModulesManagerWidgetState
               setDialogState(() => isGenerating = true);
               
               final aiService = AiQuizGeneratorService();
+              String mimeType = 'application/pdf';
+              if (selectedType == 'doc') mimeType = 'text/plain'; // Gemini might process it better if forced as text, or 'application/octet-stream'
+              if (selectedType == 'ppt') mimeType = 'text/plain';
+              
               final generatedQuizzes = await aiService.generateQuizzesFromPdf(
                 fileBytes, 
                 titleCtrl.text.trim(),
                 numQuizzes: numQuizzes,
                 numQuestions: numQuestions,
+                mimeType: mimeType,
               );
               
               if (generatedQuizzes != null && generatedQuizzes.isNotEmpty) {
@@ -877,12 +899,14 @@ class _GlassTextField extends StatelessWidget {
   final String label;
   final String hint;
   final int maxLines;
+  final String? errorText;
 
   const _GlassTextField({
     required this.controller,
     required this.label,
     required this.hint,
     this.maxLines = 1,
+    this.errorText,
   });
 
   @override
@@ -906,7 +930,9 @@ class _GlassTextField extends StatelessWidget {
           style: TextStyle(fontSize: 13, color: isLight ? Colors.black87 : Colors.white),
           decoration: InputDecoration(
             hintText: hint,
+            errorText: errorText,
             hintStyle: TextStyle(fontSize: 12, color: isLight ? Colors.grey.shade500 : const Color(0xFF4A6A8A)),
+            errorStyle: const TextStyle(fontSize: 11, color: Color(0xFFFF6B6B)),
             filled: true,
             fillColor: isLight ? Colors.white : const Color(0xFF142240),
             contentPadding: const EdgeInsets.symmetric(

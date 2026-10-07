@@ -54,8 +54,7 @@ class UserHeaderWidget extends StatelessWidget {
                 ),
                 child: ClipOval(
                   child: CustomImageWidget(
-                    imageUrl:
-                        'https://images.pexels.com/photos/4145153/pexels-photo-4145153.jpeg',
+                    imageUrl: context.watch<AuthService>().currentUser?.avatarUrl ?? 'https://images.pixabay.com/photo/2023/06/23/11/23/ai-generated-8083323_1280.jpg',
                     width: 48,
                     height: 48,
                     fit: BoxFit.cover,

@@ -72,8 +72,9 @@ extension VerificationStatusX on VerificationStatus {
 /// the Firebase Auth uid.
 class AppUser {
   final String id;
-  final String name;
+  String name;
   final String email;
+  String? avatarUrl;
   UserRole? role;
   VerificationStatus status;
   List<String> sections; // teacher's class sections, e.g. ['9-Rizal', '10-Luna']
@@ -86,6 +87,7 @@ class AppUser {
     required this.id,
     required this.name,
     required this.email,
+    this.avatarUrl,
     this.role,
     this.status = VerificationStatus.pending,
     this.sections = const [],
@@ -109,6 +111,7 @@ class AppUser {
       id: id,
       name: (data['name'] as String?) ?? '',
       email: (data['email'] as String?) ?? '',
+      avatarUrl: data['avatarUrl'] as String?,
       role: UserRoleX.fromId(data['role'] as String?),
       status: VerificationStatusX.fromId(data['status'] as String?),
       sections: List<String>.from(data['sections'] ?? const []),
@@ -122,6 +125,7 @@ class AppUser {
   Map<String, dynamic> toMap() => {
         'name': name,
         'email': email,
+        if (avatarUrl != null) 'avatarUrl': avatarUrl,
         'role': role?.id,
         'status': status.id,
         'sections': sections,
