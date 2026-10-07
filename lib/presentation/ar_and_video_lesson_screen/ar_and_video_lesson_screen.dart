@@ -269,7 +269,7 @@ class _ArAndVideoLessonScreenState extends State<ArAndVideoLessonScreen>
   }
 
   void _onRunAR(ArExperimentModel experiment) {
-    context.push('${AppRoutes.unityArScreen}?experimentId=${experiment.id.replaceAll('ar', '')}');
+    context.push('${AppRoutes.unityArScreen}?experimentId=${experiment.id}');
   }
 
   @override

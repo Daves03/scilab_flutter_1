@@ -37088,7 +37088,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t UnsafeList_1_get_Length_m
 		return L_1;
 	}
 }
-// Method Definition Index: 115048
+// Method Definition Index: 115073
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void* ILSupport_AddressOf_TisIl2CppFullySharedGenericStruct_m373C1FEADC4248F808294AA8958583E51840E129_gshared_inline (Il2CppFullySharedGenericStruct* ___0_thing, const RuntimeMethod* method) 
 {
 	{
@@ -37096,7 +37096,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void* ILSupport_AddressOf_TisIl2C
 		return (void*)(L_0);
 	}
 }
-// Method Definition Index: 115049
+// Method Definition Index: 115074
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR Il2CppFullySharedGenericStruct* ILSupport_AsRef_TisIl2CppFullySharedGenericStruct_mE9195E637265E7F6E317ACE31DCBA0EA7A989E30_gshared_inline (Il2CppFullySharedGenericStruct* ___0_thing, const RuntimeMethod* method) 
 {
 	{

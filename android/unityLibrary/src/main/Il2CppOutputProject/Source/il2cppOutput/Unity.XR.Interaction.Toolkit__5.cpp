@@ -28002,7 +28002,7 @@ IL_0053:
 		return L_24;
 	}
 }
-// Method Definition Index: 109951
+// Method Definition Index: 109976
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* XROrigin_get_Origin_mCE6A3B327ACE6FAEDCC67A9DC952FEED191C26B6_inline (XROrigin_t5E534A6D886991AF3C1C64127E19A3A510009CFE* __this, const RuntimeMethod* method) 
 {
 	{
@@ -30454,7 +30454,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void Enumerator_get_Current_m8B42
 		return;
 	}
 }
-// Method Definition Index: 110025
+// Method Definition Index: 110050
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t HashSetList_1_get_Count_m7B4003BA1C82B14972FABCB61ABB88418D13297A_gshared_inline (HashSetList_1_tA79BA5A1A2EFA49275053A69FD2E6CC78A69BB1F* __this, const RuntimeMethod* method) 
 {
 	{
@@ -30463,7 +30463,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t HashSetList_1_get_Count_m
 		return L_0;
 	}
 }
-// Method Definition Index: 110051
+// Method Definition Index: 110076
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR RuntimeObject* HashSetList_1_AsList_m331AAB97FB14632EB560DF8D414CC709FFA4A3B7_gshared_inline (HashSetList_1_tA79BA5A1A2EFA49275053A69FD2E6CC78A69BB1F* __this, const RuntimeMethod* method) 
 {
 	{

@@ -29312,7 +29312,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR Vector2_t1FD6F485C871E832B347AB2D
 		return L_0;
 	}
 }
-// Method Definition Index: 109945
+// Method Definition Index: 109970
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* XROrigin_get_Camera_m8959027D616F5BD9AEAE3E41ADEE23BBC2CE3629_inline (XROrigin_t5E534A6D886991AF3C1C64127E19A3A510009CFE* __this, const RuntimeMethod* method) 
 {
 	{
@@ -29402,7 +29402,7 @@ IL_002d:
 		return L_12;
 	}
 }
-// Method Definition Index: 109947
+// Method Definition Index: 109972
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* XROrigin_get_TrackablesParent_m6F7933DF03A5376C31D328F865F77D28EEC18E9C_inline (XROrigin_t5E534A6D886991AF3C1C64127E19A3A510009CFE* __this, const RuntimeMethod* method) 
 {
 	{
@@ -31871,7 +31871,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t List_1_get_Count_mD2ED26A
 		return L_0;
 	}
 }
-// Method Definition Index: 110130
+// Method Definition Index: 110155
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void BindableVariableBase_1_get_Value_m7B66C304BC784714EFB538482F439D628FD77823_gshared_inline (BindableVariableBase_1_tF075B55161CD973AA28BB081CC7E13F360F44F90* __this, Il2CppFullySharedGenericAny* il2cppRetVal, const RuntimeMethod* method) 
 {
 	const uint32_t SizeOf_T_t251EE36B1C491047F9B6D2029DA030A4C355DA9C = il2cpp_codegen_sizeof(il2cpp_rgctx_data_no_init(method->klass->rgctx_data, 3));
@@ -31883,7 +31883,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void BindableVariableBase_1_get_V
 		return;
 	}
 }
-// Method Definition Index: 110025
+// Method Definition Index: 110050
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t HashSetList_1_get_Count_m7B4003BA1C82B14972FABCB61ABB88418D13297A_gshared_inline (HashSetList_1_tA79BA5A1A2EFA49275053A69FD2E6CC78A69BB1F* __this, const RuntimeMethod* method) 
 {
 	{

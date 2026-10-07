@@ -84,7 +84,7 @@ class _UnityArScreenState extends State<UnityArScreen> with TickerProviderStateM
       setState(() {
         _isExperimentActive = true;
         _isLoading = true;
-        _activeExperimentId = normalizedId;
+        _activeExperimentId = experimentId;
         _currentStepIndex = 0; // Reset steps on launch
       });
 
@@ -119,7 +119,7 @@ class _UnityArScreenState extends State<UnityArScreen> with TickerProviderStateM
       // Now context is safe to use!
       final uid = context.read<AuthService>().currentUser?.id;
       if (uid != null) {
-        _activityService.logExperimentLaunch(uid, normalizedId);
+        _activityService.logExperimentLaunch(uid, experimentId);
       }
     } else {
       // We already checked !mounted above, so this context is safe too
@@ -207,6 +207,17 @@ class _UnityArScreenState extends State<UnityArScreen> with TickerProviderStateM
       message = "The beaker is still empty! Pour the bottle first.";
     } else if (ingredient == "EmptyDish") {
       message = "There's no liquid solution on the dish plate yet!";
+    } else if (ingredient == "PureBlood") {
+      message = "You dipped the litmus paper in pure blood! The red color is just a blood stain. Mix the blood with water first to read its true pH.";
+    } else if (ingredient == "ToxicGas") {
+      message = "CRITICAL SAFETY VIOLATION: Mixing Bleach and Acid creates lethal Chlorine Gas! Resetting lab...";
+      
+      // Automatically reset the experiment after 4 seconds because they failed the safety check!
+      Future.delayed(const Duration(seconds: 4), () {
+        if (mounted) {
+          _resetExperiment();
+        }
+      });
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -227,6 +238,56 @@ class _UnityArScreenState extends State<UnityArScreen> with TickerProviderStateM
         duration: const Duration(seconds: 4),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  void _resetExperiment() {
+    // Tell Unity to reset the scene
+    sendToUnity('FlutterReceiver', 'ResetExperiment', 'true');
+    
+    setState(() {
+      _currentStepIndex = 0;
+    });
+    _notifyUnityActiveStep();
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Experiment has been reset!'),
+        backgroundColor: Colors.green[700],
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showHint(ExperimentStep? currentStep) {
+    if (currentStep == null) return;
+    
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF0A1628),
+        title: const Row(
+          children: [
+            Icon(Icons.lightbulb, color: Color(0xFF00D4FF)),
+            SizedBox(width: 10),
+            Text("Need a Hint?", style: TextStyle(color: Colors.white)),
+          ],
+        ),
+        content: Text(
+          currentStep.instructionDetail,
+          style: const TextStyle(color: Color(0xFF8BA3C0), height: 1.5, fontSize: 16),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text("Got it!", style: TextStyle(color: Color(0xFF00D4FF), fontWeight: FontWeight.bold)),
+          ),
+        ],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: const Color(0xFF00D4FF).withValues(alpha: 0.5), width: 1.5),
+        ),
       ),
     );
   }
@@ -442,8 +503,51 @@ class _UnityArScreenState extends State<UnityArScreen> with TickerProviderStateM
               child: EmbedUnity(onMessageFromUnity: _handleMessageFromUnity),
             ),
 
-            // --- UI OVERLAY FOR INSTRUCTIONS WHEN EXPERIMENT IS ACTIVE ---
-            if (_isExperimentActive && !_isLoading && currentStepData != null)
+            // --- UI OVERLAY FOR INSTRUCTIONS AND CONTROLS WHEN EXPERIMENT IS ACTIVE ---
+            if (_isExperimentActive && !_isLoading && currentStepData != null) ...[
+              
+              // 1. ACTION BUTTONS (TOP LEFT)
+              SafeArea(
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // EXIT BUTTON
+                        FloatingActionButton(
+                          heroTag: 'btn_exit',
+                          mini: true,
+                          backgroundColor: Colors.red[800],
+                          onPressed: _closeUnityAndReturnToMenu,
+                          child: const Icon(Icons.close, color: Colors.white),
+                        ),
+                        const SizedBox(height: 12),
+                        // RESET BUTTON
+                        FloatingActionButton(
+                          heroTag: 'btn_reset',
+                          mini: true,
+                          backgroundColor: Colors.orange[800],
+                          onPressed: _resetExperiment,
+                          child: const Icon(Icons.refresh, color: Colors.white),
+                        ),
+                        const SizedBox(height: 12),
+                        // HINT BUTTON
+                        FloatingActionButton(
+                          heroTag: 'btn_hint',
+                          mini: true,
+                          backgroundColor: const Color(0xFF00D4FF),
+                          onPressed: () => _showHint(currentStepData),
+                          child: const Icon(Icons.lightbulb_outline, color: Color(0xFF0A1628)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              // 2. PROGRESS & INSTRUCTION BOX (TOP RIGHT)
               SafeArea(
                 child: Align(
                   alignment: Alignment.topRight,
@@ -525,6 +629,7 @@ class _UnityArScreenState extends State<UnityArScreen> with TickerProviderStateM
                   ),
                 ),
               ),
+            ],
 
             if (_isLoading)
               Container(
