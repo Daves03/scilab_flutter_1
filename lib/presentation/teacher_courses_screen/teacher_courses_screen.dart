@@ -1,3 +1,4 @@
+import 'dart:math';
 import '../../core/app_export.dart';
 import './widgets/teacher_course_detail_widget.dart';
 import 'package:provider/provider.dart';
@@ -451,6 +452,32 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
         onSave: () async {
           if (formKey.currentState!.validate()) {
             final user = context.read<AuthService>().currentUser!;
+            
+            final chemistryIcons = [
+              'science',
+              'biotech',
+              'sanitizer',
+              'bubble_chart',
+              'masks',
+              'eco',
+              'psychology',
+              'wb_incandescent',
+              'opacity',
+              'whatshot',
+              'blur_on',
+              'water_drop',
+              'grass',
+              'coronavirus'
+            ];
+            final teacherCourses = await context.read<CourseService>().fetchCoursesForTeacher(user.id);
+            teacherCourses.sort((a, b) => (b.createdAt ?? DateTime.now()).compareTo(a.createdAt ?? DateTime.now()));
+            final lastIcon = teacherCourses.isNotEmpty ? teacherCourses.first.iconName : null;
+
+            String randomIcon = chemistryIcons[Random().nextInt(chemistryIcons.length)];
+            while (randomIcon == lastIcon) {
+              randomIcon = chemistryIcons[Random().nextInt(chemistryIcons.length)];
+            }
+
             final newCourse = Course(
               id: '',
               title: titleCtrl.text.trim(),
@@ -459,7 +486,7 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
               teacherUid: user.id,
               teacherName: user.name,
               accentColorValue: 0xFF00D4FF,
-              iconName: 'science',
+              iconName: randomIcon,
               sections: selectedSections,
               modules: [],
               quizzes: [],

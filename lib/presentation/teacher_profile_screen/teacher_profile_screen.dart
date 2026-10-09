@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -32,6 +33,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
   String _teacherName = 'Teacher';
   String _email = '';
   List<String> _teacherSections = [];
+  List<String> _gradeLevels = [];
 
   String _avatarUrl =
       'https://images.pexels.com/photos/3769021/pexels-photo-3769021.jpeg?auto=compress&cs=tinysrgb&w=400';
@@ -50,11 +52,34 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
       _email = user?.email ?? 'teacher@scilabar.edu';
       _teacherSections = (user?.sections?.isNotEmpty ?? false) 
           ? user!.sections! 
-          : ['Grade 9', 'Grade 10'];
+          : [];
       if (user?.avatarUrl != null && user!.avatarUrl!.isNotEmpty) {
         _avatarUrl = user.avatarUrl!;
       }
     });
+
+    if (_teacherSections.isNotEmpty) {
+      try {
+        final querySnapshot = await FirebaseFirestore.instance
+            .collection('sections')
+            .where('name', whereIn: _teacherSections)
+            .get();
+        Set<String> grades = {};
+        for (var doc in querySnapshot.docs) {
+          final data = doc.data();
+          if (data['grade'] != null) {
+            grades.add(data['grade'].toString());
+          }
+        }
+        if (mounted) {
+          setState(() {
+            _gradeLevels = grades.toList()..sort();
+          });
+        }
+      } catch (e) {
+        debugPrint('Error fetching grades: $e');
+      }
+    }
   }
 
   Future<void> _uploadProfilePicture() async {
@@ -595,6 +620,15 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                       value: _email,
                       isDark: isDark,
                     ),
+                    if (_gradeLevels.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      _InfoRow(
+                        icon: 'school_outlined',
+                        label: 'Grade Level Teaching',
+                        value: _gradeLevels.join(', '),
+                        isDark: isDark,
+                      ),
+                    ],
                     if (_teacherSections.isNotEmpty) ...[
                       const SizedBox(height: 16),
                       _SectionsRow(sections: _teacherSections, isDark: isDark),

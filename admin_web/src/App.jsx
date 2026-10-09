@@ -11,6 +11,9 @@ import ManageUsers from './pages/ManageUsers';
 import ManageSections from './pages/ManageSections';
 import TeacherUploads from './pages/TeacherUploads';
 import ARLabManager from './pages/ARLabManager';
+import ARMarker from './pages/ARMarker';
+import ActivityLogs from './pages/ActivityLogs';
+import Legal from './pages/Legal';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -69,6 +72,9 @@ function App() {
           <Route path="sections" element={<ManageSections />} />
           <Route path="uploads" element={<TeacherUploads />} />
           <Route path="ar-labs" element={<ARLabManager />} />
+          <Route path="ar-marker" element={<ARMarker />} />
+          <Route path="activity-logs" element={<ActivityLogs />} />
+          <Route path="legal" element={<Legal />} />
         </Route>
       </Routes>
     </BrowserRouter>

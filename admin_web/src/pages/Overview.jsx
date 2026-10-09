@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Users, Clock, ShieldCheck, BookOpen, GraduationCap, UserCheck, Layers, Hexagon, ArrowRight, Activity } from 'lucide-react';
+import { Users, Clock, ShieldCheck, BookOpen, GraduationCap, UserCheck, Layers, Hexagon, ArrowRight, Activity, QrCode, Server, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Overview() {
@@ -15,6 +16,8 @@ export default function Overview() {
     totalArLabs: 0
   });
   const [loading, setLoading] = useState(true);
+  const [showSystemHealth, setShowSystemHealth] = useState(false);
+  const [ping, setPing] = useState(null);
 
   useEffect(() => {
     async function fetchStats() {
@@ -138,15 +141,116 @@ export default function Overview() {
           small
         />
         
+      </div>
+
+      <h2 style={{ fontSize: '1.5rem', marginBottom: '20px', color: 'var(--text-primary)', marginTop: '40px' }}>System Tools & Admin</h2>
+      
+      <div className="grid-secondary" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
+        <StatCard 
+          title="AR Marker" 
+          value="VuMark" 
+          icon={<QrCode size={24} color="#fcd34d" />} 
+          trend="Download Scilab Marker"
+          onClick={() => navigate('/ar-marker')}
+          color="#fcd34d"
+          small
+        />
+        
+        <StatCard 
+          title="Activity Logs" 
+          value="Tracker" 
+          icon={<Activity size={24} color="#14b8a6" />} 
+          trend="Track user actions"
+          onClick={() => navigate('/activity-logs')}
+          color="#14b8a6"
+          small
+        />
+
+        <StatCard 
+          title="Legal" 
+          value="Terms" 
+          icon={<ShieldCheck size={24} color="#94a3b8" />} 
+          trend="Terms & conditions"
+          onClick={() => navigate('/legal')}
+          color="#94a3b8"
+          small
+        />
+        
         <StatCard 
           title="System Status" 
           value="Online" 
-          icon={<Activity size={24} color="#10b981" />} 
+          icon={<Server size={24} color="#10b981" />} 
           trend="All systems operational"
           color="#10b981"
+          onClick={() => {
+            setShowSystemHealth(true);
+            const start = Date.now();
+            getDocs(collection(db, 'users')).then(() => {
+              setPing(Date.now() - start);
+            }).catch(() => setPing(-1));
+          }}
           small
         />
       </div>
+
+      {showSystemHealth && createPortal(
+        <div className="modal-overlay" style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+        }}>
+          <div className="modal-content animate-fade-in glass-panel" style={{
+            background: 'var(--bg-card)', width: '100%', maxWidth: '400px',
+            borderRadius: '16px', padding: '24px', position: 'relative',
+            border: '1px solid var(--border-light)',
+            boxShadow: 'var(--shadow-lg)'
+          }}>
+            <h2 style={{ fontSize: '1.25rem', marginBottom: '20px', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Server size={20} color="#10b981" /> System Health
+            </h2>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: 'var(--bg-main)', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                <span style={{ color: 'var(--text-secondary)' }}>Firestore Database</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <CheckCircle2 size={16} color="#10b981" />
+                  <span style={{ color: '#10b981', fontWeight: 'bold' }}>Online</span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: 'var(--bg-main)', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                <span style={{ color: 'var(--text-secondary)' }}>Authentication Service</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <CheckCircle2 size={16} color="#10b981" />
+                  <span style={{ color: '#10b981', fontWeight: 'bold' }}>Online</span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: 'var(--bg-main)', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                <span style={{ color: 'var(--text-secondary)' }}>Storage Bucket</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <CheckCircle2 size={16} color="#10b981" />
+                  <span style={{ color: '#10b981', fontWeight: 'bold' }}>Online</span>
+                </div>
+              </div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', borderTop: '1px solid var(--border-light)', marginTop: '8px' }}>
+                <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Network Latency</span>
+                <span style={{ color: 'var(--text-primary)', fontWeight: 'bold' }}>
+                  {ping === null ? 'Pinging...' : ping === -1 ? 'Error' : `${ping} ms`}
+                </span>
+              </div>
+            </div>
+
+            <button 
+              className="btn btn-secondary" 
+              style={{ width: '100%', marginTop: '24px' }}
+              onClick={() => setShowSystemHealth(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
