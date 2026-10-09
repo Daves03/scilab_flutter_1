@@ -95,7 +95,7 @@ class _StudentArAndVideoLessonScreenState
   }
 
   void _onRunAR(ArExperimentModel experiment) {
-    context.push('${AppRoutes.unityArScreen}?experimentId=${experiment.id.replaceAll('ar', '')}');
+    context.push('${AppRoutes.unityArScreen}?experimentId=${experiment.id}');
   }
 
   @override
