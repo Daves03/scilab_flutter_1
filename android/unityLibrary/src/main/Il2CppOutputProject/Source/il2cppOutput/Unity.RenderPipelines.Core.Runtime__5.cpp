@@ -27969,7 +27969,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void Vector3__ctor_m376936E6B999E
 		return;
 	}
 }
-// Method Definition Index: 67583
+// Method Definition Index: 67585
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void float3x3__ctor_m3AB31C9B587ABDCF15C8BF0E3A5B0158996A75ED_inline (float3x3_tB318DB8C7E54B6CA9E14EB9AC7F5964C1189FC79* __this, float ___0_m00, float ___1_m01, float ___2_m02, float ___3_m10, float ___4_m11, float ___5_m12, float ___6_m20, float ___7_m21, float ___8_m22, const RuntimeMethod* method) 
 {
 	{
@@ -28001,7 +28001,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void float3x3__ctor_m3AB31C9B587A
 		return;
 	}
 }
-// Method Definition Index: 63259
+// Method Definition Index: 63261
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR float3x3_tB318DB8C7E54B6CA9E14EB9AC7F5964C1189FC79 math_float3x3_m63BD623B75D81DD4349E93172851DA6CAB8D899F_inline (float ___0_m00, float ___1_m01, float ___2_m02, float ___3_m10, float ___4_m11, float ___5_m12, float ___6_m20, float ___7_m21, float ___8_m22, const RuntimeMethod* method) 
 {
 	{
@@ -28255,7 +28255,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void Enumerator_get_Current_m8B42
 		return;
 	}
 }
-// Method Definition Index: 92283
+// Method Definition Index: 92285
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t HashSet_1_get_Count_mA764DCA3CB14CB2CBDF742A163492FF4DA515B63_gshared_inline (HashSet_1_t2E820DA94CC6D5A61CA29EBD9BE297C43D691C87* __this, const RuntimeMethod* method) 
 {
 	{
@@ -28263,7 +28263,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t HashSet_1_get_Count_mA764
 		return L_0;
 	}
 }
-// Method Definition Index: 92325
+// Method Definition Index: 92327
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void Enumerator_get_Current_m51282E47C90E55BF2D96A0D329869ABC122A85A0_gshared_inline (Enumerator_t0D36BD6D63D775CDEAF8501F5A252535FFFF52CB* __this, Il2CppFullySharedGenericAny* il2cppRetVal, const RuntimeMethod* method) 
 {
 	const uint32_t SizeOf_T_t6D22409F37413B725563BF484486F55FB7202BB8 = il2cpp_codegen_sizeof(il2cpp_rgctx_data_no_init(InitializedTypeInfo(method->klass)->rgctx_data, 2));
@@ -28370,7 +28370,7 @@ IL_0027:
 		return L_4;
 	}
 }
-// Method Definition Index: 67317
+// Method Definition Index: 67319
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void float3__ctor_mC61002CD0EC13D7C37D846D021A78C028FB80DB9_inline (float3_t4AB5D88249ADB24F69FFD0793E8ED25E1CC3745E* __this, float ___0_x, float ___1_y, float ___2_z, const RuntimeMethod* method) 
 {
 	{

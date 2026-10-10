@@ -8,6 +8,7 @@ import '../../services/activity_service.dart';
 import '../../models/experiment_step.dart';
 import '../../models/ar_experiment_model.dart';
 import '../../data/dummy_ar_experiments.dart';
+import '../../data/periodic_table_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 
@@ -30,9 +31,12 @@ class _UnityArScreenState extends State<UnityArScreen> with TickerProviderStateM
   int _guideStep = 0;
   late AnimationController _guideAnimationController;
 
+  bool get _isPeriodicTable => _activeExperimentId == '8' || _activeExperimentId == 'ar8';
+
   // --- NEW: Step tracking variables ---
   int _currentStepIndex = 0;
   List<ExperimentStep> _currentSteps = [];
+  String? _activeExplanation;
 
   @override
   void initState() {
@@ -149,6 +153,25 @@ class _UnityArScreenState extends State<UnityArScreen> with TickerProviderStateM
     sendToUnity('FlutterReceiver', 'SetActiveStep', activeTag);
   }
 
+  // --- DYNAMIC REACTION EXPLANATIONS ---
+  final Map<String, String> _reactionDatabase = {
+    "bleach_lemon": "DANGER! Bleach (strong base) and Lemon (acid) react to create toxic Chlorine Gas! The pH remains highly alkaline (purple) because bleach dominates.",
+    "bleach_blood": "Bleach is a powerful oxidizer. It destroys the hemoglobin in the blood, turning it dirty yellow. The pH is highly alkaline (purple).",
+    "lemon_soap": "Acid-Base Neutralization! The acid in the lemon neutralizes the alkaline soap, creating a neutral (green) pH. The mixture turns cloudy as fatty acids separate.",
+    "blood_lemon": "The acid from the lemon 'denatures' (cooks) the proteins in the blood, causing it to coagulate into a dark mass. The Litmus shows an acidic (orange) pH.",
+    "blood_soap": "Hemolysis! The surfactants in the soap destroy the red blood cell membranes, making them burst into a clear red liquid. Litmus shows an alkaline (blue) pH.",
+    "blood_water": "Water dilutes the blood, making it lighter in color. However, blood is buffered, so its pH remains safely around 7.4 (Teal).",
+    "bleach": "Bleach is an extremely strong base. It overpowers the other substances, turning the Litmus paper purple (pH 13).",
+    "lemon": "Lemon juice is a strong acid. It dominates the mixture, causing the Litmus paper to read highly acidic (orange).",
+    "soap": "Soap is a moderate base. It dominates the mixture, turning the Litmus paper blue (pH 9).",
+    "pure_blood": "Pure blood stains the paper red! You must dilute it with water first to read its true pH.",
+    "pure_water": "You are testing pure water. The Litmus paper shows its natural pH level (Neutral/Green).",
+    "pure_lemon": "You are testing pure lemon juice. The Litmus paper shows its natural pH level (Highly Acidic/Orange).",
+    "pure_soap": "You are testing pure liquid soap. The Litmus paper shows its natural pH level (Basic/Blue).",
+    "pure_bleach": "You are testing pure bleach. The Litmus paper shows its natural pH level (Highly Basic/Purple).",
+    "complex_mix": "You've mixed a complex soup! Without strong acids or bases, it becomes a murky mix with a default pH."
+  };
+
   void _handleMessageFromUnity(String message) {
     final trimmedMessage = message.trim();
     debugPrint('Received from Unity: "$trimmedMessage"');
@@ -175,6 +198,28 @@ class _UnityArScreenState extends State<UnityArScreen> with TickerProviderStateM
     if (trimmedMessage.startsWith("WARNING:")) {
       String ingredient = trimmedMessage.replaceFirst("WARNING:", "");
       _showEarlyActivatorWarning(ingredient);
+      return;
+    }
+
+    // --- CATCH EXPLANATION FROM UNITY (Dynamic Lookup) ---
+    if (trimmedMessage.startsWith("EXPLANATION:")) {
+      // Unity sends: "EXPLANATION:bleach,lemon"
+      String combinationKeys = trimmedMessage.replaceFirst("EXPLANATION:", "");
+      
+      // Look it up in our dynamic dictionary! If not found, show default.
+      String explanation = _reactionDatabase[combinationKeys] ?? 
+                           "You've mixed a complex soup! Without strong acids or bases, it becomes a murky mix with a default pH.";
+      
+      setState(() {
+        _activeExplanation = explanation;
+      });
+      return;
+    }
+
+    // --- CATCH ELEMENT CLICKED (Periodic Table AR) ---
+    if (trimmedMessage.startsWith("ELEMENT_CLICKED:")) {
+      String atomicNumberStr = trimmedMessage.replaceFirst("ELEMENT_CLICKED:", "");
+      _showElementDetails(atomicNumberStr);
       return;
     }
 
@@ -287,6 +332,7 @@ class _UnityArScreenState extends State<UnityArScreen> with TickerProviderStateM
     
     setState(() {
       _currentStepIndex = 0;
+      _activeExplanation = null;
     });
     _notifyUnityActiveStep();
     
@@ -295,6 +341,144 @@ class _UnityArScreenState extends State<UnityArScreen> with TickerProviderStateM
         content: const Text('Experiment has been reset!'),
         backgroundColor: Colors.green[700],
         duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showElementDetails(String atomicNumberStr) {
+    final data = periodicTable[atomicNumberStr];
+    if (data == null) {
+      debugPrint("No element data found for Atomic Number: $atomicNumberStr");
+      return;
+    }
+
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "Dismiss",
+      barrierColor: Colors.transparent, // <-- REMOVES THE DARK OVERLAY!
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Align(
+          alignment: Alignment.centerRight,
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.48, // Almost half the screen
+              height: double.infinity,
+              padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0A1628).withValues(alpha: 0.6), // <-- MADE IT MORE TRANSPARENT!
+                borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), bottomLeft: Radius.circular(30)),
+                border: Border(
+                  left: BorderSide(color: const Color(0xFF00D4FF).withValues(alpha: 0.3), width: 1.5),
+                  top: BorderSide(color: const Color(0xFF00D4FF).withValues(alpha: 0.3), width: 1.5),
+                  bottom: BorderSide(color: const Color(0xFF00D4FF).withValues(alpha: 0.3), width: 1.5),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.4),
+                    blurRadius: 25,
+                    offset: const Offset(-10, 0),
+                  ),
+                ],
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF00D4FF).withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xFF00D4FF)),
+                          ),
+                          child: Center(
+                            child: Text(
+                              data.symbol,
+                              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                data.name,
+                                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(
+                                data.category,
+                                style: const TextStyle(fontSize: 14, color: Color(0xFF8BA3C0)),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          "#${data.atomicNumber}",
+                          style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Color(0xFF00D4FF)),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildElementStatBox("Protons", data.atomicNumber.toString()),
+                        _buildElementStatBox("Mass", data.atomicMass.toStringAsFixed(1)),
+                        _buildElementStatBox("Electrons", data.atomicNumber.toString()),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
+                    const Text("FUN FACT", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Color(0xFF00D4FF), letterSpacing: 1.2)),
+                    const SizedBox(height: 12),
+                    Text(
+                      data.funFact,
+                      style: const TextStyle(fontSize: 15, color: Colors.white, height: 1.6),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(1, 0),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
+          child: child,
+        );
+      },
+    );
+  }
+
+  Widget _buildElementStatBox(String label, String value) {
+    return Container(
+      width: 90, // Adjusted width slightly to fit nicely
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF8BA3C0).withValues(alpha: 0.2)),
+      ),
+      child: Column(
+        children: [
+          Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+          const SizedBox(height: 4),
+          Text(label, style: const TextStyle(fontSize: 11, color: Color(0xFF8BA3C0))),
+        ],
       ),
     );
   }
@@ -562,24 +746,26 @@ class _UnityArScreenState extends State<UnityArScreen> with TickerProviderStateM
                           onPressed: _closeUnityAndReturnToMenu,
                           child: const Icon(Icons.close, color: Colors.white),
                         ),
-                        const SizedBox(height: 12),
+                        if (!_isPeriodicTable) const SizedBox(height: 12),
                         // RESET BUTTON
-                        FloatingActionButton(
-                          heroTag: 'btn_reset',
-                          mini: true,
-                          backgroundColor: Colors.orange[800],
-                          onPressed: _resetExperiment,
-                          child: const Icon(Icons.refresh, color: Colors.white),
-                        ),
-                        const SizedBox(height: 12),
+                        if (!_isPeriodicTable)
+                          FloatingActionButton(
+                            heroTag: 'btn_reset',
+                            mini: true,
+                            backgroundColor: Colors.orange[800],
+                            onPressed: _resetExperiment,
+                            child: const Icon(Icons.refresh, color: Colors.white),
+                          ),
+                        if (!_isPeriodicTable) const SizedBox(height: 12),
                         // HINT BUTTON
-                        FloatingActionButton(
-                          heroTag: 'btn_hint',
-                          mini: true,
-                          backgroundColor: const Color(0xFF00D4FF),
-                          onPressed: () => _showHint(currentStepData),
-                          child: const Icon(Icons.lightbulb_outline, color: Color(0xFF0A1628)),
-                        ),
+                        if (!_isPeriodicTable)
+                          FloatingActionButton(
+                            heroTag: 'btn_hint',
+                            mini: true,
+                            backgroundColor: const Color(0xFF00D4FF),
+                            onPressed: () => _showHint(currentStepData),
+                            child: const Icon(Icons.lightbulb_outline, color: Color(0xFF0A1628)),
+                          ),
                       ],
                     ),
                   ),
@@ -587,87 +773,89 @@ class _UnityArScreenState extends State<UnityArScreen> with TickerProviderStateM
               ),
 
               // 2. PROGRESS & INSTRUCTION BOX (TOP RIGHT)
-              SafeArea(
-                child: Align(
-                  alignment: Alignment.topRight,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Container(
-                      constraints: const BoxConstraints(maxWidth: 280),
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF0A1628).withValues(alpha: 0.85),
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: const Color(0xFF00D4FF).withValues(alpha: 0.3),
-                          width: 1.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.4),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
+              if (!_isPeriodicTable)
+                SafeArea(
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Container(
+                        constraints: const BoxConstraints(maxWidth: 280),
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0A1628).withValues(alpha: 0.85),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: const Color(0xFF00D4FF).withValues(alpha: 0.3),
+                            width: 1.5,
                           ),
-                        ],
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                "PROGRESS",
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF8BA3C0),
-                                  letterSpacing: 1.2,
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF00D4FF).withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(50),
-                                  border: Border.all(color: const Color(0xFF00D4FF).withValues(alpha: 0.4)),
-                                ),
-                                child: Text(
-                                  "${_currentStepIndex + 1}/${_currentSteps.length}",
-                                  style: const TextStyle(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.4),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  _activeExplanation != null ? "SCIENTIFIC ANALYSIS" : "PROGRESS",
+                                  style: TextStyle(
                                     fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF00D4FF),
+                                    fontWeight: FontWeight.w800,
+                                    color: _activeExplanation != null ? const Color(0xFF00D4FF) : const Color(0xFF8BA3C0),
+                                    letterSpacing: 1.2,
                                   ),
                                 ),
+                                if (_activeExplanation == null)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF00D4FF).withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(50),
+                                      border: Border.all(color: const Color(0xFF00D4FF).withValues(alpha: 0.4)),
+                                    ),
+                                    child: Text(
+                                      "${_currentStepIndex + 1}/${_currentSteps.length}",
+                                      style: const TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF00D4FF),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              _activeExplanation != null ? "Reaction Result" : currentStepData.instructionTitle,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            currentStepData.instructionTitle,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
                             ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            currentStepData.instructionDetail,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF8BA3C0),
-                              height: 1.4,
+                            const SizedBox(height: 6),
+                            Text(
+                              _activeExplanation ?? currentStepData.instructionDetail,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFF8BA3C0),
+                                height: 1.4,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
             ],
 
             if (_isLoading)
@@ -685,7 +873,7 @@ class _UnityArScreenState extends State<UnityArScreen> with TickerProviderStateM
                 ),
               ),
 
-            if (_showGuide) _buildGuideOverlay(theme),
+            if (_showGuide && !_isPeriodicTable) _buildGuideOverlay(theme),
 
           ],
         ),

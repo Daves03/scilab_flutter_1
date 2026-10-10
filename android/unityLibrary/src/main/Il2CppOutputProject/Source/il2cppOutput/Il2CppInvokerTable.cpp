@@ -59773,6 +59773,12 @@ void RuntimeInvoker_TrueRuntimeObject_Byte_t94D9231AC217BE4D2E004C4CD32DF6D099EA
 	*((RuntimeObject**)returnAddress) = ((Func)methodPointer)(obj, *((uint8_t*)args[0]), (RuntimeObject*)args[1], methodMetadata);
 }
 
+void RuntimeInvoker_TrueRuntimeObject_Color_tD001788D726C3A7F1379BEED0260B9591F440C1F_RuntimeObject (Il2CppMethodPointer methodPointer, const RuntimeMethod* methodMetadata, void* obj, void** args, void* returnAddress)
+{
+	typedef RuntimeObject* (*Func)(void* obj, Color_tD001788D726C3A7F1379BEED0260B9591F440C1F p1, RuntimeObject* p2, const RuntimeMethod* method);
+	*((RuntimeObject**)returnAddress) = ((Func)methodPointer)(obj, *((Color_tD001788D726C3A7F1379BEED0260B9591F440C1F*)args[0]), (RuntimeObject*)args[1], methodMetadata);
+}
+
 void RuntimeInvoker_TrueRuntimeObject_Color_tD001788D726C3A7F1379BEED0260B9591F440C1F_Single_t4530F2FF86FCB0DC29F35385CA1BD21BE294761C (Il2CppMethodPointer methodPointer, const RuntimeMethod* methodMetadata, void* obj, void** args, void* returnAddress)
 {
 	typedef RuntimeObject* (*Func)(void* obj, Color_tD001788D726C3A7F1379BEED0260B9591F440C1F p1, float p2, const RuntimeMethod* method);
@@ -124772,7 +124778,7 @@ void RuntimeInvoker_FalseInternal_t40235E8D1E97E2C7693D27363EE060972ACE8D06 (Il2
 }
 
 IL2CPP_EXTERN_C const InvokerMethod g_Il2CppInvokerPointers[];
-const InvokerMethod g_Il2CppInvokerPointers[12211] = 
+const InvokerMethod g_Il2CppInvokerPointers[12212] = 
 {
 	RuntimeInvoker_F57671A1A271362DE5576D4120520430DEAD6EAE,
 	RuntimeInvoker_7C7502B48E2131BE322E25A4A5423517C2046CC6,
@@ -127270,6 +127276,7 @@ const InvokerMethod g_Il2CppInvokerPointers[12211] =
 	RuntimeInvoker_TrueRuntimeObject_Byte_t94D9231AC217BE4D2E004C4CD32DF6D099EA41A3_CancellationToken_t51142D9C6D7C02D314DA34A6A7988C528992FFED,
 	RuntimeInvoker_TrueRuntimeObject_Byte_t94D9231AC217BE4D2E004C4CD32DF6D099EA41A3_Int32_t680FF22E76F6EFAD4375103CBBFFA0421349384C,
 	RuntimeInvoker_TrueRuntimeObject_Byte_t94D9231AC217BE4D2E004C4CD32DF6D099EA41A3_RuntimeObject,
+	RuntimeInvoker_TrueRuntimeObject_Color_tD001788D726C3A7F1379BEED0260B9591F440C1F_RuntimeObject,
 	RuntimeInvoker_TrueRuntimeObject_Color_tD001788D726C3A7F1379BEED0260B9591F440C1F_Single_t4530F2FF86FCB0DC29F35385CA1BD21BE294761C,
 	RuntimeInvoker_TrueRuntimeObject_DataKey_tC6DF14FCD651ACE82D9C872CFC449847B000F73A_Int32_t680FF22E76F6EFAD4375103CBBFFA0421349384C,
 	RuntimeInvoker_TrueRuntimeObject_DateTime_t66193957C73913903DDAD89FEDC46139BCA5802D_VoidU2A_t104EAEFBD2D237A8C29618913DA9B4D99355E965,

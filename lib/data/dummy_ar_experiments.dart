@@ -250,6 +250,35 @@ const List<Map<String, dynamic>> _experimentMaps = [
         {'bottleTag': 'Flame-Switch', 'instructionTitle': 'STEP 3: PERFORM THE FLAME TEST', 'instructionDetail': 'Turn on the flame switch, then place the coated nichrome stick over the burner to observe the flame color produced.'},
       ],
     },
+    {
+      'id': 'ar8',
+      'title': 'Interactive Periodic Table',
+      'topic': 'Atomic Structure',
+      'category': 'Exploration',
+      'backgroundInfo':
+          'Explore the building blocks of the universe! Tap any element on your physical periodic table marker to reveal its atomic structure, mass, and fascinating facts.',
+      'safetyNote':
+          'No virtual hazards detected. Safe for all aspiring chemists!',
+      'relatedConcepts': [
+        'Atomic Number',
+        'Atomic Mass',
+        'Protons, Neutrons, Electrons',
+        'Chemical Symbols',
+      ],
+      'requiredMaterials': [
+        'Periodic Table AR Marker',
+        'Curiosity',
+      ],
+      'thumbnailUrl':
+          'https://img.rocket.new/generatedImages/rocket_gen_img_1817773a0-1784320962469.png', // Reusing an image for now
+      'iconName': 'grid_on',
+      'tintColorValue': 0xFF1A1A3A,
+      'semanticLabel':
+          'An interactive AR grid representing the periodic table of elements',
+      'steps': [
+        {'bottleTag': 'Explore', 'instructionTitle': 'Explore the Elements', 'instructionDetail': 'Aim your camera at the periodic table marker and tap on any element to learn more about it!'},
+      ],
+    },
   ];
 
 final List<ArExperimentModel> dummyArExperiments = _experimentMaps
