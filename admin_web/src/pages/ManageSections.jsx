@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
-import { collection, query, onSnapshot, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Layers, Plus, Trash2, RefreshCcw, AlertTriangle } from 'lucide-react';
+import { Layers, Plus, Trash2, RefreshCcw, AlertTriangle, ArrowLeft } from 'lucide-react';
 
 export default function ManageSections() {
   const [activeTab, setActiveTab] = useState('active');
   const [gradeFilter, setGradeFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [sections, setSections] = useState([]);
   const [trashedSections, setTrashedSections] = useState([]);
+  
+  const [activeSection, setActiveSection] = useState(null);
+  const [sectionUsers, setSectionUsers] = useState([]);
   
   const [showAddModal, setShowAddModal] = useState(false);
   const [newSectionName, setNewSectionName] = useState('');
@@ -45,6 +49,25 @@ export default function ManageSections() {
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!activeSection) return;
+    const q = query(
+      collection(db, 'users'),
+      where('sections', 'array-contains', activeSection.name)
+    );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const usersData = [];
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.role !== 'admin' && data.role !== 'teacher' && data.status === 'approved') {
+          usersData.push({ id: doc.id, ...data });
+        }
+      });
+      setSectionUsers(usersData);
+    });
+    return () => unsubscribe();
+  }, [activeSection]);
 
   const handleAddSection = async (e) => {
     e.preventDefault();
@@ -105,15 +128,20 @@ export default function ManageSections() {
   };
 
   const currentList = activeTab === 'active' ? sections : trashedSections;
+  const filteredList = currentList.filter(s => {
+    const matchesGrade = gradeFilter === 'all' || s.grade === gradeFilter;
+    const matchesSearch = (s.name || '').toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesGrade && matchesSearch;
+  });
 
   return (
     <div className="animate-fade-in">
       <div className="page-header">
         <div>
-          <h1>Manage Sections</h1>
-          <p>Create and remove school sections.</p>
+          <h1>{activeSection ? `Section: ${(activeSection.name || '').replace(/^\\d+-\\s*/, '')}` : 'Manage Sections'}</h1>
+          <p>{activeSection ? 'View students in this section.' : 'Create and remove school sections.'}</p>
         </div>
-        {activeTab === 'active' && (
+        {!activeSection && activeTab === 'active' && (
           <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
             <Plus size={20} /> Add Section
           </button>
@@ -121,8 +149,47 @@ export default function ManageSections() {
       </div>
 
       <div className="glass-panel" style={{ padding: '24px' }}>
-        <div className="flex-mobile-col" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid var(--border-light)', gap: '16px' }}>
-          <div className="tabs" style={{ borderBottom: 'none', marginBottom: 0, display: 'flex', justifyContent: 'center', width: '100%', paddingBottom: '4px' }}>
+        {activeSection ? (
+          <div>
+            <button 
+              className="btn btn-secondary" 
+              onClick={() => setActiveSection(null)}
+              style={{ marginBottom: '24px' }}
+            >
+              <ArrowLeft size={18} /> Back to Sections
+            </button>
+            
+            {sectionUsers.length === 0 ? (
+              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                No students found in this section.
+              </div>
+            ) : (
+              <div style={{ overflowX: 'auto' }}>
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Student Number</th>
+                      <th>Email</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sectionUsers.map(user => (
+                      <tr key={user.id}>
+                        <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{user.name || 'No Name'}</td>
+                        <td style={{ color: 'var(--text-secondary)' }}>{user.studentNumber ? `#${user.studentNumber}` : '-'}</td>
+                        <td>{user.email}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="flex-mobile-col" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid var(--border-light)', gap: '16px', flexWrap: 'wrap' }}>
+              <div className="tabs" style={{ borderBottom: 'none', marginBottom: 0, display: 'flex', justifyContent: 'flex-start', flex: 1, paddingBottom: '4px' }}>
             <button 
               className={`tab ${activeTab === 'active' ? 'active' : ''}`}
               onClick={() => setActiveTab('active')}
@@ -139,25 +206,35 @@ export default function ManageSections() {
             </button>
           </div>
           
-          <select 
-            className="input-field mobile-w-full" 
-            style={{ width: '200px', padding: '8px 12px' }}
-            value={gradeFilter}
-            onChange={(e) => setGradeFilter(e.target.value)}
-          >
-            <option value="all">All Grades</option>
-            <option value="Grade 9">Grade 9</option>
-            <option value="Grade 10">Grade 10</option>
-          </select>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <input 
+              type="text"
+              placeholder="Search sections..."
+              className="input-field"
+              style={{ width: '200px', padding: '8px 12px', marginBottom: 0 }}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <select 
+              className="input-field mobile-w-full" 
+              style={{ width: '140px', padding: '8px 12px', marginBottom: 0 }}
+              value={gradeFilter}
+              onChange={(e) => setGradeFilter(e.target.value)}
+            >
+              <option value="all">All Grades</option>
+              <option value="Grade 9">Grade 9</option>
+              <option value="Grade 10">Grade 10</option>
+            </select>
+          </div>
         </div>
 
-        {currentList.filter(s => gradeFilter === 'all' || s.grade === gradeFilter).length === 0 ? (
+        {filteredList.length === 0 ? (
           <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-            {activeTab === 'active' ? 'No sections created yet in this view.' : 'Trash is empty.'}
+            {activeTab === 'active' ? 'No sections found.' : 'Trash is empty.'}
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
-            {currentList.filter(s => gradeFilter === 'all' || s.grade === gradeFilter).map(section => (
+            {filteredList.map(section => (
               <div key={section.id} style={{ 
                 background: 'rgba(0,0,0,0.2)', 
                 border: '1px solid var(--border-light)',
@@ -166,15 +243,28 @@ export default function ManageSections() {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                opacity: activeTab === 'trash' ? 0.7 : 1
-              }}>
+                opacity: activeTab === 'trash' ? 0.7 : 1,
+                cursor: activeTab === 'active' ? 'pointer' : 'default',
+                transition: 'all 0.2s',
+                boxShadow: 'var(--shadow-sm)'
+              }}
+              onClick={() => {
+                if (activeTab === 'active') setActiveSection(section);
+              }}
+              onMouseOver={(e) => {
+                if (activeTab === 'active') e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseOut={(e) => {
+                if (activeTab === 'active') e.currentTarget.style.transform = 'translateY(0)';
+              }}
+              >
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                   <div style={{ background: activeTab === 'trash' ? 'rgba(255,255,255,0.1)' : 'var(--accent-purple)', padding: '10px', borderRadius: '10px' }}>
                     <Layers size={20} color="white" />
                   </div>
                   <div>
                     <h4 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-primary)', textDecoration: activeTab === 'trash' ? 'line-through' : 'none' }}>
-                      {section.name}
+                      {(section.name || '').replace(/^\\d+-\\s*/, '')}
                     </h4>
                     <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{section.grade}</span>
                   </div>
@@ -184,7 +274,10 @@ export default function ManageSections() {
                   <button 
                     className="btn btn-danger" 
                     style={{ padding: '8px' }}
-                    onClick={() => setDeleteConfirm(section)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteConfirm(section);
+                    }}
                     title="Move to Trash"
                   >
                     <Trash2 size={16} />
@@ -213,6 +306,8 @@ export default function ManageSections() {
             ))}
           </div>
         )}
+        </>
+        )}
       </div>
 
       {/* Add Section Modal */}
@@ -228,17 +323,6 @@ export default function ManageSections() {
             <h2 style={{ marginBottom: '24px' }}>Add New Section</h2>
             <form onSubmit={handleAddSection}>
               <div className="input-group">
-                <label className="input-label">Section Name</label>
-                <input 
-                  className="input-field"
-                  value={newSectionName}
-                  onChange={(e) => setNewSectionName(e.target.value)}
-                  placeholder="e.g. 9-Rizal"
-                  autoFocus
-                  required
-                />
-              </div>
-              <div className="input-group" style={{ marginBottom: '32px' }}>
                 <label className="input-label">Grade Level</label>
                 <select 
                   className="input-field" 
@@ -248,6 +332,17 @@ export default function ManageSections() {
                   <option value="Grade 9">Grade 9</option>
                   <option value="Grade 10">Grade 10</option>
                 </select>
+              </div>
+              <div className="input-group" style={{ marginBottom: '32px' }}>
+                <label className="input-label">Section Name</label>
+                <input 
+                  className="input-field"
+                  value={newSectionName}
+                  onChange={(e) => setNewSectionName(e.target.value)}
+                  placeholder="e.g. Einstein"
+                  autoFocus
+                  required
+                />
               </div>
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
                 <button type="button" className="btn btn-secondary" onClick={() => setShowAddModal(false)}>Cancel</button>

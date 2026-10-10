@@ -11,7 +11,10 @@ import {
   Menu,
   X,
   Sun,
-  Moon
+  Moon,
+  Activity,
+  Shield,
+  QrCode
 } from 'lucide-react';
 
 export default function Layout() {
@@ -109,6 +112,33 @@ export default function Layout() {
           >
             <Box size={20} />
             AR Labs
+          </NavLink>
+
+          <NavLink 
+            to="/ar-marker" 
+            onClick={closeMenu}
+            className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+          >
+            <QrCode size={20} />
+            AR Marker
+          </NavLink>
+          
+          <NavLink 
+            to="/activity-logs" 
+            onClick={closeMenu}
+            className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+          >
+            <Activity size={20} />
+            Activity Logs
+          </NavLink>
+
+          <NavLink 
+            to="/legal" 
+            onClick={closeMenu}
+            className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+          >
+            <Shield size={20} />
+            Legal
           </NavLink>
           
           <div 

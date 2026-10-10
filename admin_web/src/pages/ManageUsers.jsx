@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, query, where, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, updateDoc, deleteDoc, getDocs } from 'firebase/firestore';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { db, auth } from '../firebase';
 import { CheckCircle, XCircle, Key, RefreshCcw, Trash2, AlertTriangle, Search, Edit } from 'lucide-react';
@@ -9,6 +9,7 @@ export default function ManageUsers() {
   const [roleFilter, setRoleFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [users, setUsers] = useState([]);
+  const [sectionsMap, setSectionsMap] = useState({});
   
   const [deleteConfirm, setDeleteConfirm] = useState(null); // User to reject
   const [recoverConfirm, setRecoverConfirm] = useState(null); // User to recover
@@ -34,6 +35,25 @@ export default function ManageUsers() {
 
     return () => unsubscribe();
   }, [activeTab]);
+
+  useEffect(() => {
+    const fetchSections = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, 'sections'));
+        const map = {};
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          if (data.name && data.grade) {
+            map[data.name] = data.grade;
+          }
+        });
+        setSectionsMap(map);
+      } catch (e) {
+        console.error('Error fetching sections map:', e);
+      }
+    };
+    fetchSections();
+  }, []);
 
   const handleApprove = async (id, currentRole) => {
     try {
@@ -181,6 +201,7 @@ export default function ManageUsers() {
                   <th>Student Number</th>
                   <th>Email</th>
                   <th>Role</th>
+                  <th>Grade Level</th>
                   <th>Sections</th>
                   <th style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
@@ -216,7 +237,16 @@ export default function ManageUsers() {
                     <td style={{ textDecoration: activeTab === 'rejected' ? 'line-through' : 'none' }}>{user.email}</td>
                     <td>
                       <span className="badge badge-role">
-                        {user.role || 'Unknown'}
+                        {user.role === 'teacher' ? 'Teacher' : 'Student'}
+                      </span>
+                    </td>
+                    <td>
+                      <span style={{ color: 'var(--text-secondary)' }}>
+                        {user.role === 'grade9' ? 'Grade 9' 
+                          : user.role === 'grade10' ? 'Grade 10' 
+                          : user.role === 'teacher' && user.sections?.length > 0
+                            ? [...new Set(user.sections.map(s => sectionsMap[s]))].filter(Boolean).join(', ') || '-'
+                          : '-'}
                       </span>
                     </td>
                     <td>{user.sections?.join(', ') || '-'}</td>

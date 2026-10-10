@@ -1,13 +1,26 @@
 import { useState, useEffect } from 'react';
-import { collection, query, onSnapshot, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, setDoc, deleteDoc, getDocs, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { BookOpen, FileText, HelpCircle, Trash2, AlertTriangle, Search } from 'lucide-react';
 
 export default function TeacherUploads() {
   const [courses, setCourses] = useState([]);
-  const [activeTeacherName, setActiveTeacherName] = useState(null);
+  const [activeTeacherId, setActiveTeacherId] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [teacherEmails, setTeacherEmails] = useState({});
+
+  useEffect(() => {
+    const q = query(collection(db, 'users'), where('role', '==', 'teacher'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const emails = {};
+      snapshot.forEach(doc => {
+        emails[doc.id] = doc.data().email;
+      });
+      setTeacherEmails(emails);
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const q = query(collection(db, 'courses'));
@@ -19,15 +32,15 @@ export default function TeacherUploads() {
       });
       setCourses(data);
       if (data.length > 0) {
-        const uniqueTeachers = Array.from(new Set(data.map(c => c.teacherName)));
-        setActiveTeacherName(prev => {
-           if (!prev || !uniqueTeachers.includes(prev)) {
-               return uniqueTeachers[0];
+        const uniqueIds = Array.from(new Set(data.map(c => c.teacherUid || c.teacherName)));
+        setActiveTeacherId(prev => {
+           if (!prev || !uniqueIds.includes(prev)) {
+               return uniqueIds[0];
            }
            return prev;
         });
       } else {
-        setActiveTeacherName(null);
+        setActiveTeacherId(null);
       }
     });
 
@@ -35,16 +48,28 @@ export default function TeacherUploads() {
   }, []);
 
   // Derived state
-  const teachers = Array.from(new Set(courses.map(c => c.teacherName)))
-    .filter(name => name.toLowerCase().includes(searchQuery.toLowerCase()))
-    .map(name => {
-      return {
-        name,
-        courses: courses.filter(c => c.teacherName === name)
-      };
+  const uniqueTeacherIds = Array.from(new Set(courses.map(c => c.teacherUid || c.teacherName)));
+  const teachers = uniqueTeacherIds.map(uid => {
+    const teacherCourses = courses.filter(c => (c.teacherUid || c.teacherName) === uid);
+    // Find the latest name by sorting by createdAt if possible, or just use the last one in the list
+    const sorted = [...teacherCourses].sort((a, b) => {
+       const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+       const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+       return timeA - timeB;
     });
+    const latestName = sorted[sorted.length - 1]?.teacherName || uid;
+    
+    return {
+      id: uid,
+      name: latestName,
+      email: teacherEmails[uid] || '',
+      courses: teacherCourses
+    };
+  }).filter(t => (t.name || '').toLowerCase().includes(searchQuery.toLowerCase()));
   
-  const activeTeacherCourses = courses.filter(c => c.teacherName === activeTeacherName);
+  const activeTeacherCourses = courses.filter(c => (c.teacherUid || c.teacherName) === activeTeacherId);
+  const activeTeacherInfo = teachers.find(t => t.id === activeTeacherId) || {};
+  const displayActiveTeacherName = activeTeacherInfo.name || 'Teacher';
 
   const handleDeleteCourse = (courseId, title) => {
     setDeleteConfirm({ type: 'course', id: courseId, name: title });
@@ -119,19 +144,24 @@ export default function TeacherUploads() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {teachers.map(teacher => (
                 <div 
-                  key={teacher.name}
-                  onClick={() => setActiveTeacherName(teacher.name)}
+                  key={teacher.id}
+                  onClick={() => setActiveTeacherId(teacher.id)}
                   style={{
                     padding: '16px',
                     borderRadius: '12px',
                     cursor: 'pointer',
-                    background: activeTeacherName === teacher.name ? 'rgba(0, 212, 255, 0.1)' : 'rgba(0,0,0,0.2)',
+                    background: activeTeacherId === teacher.id ? 'rgba(0, 212, 255, 0.1)' : 'rgba(0,0,0,0.2)',
                     border: '1px solid',
-                    borderColor: activeTeacherName === teacher.name ? 'var(--accent-cyan)' : 'var(--border-light)',
+                    borderColor: activeTeacherId === teacher.id ? 'var(--accent-cyan)' : 'var(--border-light)',
                     transition: 'all 0.2s ease'
                   }}
                 >
                   <h4 style={{ color: 'var(--text-primary)', marginBottom: '4px', fontSize: '1rem' }}>{teacher.name}</h4>
+                  {teacher.email && (
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                      {teacher.email}
+                    </div>
+                  )}
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                     <span>{teacher.courses.length} {teacher.courses.length === 1 ? 'Topic' : 'Topics'}</span>
                   </div>
@@ -143,10 +173,10 @@ export default function TeacherUploads() {
       </div>
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        {activeTeacherName && activeTeacherCourses.length > 0 ? (
+        {activeTeacherId && activeTeacherCourses.length > 0 ? (
           <div className="glass-panel animate-fade-in" style={{ flex: 1, padding: '32px', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
             <h2 style={{ fontSize: '2rem', marginBottom: '32px', borderBottom: '1px solid var(--border-light)', paddingBottom: '16px' }}>
-              {activeTeacherName}'s Uploads
+              {displayActiveTeacherName}'s Uploads
             </h2>
             
             {activeTeacherCourses.map((course, index) => (

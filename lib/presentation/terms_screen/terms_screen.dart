@@ -70,10 +70,10 @@ class TermsScreen extends StatelessWidget {
                         _buildSectionTitle(theme, '4. Device & Environment Requirements'),
                         _buildSectionContent(theme, 'To ensure the app functions correctly, please ensure your device meets the minimum hardware requirements (Android, ARCore/Vuforia compatible). The app requires a well-lit environment to detect markers accurately. Poor lighting or reflective surfaces may affect performance.'),
                         
-                        _buildSectionTitle(theme, '5. Data Privacy (Offline Storage)'),
-                        _buildSectionContent(theme, 'SciLab AR operates as an offline application. All user data, including names, progress logs, and experiment records, are stored locally on your device.'),
-                        _buildBulletPoint(theme, 'We do not collect, transmit, or store your personal information on external servers.'),
-                        _buildBulletPoint(theme, 'You are responsible for your device\'s security. Uninstalling the app may result in the permanent loss of your saved progress.'),
+                        _buildSectionTitle(theme, '5. Data Privacy and Storage'),
+                        _buildSectionContent(theme, 'SciLab AR utilizes cloud services to sync your progress. Your data, including names, progress logs, and experiment records, are stored securely on our cloud servers.'),
+                        _buildBulletPoint(theme, 'We collect and transmit your data to our secure external servers solely for the purpose of providing you with educational content and activity logs across devices.'),
+                        _buildBulletPoint(theme, 'Your progress is saved to your account in the cloud, allowing you to access it securely anytime.'),
                         
                         _buildSectionTitle(theme, '6. Intellectual Property & Copyright'),
                         _buildSectionContent(theme, 'All content included in this application, such as text, graphics, logos, 3D models, animations, user interfaces, and software code, is the property of the developers and Cavite State University - Bacoor City Campus or its content suppliers and is protected by copyright laws.'),
