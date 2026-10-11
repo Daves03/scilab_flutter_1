@@ -67,6 +67,7 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
         quizId: _activeQuiz!.id,
         quizTitle: _activeQuiz!.title,
         studentId: user.id,
+        studentName: user.name,
         selectedAnswers: _activeQuiz!.questions.map((q) => _selectedAnswers[q.id] ?? -1).toList(),
         score: score,
         totalQuestions: _activeQuiz!.questions.length,

@@ -1,9 +1,7 @@
-import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import '../../core/app_export.dart';
 import '../../services/auth_service.dart';
-import '../../widgets/custom_icon_widget.dart';
 import '../../models/course_model.dart';
 import '../../models/user_model.dart';
 
@@ -169,91 +167,94 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: _loading 
-        ? const Center(child: CircularProgressIndicator(color: Color(0xFF00D4FF)))
-        : CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: _buildHeader()),
-          SliverToBoxAdapter(
-            child: _buildAnimatedSection(
-              delay: 0,
-              child: _buildOverviewCards(),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: _buildAnimatedSection(
-              delay: 100,
-              child: _buildSectionHeader('Quiz Results', 'quiz'),
-            ),
-          ),
-          _quizzes.isEmpty
-              ? SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Center(
-                      child: Text('No quizzes completed yet.', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600)),
+      body: SafeArea(
+        bottom: false,
+        child: _loading
+            ? const Center(child: CircularProgressIndicator(color: Color(0xFF00D4FF)))
+            : CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(child: _buildHeader()),
+                  SliverToBoxAdapter(
+                    child: _buildAnimatedSection(
+                      delay: 0,
+                      child: _buildOverviewCards(),
                     ),
                   ),
-                )
-              : SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) => _buildAnimatedSection(
-                      delay: 200 + (index * 50),
-                      child: _buildQuizCard(_quizzes[index]),
-                    ),
-                    childCount: _quizzes.length,
-                  ),
-                ),
-          SliverToBoxAdapter(
-            child: _buildAnimatedSection(
-              delay: 250,
-              child: _buildSectionHeader('Missed Quizzes', 'warning', color: const Color(0xFFFF4757)),
-            ),
-          ),
-          _missedQuizzes.isEmpty
-              ? SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Center(
-                      child: Text('No missed quizzes.', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600)),
+                  SliverToBoxAdapter(
+                    child: _buildAnimatedSection(
+                      delay: 100,
+                      child: _buildSectionHeader('Quiz Results', 'quiz'),
                     ),
                   ),
-                )
-              : SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) => _buildAnimatedSection(
-                      delay: 300 + (index * 50),
-                      child: _buildMissedQuizCard(_missedQuizzes[index]),
+                  _quizzes.isEmpty
+                      ? SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Center(
+                              child: Text('No quizzes completed yet.', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600)),
+                            ),
+                          ),
+                        )
+                      : SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => _buildAnimatedSection(
+                              delay: 200 + (index * 50),
+                              child: _buildQuizCard(_quizzes[index]),
+                            ),
+                            childCount: _quizzes.length,
+                          ),
+                        ),
+                  SliverToBoxAdapter(
+                    child: _buildAnimatedSection(
+                      delay: 250,
+                      child: _buildSectionHeader('Missed Quizzes', 'warning', color: const Color(0xFFFF4757)),
                     ),
-                    childCount: _missedQuizzes.length,
                   ),
-                ),
-          SliverToBoxAdapter(
-            child: _buildAnimatedSection(
-              delay: 300,
-              child: _buildSectionHeader('AR Experiments', 'science'),
-            ),
-          ),
-          _arExperiments.isEmpty
-              ? SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Center(
-                      child: Text('No AR experiments completed yet.', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600)),
+                  _missedQuizzes.isEmpty
+                      ? SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Center(
+                              child: Text('No missed quizzes.', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600)),
+                            ),
+                          ),
+                        )
+                      : SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => _buildAnimatedSection(
+                              delay: 300 + (index * 50),
+                              child: _buildMissedQuizCard(_missedQuizzes[index]),
+                            ),
+                            childCount: _missedQuizzes.length,
+                          ),
+                        ),
+                  SliverToBoxAdapter(
+                    child: _buildAnimatedSection(
+                      delay: 300,
+                      child: _buildSectionHeader('AR Experiments', 'science'),
                     ),
                   ),
-                )
-              : SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) => _buildAnimatedSection(
-                      delay: 400 + (index * 50),
-                      child: _buildArExperimentCard(_arExperiments[index]),
-                    ),
-                    childCount: _arExperiments.length,
-                  ),
-                ),
-          const SliverToBoxAdapter(child: SizedBox(height: 140)),
-        ],
+                  _arExperiments.isEmpty
+                      ? SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Center(
+                              child: Text('No AR experiments completed yet.', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600)),
+                            ),
+                          ),
+                        )
+                      : SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => _buildAnimatedSection(
+                              delay: 400 + (index * 50),
+                              child: _buildArExperimentCard(_arExperiments[index]),
+                            ),
+                            childCount: _arExperiments.length,
+                          ),
+                        ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 140)),
+                ],
+              ),
       ),
     );
   }

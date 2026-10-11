@@ -263,6 +263,7 @@ class QuizAttempt {
   final String quizId;
   final String quizTitle;
   final String studentId;
+  final String? studentName;
   final List<int> selectedAnswers;
   final int score;
   final int totalQuestions;
@@ -274,6 +275,7 @@ class QuizAttempt {
     required this.quizId,
     required this.quizTitle,
     required this.studentId,
+    this.studentName,
     required this.selectedAnswers,
     required this.score,
     required this.totalQuestions,
@@ -288,6 +290,7 @@ class QuizAttempt {
       quizId: (data['quizId'] as String?) ?? '',
       quizTitle: (data['quizTitle'] as String?) ?? '',
       studentId: (data['studentId'] as String?) ?? '',
+      studentName: data['studentName'] as String?,
       selectedAnswers: List<int>.from(data['selectedAnswers'] ?? const []),
       score: (data['score'] as num?)?.toInt() ?? 0,
       totalQuestions: (data['totalQuestions'] as num?)?.toInt() ?? 0,
@@ -300,6 +303,7 @@ class QuizAttempt {
         'quizId': quizId,
         'quizTitle': quizTitle,
         'studentId': studentId,
+        if (studentName != null) 'studentName': studentName,
         'selectedAnswers': selectedAnswers,
         'score': score,
         'totalQuestions': totalQuestions,

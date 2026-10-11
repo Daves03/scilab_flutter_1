@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { collection, query, where, onSnapshot, doc, setDoc, deleteDoc, getDocs, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { BookOpen, FileText, HelpCircle, Trash2, AlertTriangle, Search } from 'lucide-react';
+import { BookOpen, FileText, HelpCircle, Trash2, AlertTriangle, Search, Clock } from 'lucide-react';
 
 export default function TeacherUploads() {
   const [courses, setCourses] = useState([]);
@@ -9,6 +9,33 @@ export default function TeacherUploads() {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [teacherEmails, setTeacherEmails] = useState({});
+
+  const formatDateTime = (ts) => {
+    if (!ts) return null;
+    let date = null;
+    try {
+      if (ts.toDate && typeof ts.toDate === 'function') {
+        date = ts.toDate();
+      } else if (ts.toMillis && typeof ts.toMillis === 'function') {
+        date = new Date(ts.toMillis());
+      } else if (ts instanceof Date) {
+        date = ts;
+      } else {
+        date = new Date(ts);
+      }
+    } catch {
+      return null;
+    }
+    if (!date || isNaN(date.getTime())) return null;
+    return date.toLocaleString();
+  };
+
+  const getCourseDate = (course) => {
+    if (course.createdAt) return formatDateTime(course.createdAt);
+    if (course.modules?.length && course.modules[0]?.uploadedAt) return formatDateTime(course.modules[0].uploadedAt);
+    if (course.quizzes?.length && course.quizzes[0]?.createdAt) return formatDateTime(course.quizzes[0].createdAt);
+    return null;
+  };
 
   useEffect(() => {
     const q = query(collection(db, 'users'), where('role', '==', 'teacher'));
@@ -194,6 +221,15 @@ export default function TeacherUploads() {
                   </span>
                   <span className="badge" style={{ background: 'rgba(255,255,255,0.1)', fontSize: '0.9rem', padding: '6px 12px', color: 'var(--accent-purple)' }}>Subject: {course.subject}</span>
                   <span className="badge" style={{ background: 'rgba(255,255,255,0.1)', fontSize: '0.9rem', padding: '6px 12px', color: 'var(--accent-cyan)' }}>Section: {course.sections?.join(', ')}</span>
+                  {(() => {
+                    const createdDate = getCourseDate(course);
+                    return createdDate ? (
+                      <span className="badge" style={{ background: 'rgba(255,255,255,0.1)', fontSize: '0.9rem', padding: '6px 12px', color: 'var(--accent-orange)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                        <Clock size={14} />
+                        Created: {createdDate}
+                      </span>
+                    ) : null;
+                  })()}
                 </div>
 
                 <h3 style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>

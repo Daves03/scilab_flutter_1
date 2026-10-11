@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, query, where, onSnapshot, doc, updateDoc, deleteDoc, getDocs } from 'firebase/firestore';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { db, auth } from '../firebase';
-import { CheckCircle, XCircle, Key, RefreshCcw, Trash2, AlertTriangle, Search, Edit } from 'lucide-react';
+import { CheckCircle, XCircle, Key, RefreshCcw, Trash2, AlertTriangle, Search, Edit, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function ManageUsers() {
   const [activeTab, setActiveTab] = useState('pending'); // 'pending' | 'approved' | 'rejected'
@@ -10,6 +10,12 @@ export default function ManageUsers() {
   const [searchQuery, setSearchQuery] = useState('');
   const [users, setUsers] = useState([]);
   const [sectionsMap, setSectionsMap] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, roleFilter, searchQuery]);
   
   const [deleteConfirm, setDeleteConfirm] = useState(null); // User to reject
   const [recoverConfirm, setRecoverConfirm] = useState(null); // User to recover
@@ -188,111 +194,186 @@ export default function ManageUsers() {
           </div>
         </div>
 
-        {users.length === 0 ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-            {activeTab === 'rejected' ? 'No rejected users.' : 'No users found in this category.'}
-          </div>
-        ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Student Number</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Grade Level</th>
-                  <th>Sections</th>
-                  <th style={{ textAlign: 'right' }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.filter(u => {
-                  // Filter by role
-                  let roleMatch = true;
-                  if (roleFilter === 'teacher') roleMatch = u.role === 'teacher';
-                  else if (roleFilter === 'student') roleMatch = u.role !== 'teacher' && u.role !== 'admin';
-                  
-                  // Filter by search query
-                  let searchMatch = true;
-                  if (searchQuery.trim()) {
-                    const q = searchQuery.toLowerCase();
-                    const name = (u.name || '').toLowerCase();
-                    const email = (u.email || '').toLowerCase();
-                    const studentNum = (u.studentNumber || '').toLowerCase();
-                    searchMatch = name.includes(q) || email.includes(q) || studentNum.includes(q);
-                  }
-                  
-                  return roleMatch && searchMatch;
-                }).map(user => (
-                  <tr key={user.id} style={{ opacity: activeTab === 'rejected' ? 0.6 : 1 }}>
-                    <td>
-                      <div style={{ fontWeight: 600, color: 'var(--text-primary)', textDecoration: activeTab === 'rejected' ? 'line-through' : 'none' }}>
-                        {user.name || 'No Name'}
-                      </div>
-                    </td>
-                    <td style={{ textDecoration: activeTab === 'rejected' ? 'line-through' : 'none', color: 'var(--text-secondary)' }}>
-                      {user.studentNumber ? `#${user.studentNumber}` : '-'}
-                    </td>
-                    <td style={{ textDecoration: activeTab === 'rejected' ? 'line-through' : 'none' }}>{user.email}</td>
-                    <td>
-                      <span className="badge badge-role">
-                        {user.role === 'teacher' ? 'Teacher' : 'Student'}
-                      </span>
-                    </td>
-                    <td>
-                      <span style={{ color: 'var(--text-secondary)' }}>
-                        {user.role === 'grade9' ? 'Grade 9' 
-                          : user.role === 'grade10' ? 'Grade 10' 
-                          : user.role === 'teacher' && user.sections?.length > 0
-                            ? [...new Set(user.sections.map(s => sectionsMap[s]))].filter(Boolean).join(', ') || '-'
-                          : '-'}
-                      </span>
-                    </td>
-                    <td>{user.sections?.join(', ') || '-'}</td>
-                    <td style={{ textAlign: 'right' }}>
-                      
-                      {activeTab === 'pending' && (
-                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                          <button className="btn btn-success" onClick={() => handleApprove(user.id, user.role)} title="Approve">
-                            <CheckCircle size={16} />
-                          </button>
-                          <button className="btn btn-danger" onClick={() => setDeleteConfirm(user)} title="Reject">
-                            <XCircle size={16} />
-                          </button>
-                        </div>
-                      )}
+        {(() => {
+          const filteredUsers = users.filter(u => {
+            // Filter by role
+            let roleMatch = true;
+            if (roleFilter === 'teacher') roleMatch = u.role === 'teacher';
+            else if (roleFilter === 'student') roleMatch = u.role !== 'teacher' && u.role !== 'admin';
+            
+            // Filter by search query
+            let searchMatch = true;
+            if (searchQuery.trim()) {
+              const q = searchQuery.toLowerCase();
+              const name = (u.name || '').toLowerCase();
+              const email = (u.email || '').toLowerCase();
+              const studentNum = (u.studentNumber || '').toLowerCase();
+              searchMatch = name.includes(q) || email.includes(q) || studentNum.includes(q);
+            }
+            
+            return roleMatch && searchMatch;
+          });
 
-                      {activeTab === 'approved' && (
-                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                          <button className="btn btn-secondary" onClick={() => handleOpenEdit(user)} title="Edit User">
-                            <Edit size={16} /> Edit
-                          </button>
-                          <button className="btn btn-secondary" onClick={() => setResetConfirm(user)} title="Reset Password">
-                            <Key size={16} /> Reset
-                          </button>
-                          {user.role !== 'admin' && (
-                            <button className="btn btn-danger" onClick={() => setDeleteConfirm(user)} title="Revoke">
-                              <XCircle size={16} />
-                            </button>
+          const totalPages = Math.max(1, Math.ceil(filteredUsers.length / itemsPerPage));
+          const startIndex = (currentPage - 1) * itemsPerPage;
+          const paginatedUsers = filteredUsers.slice(startIndex, startIndex + itemsPerPage);
+
+          if (users.length === 0) {
+            return (
+              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                {activeTab === 'rejected' ? 'No rejected users.' : 'No users found in this category.'}
+              </div>
+            );
+          }
+
+          if (filteredUsers.length === 0) {
+            return (
+              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                No users match your filters.
+              </div>
+            );
+          }
+
+          return (
+            <>
+              <div style={{ overflowX: 'auto' }}>
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Student Number</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                      <th>Grade Level</th>
+                      <th>Sections</th>
+                      <th style={{ textAlign: 'right' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginatedUsers.map(user => (
+                      <tr key={user.id} style={{ opacity: activeTab === 'rejected' ? 0.6 : 1 }}>
+                        <td>
+                          <div style={{ fontWeight: 600, color: 'var(--text-primary)', textDecoration: activeTab === 'rejected' ? 'line-through' : 'none' }}>
+                            {user.name || 'No Name'}
+                          </div>
+                        </td>
+                        <td style={{ textDecoration: activeTab === 'rejected' ? 'line-through' : 'none', color: 'var(--text-secondary)' }}>
+                          {user.studentNumber ? `#${user.studentNumber}` : '-'}
+                        </td>
+                        <td style={{ textDecoration: activeTab === 'rejected' ? 'line-through' : 'none' }}>{user.email}</td>
+                        <td>
+                          <span className="badge badge-role">
+                            {user.role === 'teacher' ? 'Teacher' : 'Student'}
+                          </span>
+                        </td>
+                        <td>
+                          <span style={{ color: 'var(--text-secondary)' }}>
+                            {user.role === 'grade9' ? 'Grade 9' 
+                              : user.role === 'grade10' ? 'Grade 10' 
+                              : user.role === 'teacher' && user.sections?.length > 0
+                                ? [...new Set(user.sections.map(s => sectionsMap[s]))].filter(Boolean).join(', ') || '-'
+                              : '-'}
+                          </span>
+                        </td>
+                        <td>{user.sections?.join(', ') || '-'}</td>
+                        <td style={{ textAlign: 'right' }}>
+                          
+                          {activeTab === 'pending' && (
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                              <button className="btn btn-success" onClick={() => handleApprove(user.id, user.role)} title="Approve">
+                                <CheckCircle size={16} />
+                              </button>
+                              <button className="btn btn-danger" onClick={() => setDeleteConfirm(user)} title="Reject">
+                                <XCircle size={16} />
+                              </button>
+                            </div>
                           )}
-                        </div>
-                      )}
 
-                      {activeTab === 'rejected' && (
-                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                          <button className="btn btn-success" onClick={() => setRecoverConfirm(user)} title="Recover User">
-                            <RefreshCcw size={16} />
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                          {activeTab === 'approved' && (
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                              <button className="btn btn-secondary" onClick={() => handleOpenEdit(user)} title="Edit User">
+                                <Edit size={16} /> Edit
+                              </button>
+                              <button className="btn btn-secondary" onClick={() => setResetConfirm(user)} title="Reset Password">
+                                <Key size={16} /> Reset
+                              </button>
+                              {user.role !== 'admin' && (
+                                <button className="btn btn-danger" onClick={() => setDeleteConfirm(user)} title="Revoke">
+                                  <XCircle size={16} />
+                                </button>
+                              )}
+                            </div>
+                          )}
+
+                          {activeTab === 'rejected' && (
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                              <button className="btn btn-success" onClick={() => setRecoverConfirm(user)} title="Recover User">
+                                <RefreshCcw size={16} />
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {filteredUsers.length > 0 && (
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '20px',
+                  paddingTop: '16px',
+                  borderTop: '1px solid var(--border-light)',
+                  flexWrap: 'wrap',
+                  gap: '12px',
+                }}>
+                  <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                    Showing <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{startIndex + 1}</span> to <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{Math.min(startIndex + itemsPerPage, filteredUsers.length)}</span> of <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{filteredUsers.length}</span> users
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button
+                      className="btn btn-secondary"
+                      style={{
+                        padding: '8px 16px',
+                        fontSize: '0.85rem',
+                        opacity: currentPage === 1 ? 0.4 : 1,
+                        cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                      }}
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft size={16} />
+                      Previous
+                    </button>
+
+                    <span style={{ color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: 500, padding: '0 8px' }}>
+                      Page {currentPage} of {totalPages}
+                    </span>
+
+                    <button
+                      className="btn btn-secondary"
+                      style={{
+                        padding: '8px 16px',
+                        fontSize: '0.85rem',
+                        opacity: currentPage >= totalPages ? 0.4 : 1,
+                        cursor: currentPage >= totalPages ? 'not-allowed' : 'pointer',
+                      }}
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage >= totalPages}
+                    >
+                      Next
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          );
+        })()}
       </div>
 
       {/* Edit User Modal */}

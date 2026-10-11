@@ -83,6 +83,7 @@ class QuizAttempt {
   final String id;
   final String quizId;
   final String studentId;
+  final String? studentName;
   final List<int> selectedAnswers;
   final int score;
   final DateTime? submittedAt;
@@ -91,6 +92,7 @@ class QuizAttempt {
     required this.id,
     required this.quizId,
     required this.studentId,
+    this.studentName,
     required this.selectedAnswers,
     required this.score,
     this.submittedAt,
@@ -102,6 +104,7 @@ class QuizAttempt {
       id: id,
       quizId: (data['quizId'] as String?) ?? '',
       studentId: (data['studentId'] as String?) ?? '',
+      studentName: data['studentName'] as String?,
       selectedAnswers: List<int>.from(data['selectedAnswers'] ?? const []),
       score: (data['score'] as num?)?.toInt() ?? 0,
       submittedAt: ts is Timestamp ? ts.toDate() : null,
@@ -111,6 +114,7 @@ class QuizAttempt {
   Map<String, dynamic> toMap() => {
         'quizId': quizId,
         'studentId': studentId,
+        if (studentName != null) 'studentName': studentName,
         'selectedAnswers': selectedAnswers,
         'score': score,
         'submittedAt': FieldValue.serverTimestamp(),
