@@ -22083,7 +22083,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VolumeParameter_1_op_Explicit_m06E2D8024
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 104202
+// Method Definition Index: 104204
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuGenericList_1_get_NativeHandle_m6F15516897AA7E5F9008601AD32DE7637A3B5710_gshared (VuGenericList_1_t12481597D5714D7ABBE45EF1A56AA3E52BE3B050* __this, const RuntimeMethod* method) 
 {
 	{
@@ -22091,7 +22091,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuGenericList_1_get_NativeHandle_m6F
 		return L_0;
 	}
 }
-// Method Definition Index: 104203
+// Method Definition Index: 104205
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGenericList_1_get_Size_mF07A5664514F9100CE7C4457527BFE31734CE9FB_gshared (VuGenericList_1_t12481597D5714D7ABBE45EF1A56AA3E52BE3B050* __this, const RuntimeMethod* method) 
 {
 	int32_t V_0 = 0;
@@ -22118,7 +22118,7 @@ IL_0020:
 		return L_4;
 	}
 }
-// Method Definition Index: 104204
+// Method Definition Index: 104206
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericList_1_get_Item_mD84EB773F94059D349051739E66A6A2D4272112A_gshared (VuGenericList_1_t12481597D5714D7ABBE45EF1A56AA3E52BE3B050* __this, int32_t ___0_index, Il2CppFullySharedGenericAny* il2cppRetVal, const RuntimeMethod* method) 
 {
 	const uint32_t SizeOf_TElement_tCFD2D99EAC878716A4DFF5FB40F224D7DAFEE96D = il2cpp_codegen_sizeof(il2cpp_rgctx_data_no_init(method->klass->rgctx_data, 6));
@@ -22150,7 +22150,7 @@ IL_0021:
 		return;
 	}
 }
-// Method Definition Index: 104205
+// Method Definition Index: 104207
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericList_1__ctor_m490C1038CB5A8536CD79D397F7B39388F4F223CF_gshared (VuGenericList_1_t12481597D5714D7ABBE45EF1A56AA3E52BE3B050* __this, CreateListDelegate_t5FDA1A58111A3388E18F626DD2420078A4BF2439* ___0_createList, GetListSizeDelegate_tC3A4D8F283499AFEDEAC4FACD4ACE785A5CA2E27* ___1_getSize, GetListElementDelegate_t08FAFAB33D8174528713579DA299E6BEBAF26653* ___2_getElement, DeleteListDelegate_tE8EF04B6FD076EDA53ADA117B4FA3EA643AE1DCD* ___3_deleteList, const RuntimeMethod* method) 
 {
 	{
@@ -22185,7 +22185,7 @@ IL_001f:
 		return;
 	}
 }
-// Method Definition Index: 104206
+// Method Definition Index: 104208
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericList_1__ctor_m16C0E8C95C4F357DEA54230AB63C108BFFFDEA3B_gshared (VuGenericList_1_t12481597D5714D7ABBE45EF1A56AA3E52BE3B050* __this, intptr_t ___0_nativeHandle, GetListSizeDelegate_tC3A4D8F283499AFEDEAC4FACD4ACE785A5CA2E27* ___1_getSize, GetListElementDelegate_t08FAFAB33D8174528713579DA299E6BEBAF26653* ___2_getElement, const RuntimeMethod* method) 
 {
 	{
@@ -22201,7 +22201,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericList_1__ctor_m16C0E8C95C4F357DE
 		return;
 	}
 }
-// Method Definition Index: 104207
+// Method Definition Index: 104209
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericList_1_Finalize_mFFE5D36606DE9B0D8E2122FC7656FF3B1EAEE86F_gshared (VuGenericList_1_t12481597D5714D7ABBE45EF1A56AA3E52BE3B050* __this, const RuntimeMethod* method) 
 {
 	{
@@ -22231,7 +22231,7 @@ IL_0010:
 		return;
 	}
 }
-// Method Definition Index: 104208
+// Method Definition Index: 104210
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericList_1_Dispose_m4273894F7F0743D000D0001C3BE76DEB39D95740_gshared (VuGenericList_1_t12481597D5714D7ABBE45EF1A56AA3E52BE3B050* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -22247,7 +22247,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericList_1_Dispose_m4273894F7F0743D
 		return;
 	}
 }
-// Method Definition Index: 104209
+// Method Definition Index: 104211
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericList_1_Dispose_mF3B4FD449666327540018B9CF9BD39FF5F013D9E_gshared (VuGenericList_1_t12481597D5714D7ABBE45EF1A56AA3E52BE3B050* __this, bool ___0_disposing, const RuntimeMethod* method) 
 {
 	{
@@ -22293,7 +22293,7 @@ IL_002d:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 104017
+// Method Definition Index: 104019
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuGenericSet_1_get_NativeHandle_m6BD486107B23B4EF487DE040ED318345AE0E2935_gshared (VuGenericSet_1_tDFC70F6E5EF296C8184F07747991509115BB88B3* __this, const RuntimeMethod* method) 
 {
 	{
@@ -22301,7 +22301,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t VuGenericSet_1_get_NativeHandle_m6BD
 		return L_0;
 	}
 }
-// Method Definition Index: 104018
+// Method Definition Index: 104020
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t VuGenericSet_1_get_Size_mAC0DB7B572865C68E0ACE39E2CE1D73E5A78E855_gshared (VuGenericSet_1_tDFC70F6E5EF296C8184F07747991509115BB88B3* __this, const RuntimeMethod* method) 
 {
 	int32_t V_0 = 0;
@@ -22328,7 +22328,7 @@ IL_0020:
 		return L_4;
 	}
 }
-// Method Definition Index: 104019
+// Method Definition Index: 104021
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericSet_1_Add_m09A62C31E53CB51CDB1DFE8965111206FE5185DA_gshared (VuGenericSet_1_tDFC70F6E5EF296C8184F07747991509115BB88B3* __this, Il2CppFullySharedGenericAny ___0_element, const RuntimeMethod* method) 
 {
 	const uint32_t SizeOf_TElement_t1C376895C5FDDC2AD525DD7A65EE3F6F9561FECD = il2cpp_codegen_sizeof(il2cpp_rgctx_data_no_init(method->klass->rgctx_data, 4));
@@ -22361,7 +22361,7 @@ IL_002a:
 		return;
 	}
 }
-// Method Definition Index: 104020
+// Method Definition Index: 104022
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool VuGenericSet_1_HasElement_mC0226C1FF46B97648907221C4C34527911DCE722_gshared (VuGenericSet_1_tDFC70F6E5EF296C8184F07747991509115BB88B3* __this, Il2CppFullySharedGenericAny ___0_element, const RuntimeMethod* method) 
 {
 	const uint32_t SizeOf_TElement_t1C376895C5FDDC2AD525DD7A65EE3F6F9561FECD = il2cpp_codegen_sizeof(il2cpp_rgctx_data_no_init(method->klass->rgctx_data, 4));
@@ -22396,7 +22396,7 @@ IL_002c:
 		return (bool)((((int32_t)L_8) == ((int32_t)1))? 1 : 0);
 	}
 }
-// Method Definition Index: 104021
+// Method Definition Index: 104023
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericSet_1__ctor_mC5A2B1024DA1300A50B48BCC3E7FFECFC73331B5_gshared (VuGenericSet_1_tDFC70F6E5EF296C8184F07747991509115BB88B3* __this, CreateSetDelegate_tC753AAFA4365813A48CE575D4174E34952196965* ___0_createSet, GetSetSizeDelegate_tC7170993DA2AFC0AB9F81E30EECC7B6DD888E348* ___1_getSize, HasElementDelegate_tA40FFC41A7037254BFCA1C17C6DC3A5B823783A1* ___2_hasElement, AddElementDelegate_t0B736F8C92AD00C575EC3B3DD4B9046F30B1314C* ___3_addElement, DeleteSetDelegate_tDF74CBDC484BB9E04CD5942ADB095C8E420C9E78* ___4_deleteSet, const RuntimeMethod* method) 
 {
 	{
@@ -22434,7 +22434,7 @@ IL_001f:
 		return;
 	}
 }
-// Method Definition Index: 104022
+// Method Definition Index: 104024
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericSet_1__ctor_mCE9B02D1FB6C718D76383AED838E974834392AC1_gshared (VuGenericSet_1_tDFC70F6E5EF296C8184F07747991509115BB88B3* __this, intptr_t ___0_nativeHandle, GetSetSizeDelegate_tC7170993DA2AFC0AB9F81E30EECC7B6DD888E348* ___1_getSize, HasElementDelegate_tA40FFC41A7037254BFCA1C17C6DC3A5B823783A1* ___2_hasElement, AddElementDelegate_t0B736F8C92AD00C575EC3B3DD4B9046F30B1314C* ___3_addElement, const RuntimeMethod* method) 
 {
 	{
@@ -22453,7 +22453,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericSet_1__ctor_mCE9B02D1FB6C718D76
 		return;
 	}
 }
-// Method Definition Index: 104023
+// Method Definition Index: 104025
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericSet_1_Finalize_m2B6C4BC14251755C7CA3449930C073F5BBD2FC66_gshared (VuGenericSet_1_tDFC70F6E5EF296C8184F07747991509115BB88B3* __this, const RuntimeMethod* method) 
 {
 	{
@@ -22483,7 +22483,7 @@ IL_0010:
 		return;
 	}
 }
-// Method Definition Index: 104024
+// Method Definition Index: 104026
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericSet_1_Dispose_mD5350FD7731F79E483ED85BF7086D2A081086B98_gshared (VuGenericSet_1_tDFC70F6E5EF296C8184F07747991509115BB88B3* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -22499,7 +22499,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericSet_1_Dispose_mD5350FD7731F79E4
 		return;
 	}
 }
-// Method Definition Index: 104025
+// Method Definition Index: 104027
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericSet_1_Dispose_mBBDEB60018706D545F7E2A7F949364FF1B95161D_gshared (VuGenericSet_1_tDFC70F6E5EF296C8184F07747991509115BB88B3* __this, bool ___0_disposing, const RuntimeMethod* method) 
 {
 	{
@@ -22545,7 +22545,7 @@ IL_002d:
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 104226
+// Method Definition Index: 104228
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericTypedList_2_get_Item_mB44BD86CF19187153108C7E02EB2043E79128119_gshared (VuGenericTypedList_2_t7E3CDE0789264FA07DF00D68FEF65F2E5722D230* __this, int32_t ___0_index, Il2CppFullySharedGenericAny* il2cppRetVal, const RuntimeMethod* method) 
 {
 	const uint32_t SizeOf_TElement_t3D5B92B93FF1256544F42ECDA8C8E484B8776171 = il2cpp_codegen_sizeof(il2cpp_rgctx_data_no_init(method->klass->rgctx_data, 4));
@@ -22561,7 +22561,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericTypedList_2_get_Item_mB44BD86CF
 		return;
 	}
 }
-// Method Definition Index: 104227
+// Method Definition Index: 104229
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericTypedList_2__ctor_mBCFCA2EB213EFCDE0CC716C098F41E96E1E44453_gshared (VuGenericTypedList_2_t7E3CDE0789264FA07DF00D68FEF65F2E5722D230* __this, CreateListDelegate_t5FDA1A58111A3388E18F626DD2420078A4BF2439* ___0_createList, GetListSizeDelegate_tC3A4D8F283499AFEDEAC4FACD4ACE785A5CA2E27* ___1_getSize, GetListElementDelegate_t08FAFAB33D8174528713579DA299E6BEBAF26653* ___2_getElement, DeleteListDelegate_tE8EF04B6FD076EDA53ADA117B4FA3EA643AE1DCD* ___3_deleteList, const RuntimeMethod* method) 
 {
 	{
@@ -22573,7 +22573,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericTypedList_2__ctor_mBCFCA2EB213E
 		return;
 	}
 }
-// Method Definition Index: 104228
+// Method Definition Index: 104230
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuGenericTypedList_2__ctor_m18AAF426368E3CBF107CF9D9C390BFE16C9A566B_gshared (VuGenericTypedList_2_t7E3CDE0789264FA07DF00D68FEF65F2E5722D230* __this, intptr_t ___0_nativeHandle, GetListSizeDelegate_tC3A4D8F283499AFEDEAC4FACD4ACE785A5CA2E27* ___1_getSize, GetListElementDelegate_t08FAFAB33D8174528713579DA299E6BEBAF26653* ___2_getElement, const RuntimeMethod* method) 
 {
 	{
@@ -24404,7 +24404,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t List_1_get_Count_mD2ED26A
 		return L_0;
 	}
 }
-// Method Definition Index: 53173
+// Method Definition Index: 53175
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void ObjectPool_1_Release_m71F1CADB7AD9CC20BD824583A3675A4260965DB5_gshared_inline (ObjectPool_1_t13378E8CD14858BB05EA28BAB9CC49EDB91BA259* __this, RuntimeObject* ___0_element, const RuntimeMethod* method) 
 {
 	bool V_0 = false;
@@ -24600,7 +24600,7 @@ IL_0034:
 		return;
 	}
 }
-// Method Definition Index: 53171
+// Method Definition Index: 53173
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR RuntimeObject* ObjectPool_1_Get_m239BB169D8FEF3A2694E9A961C473D3807D67D89_gshared_inline (ObjectPool_1_t13378E8CD14858BB05EA28BAB9CC49EDB91BA259* __this, const RuntimeMethod* method) 
 {
 	RuntimeObject* V_0 = NULL;
@@ -24738,55 +24738,55 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR List_1_tA239CB83DE5615F348BB0507E
 		return L_0;
 	}
 }
-// Method Definition Index: 104215
+// Method Definition Index: 104217
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t GetListSizeDelegate_Invoke_m16BF419EF0CE3EF11380F5587DC9FB5787AF36F6_gshared_inline (GetListSizeDelegate_tC3A4D8F283499AFEDEAC4FACD4ACE785A5CA2E27* __this, intptr_t ___0_listHandle, int32_t* ___1_size, const RuntimeMethod* method) 
 {
 	typedef int32_t (*FunctionPointerType) (RuntimeObject*, intptr_t, int32_t*, const RuntimeMethod*);
 	return ((FunctionPointerType)__this->___invoke_impl)((Il2CppObject*)__this->___method_code, ___0_listHandle, ___1_size, reinterpret_cast<RuntimeMethod*>(__this->___method));
 }
-// Method Definition Index: 104219
+// Method Definition Index: 104221
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t GetListElementDelegate_Invoke_mEF8FC536B5A0EEB5BF4CF33FA9829A758B039B27_gshared_inline (GetListElementDelegate_t08FAFAB33D8174528713579DA299E6BEBAF26653* __this, intptr_t ___0_listHandle, int32_t ___1_index, Il2CppFullySharedGenericAny* ___2_nativeElement, const RuntimeMethod* method) 
 {
 	typedef int32_t (*FunctionPointerType) (RuntimeObject*, intptr_t, int32_t, Il2CppFullySharedGenericAny*, const RuntimeMethod*);
 	return ((FunctionPointerType)__this->___invoke_impl)((Il2CppObject*)__this->___method_code, ___0_listHandle, ___1_index, ___2_nativeElement, reinterpret_cast<RuntimeMethod*>(__this->___method));
 }
-// Method Definition Index: 104211
+// Method Definition Index: 104213
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t CreateListDelegate_Invoke_m5410E8A806A6C3CDA54B6BAD84892E9EA38975D4_gshared_inline (CreateListDelegate_t5FDA1A58111A3388E18F626DD2420078A4BF2439* __this, intptr_t* ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (*FunctionPointerType) (RuntimeObject*, intptr_t*, const RuntimeMethod*);
 	return ((FunctionPointerType)__this->___invoke_impl)((Il2CppObject*)__this->___method_code, ___0_listHandle, reinterpret_cast<RuntimeMethod*>(__this->___method));
 }
-// Method Definition Index: 104223
+// Method Definition Index: 104225
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t DeleteListDelegate_Invoke_m506EA8A8B828F0376D9E3CC64C0C95E9EC74C675_gshared_inline (DeleteListDelegate_tE8EF04B6FD076EDA53ADA117B4FA3EA643AE1DCD* __this, intptr_t ___0_listHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (*FunctionPointerType) (RuntimeObject*, intptr_t, const RuntimeMethod*);
 	return ((FunctionPointerType)__this->___invoke_impl)((Il2CppObject*)__this->___method_code, ___0_listHandle, reinterpret_cast<RuntimeMethod*>(__this->___method));
 }
-// Method Definition Index: 104031
+// Method Definition Index: 104033
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t GetSetSizeDelegate_Invoke_m7DEEE4B5708840D6E362EA12687EE552FFFBDDBD_gshared_inline (GetSetSizeDelegate_tC7170993DA2AFC0AB9F81E30EECC7B6DD888E348* __this, intptr_t ___0_setHandle, int32_t* ___1_size, const RuntimeMethod* method) 
 {
 	typedef int32_t (*FunctionPointerType) (RuntimeObject*, intptr_t, int32_t*, const RuntimeMethod*);
 	return ((FunctionPointerType)__this->___invoke_impl)((Il2CppObject*)__this->___method_code, ___0_setHandle, ___1_size, reinterpret_cast<RuntimeMethod*>(__this->___method));
 }
-// Method Definition Index: 104039
+// Method Definition Index: 104041
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t AddElementDelegate_Invoke_mA326C7CDA3DD81B8928F135252F198ACEA483C3F_gshared_inline (AddElementDelegate_t0B736F8C92AD00C575EC3B3DD4B9046F30B1314C* __this, intptr_t ___0_setHandle, Il2CppFullySharedGenericAny ___1_element, const RuntimeMethod* method) 
 {
 	typedef int32_t (*FunctionPointerType) (RuntimeObject*, intptr_t, Il2CppFullySharedGenericAny, const RuntimeMethod*);
 	return ((FunctionPointerType)__this->___invoke_impl)((Il2CppObject*)__this->___method_code, ___0_setHandle, ___1_element, reinterpret_cast<RuntimeMethod*>(__this->___method));
 }
-// Method Definition Index: 104035
+// Method Definition Index: 104037
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t HasElementDelegate_Invoke_m2614ACCDCD178FF209F387CE6AF2DD76F91132CC_gshared_inline (HasElementDelegate_tA40FFC41A7037254BFCA1C17C6DC3A5B823783A1* __this, intptr_t ___0_setHandle, Il2CppFullySharedGenericAny ___1_element, int32_t* ___2_result, const RuntimeMethod* method) 
 {
 	typedef int32_t (*FunctionPointerType) (RuntimeObject*, intptr_t, Il2CppFullySharedGenericAny, int32_t*, const RuntimeMethod*);
 	return ((FunctionPointerType)__this->___invoke_impl)((Il2CppObject*)__this->___method_code, ___0_setHandle, ___1_element, ___2_result, reinterpret_cast<RuntimeMethod*>(__this->___method));
 }
-// Method Definition Index: 104027
+// Method Definition Index: 104029
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t CreateSetDelegate_Invoke_m37EDE6E696E648A1A74536B720B9BFC77B3F27F9_gshared_inline (CreateSetDelegate_tC753AAFA4365813A48CE575D4174E34952196965* __this, intptr_t* ___0_setHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (*FunctionPointerType) (RuntimeObject*, intptr_t*, const RuntimeMethod*);
 	return ((FunctionPointerType)__this->___invoke_impl)((Il2CppObject*)__this->___method_code, ___0_setHandle, reinterpret_cast<RuntimeMethod*>(__this->___method));
 }
-// Method Definition Index: 104043
+// Method Definition Index: 104045
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t DeleteSetDelegate_Invoke_m37D14C863F168F58D17F8D469CD2B61088C74D17_gshared_inline (DeleteSetDelegate_tDF74CBDC484BB9E04CD5942ADB095C8E420C9E78* __this, intptr_t ___0_setHandle, const RuntimeMethod* method) 
 {
 	typedef int32_t (*FunctionPointerType) (RuntimeObject*, intptr_t, const RuntimeMethod*);
@@ -24864,7 +24864,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void Action_1_Invoke_m5A038831CEB
 	typedef void (*FunctionPointerType) (RuntimeObject*, Il2CppFullySharedGenericAny, const RuntimeMethod*);
 	((FunctionPointerType)__this->___invoke_impl)((Il2CppObject*)__this->___method_code, ___0_obj, reinterpret_cast<RuntimeMethod*>(__this->___method));
 }
-// Method Definition Index: 53167
+// Method Definition Index: 53169
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t ObjectPool_1_get_CountAll_mF3CDC0B64D5037106573C6CEE921EAF0A8B3C8EB_gshared_inline (ObjectPool_1_t13378E8CD14858BB05EA28BAB9CC49EDB91BA259* __this, const RuntimeMethod* method) 
 {
 	{
@@ -24872,7 +24872,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t ObjectPool_1_get_CountAll
 		return L_0;
 	}
 }
-// Method Definition Index: 53168
+// Method Definition Index: 53170
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void ObjectPool_1_set_CountAll_mED1939CDEBB184383799328A0C1AEC9E1D2960D9_gshared_inline (ObjectPool_1_t13378E8CD14858BB05EA28BAB9CC49EDB91BA259* __this, int32_t ___0_value, const RuntimeMethod* method) 
 {
 	{

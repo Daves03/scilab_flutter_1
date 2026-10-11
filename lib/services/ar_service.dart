@@ -10,11 +10,15 @@ class ArService {
     try {
       await for (final snap in _db.collection(_collection).snapshots()) {
         final exps = snap.docs.map((d) => ArExperimentModel.fromMap(d.id, d.data())).toList();
-        if (exps.isNotEmpty) {
-          yield exps;
-        } else {
-          yield dummyArExperiments;
+        
+        // Merge Firestore experiments with our local dummy experiments
+        final List<ArExperimentModel> merged = [...exps];
+        for (var dummy in dummyArExperiments) {
+          if (!merged.any((e) => e.id == dummy.id)) {
+            merged.add(dummy);
+          }
         }
+        yield merged;
       }
     } catch (e) {
       print('AR Service fallback due to error: ');
