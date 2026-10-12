@@ -914,6 +914,19 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
 
 // ── Panel course row ──────────────────────────────────────────────────────────
 
+String _courseSectionSummary(Course course) {
+  final sections = course.sections
+      .map((section) => section.trim())
+      .where((section) => section.isNotEmpty)
+      .toSet()
+      .toList()
+    ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+
+  if (sections.isEmpty) return 'No sections';
+  final label = sections.length == 1 ? 'Section' : 'Sections';
+  return '$label ${sections.join(', ')}';
+}
+
 class _PanelCourseRow extends StatelessWidget {
   final Course course;
   final bool isSelectMode;
@@ -976,7 +989,7 @@ class _PanelCourseRow extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${course.subject} · ${course.grade} · ${0} students',
+                  '${course.subject} · ${course.grade} · ${_courseSectionSummary(course)} · ${0} students',
                   style: TextStyle(
                     color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
                     fontSize: 11,
@@ -1103,11 +1116,13 @@ class _CourseCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${course.subject} · ${course.grade}',
+                        '${course.subject} · ${course.grade} · ${_courseSectionSummary(course)}',
                         style: TextStyle(
                           fontSize: 12,
                           color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),

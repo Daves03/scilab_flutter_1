@@ -75,6 +75,7 @@ class CourseService {
       'title': course.title,
       'subject': course.subject,
       'grade': course.grade,
+      'sections': course.sections,
       'accentColorValue': course.accentColorValue,
       'iconName': course.iconName,
       'modules': course.modules.map((m) => m.toMap()).toList(),

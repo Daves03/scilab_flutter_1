@@ -221,6 +221,7 @@ export default function TeacherUploads() {
                   </span>
                   <span className="badge" style={{ background: 'rgba(255,255,255,0.1)', fontSize: '0.9rem', padding: '6px 12px', color: 'var(--accent-purple)' }}>Subject: {course.subject}</span>
                   <span className="badge" style={{ background: 'rgba(255,255,255,0.1)', fontSize: '0.9rem', padding: '6px 12px', color: 'var(--accent-cyan)' }}>Section: {course.sections?.join(', ')}</span>
+                  <span className="badge" style={{ background: 'rgba(255,255,255,0.1)', fontSize: '0.9rem', padding: '6px 12px', color: 'var(--accent-pending)' }}>Grade: {course.grade || 'Not set'}</span>
                   {(() => {
                     const createdDate = getCourseDate(course);
                     return createdDate ? (
