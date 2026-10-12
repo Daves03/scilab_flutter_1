@@ -11,6 +11,8 @@ class UserHeaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final avatarUrl =
+        context.watch<AuthService>().currentUser?.avatarUrl?.trim() ?? '';
 
     return ClipRect(
       child: BackdropFilter(
@@ -40,13 +42,29 @@ class UserHeaderWidget extends StatelessWidget {
                     ],
                   ),
                   child: ClipOval(
-                    child: CustomImageWidget(
-                      imageUrl: context.watch<AuthService>().currentUser?.avatarUrl ?? 'https://images.pexels.com/photos/3769021/pexels-photo-3769021.jpeg?auto=compress&cs=tinysrgb&w=400',
-                      width: 48,
-                      height: 48,
-                      fit: BoxFit.cover,
-                      semanticLabel: 'Teacher avatar',
-                    ),
+                    child: avatarUrl.isNotEmpty
+                        ? CustomImageWidget(
+                            imageUrl: avatarUrl,
+                            width: 48,
+                            height: 48,
+                            fit: BoxFit.cover,
+                            semanticLabel: 'Teacher avatar',
+                          )
+                        : Container(
+                            width: 48,
+                            height: 48,
+                            color: isDark
+                                ? const Color(0xFF132A3D)
+                                : const Color(0xFFE8F7EF),
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.person_outline_rounded,
+                              size: 26,
+                              color: isDark
+                                  ? const Color(0xFF00D4FF)
+                                  : const Color(0xFF00994C),
+                            ),
+                          ),
                   ),
                 ),
               ),

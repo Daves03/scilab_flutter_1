@@ -32,7 +32,7 @@ class _RegisterFormWidgetState extends State<RegisterFormWidget> {
   List<Map<String, dynamic>> _allSections = [];
 
   static const _grades = ['Grade 9', 'Grade 10'];
-  static const _teacherGrades = ['Grade 9', 'Grade 10', 'Both'];
+  static const _teacherGrades = ['Grade 9', 'Grade 10', 'Both 9 and 10'];
 
   @override
   void initState() {
@@ -75,7 +75,7 @@ class _RegisterFormWidgetState extends State<RegisterFormWidget> {
       final grade = section['grade'] as String?;
       if (name == null || grade == null) continue;
       
-      if (_teacherSelectedGrade == 'Both') {
+      if (_teacherSelectedGrade == 'Both 9 and 10') {
         validSections.add(name);
       } else if (grade == _teacherSelectedGrade) {
         validSections.add(name);
@@ -562,11 +562,19 @@ class _RegisterFormWidgetState extends State<RegisterFormWidget> {
     String? Function(String?)? validator,
     void Function(String)? onChanged,
   }) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-        child: TextFormField(
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Positioned.fill(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+              child: const SizedBox.expand(),
+            ),
+          ),
+        ),
+        TextFormField(
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
@@ -601,7 +609,7 @@ class _RegisterFormWidgetState extends State<RegisterFormWidget> {
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 }

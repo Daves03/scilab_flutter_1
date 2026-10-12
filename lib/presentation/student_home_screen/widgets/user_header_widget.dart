@@ -23,6 +23,8 @@ class UserHeaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final avatarUrl =
+        context.watch<AuthService>().currentUser?.avatarUrl?.trim() ?? '';
     
     return ClipRect(
       child: BackdropFilter(
@@ -53,14 +55,29 @@ class UserHeaderWidget extends StatelessWidget {
                   ],
                 ),
                 child: ClipOval(
-                  child: CustomImageWidget(
-                    imageUrl: context.watch<AuthService>().currentUser?.avatarUrl ?? 'https://images.pixabay.com/photo/2023/06/23/11/23/ai-generated-8083323_1280.jpg',
-                    width: 48,
-                    height: 48,
-                    fit: BoxFit.cover,
-                    semanticLabel:
-                        'Student avatar — young person studying chemistry',
-                  ),
+                  child: avatarUrl.isNotEmpty
+                      ? CustomImageWidget(
+                          imageUrl: avatarUrl,
+                          width: 48,
+                          height: 48,
+                          fit: BoxFit.cover,
+                          semanticLabel: 'Student avatar',
+                        )
+                      : Container(
+                          width: 48,
+                          height: 48,
+                          color: isDark
+                              ? const Color(0xFF0D2E3F)
+                              : const Color(0xFFE8F2FC),
+                          alignment: Alignment.center,
+                          child: Icon(
+                            Icons.person_outline_rounded,
+                            size: 26,
+                            color: isDark
+                                ? const Color(0xFF00D4FF)
+                                : const Color(0xFF1565C0),
+                          ),
+                        ),
                 ),
               ),
               ),

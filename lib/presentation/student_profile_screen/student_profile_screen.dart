@@ -12,6 +12,7 @@ import '../../core/theme_provider.dart';
 import '../../routes/app_routes.dart';
 import '../../services/auth_service.dart';
 import '../../models/user_model.dart';
+import '../../widgets/profile_picture_action_dialog.dart';
 import '../../core/gallery_saver_web.dart'
     if (dart.library.io) '../../core/gallery_saver_mobile.dart';
 
@@ -29,7 +30,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
   String _gradeLevel = '';
   String _schoolSection = '';
   String _studentNumber = '';
-  String _avatarUrl = 'https://images.pixabay.com/photo/2023/06/23/11/23/ai-generated-8083323_1280.jpg';
+  String _avatarUrl = '';
 
   static const String _markerAssetPath =
       'assets/images/scilab_AR_marker-1785125880437.png';
@@ -49,11 +50,37 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
           ? user.sections.first 
           : 'Section A';
       _studentNumber = user?.studentNumber ?? '';
-      _avatarUrl = user?.avatarUrl ?? 'https://images.pixabay.com/photo/2023/06/23/11/23/ai-generated-8083323_1280.jpg';
+      _avatarUrl = user?.avatarUrl?.trim() ?? '';
     });
   }
 
+  Future<void> _handleProfilePictureTap() async {
+    final avatarUrl = context.read<AuthService>().currentUser?.avatarUrl;
+    final hasCurrentPicture = avatarUrl?.trim().isNotEmpty == true;
+
+    if (!hasCurrentPicture) {
+      await _uploadProfilePicture();
+      return;
+    }
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final action = await showProfilePictureActionDialog(
+      context,
+      accentColor: isDark
+          ? const Color(0xFF00D4FF)
+          : const Color(0xFF1565C0),
+    );
+
+    if (!mounted) return;
+    if (action == ProfilePictureAction.update) {
+      await _uploadProfilePicture();
+    } else if (action == ProfilePictureAction.remove) {
+      await _removeProfilePicture();
+    }
+  }
+
   Future<void> _uploadProfilePicture() async {
+    final auth = context.read<AuthService>();
     try {
       const XTypeGroup typeGroup = XTypeGroup(
         label: 'images',
@@ -66,7 +93,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
       setState(() => _isUploadingProfilePic = true);
 
       final bytes = await file.readAsBytes();
-      await context.read<AuthService>().updateProfilePicture(bytes, file.name);
+      await auth.updateProfilePicture(bytes, file.name);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -84,6 +111,47 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to update picture: $e', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+            backgroundColor: Colors.redAccent,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isUploadingProfilePic = false);
+      }
+    }
+  }
+
+  Future<void> _removeProfilePicture() async {
+    setState(() => _isUploadingProfilePic = true);
+    try {
+      await context.read<AuthService>().removeProfilePicture();
+
+      if (mounted) {
+        await _loadStudentData();
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'Profile picture removed',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+            ),
+            backgroundColor: const Color(0xFF1565C0),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Failed to remove picture: $e',
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+            ),
             backgroundColor: Colors.redAccent,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -479,7 +547,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                 child: Column(
                   children: [
                     GestureDetector(
-                      onTap: _isUploadingProfilePic ? null : _uploadProfilePicture,
+                      onTap: _isUploadingProfilePic ? null : _handleProfilePictureTap,
                       child: Container(
                         width: 100,
                         height: 100,
@@ -498,23 +566,44 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                           alignment: Alignment.center,
                           children: [
                             ClipOval(
-                              child: Image.network(
-                                _avatarUrl,
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                                semanticLabel: 'Student profile photo',
-                                errorBuilder: (_, __, ___) => Container(
-                                  color: const Color(0xFF0D2E3F),
-                                  width: 100,
-                                  height: 100,
-                                  child: Icon(
-                                    Icons.person,
-                                    size: 44,
-                                    color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
-                                  ),
-                                ),
-                              ),
+                              child: _avatarUrl.isNotEmpty
+                                  ? Image.network(
+                                      _avatarUrl,
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                      semanticLabel: 'Student profile photo',
+                                      errorBuilder: (_, __, ___) => Container(
+                                        color: isDark
+                                            ? const Color(0xFF0D2E3F)
+                                            : const Color(0xFFE8F2FC),
+                                        width: 100,
+                                        height: 100,
+                                        alignment: Alignment.center,
+                                        child: Icon(
+                                          Icons.person_outline_rounded,
+                                          size: 48,
+                                          color: isDark
+                                              ? const Color(0xFF00D4FF)
+                                              : const Color(0xFF1565C0),
+                                        ),
+                                      ),
+                                    )
+                                  : Container(
+                                      color: isDark
+                                          ? const Color(0xFF0D2E3F)
+                                          : const Color(0xFFE8F2FC),
+                                      width: 100,
+                                      height: 100,
+                                      alignment: Alignment.center,
+                                      child: Icon(
+                                        Icons.person_outline_rounded,
+                                        size: 48,
+                                        color: isDark
+                                            ? const Color(0xFF00D4FF)
+                                            : const Color(0xFF1565C0),
+                                      ),
+                                    ),
                             ),
                             if (_isUploadingProfilePic)
                               Container(
