@@ -92,6 +92,7 @@ class AiQuizGeneratorService {
           id: const Uuid().v4(),
           title: quizData['title'] as String? ?? 'Quiz: $defaultTitle',
           questions: questions,
+          createdAt: DateTime.now(),
         );
       }).toList();
     } catch (e) {
@@ -114,6 +115,7 @@ class AiQuizGeneratorService {
           explanation: 'This is a placeholder explanation.',
         ),
       ],
+      createdAt: DateTime.now(),
     );
   }
 }

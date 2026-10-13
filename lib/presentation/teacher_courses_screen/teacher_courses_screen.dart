@@ -795,36 +795,94 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
           if (widget.courses.isNotEmpty || _searchQuery.isNotEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
-              child: Container(
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(10.0),
-                  border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200FF88) : const Color(0xFF00994C).withOpacity(0.2), width: 1),
+              child: TextField(
+                controller: _searchCtrl,
+                onChanged: (val) => setState(() => _searchQuery = val),
+                onTapOutside: (_) => FocusScope.of(context).unfocus(),
+                cursorColor: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF00D4FF)
+                    : const Color(0xFF1565C0),
+                textInputAction: TextInputAction.search,
+                style: TextStyle(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black87,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
                 ),
-                child: TextField(
-                  controller: _searchCtrl,
-                  style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87, fontSize: 13),
-                  textAlignVertical: TextAlignVertical.center,
-                  decoration: InputDecoration(
-                    hintText: 'Search courses...',
-                    hintStyle: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF3A5070) : Colors.grey.shade500),
-                    prefixIcon: Icon(Icons.search, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF3A5070) : Colors.grey.shade500, size: 18),
-                    isDense: true,
-                    suffixIcon: _searchQuery.isNotEmpty
-                        ? GestureDetector(
-                            onTap: () {
-                              _searchCtrl.clear();
-                              setState(() => _searchQuery = '');
-                            },
-                            child: Icon(Icons.close, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, size: 16),
-                          )
-                        : null,
-                    border: InputBorder.none,
+                decoration: InputDecoration(
+                  hintText: 'Search your courses',
+                  hintStyle: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF607A99)
+                        : Colors.grey.shade500,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
                   ),
-                  onChanged: (val) {
-                    setState(() => _searchQuery = val);
-                  },
+                  filled: true,
+                  fillColor: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF0A1628)
+                      : Colors.grey.shade100,
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.only(left: 13, right: 9),
+                    child: Icon(
+                      Icons.search_rounded,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF607A99)
+                          : Colors.grey.shade500,
+                      size: 19,
+                    ),
+                  ),
+                  prefixIconConstraints: const BoxConstraints(
+                    minWidth: 44,
+                    minHeight: 46,
+                  ),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? IconButton(
+                          tooltip: 'Clear search',
+                          visualDensity: VisualDensity.compact,
+                          onPressed: () {
+                            _searchCtrl.clear();
+                            setState(() => _searchQuery = '');
+                          },
+                          icon: Icon(
+                            Icons.close_rounded,
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF8BA3C0)
+                                : Colors.grey.shade600,
+                            size: 18,
+                          ),
+                        )
+                      : null,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 13,
+                    vertical: 13,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF1E3A5F)
+                          : Colors.grey.shade300,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF1E3A5F)
+                          : Colors.grey.shade300,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF00D4FF)
+                          : const Color(0xFF1565C0),
+                      width: 1.5,
+                    ),
+                  ),
                 ),
               ),
             ),

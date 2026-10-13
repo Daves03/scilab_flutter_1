@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import '../../core/app_export.dart';
 import '../../services/auth_service.dart';
-import '../../models/course_model.dart';
+import '../../services/course_service.dart';
 import '../../models/user_model.dart';
 
 class _QuizResult {
@@ -67,6 +67,7 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
 
   Future<void> _loadData() async {
     final user = context.read<AuthService>().currentUser;
+    final courseService = context.read<CourseService>();
     if (user == null) {
       if (mounted) setState(() => _loading = false);
       return;
@@ -126,16 +127,14 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
       // Fetch missed quizzes
       List<_MissedQuizResult> missedQuizzes = [];
       if (user.role != null) {
-        final coursesSnap = await db.collection('courses').where('grade', isEqualTo: user.role!.label).get();
-        for (var doc in coursesSnap.docs) {
-          final course = Course.fromMap(doc.id, doc.data());
-          if (user.sections.isNotEmpty && course.sections.contains(user.sections.first)) {
-            for (var q in course.quizzes) {
-               final hasAttempted = qSnap.docs.any((d) => (d.data()['quizId'] as String?) == q.id);
-               if (!hasAttempted && q.dueDate != null && q.dueDate!.isBefore(DateTime.now())) {
-                  missedQuizzes.add(_MissedQuizResult(q.title, _formatDate(q.dueDate!), q.dueDate!));
-               }
-            }
+        final assignedCourses =
+            await courseService.fetchCoursesForStudent(user);
+        for (final course in assignedCourses) {
+          for (var q in course.quizzes) {
+             final hasAttempted = qSnap.docs.any((d) => (d.data()['quizId'] as String?) == q.id);
+             if (!hasAttempted && q.dueDate != null && q.dueDate!.isBefore(DateTime.now())) {
+                missedQuizzes.add(_MissedQuizResult(q.title, _formatDate(q.dueDate!), q.dueDate!));
+             }
           }
         }
         missedQuizzes.sort((a, b) => b.timestamp.compareTo(a.timestamp));

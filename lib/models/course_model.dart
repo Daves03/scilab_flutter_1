@@ -209,6 +209,11 @@ class Course {
 
   factory Course.fromMap(String id, Map<String, dynamic> data) {
     final ts = data['createdAt'];
+    final currentSections = data['sections'];
+    final legacySections = data['assignedSections'];
+    final sectionSource = currentSections is List && currentSections.isNotEmpty
+        ? currentSections
+        : legacySections;
     return Course(
       id: id,
       title: data['title']?.toString() ?? '',
@@ -219,7 +224,9 @@ class Course {
       accentColorValue:
           (data['accentColorValue'] as num?)?.toInt() ?? 0xFF00D4FF,
       iconName: data['iconName']?.toString() ?? 'science',
-      sections: (data['sections'] as List?)?.map((e) => e.toString()).toList() ?? const [],
+      sections: sectionSource is List
+          ? sectionSource.map((e) => e.toString()).toList()
+          : const [],
       modules: ((data['modules'] as List<dynamic>?) ?? const [])
           .whereType<Map<dynamic, dynamic>>()
           .map(

@@ -65,6 +65,8 @@ class TeacherHomeScreen extends StatefulWidget {
 
 class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     with SingleTickerProviderStateMixin {
+  static const String _allSummarySections = 'All Sections';
+
   late AnimationController _entranceController;
   late Timer _clockTimer;
   DateTime _now = DateTime.now().toUtc().add(const Duration(hours: 8));
@@ -72,6 +74,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   List<_StudentSummary> _students = [];
   bool _loading = true;
   DashboardTab _currentTab = DashboardTab.allStudents;
+  String _selectedSummarySection = _allSummarySections;
   
   final StreamController<List<Map<String, dynamic>>> _notifController = StreamController.broadcast();
   StreamSubscription? _usersSub;
@@ -144,7 +147,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
            print('Error fetching AR records for ${u.id}: $e');
          }
 
-         final section = u.sections.isNotEmpty ? u.sections.first : 'No Section';
+         final section = u.sections.firstWhere(
+           teacherSections.contains,
+           orElse: () => u.sections.isNotEmpty ? u.sections.first : 'No Section',
+         );
 
          dynamicStudents.add(_StudentSummary(
            id: u.id,
@@ -160,8 +166,13 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
       }
 
       if (mounted) {
+        final loadedSections = dynamicStudents.map((s) => s.section).toSet();
         setState(() {
           _students = dynamicStudents;
+          if (_selectedSummarySection != _allSummarySections &&
+              !loadedSections.contains(_selectedSummarySection)) {
+            _selectedSummarySection = _allSummarySections;
+          }
           _loading = false;
         });
         _updateNotifs();
@@ -422,9 +433,29 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    final summarySections = _students
+        .map((student) => student.section.trim())
+        .where((section) => section.isNotEmpty && section != 'No Section')
+        .toSet()
+        .toList()
+      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    final summarySectionOptions = <String>[
+      _allSummarySections,
+      ...summarySections,
+    ];
+    final selectedSummarySection =
+        summarySectionOptions.contains(_selectedSummarySection)
+            ? _selectedSummarySection
+            : _allSummarySections;
+
     List<_StudentSummary> activeStudents = _students;
     if (_currentTab == DashboardTab.needsHelp) {
       activeStudents = _students.where((s) => s.overallScore < 60).toList();
+    }
+    if (selectedSummarySection != _allSummarySections) {
+      activeStudents = activeStudents
+          .where((student) => student.section == selectedSummarySection)
+          .toList();
     }
 
     final filteredStudents = activeStudents.where((s) {
@@ -453,7 +484,11 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
               )
             else ...[
               SliverToBoxAdapter(
-                child: _buildSectionLabel('Student Progress Summary'),
+                child: _buildSectionLabel(
+                  'Student Progress Summary',
+                  sectionOptions: summarySectionOptions,
+                  selectedSection: selectedSummarySection,
+                ),
               ),
               filteredStudents.isEmpty
                   ? SliverToBoxAdapter(
@@ -461,7 +496,14 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                         padding: const EdgeInsets.only(top: 40),
                         child: Center(
                           child: Text(
-                            'No students found',
+                            _searchQuery.isNotEmpty
+                                ? 'No students match your search'
+                                : selectedSummarySection !=
+                                        _allSummarySections
+                                    ? 'No students found in Section $selectedSummarySection'
+                                    : _currentTab == DashboardTab.needsHelp
+                                        ? 'No students currently need help'
+                                        : 'No students found',
                             style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 14),
                           ),
                         ),
@@ -1226,23 +1268,159 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     );
   }
 
-  Widget _buildSectionLabel(String label) {
+  Widget _buildSectionLabel(
+    String label, {
+    required List<String> sectionOptions,
+    required String selectedSection,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentColor =
+        isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0);
+    final mutedColor =
+        isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade600;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
       child: Row(
         children: [
           CustomIconWidget(
             iconName: 'people_alt',
-            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+            color: accentColor,
             size: 18,
           ),
           const SizedBox(width: 8),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: isDark ? Colors.white : Colors.black87,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          PopupMenuButton<String>(
+            initialValue: selectedSection,
+            tooltip: 'Filter students by section',
+            offset: const Offset(0, 42),
+            color: isDark ? const Color(0xFF142240) : Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(
+                color: isDark
+                    ? const Color(0xFF1E3A5F)
+                    : Colors.grey.shade300,
+              ),
+            ),
+            onSelected: (section) {
+              setState(() => _selectedSummarySection = section);
+            },
+            itemBuilder: (context) => sectionOptions.map((section) {
+              final isSelected = section == selectedSection;
+              final studentCount = section == _allSummarySections
+                  ? _students.length
+                  : _students
+                      .where((student) => student.section == section)
+                      .length;
+              return PopupMenuItem<String>(
+                value: section,
+                child: Row(
+                  children: [
+                    Icon(
+                      isSelected
+                          ? Icons.check_circle_rounded
+                          : section == _allSummarySections
+                              ? Icons.groups_outlined
+                              : Icons.class_outlined,
+                      color: isSelected ? accentColor : mutedColor,
+                      size: 19,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        section == _allSummarySections
+                            ? _allSummarySections
+                            : 'Section $section',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black87,
+                          fontSize: 13,
+                          fontWeight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Text(
+                      '$studentCount',
+                      style: TextStyle(
+                        color: isSelected ? accentColor : mutedColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+            child: Container(
+              width: 92,
+              height: 38,
+              padding: const EdgeInsets.symmetric(horizontal: 9),
+              decoration: BoxDecoration(
+                color: selectedSection == _allSummarySections
+                    ? (isDark
+                        ? const Color(0xFF142240)
+                        : Colors.grey.shade50)
+                    : accentColor.withAlpha(isDark ? 30 : 20),
+                borderRadius: BorderRadius.circular(11),
+                border: Border.all(
+                  color: selectedSection == _allSummarySections
+                      ? (isDark
+                          ? const Color(0xFF1E3A5F)
+                          : Colors.grey.shade300)
+                      : accentColor,
+                ),
+              ),
+              child: Row(
+                children: [
+                  CustomIconWidget(
+                    iconName: 'filter_alt_outlined',
+                    color: selectedSection == _allSummarySections
+                        ? mutedColor
+                        : accentColor,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 5),
+                  Expanded(
+                    child: Text(
+                      selectedSection == _allSummarySections
+                          ? 'All'
+                          : selectedSection,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: selectedSection == _allSummarySections
+                            ? mutedColor
+                            : accentColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: selectedSection == _allSummarySections
+                        ? mutedColor
+                        : accentColor,
+                    size: 16,
+                  ),
+                ],
+              ),
             ),
           ),
         ],

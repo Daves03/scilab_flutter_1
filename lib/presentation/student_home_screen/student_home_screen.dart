@@ -2,10 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/user_model.dart';
-import '../../models/course_model.dart';
 import '../../models/activity_model.dart';
+import '../../models/course_model.dart';
 import 'package:provider/provider.dart';
 import '../../services/auth_service.dart';
+import '../../services/course_service.dart';
 
 import '../../core/app_export.dart';
 import '../../routes/app_routes.dart';
@@ -23,62 +24,146 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _entranceController;
   late Timer _timer;
+  late final AuthService _authService;
   late DateTime _philippinesTime;
-  List<Map<String, dynamic>> _notifications = [];
+  List<Map<String, dynamic>> _courseActivity = [];
   Map<String, List<Map<String, dynamic>>> _deadlines = {'upcoming': [], 'missed': []};
   Map<String, dynamic> _progressStats = {'avgQuiz': '0%', 'labs': '0'};
   bool _isLoadingNotifications = true;
   bool _isLoadingDeadlines = true;
   bool _isLoadingProgress = true;
+  Object? _courseActivityError;
   StreamSubscription? _notificationsSub;
   StreamSubscription? _deadlinesSub;
+  String? _studentDataKey;
+  int _studentDataVersion = 0;
   bool _hasShownDeadlinePopup = false;
+
+  List<Map<String, dynamic>> get _notifications {
+    final clearedAt = _authService.currentUser?.notificationsClearedAt;
+    final visible = clearedAt == null
+        ? _courseActivity
+        : _courseActivity
+            .where(
+              (activity) =>
+                  (activity['timestamp'] as DateTime).isAfter(clearedAt),
+            )
+            .toList();
+    return visible.take(5).toList(growable: false);
+  }
+
+  List<Map<String, dynamic>> get _recentCourseContent => _courseActivity
+      .where((activity) => activity['isCourseContent'] == true)
+      .take(2)
+      .toList(growable: false);
 
   @override
   void initState() {
     super.initState();
+    _authService = context.read<AuthService>();
+    _authService.addListener(_handleStudentAssignmentChanged);
+    _handleStudentAssignmentChanged();
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    )..forward();
+
+    _updateTime();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) => _updateTime());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAndShowDeadlinePopup();
+    });
+  }
+
+  String _studentAssignmentKey(AppUser? user) {
+    if (user == null) return 'signed-out';
+    final sections = user.sections
+        .map((section) => section.trim().toLowerCase())
+        .where((section) => section.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort();
+    return '${user.id}|${user.role?.id ?? ''}|${sections.join('|')}';
+  }
+
+  void _handleStudentAssignmentChanged() {
+    final key = _studentAssignmentKey(_authService.currentUser);
+    if (key == _studentDataKey) return;
+    _studentDataKey = key;
+    _subscribeToStudentData();
+  }
+
+  void _retryStudentData() {
+    _studentDataKey = null;
+    _handleStudentAssignmentChanged();
+  }
+
+  void _subscribeToStudentData() {
+    final version = ++_studentDataVersion;
+    _notificationsSub?.cancel();
+    _deadlinesSub?.cancel();
+
+    setState(() {
+      _courseActivity = [];
+      _deadlines = {'upcoming': [], 'missed': []};
+      _progressStats = {'avgQuiz': '0%', 'labs': '0'};
+      _courseActivityError = null;
+      _isLoadingNotifications = true;
+      _isLoadingDeadlines = true;
+      _isLoadingProgress = true;
+    });
+
+    if (_authService.currentUser == null) {
+      setState(() {
+        _isLoadingNotifications = false;
+        _isLoadingDeadlines = false;
+        _isLoadingProgress = false;
+      });
+      return;
+    }
+
     _notificationsSub = _streamDynamicNotifications().listen((data) {
-      if (mounted) {
+      if (mounted && version == _studentDataVersion) {
         setState(() {
-          _notifications = data;
+          _courseActivity = data;
+          _courseActivityError = null;
           _isLoadingNotifications = false;
         });
       }
-    }, onError: (e) {
-      if (mounted) setState(() => _isLoadingNotifications = false);
+    }, onError: (error) {
+      if (mounted && version == _studentDataVersion) {
+        setState(() {
+          _courseActivityError = error;
+          _isLoadingNotifications = false;
+        });
+      }
     });
 
     _deadlinesSub = _streamUpcomingDeadlines().listen((data) {
-      if (mounted) {
+      if (mounted && version == _studentDataVersion) {
         setState(() {
           _deadlines = data;
           _isLoadingDeadlines = false;
         });
       }
-    }, onError: (e) {
-      if (mounted) setState(() => _isLoadingDeadlines = false);
+    }, onError: (error) {
+      if (mounted && version == _studentDataVersion) {
+        setState(() => _isLoadingDeadlines = false);
+      }
     });
 
     _fetchProgressStats().then((data) {
-      if (mounted) {
+      if (mounted && version == _studentDataVersion) {
         setState(() {
           _progressStats = data;
           _isLoadingProgress = false;
         });
       }
-    }).catchError((e) {
-      if (mounted) setState(() => _isLoadingProgress = false);
-    });
-    _entranceController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    )..forward();
-    
-    _updateTime();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) => _updateTime());
-    
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkAndShowDeadlinePopup();
+    }).catchError((error) {
+      if (mounted && version == _studentDataVersion) {
+        setState(() => _isLoadingProgress = false);
+      }
     });
   }
 
@@ -192,6 +277,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
 
   @override
   void dispose() {
+    _authService.removeListener(_handleStudentAssignmentChanged);
+    _studentDataVersion++;
     _timer.cancel();
     _entranceController.dispose();
     _notificationsSub?.cancel();
@@ -367,24 +454,34 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     final user = context.read<AuthService>().currentUser;
     if (user == null) return Stream.value([]);
     
-    final db = FirebaseFirestore.instance;
-    return db.collection('courses').where('grade', isEqualTo: user.role?.label).snapshots().map((cSnap) {
+    return context
+        .read<CourseService>()
+        .coursesForStudentStream(user)
+        .map((courses) {
       List<Map<String, dynamic>> notifications = [];
-      for (var doc in cSnap.docs) {
-        final course = Course.fromMap(doc.id, doc.data());
+      for (final course in courses) {
 
-        // Course Created
-        if (course.createdAt != null) {
-           notifications.add({
-             'title': 'New Course Added',
-             'desc': '${course.teacherName} created the course ${course.title}.',
-             'icon': 'school',
-             'color': const Color(0xFF7C3AED),
-             'timeStr': _formatNotificationTime(course.createdAt),
-             'timestamp': course.createdAt!,
-             'course': course,
-           });
-        }
+        // Always expose an assigned course in Recent Course Content. Older
+        // course documents may not have a createdAt value, so they receive a
+        // deterministic old timestamp instead of disappearing from the feed.
+        final courseCreatedAt = course.createdAt;
+        notifications.add({
+          'title': courseCreatedAt == null
+              ? 'Course Available'
+              : 'New Course Added',
+          'desc': courseCreatedAt == null
+              ? '${course.teacherName} assigned ${course.title} to your class.'
+              : '${course.teacherName} created the course ${course.title}.',
+          'icon': 'school',
+          'color': const Color(0xFF7C3AED),
+          'timeStr': courseCreatedAt == null
+              ? 'Available'
+              : _formatNotificationTime(courseCreatedAt),
+          'timestamp':
+              courseCreatedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
+          'course': course,
+          'isCourseContent': true,
+        });
         
         // Modules
         for (var m in course.modules) {
@@ -393,10 +490,12 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
              'desc': '${course.teacherName} uploaded ${m.title} in ${course.title}.',
              'icon': 'view_in_ar',
              'color': const Color(0xFF00D4FF),
-             'timeStr': _formatNotificationTime(m.uploadedAt),
-             'timestamp': m.uploadedAt ?? DateTime.now().subtract(const Duration(days: 365)),
-             'course': course,
-           });
+              'timeStr': _formatNotificationTime(m.uploadedAt),
+              'timestamp':
+                  m.uploadedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
+              'course': course,
+              'isCourseContent': true,
+            });
         }
         
         // Quizzes
@@ -406,10 +505,12 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
              'desc': '${course.teacherName} posted ${q.title} in ${course.title}.',
              'icon': 'quiz',
              'color': const Color(0xFFFFB300),
-             'timeStr': _formatNotificationTime(q.createdAt),
-             'timestamp': q.createdAt ?? DateTime.now().subtract(const Duration(days: 365)),
-             'course': course,
-           });
+              'timeStr': _formatNotificationTime(q.createdAt),
+              'timestamp':
+                  q.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0),
+              'course': course,
+              'isCourseContent': true,
+            });
 
            // Upcoming deadlines
            if (q.dueDate != null && q.dueDate!.isAfter(DateTime.now())) {
@@ -420,22 +521,17 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                  'desc': '${q.title} is due in ${diff.inHours} hours.',
                  'icon': 'schedule',
                  'color': const Color(0xFFFF4757),
-                 'timeStr': 'Due soon',
-                 'timestamp': q.dueDate!.subtract(const Duration(hours: 48)),
-                 'course': course,
-               });
+                  'timeStr': 'Due soon',
+                  'timestamp': q.dueDate!.subtract(const Duration(hours: 48)),
+                  'course': course,
+                  'isCourseContent': false,
+                });
              }
            }
         }
       }
       
-      final clearedAt = user.notificationsClearedAt;
-      if (clearedAt != null) {
-        notifications.removeWhere((n) => !(n['timestamp'] as DateTime).isAfter(clearedAt));
-      }
-
       notifications.sort((a, b) => (b['timestamp'] as DateTime).compareTo(a['timestamp'] as DateTime));
-      if (notifications.length > 5) notifications = notifications.sublist(0, 5);
       return notifications;
     });
   }
@@ -444,13 +540,14 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     final user = context.read<AuthService>().currentUser;
     if (user == null) return Stream.value({'upcoming': [], 'missed': []});
     
-    final db = FirebaseFirestore.instance;
-    return db.collection('courses').where('grade', isEqualTo: user.role?.label).snapshots().map((cSnap) {
+    return context
+        .read<CourseService>()
+        .coursesForStudentStream(user)
+        .map((courses) {
       List<Map<String, dynamic>> upcoming = [];
       List<Map<String, dynamic>> missed = [];
       final now = DateTime.now();
-      for (var doc in cSnap.docs) {
-        final course = Course.fromMap(doc.id, doc.data());
+      for (final course in courses) {
         for (var q in course.quizzes) {
           if (q.dueDate != null) {
             if (q.dueDate!.isAfter(now)) {
@@ -775,20 +872,45 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
           const SizedBox(height: 12),
           Builder(
             builder: (ctx) {
-              if (_isLoadingNotifications) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              final notifs = _notifications;
-              if (notifs.isEmpty) {
-                 return const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20),
-                    child: Text('No new content.', style: TextStyle(color: Colors.grey)),
+               if (_isLoadingNotifications) {
+                 return const Center(child: CircularProgressIndicator());
+               }
+               if (_courseActivityError != null) {
+                 return Padding(
+                   padding: const EdgeInsets.symmetric(vertical: 12),
+                   child: Row(
+                     children: [
+                       Expanded(
+                         child: Text(
+                           'Unable to load recent course content.',
+                           style: TextStyle(
+                             color: Theme.of(context).brightness ==
+                                     Brightness.dark
+                                 ? const Color(0xFF8BA3C0)
+                                 : Colors.grey.shade700,
+                           ),
+                         ),
+                       ),
+                       TextButton(
+                         onPressed: _retryStudentData,
+                         child: const Text('Retry'),
+                       ),
+                     ],
+                   ),
                  );
-              }
-              // take top 2
-              final top2 = notifs.take(2).toList();
-              return Column(
-                children: top2.map((n) {
+               }
+               final recentContent = _recentCourseContent;
+               if (recentContent.isEmpty) {
+                  return const Padding(
+                     padding: EdgeInsets.symmetric(vertical: 20),
+                     child: Text(
+                       'No course content is assigned to your grade and section yet.',
+                       style: TextStyle(color: Colors.grey),
+                     ),
+                  );
+               }
+               return Column(
+                 children: recentContent.map((n) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: _buildAlertCard(

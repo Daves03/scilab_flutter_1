@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_selector/file_selector.dart';
+import '../core/course_assignment.dart';
 import '../models/course_model.dart';
+import '../models/user_model.dart';
 
 class CourseService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -25,6 +27,27 @@ class CourseService {
         .map((snap) => snap.docs.map((d) => Course.fromMap(d.id, d.data())).toList());
   }
 
+  Stream<List<Course>> coursesForStudentStream(AppUser student) {
+    final grade = student.role?.label;
+    if (!student.isStudent || grade == null || student.sections.isEmpty) {
+      return Stream.value(const <Course>[]);
+    }
+
+    return _db
+        .collection(_coursesCollection)
+        .where('grade', isEqualTo: grade)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map((document) => Course.fromMap(document.id, document.data()))
+              .where(
+                (course) =>
+                    CourseAssignment.courseMatchesStudent(course, student),
+              )
+              .toList(),
+        );
+  }
+
   /// One-shot fetch, used where a screen loads once into a mutable
   /// local list rather than staying subscribed to a stream.
   Future<List<Course>> fetchCourses() async {
@@ -38,6 +61,24 @@ class CourseService {
         .where('teacherUid', isEqualTo: teacherUid)
         .get();
     return snap.docs.map((d) => Course.fromMap(d.id, d.data())).toList();
+  }
+
+  Future<List<Course>> fetchCoursesForStudent(AppUser student) async {
+    final grade = student.role?.label;
+    if (!student.isStudent || grade == null || student.sections.isEmpty) {
+      return const <Course>[];
+    }
+
+    final snapshot = await _db
+        .collection(_coursesCollection)
+        .where('grade', isEqualTo: grade)
+        .get();
+    return snapshot.docs
+        .map((document) => Course.fromMap(document.id, document.data()))
+        .where(
+          (course) => CourseAssignment.courseMatchesStudent(course, student),
+        )
+        .toList();
   }
 
   Future<String> createCourse(Course course) async {

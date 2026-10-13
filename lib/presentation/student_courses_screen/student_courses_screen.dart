@@ -1,7 +1,9 @@
 import '../../core/app_export.dart';
+import '../../core/course_assignment.dart';
 import './widgets/course_detail_widget.dart';
 import 'package:provider/provider.dart';
 import '../../models/course_model.dart';
+import '../../services/auth_service.dart';
 import '../../services/course_service.dart';
 
 // ── Screen ────────────────────────────────────────────────────────────────────
@@ -24,7 +26,12 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
   @override
   void initState() {
     super.initState();
-    if (widget.initialCourse != null) _selectedCourse = widget.initialCourse;
+    final student = context.read<AuthService>().currentUser;
+    if (widget.initialCourse != null &&
+        student != null &&
+        CourseAssignment.courseMatchesStudent(widget.initialCourse!, student)) {
+      _selectedCourse = widget.initialCourse;
+    }
     _entranceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -48,14 +55,24 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
 
   @override
   Widget build(BuildContext context) {
+    final student = context.watch<AuthService>().currentUser;
+    final selectedCourse = _selectedCourse;
+    final canViewSelectedCourse = selectedCourse != null &&
+        student != null &&
+        CourseAssignment.courseMatchesStudent(selectedCourse, student);
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         bottom: false,
-        child: _selectedCourse != null
-            ? CourseDetailWidget(course: _selectedCourse!, onBack: _closeCourse)
+        child: canViewSelectedCourse
+            ? CourseDetailWidget(course: selectedCourse, onBack: _closeCourse)
             : StreamBuilder<List<Course>>(
-                stream: context.read<CourseService>().coursesStream(),
+                stream: student == null
+                    ? Stream.value(const <Course>[])
+                    : context
+                        .read<CourseService>()
+                        .coursesForStudentStream(student),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator(color: Color(0xFF00D4FF)));
@@ -128,7 +145,9 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
                   padding: const EdgeInsets.only(top: 40),
                   child: Center(
                     child: Text(
-                      'No courses found matching search',
+                      courses.isEmpty
+                          ? 'No courses are assigned to your grade and section yet.'
+                          : 'No courses found matching your search.',
                       style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 14),
                     ),
                   ),
@@ -265,6 +284,15 @@ class _CourseListCard extends StatelessWidget {
     final effectiveAccentColor = course.accentColor == const Color(0xFF00D4FF)
         ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0))
         : course.accentColor;
+    final student = context.read<AuthService>().currentUser;
+    final sections = student == null
+        ? const <String>[]
+        : CourseAssignment.matchingSectionsForStudent(course, student);
+    final sectionSummary = sections.isEmpty
+        ? 'No section assigned'
+        : sections.length == 1
+            ? 'Section ${sections.first}'
+            : 'Sections ${sections.join(', ')}';
 
     return GestureDetector(
       onTap: onTap,
@@ -312,11 +340,13 @@ class _CourseListCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${course.teacherName} · ${course.grade}',
+                        '${course.teacherName} · ${course.grade} · $sectionSummary',
                         style: TextStyle(
                           fontSize: 12,
                           color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
