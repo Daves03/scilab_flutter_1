@@ -103,7 +103,7 @@ const List<Map<String, dynamic>> _experimentMaps = [
       'steps': [
         {'bottleTag': 'Rod1,Rod2', 'instructionTitle': 'STEP 1: PREPARE THE ELECTRODES', 'instructionDetail': 'Place the two copper rods (green arrow) inside the (red arrow) beaker filled with water, making sure they do not touch each other.'},
         {'bottleTag': '2way-BlackWire', 'instructionTitle': 'STEP 2: CONNECT THE NEGATIVE TERMINAL', 'instructionDetail': 'Attach the black wire (green arrow) to the right copper rod (red arrow) and connect its other end to the negative (-) terminal of the battery.'},
-        {'bottleTag': 'RedWire', 'instructionTitle': 'STEP 3: CONNECT THE POSITIVE TERMINAL', 'instructionDetail': 'Connect the red wire (green arrow) to the light bulb (red arrow) and attach its other end to the positive (+) terminal of the battery.'},
+        {'bottleTag': 'RedWire,ElectrodeA', 'instructionTitle': 'STEP 3: CONNECT THE POSITIVE TERMINAL', 'instructionDetail': 'Connect the red wire (green arrow) to the light bulb (red arrow) and attach its other end to the positive (+) terminal of the battery.'},
         {'bottleTag': 'blackWire', 'instructionTitle': 'STEP 4: COMPLETE THE CIRCUIT', 'instructionDetail': 'Use the remaining wire (green arrow) to connect the light bulb to the left copper rod (red arrow), completing the electrical circuit.'},
         {'bottleTag': 'Salt-Bottle', 'instructionTitle': 'STEP 5: ADD THE ELECTROLYTE', 'instructionDetail': 'Add salt (green arrow) to the water in the beaker (red arrow) and observe the result as the light bulb turns on, indicating electrical conductivity.'},
       ],
@@ -141,7 +141,7 @@ const List<Map<String, dynamic>> _experimentMaps = [
         {'bottleTag': 'Flask', 'instructionTitle': 'STEP 1: SETUP & WEIGHING', 'instructionDetail': 'Place the flask (green arrow) on the electronic scale (red arrow).'},
         {'bottleTag': 'Vinegar-Bottle', 'instructionTitle': 'STEP 2: ADDING THE VINEGAR', 'instructionDetail': 'Pour 10g of vinegar (green arrow) into the flask (red arrow).'},
         {'bottleTag': 'Baking-Soda', 'instructionTitle': 'STEP 3: PREPARING THE BALLOON', 'instructionDetail': 'Place a small amount of baking soda (green arrow) inside the balloon (red arrow).'},
-        {'bottleTag': 'balloon', 'instructionTitle': 'STEP 4: OBSERVATION & REACTION', 'instructionDetail': 'Secure the mouth of the balloon (green arrow) over the opening of the flask (red arrow) and observe the mass as the balloon inflates.'},
+        {'bottleTag': 'Balloon', 'instructionTitle': 'STEP 4: OBSERVATION & REACTION', 'instructionDetail': 'Secure the mouth of the balloon (green arrow) over the opening of the flask (red arrow) and observe the mass as the balloon inflates.'},
       ],
     },
     {
@@ -211,8 +211,8 @@ const List<Map<String, dynamic>> _experimentMaps = [
         {'bottleTag': 'Surf', 'instructionTitle': 'Step 1: Add Soap', 'instructionDetail': 'Pour the dish soap into the beaker.'},
         {'bottleTag': 'Peroxide', 'instructionTitle': 'Step 2: Add Peroxide', 'instructionDetail': 'Add hydrogen peroxide to the mixture.'},
         {'bottleTag': 'Dye', 'instructionTitle': 'Step 3: Add Dye', 'instructionDetail': 'Add food coloring.'},
-        {'bottleTag': 'Yeast', 'instructionTitle': 'Step 4: Add Yeast to Cylinder', ' nstructionDetail': 'Pour the yeast into the cylinder with water'},
-        {'bottleTag': 'Activator', 'instructionTitle': 'Step 5: Pour Yeast', 'instructionDetail': 'Pour the Cylinder with yeast last to start the reaction!'},
+        {'bottleTag': 'Yeast', 'instructionTitle': 'Step 4: Add Yeast to Cylinder', 'instructionDetail': 'Pour the yeast into the small cylinder with water.'},
+        {'bottleTag': 'Activator', 'instructionTitle': 'Step 5: Pour Yeast Mixture', 'instructionDetail': 'Pour the cylinder with the yeast mixture into the main beaker to start the reaction!'},
       ],
     },
     {
@@ -245,9 +245,9 @@ const List<Map<String, dynamic>> _experimentMaps = [
       'semanticLabel':
           'Colorful flame test showing bright orange yellow and green flames from metal salts',
       'steps': [
-        {'bottleTag': 'Chemical-Bottle', 'instructionTitle': 'STEP 1: PREPARE THE CHEMICAL SOLUTION', 'instructionDetail': 'Grab the liquid bottle with the indicated solution (green arrow) and carefully pour a small amount onto the dish plate (red arrow).'},
-        {'bottleTag': 'Thread', 'instructionTitle': 'STEP 2: COAT THE NICHROME WIRE', 'instructionDetail': 'Pick up the nichrome stick (green arrow) and dip it into the solution on the dish plate (red arrow) to allow the wire to absorb the chemical solution.'},
-        {'bottleTag': 'Flame-Switch', 'instructionTitle': 'STEP 3: PERFORM THE FLAME TEST', 'instructionDetail': 'Turn on the flame switch, then place the coated nichrome stick over the burner to observe the flame color produced.'},
+        {'bottleTag': 'Chemical-Bottle', 'instructionTitle': 'STEP 1: SELECT & POUR SOLUTION', 'instructionDetail': 'Choose a chemical solution from the Flame Solution menu, then pour a small amount onto the dish plate.'},
+        {'bottleTag': 'Thread', 'instructionTitle': 'STEP 2: COAT THE NICHROME WIRE', 'instructionDetail': 'Pick up the nichrome wire and dip it into the solution on the dish plate to coat the wire with the metal ions.'},
+        {'bottleTag': 'Flame-Switch', 'instructionTitle': 'STEP 3: PERFORM THE FLAME TEST', 'instructionDetail': 'Turn on the Bunsen burner flame, then place the coated nichrome wire over the burner to observe the flame color produced!'},
       ],
     },
     {

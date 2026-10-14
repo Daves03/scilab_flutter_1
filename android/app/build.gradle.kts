@@ -11,7 +11,7 @@ android {
 
     androidResources {
         ignoreAssetsPattern = "!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~"
-        noCompress.addAll(listOf(".unity3d", ".ress", ".resource", ".obb", ".bundle", ".unityexp"))
+        noCompress.addAll(listOf(".unity3d", ".ress", ".resource", ".obb", ".bundle", ".unityexp", ".dat", ".xml"))
     }
     namespace = "com.scilab_ar.scilab_flutter_1"
     compileSdk = 36
@@ -33,6 +33,10 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = 1
         versionName = "1.0"
+
+        ndk {
+            abiFilters.addAll(listOf("arm64-v8a"))
+        }
     }
 
     buildTypes {
