@@ -33,6 +33,14 @@ Run or build the app with that configuration:
 ```sh
 flutter run --dart-define-from-file=.gemini.local.json
 flutter build web --release --dart-define-from-file=.gemini.local.json
+flutter build apk --release --dart-define-from-file=.gemini.local.json
+```
+
+On Windows, the checked-in helper validates the local configuration before
+building the APK:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build_apk.ps1
 ```
 
 Values supplied with `--dart-define` are embedded in Flutter web builds. For a

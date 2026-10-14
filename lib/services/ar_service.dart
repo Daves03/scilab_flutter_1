@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../models/ar_experiment_model.dart';
 import '../data/dummy_ar_experiments.dart';
 
@@ -20,8 +21,8 @@ class ArService {
         }
         yield merged;
       }
-    } catch (e) {
-      print('AR Service fallback due to error: ');
+    } catch (error) {
+      debugPrint('AR Service fallback due to error: $error');
       yield dummyArExperiments;
     }
   }
@@ -44,38 +45,62 @@ class ArService {
   }
 
   /// Stream locked experiment IDs for a specific set of sections.
-  Stream<List<String>> streamLockedExperimentsForSections(List<String> sections) {
-    if (sections.isEmpty) return Stream.value([]);
-    
-    return _db
-        .collection('ar_locks')
-        .where(FieldPath.documentId, whereIn: sections.take(10).toList())
-        .snapshots()
-        .map((snap) {
-      final Set<String> lockedIds = {};
-      for (final doc in snap.docs) {
-        final list = List<String>.from(doc.data()['lockedExperiments'] ?? []);
-        lockedIds.addAll(list);
+  Stream<List<String>> streamLockedExperimentsForSections(
+    List<String> sections,
+  ) async* {
+    if (sections.isEmpty) {
+      yield const [];
+      return;
+    }
+
+    try {
+      await for (final snap in _db
+          .collection('ar_locks')
+          .where(FieldPath.documentId, whereIn: sections.take(10).toList())
+          .snapshots()) {
+        final lockedIds = <String>{};
+        for (final doc in snap.docs) {
+          final list = List<String>.from(
+            doc.data()['lockedExperiments'] ?? const [],
+          );
+          lockedIds.addAll(list);
+        }
+        yield lockedIds.toList();
       }
-      return lockedIds.toList();
-    });
+    } catch (error) {
+      debugPrint('AR lock fallback due to error: $error');
+      // If locks cannot be read, keep the catalogue usable and default to
+      // unlocked instead of leaking an unhandled Firestore stream error.
+      yield const [];
+    }
   }
 
   /// Stream a map of Section -> List of locked experiment IDs
-  Stream<Map<String, List<String>>> streamSectionLocks(List<String> sections) {
-    if (sections.isEmpty) return Stream.value({});
-    
-    return _db
-        .collection('ar_locks')
-        .where(FieldPath.documentId, whereIn: sections.take(10).toList())
-        .snapshots()
-        .map((snap) {
-      final Map<String, List<String>> map = {};
-      for (final doc in snap.docs) {
-        map[doc.id] = List<String>.from(doc.data()['lockedExperiments'] ?? []);
+  Stream<Map<String, List<String>>> streamSectionLocks(
+    List<String> sections,
+  ) async* {
+    if (sections.isEmpty) {
+      yield const {};
+      return;
+    }
+
+    try {
+      await for (final snap in _db
+          .collection('ar_locks')
+          .where(FieldPath.documentId, whereIn: sections.take(10).toList())
+          .snapshots()) {
+        final map = <String, List<String>>{};
+        for (final doc in snap.docs) {
+          map[doc.id] = List<String>.from(
+            doc.data()['lockedExperiments'] ?? const [],
+          );
+        }
+        yield map;
       }
-      return map;
-    });
+    } catch (error) {
+      debugPrint('AR section-lock fallback due to error: $error');
+      yield const {};
+    }
   }
 
   /// Toggle the lock state of an AR experiment for a specific section

@@ -11,11 +11,13 @@ import 'firebase_options.dart';
 import 'services/auth_service.dart';
 import 'services/course_service.dart';
 import 'services/ar_service.dart';
+import 'services/activity_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await ActivityService.instance.initialize();
 
   bool hasShownError = false;
 
@@ -42,7 +44,9 @@ void main() async {
       MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => ThemeProvider()),
-          ChangeNotifierProvider<AuthService>.value(value: AuthService.instance),
+          ChangeNotifierProvider<AuthService>.value(
+            value: AuthService.instance,
+          ),
           Provider<CourseService>(create: (_) => CourseService()),
           Provider<ArService>(create: (_) => ArService()),
         ],

@@ -26,6 +26,7 @@ class _UnityArScreenState extends State<UnityArScreen>
   bool _isLoading = false;
   String? _activeExperimentId;
   final ActivityService _activityService = ActivityService();
+  ActivitySyncStatus? _completionSyncStatus;
 
   // --- NEW: Instructional Guide State ---
   bool _showGuide = false;
@@ -268,6 +269,7 @@ class _UnityArScreenState extends State<UnityArScreen>
         _activeExperimentId = experimentId;
         _currentStepIndex = 0; // Reset steps on launch
         _hasCompleted = false;
+        _completionSyncStatus = null;
         _showCompletionPopup = false;
         _silverNitrateDropCount = 0;
         _isDropButtonCoolingDown = false;
@@ -662,9 +664,19 @@ class _UnityArScreenState extends State<UnityArScreen>
       if (uid != null && _activeExperimentId != null) {
         _activityService
             .markExperimentCompleted(uid, _activeExperimentId!)
-            .catchError((e) {
-              debugPrint("Failed to mark experiment completed: $e");
-            });
+            .then(
+              (status) {
+                if (mounted) setState(() => _completionSyncStatus = status);
+              },
+              onError: (Object error) {
+                debugPrint('Failed to queue experiment completion: $error');
+                if (mounted) {
+                  setState(
+                    () => _completionSyncStatus = ActivitySyncStatus.pending,
+                  );
+                }
+              },
+            );
       }
     } catch (e) {
       debugPrint("Auth error in _handleExperimentComplete: $e");
@@ -716,6 +728,25 @@ class _UnityArScreenState extends State<UnityArScreen>
                     'Great job! You have successfully completed this chemistry experiment.',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Color(0xFF8BA3C0), fontSize: 16),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    switch (_completionSyncStatus) {
+                      ActivitySyncStatus.synced => 'Progress synced.',
+                      ActivitySyncStatus.permissionDenied =>
+                        'Progress saved on this device. Sync is waiting for account permission.',
+                      ActivitySyncStatus.pending =>
+                        'Progress saved on this device and will sync when you are online.',
+                      null => 'Saving progress on this device…',
+                    },
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: _completionSyncStatus == ActivitySyncStatus.synced
+                          ? const Color(0xFF00FF88)
+                          : const Color(0xFFFFC857),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
