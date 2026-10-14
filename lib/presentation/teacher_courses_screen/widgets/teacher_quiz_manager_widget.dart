@@ -64,19 +64,33 @@ class _CourseQuizManagerWidgetState extends State<CourseQuizManagerWidget> {
   }
 
   void _deleteQuiz(CourseQuiz quiz) {
+    final courseService = context.read<CourseService>();
     showDialog(
       context: context,
       builder: (ctx) => _ConfirmDeleteDialog(
         title: 'Delete Quiz',
         message:
             'Are you sure you want to delete "${quiz.title}"? This cannot be undone.',
-        onConfirm: () {
-          setState(() {
-            widget.course.quizzes.removeWhere((q) => q.id == quiz.id);
-            if (_expandedQuiz?.id == quiz.id) _expandedQuiz = null;
-          });
-          widget.onUpdated();
-          context.read<CourseService>().updateCourse(widget.course);
+        onConfirm: () async {
+          try {
+            await courseService.removeQuiz(widget.course.id, quiz.id);
+            if (!mounted) return;
+
+            setState(() {
+              widget.course.quizzes.removeWhere((q) => q.id == quiz.id);
+              if (_expandedQuiz?.id == quiz.id) _expandedQuiz = null;
+            });
+            widget.onUpdated();
+          } catch (_) {
+            if (!mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Could not delete the quiz. Please check your connection and try again.',
+                ),
+              ),
+            );
+          }
         },
       ),
     );

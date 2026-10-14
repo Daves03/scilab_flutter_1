@@ -19,7 +19,7 @@ class StudentCoursesScreen extends StatefulWidget {
 class _StudentCoursesScreenState extends State<StudentCoursesScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _entranceController;
-  Course? _selectedCourse;
+  String? _selectedCourseId;
   String _mainSearchQuery = '';
   final TextEditingController _mainSearchCtrl = TextEditingController();
 
@@ -30,12 +30,26 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
     if (widget.initialCourse != null &&
         student != null &&
         CourseAssignment.courseMatchesStudent(widget.initialCourse!, student)) {
-      _selectedCourse = widget.initialCourse;
+      _selectedCourseId = widget.initialCourse!.id;
     }
     _entranceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
     )..forward();
+  }
+
+  @override
+  void didUpdateWidget(covariant StudentCoursesScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialCourse?.id == widget.initialCourse?.id) return;
+
+    final student = context.read<AuthService>().currentUser;
+    final initialCourse = widget.initialCourse;
+    _selectedCourseId = initialCourse != null &&
+            student != null &&
+            CourseAssignment.courseMatchesStudent(initialCourse, student)
+        ? initialCourse.id
+        : null;
   }
 
   @override
@@ -46,46 +60,68 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
   }
 
   void _openCourse(Course course) {
-    setState(() => _selectedCourse = course);
+    setState(() => _selectedCourseId = course.id);
   }
 
   void _closeCourse() {
-    setState(() => _selectedCourse = null);
+    setState(() => _selectedCourseId = null);
   }
 
   @override
   Widget build(BuildContext context) {
     final student = context.watch<AuthService>().currentUser;
-    final selectedCourse = _selectedCourse;
-    final canViewSelectedCourse = selectedCourse != null &&
-        student != null &&
-        CourseAssignment.courseMatchesStudent(selectedCourse, student);
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         bottom: false,
-        child: canViewSelectedCourse
-            ? CourseDetailWidget(course: selectedCourse, onBack: _closeCourse)
-            : StreamBuilder<List<Course>>(
-                stream: student == null
-                    ? Stream.value(const <Course>[])
-                    : context
-                        .read<CourseService>()
-                        .coursesForStudentStream(student),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator(color: Color(0xFF00D4FF)));
-                  }
-                  if (snapshot.hasError) {
-                    return Center(
-                      child: Text('Failed to load courses. Please check permissions.', style: TextStyle(color: Colors.red)),
-                    );
-                  }
-                  final courses = snapshot.data ?? [];
-                  return _buildCourseList(courses);
-                },
-              ),
+        child: StreamBuilder<List<Course>>(
+          stream: student == null
+              ? Stream.value(const <Course>[])
+              : context.read<CourseService>().coursesForStudentStream(student),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(color: Color(0xFF00D4FF)),
+              );
+            }
+            if (snapshot.hasError) {
+              return const Center(
+                child: Text(
+                  'Failed to load courses. Please check permissions.',
+                  style: TextStyle(color: Colors.red),
+                ),
+              );
+            }
+
+            final courses = snapshot.data ?? const <Course>[];
+            Course? selectedCourse;
+            final selectedCourseId = _selectedCourseId;
+            if (selectedCourseId != null) {
+              for (final course in courses) {
+                if (course.id == selectedCourseId) {
+                  selectedCourse = course;
+                  break;
+                }
+              }
+            }
+
+            if (selectedCourse != null &&
+                student != null &&
+                CourseAssignment.courseMatchesStudent(
+                  selectedCourse,
+                  student,
+                )) {
+              return CourseDetailWidget(
+                key: ValueKey('student-course-${selectedCourse.id}'),
+                course: selectedCourse,
+                onBack: _closeCourse,
+              );
+            }
+
+            return _buildCourseList(courses);
+          },
+        ),
       ),
     );
   }

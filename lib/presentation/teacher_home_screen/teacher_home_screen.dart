@@ -5,6 +5,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/app_export.dart';
 import '../../widgets/custom_icon_widget.dart';
+import '../../widgets/dashboard_datetime_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/user_model.dart';
 import '../../models/course_model.dart';
@@ -39,7 +40,19 @@ class _StudentSummary {
     required this.arAttempts,
   });
 
-  double get overallScore => (avgQuizScore * 100 + avgArScore) / 2;
+  double get overallScore {
+    var total = 0.0;
+    var metricCount = 0;
+    if (quizzesTaken > 0) {
+      total += avgQuizScore * 100;
+      metricCount++;
+    }
+    if (arAttempts > 0) {
+      total += avgArScore;
+      metricCount++;
+    }
+    return metricCount == 0 ? 0 : total / metricCount;
+  }
 
   Color get performanceColor {
     if (overallScore >= 80) return const Color(0xFF00D4FF);
@@ -90,6 +103,64 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
 
   final Map<String, DateTime> _pendingUserTimestamps = {};
 
+  List<QuizAttempt> _latestAttemptsForStudent(
+    Iterable<QuizAttempt> attempts,
+    String studentId,
+  ) {
+    final latestByQuiz = <String, QuizAttempt>{};
+    for (final attempt in attempts) {
+      if (attempt.studentId != studentId ||
+          attempt.quizId.isEmpty ||
+          attempt.totalQuestions <= 0) {
+        continue;
+      }
+
+      final current = latestByQuiz[attempt.quizId];
+      final submittedAt = attempt.submittedAt ?? DateTime(2000);
+      final currentSubmittedAt = current?.submittedAt ?? DateTime(2000);
+      if (current == null || !submittedAt.isBefore(currentSubmittedAt)) {
+        latestByQuiz[attempt.quizId] = attempt;
+      }
+    }
+    return latestByQuiz.values.toList();
+  }
+
+  double _averageQuizScore(List<QuizAttempt> attempts) {
+    if (attempts.isEmpty) return 0;
+    final total = attempts.fold<double>(
+      0,
+      (totalValue, attempt) =>
+          totalValue + (attempt.score / attempt.totalQuestions),
+    );
+    return total / attempts.length;
+  }
+
+  void _applyLiveQuizAttempts(List<QuizAttempt> attempts) {
+    if (!mounted) return;
+
+    setState(() {
+      _allAttempts = attempts;
+      _students = _students.map((student) {
+        final studentAttempts = _latestAttemptsForStudent(
+          attempts,
+          student.id,
+        );
+        return _StudentSummary(
+          id: student.id,
+          name: student.name,
+          section: student.section,
+          studentNumber: student.studentNumber,
+          avatarUrl: student.avatarUrl,
+          avgQuizScore: _averageQuizScore(studentAttempts),
+          avgArScore: student.avgArScore,
+          quizzesTaken: studentAttempts.length,
+          arAttempts: student.arAttempts,
+        );
+      }).toList();
+    });
+    _updateNotifs();
+  }
+
   Future<void> _loadData() async {
     try {
       final db = FirebaseFirestore.instance;
@@ -119,16 +190,8 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
 
       List<_StudentSummary> dynamicStudents = [];
       for (var u in users) {
-         final uAttempts = allAttempts.where((a) => a.studentId == u.id).toList();
-         
-         double avgQuizScore = 0;
-         if (uAttempts.isNotEmpty) {
-           double totalScore = 0;
-           for (var a in uAttempts) {
-             totalScore += (a.totalQuestions > 0 ? a.score / a.totalQuestions : 0);
-           }
-           avgQuizScore = totalScore / uAttempts.length;
-         }
+         final uAttempts = _latestAttemptsForStudent(allAttempts, u.id);
+         final avgQuizScore = _averageQuizScore(uAttempts);
 
          int arAttempts = 0;
          double avgArScore = 0.0;
@@ -185,41 +248,6 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     }
   }
 
-  String get _formattedDate {
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
-    const days = [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday',
-    ];
-    return '${days[_now.weekday - 1]}, ${months[_now.month - 1]} ${_now.day}, ${_now.year}';
-  }
-
-  String get _formattedTime {
-    final h = _now.hour % 12 == 0 ? 12 : _now.hour % 12;
-    final m = _now.minute.toString().padLeft(2, '0');
-    final s = _now.second.toString().padLeft(2, '0');
-    final period = _now.hour < 12 ? 'AM' : 'PM';
-    return '$h:$m:$s $period';
-  }
-
   double get _classAvgScore {
     if (_students.isEmpty) return 0;
     return _students.map((s) => s.overallScore).reduce((a, b) => a + b) /
@@ -245,6 +273,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
       duration: const Duration(milliseconds: 700),
     )..forward();
     _clockTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
       setState(() {
         _now = DateTime.now().toUtc().add(const Duration(hours: 8));
       });
@@ -269,10 +298,13 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
       });
 
     _quizSub = db.collection('quiz_attempts')
-      .orderBy('submittedAt', descending: true).limit(10)
+      .orderBy('submittedAt', descending: true)
       .snapshots().listen((snap) {
-        _quizAttempts = snap.docs;
-        _updateNotifs();
+        _quizAttempts = snap.docs.take(10).toList();
+        final attempts = snap.docs
+            .map((doc) => QuizAttempt.fromMap(doc.id, doc.data()))
+            .toList();
+        _applyLiveQuizAttempts(attempts);
       });
       
     try {
@@ -926,84 +958,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   Widget _buildDateTimeCard() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-        decoration: BoxDecoration(
-          gradient: Theme.of(context).brightness == Brightness.dark ? const LinearGradient(
-            colors: [Color(0xFF142240), Color(0xFF1A2E50)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ) : const LinearGradient(
-            colors: [Color(0xFFE8F9FD), Color(0xFFF8FBFF)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(16.0),
-          border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: const Color(0xFF7C3AED).withAlpha(40),
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: const Center(
-                child: CustomIconWidget(
-                  iconName: 'schedule',
-                  color: Color(0xFF7C3AED),
-                  size: 20,
-                ),
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _formattedTime,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    _formattedDate,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF8BA3C0),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: const Color(0xFF7C3AED).withAlpha(30),
-                borderRadius: BorderRadius.circular(20.0),
-                border: Border.all(
-                  color: const Color(0xFF7C3AED).withAlpha(80),
-                ),
-              ),
-              child: const Text(
-                'GMT+8 PH',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF7C3AED),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+      child: DashboardDateTimeCard(dateTime: _now),
     );
   }
 

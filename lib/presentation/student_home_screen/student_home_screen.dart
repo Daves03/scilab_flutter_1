@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/user_model.dart';
-import '../../models/activity_model.dart';
 import '../../models/course_model.dart';
 import 'package:provider/provider.dart';
 import '../../services/auth_service.dart';
@@ -11,6 +10,7 @@ import '../../services/course_service.dart';
 import '../../core/app_export.dart';
 import '../../routes/app_routes.dart';
 import '../../widgets/custom_icon_widget.dart';
+import '../../widgets/dashboard_datetime_card.dart';
 import './widgets/user_header_widget.dart';
 
 class StudentHomeScreen extends StatefulWidget {
@@ -27,7 +27,10 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
   late final AuthService _authService;
   late DateTime _philippinesTime;
   List<Map<String, dynamic>> _courseActivity = [];
-  Map<String, List<Map<String, dynamic>>> _deadlines = {'upcoming': [], 'missed': []};
+  Map<String, List<Map<String, dynamic>>> _deadlines = {
+    'upcoming': [],
+    'missed': [],
+  };
   Map<String, dynamic> _progressStats = {'avgQuiz': '0%', 'labs': '0'};
   bool _isLoadingNotifications = true;
   bool _isLoadingDeadlines = true;
@@ -35,6 +38,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
   Object? _courseActivityError;
   StreamSubscription? _notificationsSub;
   StreamSubscription? _deadlinesSub;
+  StreamSubscription<List<QuizAttempt>>? _quizAttemptsSub;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _labActivitySub;
   String? _studentDataKey;
   int _studentDataVersion = 0;
   bool _hasShownDeadlinePopup = false;
@@ -44,11 +49,11 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     final visible = clearedAt == null
         ? _courseActivity
         : _courseActivity
-            .where(
-              (activity) =>
-                  (activity['timestamp'] as DateTime).isAfter(clearedAt),
-            )
-            .toList();
+              .where(
+                (activity) =>
+                    (activity['timestamp'] as DateTime).isAfter(clearedAt),
+              )
+              .toList();
     return visible.take(5).toList(growable: false);
   }
 
@@ -78,12 +83,13 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
 
   String _studentAssignmentKey(AppUser? user) {
     if (user == null) return 'signed-out';
-    final sections = user.sections
-        .map((section) => section.trim().toLowerCase())
-        .where((section) => section.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort();
+    final sections =
+        user.sections
+            .map((section) => section.trim().toLowerCase())
+            .where((section) => section.isNotEmpty)
+            .toSet()
+            .toList()
+          ..sort();
     return '${user.id}|${user.role?.id ?? ''}|${sections.join('|')}';
   }
 
@@ -103,6 +109,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     final version = ++_studentDataVersion;
     _notificationsSub?.cancel();
     _deadlinesSub?.cancel();
+    _quizAttemptsSub?.cancel();
+    _labActivitySub?.cancel();
 
     setState(() {
       _courseActivity = [];
@@ -123,63 +131,125 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
       return;
     }
 
-    _notificationsSub = _streamDynamicNotifications().listen((data) {
-      if (mounted && version == _studentDataVersion) {
-        setState(() {
-          _courseActivity = data;
-          _courseActivityError = null;
-          _isLoadingNotifications = false;
-        });
-      }
-    }, onError: (error) {
-      if (mounted && version == _studentDataVersion) {
-        setState(() {
-          _courseActivityError = error;
-          _isLoadingNotifications = false;
-        });
-      }
-    });
+    _notificationsSub = _streamDynamicNotifications().listen(
+      (data) {
+        if (mounted && version == _studentDataVersion) {
+          setState(() {
+            _courseActivity = data;
+            _courseActivityError = null;
+            _isLoadingNotifications = false;
+          });
+        }
+      },
+      onError: (error) {
+        if (mounted && version == _studentDataVersion) {
+          setState(() {
+            _courseActivityError = error;
+            _isLoadingNotifications = false;
+          });
+        }
+      },
+    );
 
-    _deadlinesSub = _streamUpcomingDeadlines().listen((data) {
-      if (mounted && version == _studentDataVersion) {
-        setState(() {
-          _deadlines = data;
-          _isLoadingDeadlines = false;
-        });
-      }
-    }, onError: (error) {
-      if (mounted && version == _studentDataVersion) {
-        setState(() => _isLoadingDeadlines = false);
-      }
-    });
+    _deadlinesSub = _streamUpcomingDeadlines().listen(
+      (data) {
+        if (mounted && version == _studentDataVersion) {
+          setState(() {
+            _deadlines = data;
+            _isLoadingDeadlines = false;
+          });
+        }
+      },
+      onError: (error) {
+        if (mounted && version == _studentDataVersion) {
+          setState(() => _isLoadingDeadlines = false);
+        }
+      },
+    );
 
-    _fetchProgressStats().then((data) {
-      if (mounted && version == _studentDataVersion) {
-        setState(() {
-          _progressStats = data;
-          _isLoadingProgress = false;
-        });
-      }
-    }).catchError((error) {
-      if (mounted && version == _studentDataVersion) {
-        setState(() => _isLoadingProgress = false);
-      }
-    });
+    _subscribeToProgressStats(version);
+  }
+
+  void _subscribeToProgressStats(int version) {
+    final user = _authService.currentUser;
+    if (user == null) return;
+
+    _quizAttemptsSub = context
+        .read<CourseService>()
+        .attemptsForStudent(user.id)
+        .listen(
+          (attempts) {
+            if (!mounted || version != _studentDataVersion) return;
+
+            final latestByQuiz = <String, QuizAttempt>{};
+            for (final attempt in attempts) {
+              if (attempt.quizId.isEmpty || attempt.totalQuestions <= 0) {
+                continue;
+              }
+              final current = latestByQuiz[attempt.quizId];
+              final submittedAt = attempt.submittedAt ?? DateTime(2000);
+              final currentSubmittedAt =
+                  current?.submittedAt ?? DateTime(2000);
+              if (current == null || !submittedAt.isBefore(currentSubmittedAt)) {
+                latestByQuiz[attempt.quizId] = attempt;
+              }
+            }
+            final totalPercentage = latestByQuiz.values.fold<double>(
+              0,
+              (total, attempt) =>
+                  total + (attempt.score / attempt.totalQuestions),
+            );
+            final average = latestByQuiz.isEmpty
+                ? 0.0
+                : (totalPercentage / latestByQuiz.length) * 100;
+
+            setState(() {
+              _progressStats = {
+                ..._progressStats,
+                'avgQuiz': '${average.toStringAsFixed(0)}%',
+              };
+              _isLoadingProgress = false;
+            });
+          },
+          onError: (_) {
+            if (!mounted || version != _studentDataVersion) return;
+            setState(() => _isLoadingProgress = false);
+          },
+        );
+
+    _labActivitySub = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.id)
+        .collection('experiment_activity')
+        .snapshots()
+        .listen(
+          (snapshot) {
+            if (!mounted || version != _studentDataVersion) return;
+            final completedLabs = snapshot.docs
+                .where((doc) => doc.data()['completedAt'] != null)
+                .length;
+            setState(() {
+              _progressStats = {..._progressStats, 'labs': '$completedLabs'};
+            });
+          },
+          onError: (Object error) =>
+              debugPrint('Error streaming completed labs: $error'),
+        );
   }
 
   Future<void> _checkAndShowDeadlinePopup() async {
     if (_hasShownDeadlinePopup) return;
-    
+
     final firstEvent = await _streamUpcomingDeadlines().first;
     if (!mounted) return;
-    
+
     final upcoming = firstEvent['upcoming'] as List<Map<String, dynamic>>;
     final now = DateTime.now();
     final urgentDeadlines = upcoming.where((d) {
       final dueDate = d['dueDate'] as DateTime;
       return dueDate.difference(now).inHours <= 48;
     }).toList();
-    
+
     if (urgentDeadlines.isNotEmpty) {
       _hasShownDeadlinePopup = true;
       _showUrgentDeadlinesDialog(urgentDeadlines);
@@ -195,21 +265,29 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
           width: 400,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF142240)
+                : Colors.white,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: const Color(0xFFFF4757).withAlpha(100)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const CustomIconWidget(iconName: 'warning', color: Color(0xFFFF4757), size: 48),
+              const CustomIconWidget(
+                iconName: 'warning',
+                color: Color(0xFFFF4757),
+                size: 48,
+              ),
               const SizedBox(height: 16),
               Text(
                 'Upcoming Deadlines!',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
-                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black87,
                 ),
               ),
               const SizedBox(height: 8),
@@ -231,16 +309,28 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                   ),
                   child: Row(
                     children: [
-                      const CustomIconWidget(iconName: 'schedule', color: Color(0xFFFF4757), size: 20),
+                      const CustomIconWidget(
+                        iconName: 'schedule',
+                        color: Color(0xFFFF4757),
+                        size: 20,
+                      ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(quiz.title, style: const TextStyle(fontWeight: FontWeight.w600)),
+                            Text(
+                              quiz.title,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                             Text(
                               'Due: ${date.month}/${date.day} at ${_formatTimeOnly(date)}',
-                              style: const TextStyle(fontSize: 12, color: Color(0xFFFF4757)),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFFFF4757),
+                              ),
                             ),
                           ],
                         ),
@@ -258,7 +348,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                   minimumSize: const Size(double.infinity, 45),
                 ),
                 child: const Text('Got it'),
-              )
+              ),
             ],
           ),
         ),
@@ -283,21 +373,9 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     _entranceController.dispose();
     _notificationsSub?.cancel();
     _deadlinesSub?.cancel();
+    _quizAttemptsSub?.cancel();
+    _labActivitySub?.cancel();
     super.dispose();
-  }
-
-  String _formatDateTime(DateTime dt) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    final month = months[dt.month - 1];
-    final day = dt.day;
-    final year = dt.year;
-    
-    final h = dt.hour == 0 ? 12 : (dt.hour > 12 ? dt.hour - 12 : dt.hour);
-    final m = dt.minute.toString().padLeft(2, '0');
-    final s = dt.second.toString().padLeft(2, '0');
-    final ampm = dt.hour >= 12 ? 'PM' : 'AM';
-    
-    return '$month $day, $year  •  $h:$m:$s $ampm PHT';
   }
 
   String _formatTimeOnly(DateTime dt) {
@@ -328,10 +406,13 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
             builder: (context) {
               final user = context.watch<AuthService>().currentUser;
               final lastRead = user?.lastNotificationReadAt ?? DateTime(2000);
-              final hasUnread = _notifications.any((n) => (n['timestamp'] as DateTime).isAfter(lastRead));
-              
+              final hasUnread = _notifications.any(
+                (n) => (n['timestamp'] as DateTime).isAfter(lastRead),
+              );
+
               final avgStr = _progressStats['avgQuiz'] as String;
-              final doubleVal = double.tryParse(avgStr.replaceAll('%', '')) ?? 0.0;
+              final doubleVal =
+                  double.tryParse(avgStr.replaceAll('%', '')) ?? 0.0;
               final double progressPercent = doubleVal / 100.0;
 
               return UserHeaderWidget(
@@ -348,13 +429,22 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
         ),
         SliverToBoxAdapter(child: _buildDateTimeSection()),
         SliverToBoxAdapter(
-          child: _buildAnimatedSection(delay: 0, child: _buildNotificationsSection()),
+          child: _buildAnimatedSection(
+            delay: 0,
+            child: _buildNotificationsSection(),
+          ),
         ),
         SliverToBoxAdapter(
-          child: _buildAnimatedSection(delay: 100, child: _buildProgressSummarySection()),
+          child: _buildAnimatedSection(
+            delay: 100,
+            child: _buildProgressSummarySection(),
+          ),
         ),
         SliverToBoxAdapter(
-          child: _buildAnimatedSection(delay: 200, child: _buildCalendarSection()),
+          child: _buildAnimatedSection(
+            delay: 200,
+            child: _buildCalendarSection(),
+          ),
         ),
         const SliverToBoxAdapter(child: SizedBox(height: 140)),
       ],
@@ -369,10 +459,13 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
             builder: (context) {
               final user = context.watch<AuthService>().currentUser;
               final lastRead = user?.lastNotificationReadAt ?? DateTime(2000);
-              final hasUnread = _notifications.any((n) => (n['timestamp'] as DateTime).isAfter(lastRead));
-              
+              final hasUnread = _notifications.any(
+                (n) => (n['timestamp'] as DateTime).isAfter(lastRead),
+              );
+
               final avgStr = _progressStats['avgQuiz'] as String;
-              final doubleVal = double.tryParse(avgStr.replaceAll('%', '')) ?? 0.0;
+              final doubleVal =
+                  double.tryParse(avgStr.replaceAll('%', '')) ?? 0.0;
               final double progressPercent = doubleVal / 100.0;
 
               return UserHeaderWidget(
@@ -396,14 +489,23 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                 flex: 5,
                 child: Column(
                   children: [
-                    _buildAnimatedSection(delay: 0, child: _buildNotificationsSection()),
-                    _buildAnimatedSection(delay: 200, child: _buildCalendarSection()),
+                    _buildAnimatedSection(
+                      delay: 0,
+                      child: _buildNotificationsSection(),
+                    ),
+                    _buildAnimatedSection(
+                      delay: 200,
+                      child: _buildCalendarSection(),
+                    ),
                   ],
                 ),
               ),
               Expanded(
                 flex: 4,
-                child: _buildAnimatedSection(delay: 100, child: _buildProgressSummarySection()),
+                child: _buildAnimatedSection(
+                  delay: 100,
+                  child: _buildProgressSummarySection(),
+                ),
               ),
             ],
           ),
@@ -416,31 +518,28 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     return AnimatedBuilder(
       animation: _entranceController,
       builder: (context, child) {
-        final slide = Tween<Offset>(
-          begin: const Offset(0, 0.15),
-          end: Offset.zero,
-        ).animate(
-          CurvedAnimation(
-            parent: _entranceController,
-            curve: Interval(
-              (delay / 600).clamp(0.0, 0.8),
-              ((delay + 300) / 600).clamp(0.0, 1.0),
-              curve: Curves.easeOutCubic,
-            ),
-          ),
-        );
+        final slide =
+            Tween<Offset>(
+              begin: const Offset(0, 0.15),
+              end: Offset.zero,
+            ).animate(
+              CurvedAnimation(
+                parent: _entranceController,
+                curve: Interval(
+                  (delay / 600).clamp(0.0, 0.8),
+                  ((delay + 300) / 600).clamp(0.0, 1.0),
+                  curve: Curves.easeOutCubic,
+                ),
+              ),
+            );
         return SlideTransition(
           position: slide,
-          child: FadeTransition(
-            opacity: _entranceController,
-            child: child,
-          ),
+          child: FadeTransition(opacity: _entranceController, child: child),
         );
       },
       child: child,
     );
   }
-
 
   String _formatNotificationTime(DateTime? dt) {
     if (dt == null) return '';
@@ -453,14 +552,12 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
   Stream<List<Map<String, dynamic>>> _streamDynamicNotifications() {
     final user = context.read<AuthService>().currentUser;
     if (user == null) return Stream.value([]);
-    
-    return context
-        .read<CourseService>()
-        .coursesForStudentStream(user)
-        .map((courses) {
+
+    return context.read<CourseService>().coursesForStudentStream(user).map((
+      courses,
+    ) {
       List<Map<String, dynamic>> notifications = [];
       for (final course in courses) {
-
         // Always expose an assigned course in Recent Course Content. Older
         // course documents may not have a createdAt value, so they receive a
         // deterministic old timestamp instead of disappearing from the feed.
@@ -482,56 +579,59 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
           'course': course,
           'isCourseContent': true,
         });
-        
+
         // Modules
         for (var m in course.modules) {
-           notifications.add({
-             'title': 'New Module Uploaded',
-             'desc': '${course.teacherName} uploaded ${m.title} in ${course.title}.',
-             'icon': 'view_in_ar',
-             'color': const Color(0xFF00D4FF),
-              'timeStr': _formatNotificationTime(m.uploadedAt),
-              'timestamp':
-                  m.uploadedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
-              'course': course,
-              'isCourseContent': true,
-            });
+          notifications.add({
+            'title': 'New Module Uploaded',
+            'desc':
+                '${course.teacherName} uploaded ${m.title} in ${course.title}.',
+            'icon': 'view_in_ar',
+            'color': const Color(0xFF00D4FF),
+            'timeStr': _formatNotificationTime(m.uploadedAt),
+            'timestamp': m.uploadedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
+            'course': course,
+            'isCourseContent': true,
+          });
         }
-        
+
         // Quizzes
         for (var q in course.quizzes) {
-           notifications.add({
-             'title': 'New Quiz Available',
-             'desc': '${course.teacherName} posted ${q.title} in ${course.title}.',
-             'icon': 'quiz',
-             'color': const Color(0xFFFFB300),
-              'timeStr': _formatNotificationTime(q.createdAt),
-              'timestamp':
-                  q.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0),
-              'course': course,
-              'isCourseContent': true,
-            });
+          notifications.add({
+            'title': 'New Quiz Available',
+            'desc':
+                '${course.teacherName} posted ${q.title} in ${course.title}.',
+            'icon': 'quiz',
+            'color': const Color(0xFFFFB300),
+            'timeStr': _formatNotificationTime(q.createdAt),
+            'timestamp': q.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0),
+            'course': course,
+            'isCourseContent': true,
+          });
 
-           // Upcoming deadlines
-           if (q.dueDate != null && q.dueDate!.isAfter(DateTime.now())) {
-             final diff = q.dueDate!.difference(DateTime.now());
-             if (diff.inHours <= 48) {
-               notifications.add({
-                 'title': 'Quiz Deadline Approaching',
-                 'desc': '${q.title} is due in ${diff.inHours} hours.',
-                 'icon': 'schedule',
-                 'color': const Color(0xFFFF4757),
-                  'timeStr': 'Due soon',
-                  'timestamp': q.dueDate!.subtract(const Duration(hours: 48)),
-                  'course': course,
-                  'isCourseContent': false,
-                });
-             }
-           }
+          // Upcoming deadlines
+          if (q.dueDate != null && q.dueDate!.isAfter(DateTime.now())) {
+            final diff = q.dueDate!.difference(DateTime.now());
+            if (diff.inHours <= 48) {
+              notifications.add({
+                'title': 'Quiz Deadline Approaching',
+                'desc': '${q.title} is due in ${diff.inHours} hours.',
+                'icon': 'schedule',
+                'color': const Color(0xFFFF4757),
+                'timeStr': 'Due soon',
+                'timestamp': q.dueDate!.subtract(const Duration(hours: 48)),
+                'course': course,
+                'isCourseContent': false,
+              });
+            }
+          }
         }
       }
-      
-      notifications.sort((a, b) => (b['timestamp'] as DateTime).compareTo(a['timestamp'] as DateTime));
+
+      notifications.sort(
+        (a, b) =>
+            (b['timestamp'] as DateTime).compareTo(a['timestamp'] as DateTime),
+      );
       return notifications;
     });
   }
@@ -539,11 +639,10 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
   Stream<Map<String, List<Map<String, dynamic>>>> _streamUpcomingDeadlines() {
     final user = context.read<AuthService>().currentUser;
     if (user == null) return Stream.value({'upcoming': [], 'missed': []});
-    
-    return context
-        .read<CourseService>()
-        .coursesForStudentStream(user)
-        .map((courses) {
+
+    return context.read<CourseService>().coursesForStudentStream(user).map((
+      courses,
+    ) {
       List<Map<String, dynamic>> upcoming = [];
       List<Map<String, dynamic>> missed = [];
       final now = DateTime.now();
@@ -557,17 +656,19 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                 'dueDate': q.dueDate!,
               });
             } else {
-              missed.add({
-                'course': course,
-                'quiz': q,
-                'dueDate': q.dueDate!,
-              });
+              missed.add({'course': course, 'quiz': q, 'dueDate': q.dueDate!});
             }
           }
         }
       }
-      upcoming.sort((a, b) => (a['dueDate'] as DateTime).compareTo(b['dueDate'] as DateTime));
-      missed.sort((a, b) => (b['dueDate'] as DateTime).compareTo(a['dueDate'] as DateTime));
+      upcoming.sort(
+        (a, b) =>
+            (a['dueDate'] as DateTime).compareTo(b['dueDate'] as DateTime),
+      );
+      missed.sort(
+        (a, b) =>
+            (b['dueDate'] as DateTime).compareTo(a['dueDate'] as DateTime),
+      );
       return {'upcoming': upcoming, 'missed': missed};
     });
   }
@@ -578,14 +679,23 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
       builder: (context) {
         return Dialog(
           backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 24,
+          ),
           child: Container(
             width: 400,
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF142240)
+                  : Colors.white,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+              border: Border.all(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF1E3A5F)
+                    : Colors.grey.shade300,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.3),
@@ -602,7 +712,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                     child: Center(child: CircularProgressIndicator()),
                   );
                 }
-                
+
                 final notifs = _notifications;
                 return Column(
                   mainAxisSize: MainAxisSize.min,
@@ -614,7 +724,15 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                         Expanded(
                           child: Row(
                             children: [
-                              CustomIconWidget(iconName: 'notifications', color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0), size: 24),
+                              CustomIconWidget(
+                                iconName: 'notifications',
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? const Color(0xFF00D4FF)
+                                    : const Color(0xFF1565C0),
+                                size: 24,
+                              ),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Text(
@@ -622,7 +740,11 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w700,
-                                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                                    color:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black87,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -639,38 +761,65 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                                   showDialog(
                                     context: context,
                                     builder: (confirmCtx) {
-                                      final isDark = Theme.of(context).brightness == Brightness.dark;
+                                      final isDark =
+                                          Theme.of(context).brightness ==
+                                          Brightness.dark;
                                       return AlertDialog(
-                                        backgroundColor: isDark ? const Color(0xFF142240) : Colors.white,
+                                        backgroundColor: isDark
+                                            ? const Color(0xFF142240)
+                                            : Colors.white,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(16),
-                                          side: BorderSide(color: isDark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
+                                          side: BorderSide(
+                                            color: isDark
+                                                ? const Color(0xFF1E3A5F)
+                                                : Colors.grey.shade300,
+                                          ),
                                         ),
                                         title: Text(
                                           'Clear All Notifications',
                                           style: TextStyle(
-                                            color: isDark ? Colors.white : Colors.black87,
+                                            color: isDark
+                                                ? Colors.white
+                                                : Colors.black87,
                                             fontWeight: FontWeight.w700,
                                           ),
                                         ),
                                         content: Text(
                                           'Are you sure you want to clear all notifications?',
                                           style: TextStyle(
-                                            color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
+                                            color: isDark
+                                                ? const Color(0xFF8BA3C0)
+                                                : Colors.grey.shade700,
                                           ),
                                         ),
                                         actions: [
                                           TextButton(
-                                            onPressed: () => Navigator.pop(confirmCtx),
-                                            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                                            onPressed: () =>
+                                                Navigator.pop(confirmCtx),
+                                            child: const Text(
+                                              'Cancel',
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                              ),
+                                            ),
                                           ),
                                           TextButton(
                                             onPressed: () {
-                                              context.read<AuthService>().clearAllNotifications();
+                                              context
+                                                  .read<AuthService>()
+                                                  .clearAllNotifications();
                                               Navigator.pop(confirmCtx);
                                               Navigator.pop(context);
                                             },
-                                            child: const Text('Clear', style: TextStyle(color: Color(0xFFFF4757))),
+                                            child: const Text(
+                                              'Clear',
+                                              style: TextStyle(
+                                                color: Color(0xFFFF4757),
+                                              ),
+                                            ),
                                           ),
                                         ],
                                       );
@@ -678,14 +827,22 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                                   );
                                 },
                                 style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
                                   minimumSize: Size.zero,
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
                                 ),
                                 child: Text(
                                   'Clear All',
                                   style: TextStyle(
-                                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                                    color:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? const Color(0xFF8BA3C0)
+                                        : Colors.grey.shade600,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -697,10 +854,22 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                               child: Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade200,
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? const Color(0xFF0A1628)
+                                      : Colors.grey.shade200,
                                   shape: BoxShape.circle,
                                 ),
-                                child: CustomIconWidget(iconName: 'close', color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700, size: 16),
+                                child: CustomIconWidget(
+                                  iconName: 'close',
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? const Color(0xFF8BA3C0)
+                                      : Colors.grey.shade700,
+                                  size: 16,
+                                ),
                               ),
                             ),
                           ],
@@ -735,7 +904,10 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                                     onTap: () {
                                       Navigator.pop(context);
                                       if (n['course'] != null) {
-                                        context.go(AppRoutes.studentCoursesScreen, extra: n['course']);
+                                        context.go(
+                                          AppRoutes.studentCoursesScreen,
+                                          extra: n['course'],
+                                        );
                                       }
                                     },
                                   ),
@@ -755,69 +927,90 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     );
   }
 
-  Widget _buildNotificationItem(String title, String desc, String icon, Color color, String time, {VoidCallback? onTap}) {
+  Widget _buildNotificationItem(
+    String title,
+    String desc,
+    String icon,
+    Color color,
+    String time, {
+    VoidCallback? onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: CustomIconWidget(iconName: icon, color: color, size: 20),
+        decoration: BoxDecoration(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF0A1628)
+              : Colors.grey.shade50,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF1E3A5F)
+                : Colors.grey.shade300,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: CustomIconWidget(iconName: icon, color: color, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.black87,
+                          ),
                         ),
                       ),
-                    ),
-                    Text(
-                      time,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                      Text(
+                        time,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF8BA3C0)
+                              : Colors.grey.shade600,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  desc,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
-                    height: 1.4,
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    desc,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF8BA3C0)
+                          : Colors.grey.shade600,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ));
+    );
   }
 
   Widget _buildDateTimeSection() {
@@ -831,29 +1024,17 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w700,
-              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black87,
             ),
           ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              CustomIconWidget(iconName: 'schedule', color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0), size: 16),
-              const SizedBox(width: 6),
-              Text(
-                _formatDateTime(_philippinesTime),
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
-                ),
-              ),
-            ],
-          ),
+          const SizedBox(height: 14),
+          DashboardDateTimeCard(dateTime: _philippinesTime),
         ],
       ),
     );
   }
-
 
   Widget _buildNotificationsSection() {
     return Padding(
@@ -866,51 +1047,53 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black87,
             ),
           ),
           const SizedBox(height: 12),
           Builder(
             builder: (ctx) {
-               if (_isLoadingNotifications) {
-                 return const Center(child: CircularProgressIndicator());
-               }
-               if (_courseActivityError != null) {
-                 return Padding(
-                   padding: const EdgeInsets.symmetric(vertical: 12),
-                   child: Row(
-                     children: [
-                       Expanded(
-                         child: Text(
-                           'Unable to load recent course content.',
-                           style: TextStyle(
-                             color: Theme.of(context).brightness ==
-                                     Brightness.dark
-                                 ? const Color(0xFF8BA3C0)
-                                 : Colors.grey.shade700,
-                           ),
-                         ),
-                       ),
-                       TextButton(
-                         onPressed: _retryStudentData,
-                         child: const Text('Retry'),
-                       ),
-                     ],
-                   ),
-                 );
-               }
-               final recentContent = _recentCourseContent;
-               if (recentContent.isEmpty) {
-                  return const Padding(
-                     padding: EdgeInsets.symmetric(vertical: 20),
-                     child: Text(
-                       'No course content is assigned to your grade and section yet.',
-                       style: TextStyle(color: Colors.grey),
-                     ),
-                  );
-               }
-               return Column(
-                 children: recentContent.map((n) {
+              if (_isLoadingNotifications) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (_courseActivityError != null) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Unable to load recent course content.',
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF8BA3C0)
+                                : Colors.grey.shade700,
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: _retryStudentData,
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              final recentContent = _recentCourseContent;
+              if (recentContent.isEmpty) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20),
+                  child: Text(
+                    'No course content is assigned to your grade and section yet.',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                );
+              }
+              return Column(
+                children: recentContent.map((n) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: _buildAlertCard(
@@ -929,9 +1112,14 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     );
   }
 
-  Widget _buildAlertCard({required String title, required String subtitle, required String icon, required Color color}) {
+  Widget _buildAlertCard({
+    required String title,
+    required String subtitle,
+    required String icon,
+    required Color color,
+  }) {
     return Container(
-        padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color.withAlpha(20),
         borderRadius: BorderRadius.circular(16),
@@ -965,7 +1153,9 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                   subtitle,
                   style: TextStyle(
                     fontSize: 13,
-                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white.withAlpha(200) : Colors.black54,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white.withAlpha(200)
+                        : Colors.black54,
                   ),
                 ),
               ],
@@ -974,36 +1164,6 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
         ],
       ),
     );
-  }
-
-
-  Future<Map<String, dynamic>> _fetchProgressStats() async {
-    final user = context.read<AuthService>().currentUser;
-    if (user == null) return {'avgQuiz': '0%', 'labs': '0'};
-    final db = FirebaseFirestore.instance;
-    
-    // fetch quizzes
-    final qSnap = await db.collection('quiz_attempts').where('studentId', isEqualTo: user.id).get();
-    double totalScore = 0;
-    int quizCount = 0;
-    for (var doc in qSnap.docs) {
-       final data = doc.data();
-       final s = (data['score'] as num?)?.toInt() ?? 0;
-       final t = (data['totalQuestions'] as num?)?.toInt() ?? 1;
-       if (t > 0) {
-         totalScore += (s / t);
-         quizCount++;
-       }
-    }
-    final avg = quizCount > 0 ? (totalScore / quizCount) * 100 : 0.0;
-    
-    // fetch labs
-    final lSnap = await db.collection('users').doc(user.id).collection('experiment_activity').where('completedAt', isNotEqualTo: null).get();
-    
-    return {
-       'avgQuiz': '${avg.toStringAsFixed(0)}%',
-       'labs': '${lSnap.docs.length}',
-    };
   }
 
   Widget _buildProgressSummarySection() {
@@ -1017,7 +1177,9 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black87,
             ),
           ),
           const SizedBox(height: 12),
@@ -1029,9 +1191,25 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
               final stats = _progressStats;
               return Row(
                 children: [
-                  Expanded(child: _buildSummaryCard('Avg Quiz Score', stats['avgQuiz'] as String, 'quiz', Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0))),
+                  Expanded(
+                    child: _buildSummaryCard(
+                      'Avg Quiz Score',
+                      stats['avgQuiz'] as String,
+                      'quiz',
+                      Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF00D4FF)
+                          : const Color(0xFF1565C0),
+                    ),
+                  ),
                   const SizedBox(width: 12),
-                  Expanded(child: _buildSummaryCard('Completed Labs', stats['labs'] as String, 'biotech', const Color(0xFF7C3AED))),
+                  Expanded(
+                    child: _buildSummaryCard(
+                      'Completed Labs',
+                      stats['labs'] as String,
+                      'biotech',
+                      const Color(0xFF7C3AED),
+                    ),
+                  ),
                 ],
               );
             },
@@ -1041,47 +1219,77 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     );
   }
 
-  Widget _buildSummaryCard(String title, String value, String icon, Color color, {bool isWide = false}) {
+  Widget _buildSummaryCard(
+    String title,
+    String value,
+    String icon,
+    Color color, {
+    bool isWide = false,
+  }) {
     return Container(
-        padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF142240)
+            : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF1E3A5F)
+              : Colors.grey.shade300,
+        ),
       ),
-      child: isWide 
-        ? Row(
-            children: [
-              CustomIconWidget(iconName: icon, color: color, size: 28),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  title,
-                  style: TextStyle(fontSize: 14, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700),
+      child: isWide
+          ? Row(
+              children: [
+                CustomIconWidget(iconName: icon, color: color, size: 28),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF8BA3C0)
+                          : Colors.grey.shade700,
+                    ),
+                  ),
                 ),
-              ),
-              Text(
-                value,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: color),
-              ),
-            ],
-          )
-        : Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomIconWidget(iconName: icon, color: color, size: 24),
-              const SizedBox(height: 12),
-              Text(
-                value,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: color),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                title,
-                style: TextStyle(fontSize: 13, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700),
-              ),
-            ],
-          ),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
+                ),
+              ],
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomIconWidget(iconName: icon, color: color, size: 24),
+                const SizedBox(height: 12),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF8BA3C0)
+                        : Colors.grey.shade700,
+                  ),
+                ),
+              ],
+            ),
     );
   }
 
@@ -1093,14 +1301,22 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
         children: [
           Row(
             children: [
-              CustomIconWidget(iconName: 'calendar_month', color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700, size: 20),
+              CustomIconWidget(
+                iconName: 'calendar_month',
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF8BA3C0)
+                    : Colors.grey.shade700,
+                size: 20,
+              ),
               SizedBox(width: 8),
               Text(
                 'Upcoming Due Dates',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black87,
                 ),
               ),
             ],
@@ -1114,13 +1330,19 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
               final data = _deadlines;
               final upcoming = data['upcoming'] as List<Map<String, dynamic>>;
               final missed = data['missed'] as List<Map<String, dynamic>>;
-              
+
               if (upcoming.isEmpty && missed.isEmpty) {
                 return Container(
                   decoration: BoxDecoration(
-                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF142240)
+                        : Colors.white,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+                    border: Border.all(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF1E3A5F)
+                          : Colors.grey.shade300,
+                    ),
                   ),
                   child: const Padding(
                     padding: EdgeInsets.symmetric(vertical: 24, horizontal: 16),
@@ -1139,21 +1361,47 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                   if (upcoming.isNotEmpty)
                     Container(
                       decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF142240)
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+                        border: Border.all(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF1E3A5F)
+                              : Colors.grey.shade300,
+                        ),
                       ),
                       child: Column(
                         children: upcoming.take(4).map((d) {
                           final date = d['dueDate'] as DateTime;
-                          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                          const months = [
+                            'Jan',
+                            'Feb',
+                            'Mar',
+                            'Apr',
+                            'May',
+                            'Jun',
+                            'Jul',
+                            'Aug',
+                            'Sep',
+                            'Oct',
+                            'Nov',
+                            'Dec',
+                          ];
                           final m = months[date.month - 1];
                           final day = date.day.toString();
                           final title = (d['quiz'] as CourseQuiz).title;
                           final time = _formatTimeOnly(date);
-                          final isUpcoming = date.difference(DateTime.now()).inHours <= 48;
-                          
-                          return _buildCalendarItem(day, m, title, time, isUpcoming);
+                          final isUpcoming =
+                              date.difference(DateTime.now()).inHours <= 48;
+
+                          return _buildCalendarItem(
+                            day,
+                            m,
+                            title,
+                            time,
+                            isUpcoming,
+                          );
                         }).toList(),
                       ),
                     ),
@@ -1161,7 +1409,11 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                     const SizedBox(height: 20),
                     Row(
                       children: [
-                        CustomIconWidget(iconName: 'warning', color: const Color(0xFFFF4757), size: 20),
+                        CustomIconWidget(
+                          iconName: 'warning',
+                          color: const Color(0xFFFF4757),
+                          size: 20,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           'Missed Deadlines',
@@ -1176,20 +1428,44 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                     const SizedBox(height: 12),
                     Container(
                       decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF142240)
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFFF4757).withAlpha(100)),
+                        border: Border.all(
+                          color: const Color(0xFFFF4757).withAlpha(100),
+                        ),
                       ),
                       child: Column(
                         children: missed.take(3).map((d) {
                           final date = d['dueDate'] as DateTime;
-                          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                          const months = [
+                            'Jan',
+                            'Feb',
+                            'Mar',
+                            'Apr',
+                            'May',
+                            'Jun',
+                            'Jul',
+                            'Aug',
+                            'Sep',
+                            'Oct',
+                            'Nov',
+                            'Dec',
+                          ];
                           final m = months[date.month - 1];
                           final day = date.day.toString();
                           final title = (d['quiz'] as CourseQuiz).title;
                           final time = _formatTimeOnly(date);
-                          
-                          return _buildCalendarItem(day, m, title, time, false, isMissed: true);
+
+                          return _buildCalendarItem(
+                            day,
+                            m,
+                            title,
+                            time,
+                            false,
+                            isMissed: true,
+                          );
                         }).toList(),
                       ),
                     ),
@@ -1197,13 +1473,20 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                 ],
               );
             },
-          )
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildCalendarItem(String day, String month, String title, String time, bool isUpcoming, {bool isMissed = false}) {
+  Widget _buildCalendarItem(
+    String day,
+    String month,
+    String title,
+    String time,
+    bool isUpcoming, {
+    bool isMissed = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -1212,13 +1495,27 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
             width: 50,
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              color: isMissed 
-                  ? const Color(0xFFFF4757).withAlpha(20) 
-                  : (isUpcoming ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF).withAlpha(20) : const Color(0xFF1565C0).withAlpha(20)) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade50)),
+              color: isMissed
+                  ? const Color(0xFFFF4757).withAlpha(20)
+                  : (isUpcoming
+                        ? (Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF00D4FF).withAlpha(20)
+                              : const Color(0xFF1565C0).withAlpha(20))
+                        : (Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF0A1628)
+                              : Colors.grey.shade50)),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: isMissed 
-                  ? const Color(0xFFFF4757) 
-                  : (isUpcoming ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300))),
+              border: Border.all(
+                color: isMissed
+                    ? const Color(0xFFFF4757)
+                    : (isUpcoming
+                          ? (Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF00D4FF)
+                                : const Color(0xFF1565C0))
+                          : (Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF1E3A5F)
+                                : Colors.grey.shade300)),
+              ),
             ),
             child: Column(
               children: [
@@ -1229,7 +1526,13 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                     fontWeight: FontWeight.w600,
                     color: isMissed
                         ? const Color(0xFFFF4757)
-                        : (isUpcoming ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600)),
+                        : (isUpcoming
+                              ? (Theme.of(context).brightness == Brightness.dark
+                                    ? const Color(0xFF00D4FF)
+                                    : const Color(0xFF1565C0))
+                              : (Theme.of(context).brightness == Brightness.dark
+                                    ? const Color(0xFF8BA3C0)
+                                    : Colors.grey.shade600)),
                   ),
                 ),
                 Text(
@@ -1239,7 +1542,13 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                     fontWeight: FontWeight.w700,
                     color: isMissed
                         ? const Color(0xFFFF4757)
-                        : (isUpcoming ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)) : (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87)),
+                        : (isUpcoming
+                              ? (Theme.of(context).brightness == Brightness.dark
+                                    ? const Color(0xFF00D4FF)
+                                    : const Color(0xFF1565C0))
+                              : (Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black87)),
                   ),
                 ),
               ],
@@ -1255,19 +1564,29 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black87,
                   ),
                 ),
                 SizedBox(height: 4),
                 Row(
                   children: [
-                    CustomIconWidget(iconName: 'schedule', color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, size: 14),
+                    CustomIconWidget(
+                      iconName: 'schedule',
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF8BA3C0)
+                          : Colors.grey.shade600,
+                      size: 14,
+                    ),
                     SizedBox(width: 4),
                     Text(
                       time,
                       style: TextStyle(
                         fontSize: 13,
-                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF8BA3C0)
+                            : Colors.grey.shade600,
                       ),
                     ),
                   ],

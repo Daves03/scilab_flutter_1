@@ -39,6 +39,29 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
     });
   }
 
+  @override
+  void didUpdateWidget(covariant QuizSectionWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final activeQuiz = _activeQuiz;
+    if (activeQuiz == null) return;
+
+    CourseQuiz? updatedQuiz;
+    for (final quiz in widget.course.quizzes) {
+      if (quiz.id == activeQuiz.id) {
+        updatedQuiz = quiz;
+        break;
+      }
+    }
+
+    if (updatedQuiz == null) {
+      _activeQuiz = null;
+      _selectedAnswers.clear();
+      _quizSubmitted = false;
+    } else {
+      _activeQuiz = updatedQuiz;
+    }
+  }
+
   void _startQuiz(CourseQuiz quiz) {
     setState(() {
       _activeQuiz = quiz;

@@ -177,16 +177,36 @@ class CourseService {
   }
 
   Future<void> removeModule(String courseId, String moduleId) async {
-    final course = await _fetchOne(courseId);
-    if (course == null) { return; }
-    final target = course.modules.where((m) => m.id == moduleId).toList();
-    final updated = course.modules.where((m) => m.id != moduleId).toList();
-    await _db.collection(_coursesCollection).doc(courseId).update({
-      'modules': updated.map((m) => m.toMap()).toList(),
+    final courseRef = _db.collection(_coursesCollection).doc(courseId);
+    var storagePath = '';
+
+    await _db.runTransaction((transaction) async {
+      final snapshot = await transaction.get(courseRef);
+      final data = snapshot.data();
+      if (!snapshot.exists || data == null) return;
+
+      final rawModules = data['modules'];
+      final modules = rawModules is List
+          ? List<dynamic>.from(rawModules)
+          : <dynamic>[];
+      final updated = <dynamic>[];
+
+      for (final rawModule in modules) {
+        if (rawModule is Map && rawModule['id']?.toString() == moduleId) {
+          if (storagePath.isEmpty) {
+            storagePath = rawModule['storagePath']?.toString() ?? '';
+          }
+        } else {
+          updated.add(rawModule);
+        }
+      }
+
+      transaction.update(courseRef, {'modules': updated});
     });
-    if (target.isNotEmpty && target.first.storagePath.isNotEmpty) {
+
+    if (storagePath.isNotEmpty) {
       try {
-        await _storage.ref(target.first.storagePath).delete();
+        await _storage.ref(storagePath).delete();
       } catch (_) {}
     }
   }
@@ -221,11 +241,21 @@ class CourseService {
   }
 
   Future<void> removeQuiz(String courseId, String quizId) async {
-    final course = await _fetchOne(courseId);
-    if (course == null) { return; }
-    final updated = course.quizzes.where((q) => q.id != quizId).toList();
-    await _db.collection(_coursesCollection).doc(courseId).update({
-      'quizzes': updated.map((q) => q.toMap()).toList(),
+    final courseRef = _db.collection(_coursesCollection).doc(courseId);
+    await _db.runTransaction((transaction) async {
+      final snapshot = await transaction.get(courseRef);
+      final data = snapshot.data();
+      if (!snapshot.exists || data == null) return;
+
+      final rawQuizzes = data['quizzes'];
+      final quizzes = rawQuizzes is List
+          ? List<dynamic>.from(rawQuizzes)
+          : <dynamic>[];
+      final updated = quizzes.where((rawQuiz) {
+        return rawQuiz is! Map || rawQuiz['id']?.toString() != quizId;
+      }).toList();
+
+      transaction.update(courseRef, {'quizzes': updated});
     });
   }
 

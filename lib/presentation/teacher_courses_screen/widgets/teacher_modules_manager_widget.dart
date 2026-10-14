@@ -40,17 +40,31 @@ class _CourseModulesManagerWidgetState
   }
 
   void _deleteModule(CourseModule module) {
+    final courseService = context.read<CourseService>();
     showDialog(
       context: context,
       builder: (ctx) => _ConfirmDeleteDialog(
         title: 'Remove Module',
         message: 'Remove "${module.title}" from this course?',
-        onConfirm: () {
-          setState(() {
-            widget.course.modules.removeWhere((m) => m.id == module.id);
-          });
-          widget.onUpdated();
-      context.read<CourseService>().updateCourse(widget.course);
+        onConfirm: () async {
+          try {
+            await courseService.removeModule(widget.course.id, module.id);
+            if (!mounted) return;
+
+            setState(() {
+              widget.course.modules.removeWhere((m) => m.id == module.id);
+            });
+            widget.onUpdated();
+          } catch (_) {
+            if (!mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Could not remove the module. Please check your connection and try again.',
+                ),
+              ),
+            );
+          }
         },
       ),
     );
@@ -377,7 +391,12 @@ class _CourseModulesManagerWidgetState
               } else {
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('AI Quiz generation failed.')),
+                    SnackBar(
+                      content: Text(
+                        aiService.lastErrorMessage ??
+                            'AI quiz generation failed. Please try again.',
+                      ),
+                    ),
                   );
                 }
               }
