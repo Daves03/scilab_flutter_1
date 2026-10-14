@@ -345,11 +345,19 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
     TextInputType? keyboardType,
     String? Function(String?)? validator,
   }) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-        child: TextFormField(
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Positioned.fill(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+              child: const SizedBox.expand(),
+            ),
+          ),
+        ),
+        TextFormField(
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
@@ -383,7 +391,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 }

@@ -337,10 +337,13 @@ class AuthService extends ChangeNotifier {
     loading = true;
     notifyListeners();
     try {
+      final previousAvatarUrl = currentUser!.avatarUrl;
       final storageRef = firebase_storage.FirebaseStorage.instance
           .ref()
           .child('user_avatars')
-          .child('${currentUser!.id}_$fileName');
+          .child(
+            '${currentUser!.id}_${DateTime.now().millisecondsSinceEpoch}_$fileName',
+          );
       
       final uploadTask = storageRef.putData(fileBytes);
       final snapshot = await uploadTask;
@@ -356,12 +359,60 @@ class AuthService extends ChangeNotifier {
       }
       
       currentUser!.avatarUrl = downloadUrl;
+
+      if (previousAvatarUrl != downloadUrl) {
+        await _deleteStoredAvatarBestEffort(previousAvatarUrl);
+      }
     } catch (e) {
       debugPrint('Error updating profile picture: $e');
       throw AuthFailure('Failed to update profile picture: $e');
     } finally {
       loading = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> removeProfilePicture() async {
+    if (currentUser == null) return;
+    loading = true;
+    notifyListeners();
+
+    final previousAvatarUrl = currentUser!.avatarUrl;
+    try {
+      await _db.collection('users').doc(currentUser!.id).update({
+        'avatarUrl': FieldValue.delete(),
+      });
+
+      final user = _auth.currentUser;
+      if (user != null) {
+        try {
+          await user.updatePhotoURL(null);
+        } catch (e) {
+          debugPrint('Failed to clear Firebase Auth profile picture: $e');
+        }
+      }
+
+      currentUser!.avatarUrl = null;
+      await _deleteStoredAvatarBestEffort(previousAvatarUrl);
+    } catch (e) {
+      debugPrint('Error removing profile picture: $e');
+      throw AuthFailure('Failed to remove profile picture: $e');
+    } finally {
+      loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> _deleteStoredAvatarBestEffort(String? avatarUrl) async {
+    if (avatarUrl == null || avatarUrl.trim().isEmpty) return;
+
+    try {
+      await firebase_storage.FirebaseStorage.instance
+          .refFromURL(avatarUrl)
+          .delete();
+    } catch (e) {
+      // The URL may be external or the old file may already be gone.
+      debugPrint('Could not delete previous profile picture file: $e');
     }
   }
 

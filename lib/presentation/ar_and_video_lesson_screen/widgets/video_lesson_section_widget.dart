@@ -77,20 +77,31 @@ class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final accentColor =
+        isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0);
+    final titleColor = isDark ? Colors.white : const Color(0xFF0A1628);
+    final mutedColor =
+        isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700;
+
     if (_isLoading) {
-      return const Center(
+      return Center(
         child: Padding(
-          padding: EdgeInsets.all(20.0),
-          child: CircularProgressIndicator(color: Color(0xFF00D4FF)),
+          padding: const EdgeInsets.all(20.0),
+          child: CircularProgressIndicator(color: accentColor),
         ),
       );
     }
 
     if (_lessons.isEmpty) {
-      return const Center(
+      return Center(
         child: Padding(
-          padding: EdgeInsets.all(20.0),
-          child: Text('No videos found.', style: TextStyle(color: Colors.white)),
+          padding: const EdgeInsets.all(20.0),
+          child: Text(
+            'No videos found.',
+            style: TextStyle(color: mutedColor),
+          ),
         ),
       );
     }
@@ -107,30 +118,36 @@ class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Video Lessons',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
-                      color: Colors.white,
+                      color: titleColor,
                       letterSpacing: 0.5,
-                      shadows: [
-                        Shadow(
-                          color: Color(0x6600D4FF),
-                          blurRadius: 10,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
+                      shadows: isDark
+                          ? const [
+                              Shadow(
+                                color: Color(0x6600D4FF),
+                                blurRadius: 10,
+                                offset: Offset(0, 2),
+                              ),
+                            ]
+                          : null,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1E3A5F).withOpacity(0.3),
+                      color: isDark
+                          ? const Color(0xFF1E3A5F).withAlpha(77)
+                          : const Color(0xFFE8F2FF),
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(
-                        color: const Color(0xFF00D4FF).withOpacity(0.3),
+                        color: isDark
+                            ? const Color(0xFF00D4FF).withAlpha(77)
+                            : const Color(0xFFB8D8F8),
                       ),
                     ),
                     child: Row(
@@ -142,12 +159,12 @@ class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
                           size: 14,
                         ),
                         const SizedBox(width: 6),
-                        const Text(
+                        Text(
                           'Suggested on YouTube',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF8BA3C0),
+                            color: mutedColor,
                             letterSpacing: 0.3,
                           ),
                         ),
@@ -161,16 +178,27 @@ class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0F1E35),
+                    color: isDark ? const Color(0xFF0F1E35) : Colors.white,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: const Color(0xFF1E3A5F),
+                      color: isDark
+                          ? const Color(0xFF1E3A5F)
+                          : Colors.grey.shade300,
                       width: 1,
                     ),
+                    boxShadow: isDark
+                        ? null
+                        : const [
+                            BoxShadow(
+                              color: Color(0x120A1628),
+                              blurRadius: 8,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.refresh,
-                    color: Color(0xFF00D4FF),
+                    color: accentColor,
                     size: 20,
                   ),
                 ),
@@ -184,6 +212,14 @@ class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
   }
 
   Widget _buildLessonItem(_VideoLesson lesson) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? const Color(0xFF0F1E35) : Colors.white;
+    final borderColor =
+        isDark ? const Color(0xFF1E3A5F) : Colors.grey.shade300;
+    final titleColor = isDark ? Colors.white : const Color(0xFF0A1628);
+    final mutedColor =
+        isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade600;
+
     return GestureDetector(
       onTap: () async {
         final url = Uri.parse('https://www.youtube.com/watch?v=${lesson.id}');
@@ -196,12 +232,21 @@ class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: const Color(0xFF0F1E35),
+          color: cardColor,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: const Color(0xFF1E3A5F),
+            color: borderColor,
             width: 1,
           ),
+          boxShadow: isDark
+              ? null
+              : const [
+                  BoxShadow(
+                    color: Color(0x120A1628),
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  ),
+                ],
         ),
         child: Padding(
           padding: const EdgeInsets.all(14),
@@ -224,10 +269,10 @@ class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
                   children: [
                     Text(
                       lesson.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        color: titleColor,
                         height: 1.3,
                       ),
                       maxLines: 2,
@@ -255,9 +300,9 @@ class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
                         Expanded(
                           child: Text(
                             lesson.subject,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
-                              color: Color(0xFF8BA3C0),
+                              color: mutedColor,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,

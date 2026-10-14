@@ -1,6 +1,5 @@
 import '../../../core/app_export.dart';
 import '../../../models/course_model.dart';
-import '../../../services/course_service.dart';
 import '../../../services/auth_service.dart';
 import 'package:provider/provider.dart';
 import '../teacher_courses_screen.dart';
@@ -53,7 +52,6 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
   void _refresh() {
     setState(() {});
     widget.onUpdated();
-      context.read<CourseService>().updateCourse(widget.course);
   }
 
   @override

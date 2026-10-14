@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_selector/file_selector.dart';
+import '../core/course_assignment.dart';
 import '../models/course_model.dart';
+import '../models/user_model.dart';
 
 class CourseService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -25,6 +27,27 @@ class CourseService {
         .map((snap) => snap.docs.map((d) => Course.fromMap(d.id, d.data())).toList());
   }
 
+  Stream<List<Course>> coursesForStudentStream(AppUser student) {
+    final grade = student.role?.label;
+    if (!student.isStudent || grade == null || student.sections.isEmpty) {
+      return Stream.value(const <Course>[]);
+    }
+
+    return _db
+        .collection(_coursesCollection)
+        .where('grade', isEqualTo: grade)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map((document) => Course.fromMap(document.id, document.data()))
+              .where(
+                (course) =>
+                    CourseAssignment.courseMatchesStudent(course, student),
+              )
+              .toList(),
+        );
+  }
+
   /// One-shot fetch, used where a screen loads once into a mutable
   /// local list rather than staying subscribed to a stream.
   Future<List<Course>> fetchCourses() async {
@@ -38,6 +61,24 @@ class CourseService {
         .where('teacherUid', isEqualTo: teacherUid)
         .get();
     return snap.docs.map((d) => Course.fromMap(d.id, d.data())).toList();
+  }
+
+  Future<List<Course>> fetchCoursesForStudent(AppUser student) async {
+    final grade = student.role?.label;
+    if (!student.isStudent || grade == null || student.sections.isEmpty) {
+      return const <Course>[];
+    }
+
+    final snapshot = await _db
+        .collection(_coursesCollection)
+        .where('grade', isEqualTo: grade)
+        .get();
+    return snapshot.docs
+        .map((document) => Course.fromMap(document.id, document.data()))
+        .where(
+          (course) => CourseAssignment.courseMatchesStudent(course, student),
+        )
+        .toList();
   }
 
   Future<String> createCourse(Course course) async {
@@ -75,6 +116,7 @@ class CourseService {
       'title': course.title,
       'subject': course.subject,
       'grade': course.grade,
+      'sections': course.sections,
       'accentColorValue': course.accentColorValue,
       'iconName': course.iconName,
       'modules': course.modules.map((m) => m.toMap()).toList(),
@@ -135,16 +177,36 @@ class CourseService {
   }
 
   Future<void> removeModule(String courseId, String moduleId) async {
-    final course = await _fetchOne(courseId);
-    if (course == null) { return; }
-    final target = course.modules.where((m) => m.id == moduleId).toList();
-    final updated = course.modules.where((m) => m.id != moduleId).toList();
-    await _db.collection(_coursesCollection).doc(courseId).update({
-      'modules': updated.map((m) => m.toMap()).toList(),
+    final courseRef = _db.collection(_coursesCollection).doc(courseId);
+    var storagePath = '';
+
+    await _db.runTransaction((transaction) async {
+      final snapshot = await transaction.get(courseRef);
+      final data = snapshot.data();
+      if (!snapshot.exists || data == null) return;
+
+      final rawModules = data['modules'];
+      final modules = rawModules is List
+          ? List<dynamic>.from(rawModules)
+          : <dynamic>[];
+      final updated = <dynamic>[];
+
+      for (final rawModule in modules) {
+        if (rawModule is Map && rawModule['id']?.toString() == moduleId) {
+          if (storagePath.isEmpty) {
+            storagePath = rawModule['storagePath']?.toString() ?? '';
+          }
+        } else {
+          updated.add(rawModule);
+        }
+      }
+
+      transaction.update(courseRef, {'modules': updated});
     });
-    if (target.isNotEmpty && target.first.storagePath.isNotEmpty) {
+
+    if (storagePath.isNotEmpty) {
       try {
-        await _storage.ref(target.first.storagePath).delete();
+        await _storage.ref(storagePath).delete();
       } catch (_) {}
     }
   }
@@ -179,11 +241,21 @@ class CourseService {
   }
 
   Future<void> removeQuiz(String courseId, String quizId) async {
-    final course = await _fetchOne(courseId);
-    if (course == null) { return; }
-    final updated = course.quizzes.where((q) => q.id != quizId).toList();
-    await _db.collection(_coursesCollection).doc(courseId).update({
-      'quizzes': updated.map((q) => q.toMap()).toList(),
+    final courseRef = _db.collection(_coursesCollection).doc(courseId);
+    await _db.runTransaction((transaction) async {
+      final snapshot = await transaction.get(courseRef);
+      final data = snapshot.data();
+      if (!snapshot.exists || data == null) return;
+
+      final rawQuizzes = data['quizzes'];
+      final quizzes = rawQuizzes is List
+          ? List<dynamic>.from(rawQuizzes)
+          : <dynamic>[];
+      final updated = quizzes.where((rawQuiz) {
+        return rawQuiz is! Map || rawQuiz['id']?.toString() != quizId;
+      }).toList();
+
+      transaction.update(courseRef, {'quizzes': updated});
     });
   }
 

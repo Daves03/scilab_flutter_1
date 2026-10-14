@@ -429,59 +429,72 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
                   // ── Search Bar ───────────────────────────────────────────
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: cardColor,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: borderColor),
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (val) => setState(() => _searchQuery = val),
+                      onTapOutside: (_) => FocusScope.of(context).unfocus(),
+                      cursorColor: isDark
+                          ? const Color(0xFF00D4FF)
+                          : const Color(0xFF1565C0),
+                      textInputAction: TextInputAction.search,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
                       ),
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: (val) => setState(() => _searchQuery = val),
-                        style: theme.textTheme.bodyMedium,
-                        decoration: InputDecoration(
-                          hintText: 'Search student by name...',
-                          hintStyle: theme.textTheme.bodyMedium?.copyWith(
-                            color: subTextColor,
+                      decoration: InputDecoration(
+                        hintText: 'Search by student name or ID',
+                        hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                          color: subTextColor,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        filled: true,
+                        fillColor: cardColor,
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.only(left: 14, right: 10),
+                          child: CustomIconWidget(
+                            iconName: 'search',
+                            color: isDark
+                                ? const Color(0xFF00D4FF)
+                                : const Color(0xFF1565C0),
+                            size: 19,
                           ),
-                          prefixIcon: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: CustomIconWidget(
-                              iconName: 'search',
-                              color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
-                              size: 20,
-                            ),
-                          ),
-                          prefixIconConstraints: const BoxConstraints(
-                            minWidth: 44,
-                            minHeight: 44,
-                          ),
-                          suffixIcon: _searchQuery.isNotEmpty
-                              ? GestureDetector(
-                                  onTap: () {
-                                    _searchController.clear();
-                                    setState(() => _searchQuery = '');
-                                  },
-                                  child: const Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                    ),
-                                    child: CustomIconWidget(
-                                      iconName: 'close',
-                                      color: Color(0xFF8BA3C0),
-                                      size: 18,
-                                    ),
-                                  ),
-                                )
-                              : null,
-                          suffixIconConstraints: const BoxConstraints(
-                            minWidth: 44,
-                            minHeight: 44,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 12,
+                        ),
+                        prefixIconConstraints: const BoxConstraints(
+                          minWidth: 48,
+                          minHeight: 50,
+                        ),
+                        suffixIcon: _searchQuery.isNotEmpty
+                            ? IconButton(
+                                tooltip: 'Clear search',
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() => _searchQuery = '');
+                                },
+                                icon: const CustomIconWidget(
+                                  iconName: 'close',
+                                  color: Color(0xFF8BA3C0),
+                                  size: 18,
+                                ),
+                              )
+                            : null,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 15,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide(color: borderColor),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide(color: borderColor),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide(
+                            color: isDark
+                                ? const Color(0xFF00D4FF)
+                                : const Color(0xFF1565C0),
+                            width: 1.5,
                           ),
                         ),
                       ),

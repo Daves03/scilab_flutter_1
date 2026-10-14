@@ -1,10 +1,11 @@
-import 'dart:ui';
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import '../../core/app_export.dart';
-import '../../services/auth_service.dart';
-import '../../widgets/custom_icon_widget.dart';
 import '../../models/course_model.dart';
+import '../../services/auth_service.dart';
+import '../../services/course_service.dart';
 import '../../models/user_model.dart';
 
 class _QuizResult {
@@ -13,7 +14,13 @@ class _QuizResult {
   final int score;
   final int total;
   final DateTime timestamp;
-  const _QuizResult(this.title, this.date, this.score, this.total, this.timestamp);
+  const _QuizResult(
+    this.title,
+    this.date,
+    this.score,
+    this.total,
+    this.timestamp,
+  );
 }
 
 class _MissedQuizResult {
@@ -27,7 +34,8 @@ class _ArExperimentResult {
   final String title;
   final String date;
   final double score;
-  const _ArExperimentResult(this.title, this.date, this.score);
+  final DateTime timestamp;
+  const _ArExperimentResult(this.title, this.date, this.score, this.timestamp);
 }
 
 class StudentProgressScreen extends StatefulWidget {
@@ -40,6 +48,7 @@ class StudentProgressScreen extends StatefulWidget {
 class _StudentProgressScreenState extends State<StudentProgressScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _entranceController;
+  late final AuthService _authService;
 
   bool _loading = true;
   List<_QuizResult> _quizzes = [];
@@ -47,6 +56,11 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
   List<_ArExperimentResult> _arExperiments = [];
   String _avgQuiz = '0%';
   String _avgAr = '0.0';
+  StreamSubscription<List<QuizAttempt>>? _quizAttemptsSub;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _arActivitySub;
+  String? _studentDataKey;
+  int _dataVersion = 0;
+  int _missedLoadVersion = 0;
 
   @override
   void initState() {
@@ -55,11 +69,26 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
       vsync: this,
       duration: const Duration(milliseconds: 600),
     )..forward();
-    _loadData();
+    _authService = context.read<AuthService>();
+    _authService.addListener(_handleStudentChanged);
+    _handleStudentChanged();
   }
 
   String _formatDate(DateTime dt) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     final m = months[dt.month - 1];
     final h = dt.hour == 0 ? 12 : (dt.hour > 12 ? dt.hour - 12 : dt.hour);
     final min = dt.minute.toString().padLeft(2, '0');
@@ -67,100 +96,197 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
     return '$m ${dt.day}, ${dt.year} at $h:$min $ampm';
   }
 
-  Future<void> _loadData() async {
-    final user = context.read<AuthService>().currentUser;
+  String _studentKey(AppUser? user) {
+    if (user == null) return 'signed-out';
+    final sections =
+        user.sections
+            .map((section) => section.trim().toLowerCase())
+            .where((section) => section.isNotEmpty)
+            .toSet()
+            .toList()
+          ..sort();
+    return '${user.id}|${user.role?.id ?? ''}|${sections.join('|')}';
+  }
+
+  void _handleStudentChanged() {
+    final key = _studentKey(_authService.currentUser);
+    if (key == _studentDataKey) return;
+    _studentDataKey = key;
+    _subscribeToData();
+  }
+
+  void _subscribeToData() {
+    final version = ++_dataVersion;
+    _quizAttemptsSub?.cancel();
+    _arActivitySub?.cancel();
+
+    if (mounted) {
+      setState(() {
+        _loading = true;
+        _quizzes = [];
+        _missedQuizzes = [];
+        _arExperiments = [];
+        _avgQuiz = '0%';
+        _avgAr = '0.0';
+      });
+    }
+
+    final user = _authService.currentUser;
     if (user == null) {
       if (mounted) setState(() => _loading = false);
       return;
     }
 
-    try {
-      final db = FirebaseFirestore.instance;
-      
-      // Fetch quizzes
-      final qSnap = await db.collection('quiz_attempts').where('studentId', isEqualTo: user.id).get();
-      List<_QuizResult> quizzes = [];
-      double totalScore = 0;
-      int quizCount = 0;
-
-      for (var doc in qSnap.docs) {
-         final data = doc.data();
-         final s = (data['score'] as num?)?.toInt() ?? 0;
-         final t = (data['totalQuestions'] as num?)?.toInt() ?? 1;
-         final title = data['quizTitle'] as String? ?? 'Quiz';
-         final ts = data['submittedAt'] as Timestamp?;
-         final date = ts != null ? _formatDate(ts.toDate()) : 'Unknown Date';
-         
-         // Store actual timestamp for sorting
-         final timestamp = ts?.toDate() ?? DateTime(2000);
-         quizzes.add(_QuizResult(title, date, s, t, timestamp));
-         if (t > 0) {
-           totalScore += (s / t);
-           quizCount++;
-         }
-      }
-      // Sort quizzes descending by date
-      quizzes.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-
-      final avgQ = quizCount > 0 ? (totalScore / quizCount) * 100 : 0.0;
-
-      // Fetch AR
-      final arSnap = await db.collection('users').doc(user.id).collection('experiment_activity').where('completed', isEqualTo: true).get();
-      List<_ArExperimentResult> ars = [];
-      double totalAr = 0;
-      int arCount = 0;
-
-      for (var doc in arSnap.docs) {
-         final data = doc.data();
-         final title = data['experimentId'] as String? ?? 'Experiment';
-         final ts = data['completedAt'] as Timestamp?;
-         final date = ts != null ? _formatDate(ts.toDate()) : 'Unknown Date';
-         final score = (data['score'] as num?)?.toDouble() ?? 100.0; // Mock score if missing
-         ars.add(_ArExperimentResult(title, date, score));
-         totalAr += score;
-         arCount++;
-      }
-      final avgA = arCount > 0 ? (totalAr / arCount) : 0.0;
-
-      // Sort AR by date descending if completedAt exists
-      ars.sort((a, b) => b.date.compareTo(a.date)); 
-
-      // Fetch missed quizzes
-      List<_MissedQuizResult> missedQuizzes = [];
-      if (user.role != null) {
-        final coursesSnap = await db.collection('courses').where('grade', isEqualTo: user.role!.label).get();
-        for (var doc in coursesSnap.docs) {
-          final course = Course.fromMap(doc.id, doc.data());
-          if (user.sections.isNotEmpty && course.sections.contains(user.sections.first)) {
-            for (var q in course.quizzes) {
-               final hasAttempted = qSnap.docs.any((d) => (d.data()['quizId'] as String?) == q.id);
-               if (!hasAttempted && q.dueDate != null && q.dueDate!.isBefore(DateTime.now())) {
-                  missedQuizzes.add(_MissedQuizResult(q.title, _formatDate(q.dueDate!), q.dueDate!));
-               }
+    _quizAttemptsSub = context
+        .read<CourseService>()
+        .attemptsForStudent(user.id)
+        .listen(
+          (attempts) {
+            if (!mounted || version != _dataVersion) return;
+            _applyQuizAttempts(attempts);
+            _loadMissedQuizzes(
+              user,
+              attempts.map((attempt) => attempt.quizId).toSet(),
+              version,
+              ++_missedLoadVersion,
+            );
+          },
+          onError: (Object error) {
+            debugPrint('Error streaming quiz progress: $error');
+            if (mounted && version == _dataVersion) {
+              setState(() => _loading = false);
             }
+          },
+        );
+
+    _arActivitySub = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.id)
+        .collection('experiment_activity')
+        .snapshots()
+        .listen(
+          (snapshot) {
+            if (!mounted || version != _dataVersion) return;
+            _applyArActivity(snapshot.docs);
+          },
+          onError: (Object error) {
+            debugPrint('Error streaming AR progress: $error');
+          },
+        );
+  }
+
+  void _applyQuizAttempts(List<QuizAttempt> attempts) {
+    final latestByQuiz = <String, QuizAttempt>{};
+    for (final attempt in attempts) {
+      if (attempt.quizId.isEmpty || attempt.totalQuestions <= 0) continue;
+      final current = latestByQuiz[attempt.quizId];
+      final submittedAt = attempt.submittedAt ?? DateTime(2000);
+      final currentSubmittedAt = current?.submittedAt ?? DateTime(2000);
+      if (current == null || !submittedAt.isBefore(currentSubmittedAt)) {
+        latestByQuiz[attempt.quizId] = attempt;
+      }
+    }
+
+    final quizzes = latestByQuiz.values.map((attempt) {
+      final timestamp = attempt.submittedAt ?? DateTime(2000);
+      return _QuizResult(
+        attempt.quizTitle.isEmpty ? 'Quiz' : attempt.quizTitle,
+        attempt.submittedAt == null
+            ? 'Just now'
+            : _formatDate(attempt.submittedAt!),
+        attempt.score,
+        attempt.totalQuestions,
+        timestamp,
+      );
+    }).toList()..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+
+    final totalPercentage = latestByQuiz.values.fold<double>(
+      0,
+      (total, attempt) => total + (attempt.score / attempt.totalQuestions),
+    );
+    final average = latestByQuiz.isEmpty
+        ? 0.0
+        : (totalPercentage / latestByQuiz.length) * 100;
+
+    setState(() {
+      _quizzes = quizzes;
+      _avgQuiz = '${average.toStringAsFixed(0)}%';
+      _loading = false;
+    });
+  }
+
+  void _applyArActivity(
+    List<QueryDocumentSnapshot<Map<String, dynamic>>> documents,
+  ) {
+    final experiments = <_ArExperimentResult>[];
+    var totalScore = 0.0;
+    for (final document in documents) {
+      final data = document.data();
+      final completedAt = data['completedAt'];
+      if (completedAt is! Timestamp) continue;
+      final timestamp = completedAt.toDate();
+      final score = (data['score'] as num?)?.toDouble() ?? 100.0;
+      final title = (data['experimentId'] as String?)?.trim();
+      experiments.add(
+        _ArExperimentResult(
+          title == null || title.isEmpty ? document.id : title,
+          _formatDate(timestamp),
+          score,
+          timestamp,
+        ),
+      );
+      totalScore += score;
+    }
+    experiments.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+
+    setState(() {
+      _arExperiments = experiments;
+      _avgAr = experiments.isEmpty
+          ? '0.0'
+          : (totalScore / experiments.length).toStringAsFixed(1);
+    });
+  }
+
+  Future<void> _loadMissedQuizzes(
+    AppUser user,
+    Set<String> attemptedQuizIds,
+    int version,
+    int missedLoadVersion,
+  ) async {
+    try {
+      final assignedCourses = await context
+          .read<CourseService>()
+          .fetchCoursesForStudent(user);
+      final missedQuizzes = <_MissedQuizResult>[];
+      for (final course in assignedCourses) {
+        for (final quiz in course.quizzes) {
+          final dueDate = quiz.dueDate;
+          if (!attemptedQuizIds.contains(quiz.id) &&
+              dueDate != null &&
+              dueDate.isBefore(DateTime.now())) {
+            missedQuizzes.add(
+              _MissedQuizResult(quiz.title, _formatDate(dueDate), dueDate),
+            );
           }
         }
-        missedQuizzes.sort((a, b) => b.timestamp.compareTo(a.timestamp));
       }
-
-      if (mounted) {
-        setState(() {
-          _quizzes = quizzes;
-          _missedQuizzes = missedQuizzes;
-          _arExperiments = ars;
-          _avgQuiz = '${avgQ.toStringAsFixed(0)}%';
-          _avgAr = avgA.toStringAsFixed(1);
-          _loading = false;
-        });
+      missedQuizzes.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      if (mounted &&
+          version == _dataVersion &&
+          missedLoadVersion == _missedLoadVersion) {
+        setState(() => _missedQuizzes = missedQuizzes);
       }
-    } catch (e) {
-      print('Error fetching progress: $e');
-      if (mounted) setState(() => _loading = false);
+    } catch (error) {
+      debugPrint('Error fetching missed quizzes: $error');
     }
   }
 
   @override
   void dispose() {
+    _authService.removeListener(_handleStudentChanged);
+    _dataVersion++;
+    _quizAttemptsSub?.cancel();
+    _arActivitySub?.cancel();
     _entranceController.dispose();
     super.dispose();
   }
@@ -169,91 +295,131 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: _loading 
-        ? const Center(child: CircularProgressIndicator(color: Color(0xFF00D4FF)))
-        : CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: _buildHeader()),
-          SliverToBoxAdapter(
-            child: _buildAnimatedSection(
-              delay: 0,
-              child: _buildOverviewCards(),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: _buildAnimatedSection(
-              delay: 100,
-              child: _buildSectionHeader('Quiz Results', 'quiz'),
-            ),
-          ),
-          _quizzes.isEmpty
-              ? SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Center(
-                      child: Text('No quizzes completed yet.', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600)),
+      body: SafeArea(
+        bottom: false,
+        child: _loading
+            ? const Center(
+                child: CircularProgressIndicator(color: Color(0xFF00D4FF)),
+              )
+            : CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(child: _buildHeader()),
+                  SliverToBoxAdapter(
+                    child: _buildAnimatedSection(
+                      delay: 0,
+                      child: _buildOverviewCards(),
                     ),
                   ),
-                )
-              : SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) => _buildAnimatedSection(
-                      delay: 200 + (index * 50),
-                      child: _buildQuizCard(_quizzes[index]),
-                    ),
-                    childCount: _quizzes.length,
-                  ),
-                ),
-          SliverToBoxAdapter(
-            child: _buildAnimatedSection(
-              delay: 250,
-              child: _buildSectionHeader('Missed Quizzes', 'warning', color: const Color(0xFFFF4757)),
-            ),
-          ),
-          _missedQuizzes.isEmpty
-              ? SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Center(
-                      child: Text('No missed quizzes.', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600)),
+                  SliverToBoxAdapter(
+                    child: _buildAnimatedSection(
+                      delay: 100,
+                      child: _buildSectionHeader('Quiz Results', 'quiz'),
                     ),
                   ),
-                )
-              : SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) => _buildAnimatedSection(
-                      delay: 300 + (index * 50),
-                      child: _buildMissedQuizCard(_missedQuizzes[index]),
+                  _quizzes.isEmpty
+                      ? SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Center(
+                              child: Text(
+                                'No quizzes completed yet.',
+                                style: TextStyle(
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? const Color(0xFF8BA3C0)
+                                      : Colors.grey.shade600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      : SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => _buildAnimatedSection(
+                              delay: 200 + (index * 50),
+                              child: _buildQuizCard(_quizzes[index]),
+                            ),
+                            childCount: _quizzes.length,
+                          ),
+                        ),
+                  SliverToBoxAdapter(
+                    child: _buildAnimatedSection(
+                      delay: 250,
+                      child: _buildSectionHeader(
+                        'Missed Quizzes',
+                        'warning',
+                        color: const Color(0xFFFF4757),
+                      ),
                     ),
-                    childCount: _missedQuizzes.length,
                   ),
-                ),
-          SliverToBoxAdapter(
-            child: _buildAnimatedSection(
-              delay: 300,
-              child: _buildSectionHeader('AR Experiments', 'science'),
-            ),
-          ),
-          _arExperiments.isEmpty
-              ? SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Center(
-                      child: Text('No AR experiments completed yet.', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600)),
+                  _missedQuizzes.isEmpty
+                      ? SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Center(
+                              child: Text(
+                                'No missed quizzes.',
+                                style: TextStyle(
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? const Color(0xFF8BA3C0)
+                                      : Colors.grey.shade600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      : SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => _buildAnimatedSection(
+                              delay: 300 + (index * 50),
+                              child: _buildMissedQuizCard(
+                                _missedQuizzes[index],
+                              ),
+                            ),
+                            childCount: _missedQuizzes.length,
+                          ),
+                        ),
+                  SliverToBoxAdapter(
+                    child: _buildAnimatedSection(
+                      delay: 300,
+                      child: _buildSectionHeader('AR Experiments', 'science'),
                     ),
                   ),
-                )
-              : SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) => _buildAnimatedSection(
-                      delay: 400 + (index * 50),
-                      child: _buildArExperimentCard(_arExperiments[index]),
-                    ),
-                    childCount: _arExperiments.length,
-                  ),
-                ),
-          const SliverToBoxAdapter(child: SizedBox(height: 140)),
-        ],
+                  _arExperiments.isEmpty
+                      ? SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Center(
+                              child: Text(
+                                'No AR experiments completed yet.',
+                                style: TextStyle(
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? const Color(0xFF8BA3C0)
+                                      : Colors.grey.shade600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      : SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => _buildAnimatedSection(
+                              delay: 400 + (index * 50),
+                              child: _buildArExperimentCard(
+                                _arExperiments[index],
+                              ),
+                            ),
+                            childCount: _arExperiments.length,
+                          ),
+                        ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 140)),
+                ],
+              ),
       ),
     );
   }
@@ -262,25 +428,23 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
     return AnimatedBuilder(
       animation: _entranceController,
       builder: (context, child) {
-        final slide = Tween<Offset>(
-          begin: const Offset(0, 0.15),
-          end: Offset.zero,
-        ).animate(
-          CurvedAnimation(
-            parent: _entranceController,
-            curve: Interval(
-              (delay / 800).clamp(0.0, 0.8),
-              ((delay + 300) / 800).clamp(0.0, 1.0),
-              curve: Curves.easeOutCubic,
-            ),
-          ),
-        );
+        final slide =
+            Tween<Offset>(
+              begin: const Offset(0, 0.15),
+              end: Offset.zero,
+            ).animate(
+              CurvedAnimation(
+                parent: _entranceController,
+                curve: Interval(
+                  (delay / 800).clamp(0.0, 0.8),
+                  ((delay + 300) / 800).clamp(0.0, 1.0),
+                  curve: Curves.easeOutCubic,
+                ),
+              ),
+            );
         return SlideTransition(
           position: slide,
-          child: FadeTransition(
-            opacity: _entranceController,
-            child: child,
-          ),
+          child: FadeTransition(opacity: _entranceController, child: child),
         );
       },
       child: child,
@@ -296,14 +460,23 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0D2E3F) : const Color(0xFFE8F9FD),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF0D2E3F)
+                  : const Color(0xFFE8F9FD),
               borderRadius: BorderRadius.circular(12.0),
-              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x3300D4FF) : const Color(0xFF1565C0).withOpacity(0.3), width: 1),
+              border: Border.all(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0x3300D4FF)
+                    : const Color(0xFF1565C0).withOpacity(0.3),
+                width: 1,
+              ),
             ),
             child: Center(
               child: CustomIconWidget(
                 iconName: 'insights',
-                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF00D4FF)
+                    : const Color(0xFF1565C0),
                 size: 20,
               ),
             ),
@@ -318,12 +491,19 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
-                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black87,
                   ),
                 ),
                 Text(
                   'Student Dashboard',
-                  style: TextStyle(fontSize: 12, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF00D4FF)
+                        : const Color(0xFF1565C0),
+                  ),
                 ),
               ],
             ),
@@ -331,16 +511,25 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200D4FF) : const Color(0xFF1565C0).withOpacity(0.1),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0x2200D4FF)
+                  : const Color(0xFF1565C0).withOpacity(0.1),
               borderRadius: BorderRadius.circular(50.0),
-              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x5500D4FF) : const Color(0xFF1565C0).withOpacity(0.2), width: 1),
+              border: Border.all(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0x5500D4FF)
+                    : const Color(0xFF1565C0).withOpacity(0.2),
+                width: 1,
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 CustomIconWidget(
                   iconName: 'school',
-                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF00D4FF)
+                      : const Color(0xFF1565C0),
                   size: 13,
                 ),
                 const SizedBox(width: 4),
@@ -349,7 +538,9 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF00D4FF)
+                        : const Color(0xFF1565C0),
                   ),
                 ),
               ],
@@ -396,9 +587,15 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF142240)
+            : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF1E3A5F)
+              : Colors.grey.shade300,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -425,7 +622,9 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
             title,
             style: TextStyle(
               fontSize: 13,
-              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF8BA3C0)
+                  : Colors.grey.shade600,
             ),
           ),
         ],
@@ -433,23 +632,25 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
     );
   }
 
-  Widget _buildSectionHeader(String title, String icon, {Color color = const Color(0xFF8BA3C0)}) {
+  Widget _buildSectionHeader(
+    String title,
+    String icon, {
+    Color color = const Color(0xFF8BA3C0),
+  }) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
       child: Row(
         children: [
-          CustomIconWidget(
-            iconName: icon,
-            color: color,
-            size: 20,
-          ),
+          CustomIconWidget(iconName: icon, color: color, size: 20),
           const SizedBox(width: 8),
           Text(
             title,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black87,
             ),
           ),
         ],
@@ -472,9 +673,15 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF142240)
+            : Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF1E3A5F)
+              : Colors.grey.shade300,
+        ),
       ),
       child: Row(
         children: [
@@ -487,7 +694,9 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -495,7 +704,9 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
                   result.date,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF8BA3C0)
+                        : Colors.grey.shade600,
                   ),
                 ),
               ],
@@ -528,9 +739,15 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF142240)
+            : Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF1E3A5F)
+              : Colors.grey.shade300,
+        ),
       ),
       child: Row(
         children: [
@@ -543,7 +760,9 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -551,7 +770,9 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
                   'Due: ${result.date}',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF8BA3C0)
+                        : Colors.grey.shade600,
                   ),
                 ),
               ],
@@ -592,9 +813,15 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF142240)
+            : Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF1E3A5F)
+              : Colors.grey.shade300,
+        ),
       ),
       child: Row(
         children: [
@@ -623,7 +850,9 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -631,7 +860,9 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
                   result.date,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF8BA3C0)
+                        : Colors.grey.shade600,
                   ),
                 ),
               ],

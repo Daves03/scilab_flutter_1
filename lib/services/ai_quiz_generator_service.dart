@@ -1,119 +1,208 @@
 import 'dart:convert';
-import 'dart:typed_data';
+
+import 'package:flutter/foundation.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
-import '../../models/course_model.dart';
 import 'package:uuid/uuid.dart';
 
+import '../models/course_model.dart';
+
 class AiQuizGeneratorService {
-  // TODO: Replace with your actual Gemini API Key from Google AI Studio
-  static const String _apiKey = 'ai api here';
+  static const String _apiKey = String.fromEnvironment('GEMINI_API_KEY');
+  static const String _configuredModel = String.fromEnvironment(
+    'GEMINI_MODEL',
+    defaultValue: 'gemini-3.8-flash',
+  );
+  static const String _fallbackModel = 'gemini-3.5-flash-lite';
 
-  Future<List<CourseQuiz>?> generateQuizzesFromPdf(Uint8List pdfBytes, String moduleTitle, {int numQuizzes = 1, int numQuestions = 5, String mimeType = 'application/pdf'}) async {
-    if (_apiKey == 'YOUR_GEMINI_API_KEY' || _apiKey.isEmpty) {
-      print('AI API Key not set. Returning dummy quiz.');
-      // Return a dummy quiz if the API key isn't set so the UI doesn't break
-      return [_generateDummyQuiz(moduleTitle)];
+  String? lastErrorMessage;
+
+  Future<List<CourseQuiz>?> generateQuizzesFromPdf(
+    Uint8List pdfBytes,
+    String moduleTitle, {
+    int numQuizzes = 1,
+    int numQuestions = 5,
+    String mimeType = 'application/pdf',
+  }) async {
+    lastErrorMessage = null;
+
+    if (_apiKey.isEmpty) {
+      lastErrorMessage =
+          'Gemini is not configured. Add GEMINI_API_KEY when building the app.';
+      return null;
     }
 
-    try {
-      final model = GenerativeModel(
-        model: 'gemini-1.5-flash',
-        apiKey: _apiKey,
-        generationConfig: GenerationConfig(
-          responseMimeType: 'application/json',
-        ),
-      );
+    final prompt =
+        '''
+You are an expert chemistry teacher. Analyze the attached module and generate exactly $numQuizzes multiple-choice quiz(zes).
+Each quiz must have exactly $numQuestions questions based only on the module's content.
+Respond only with a valid JSON array. Do not wrap it in Markdown code blocks.
+Each object in the array must match this structure exactly:
+{
+  "title": "A short, descriptive title for the quiz",
+  "questions": [
+    {
+      "question": "The question text",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correctIndex": 0,
+      "explanation": "A brief explanation of why this is correct."
+    }
+  ]
+}
+''';
 
-      final prompt = '''
-      You are an expert chemistry teacher. Analyze the attached PDF module and generate exactly \$numQuizzes multiple choice quiz(zes).
-      Each quiz must have exactly \$numQuestions questions based on the module's content.
-      Respond ONLY with a valid JSON array of quizzes. Do not wrap it in markdown code blocks.
-      Each object in the array must match this structure exactly:
-      {
-        "title": "A short, descriptive title for the quiz",
-        "questions": [
-          {
-            "question": "The question text",
-            "options": ["Option A", "Option B", "Option C", "Option D"],
-            "correctIndex": 0, // The integer index of the correct option (0-3)
-            "explanation": "Brief explanation of why this is correct."
-          }
-        ]
-      }
-      ''';
+    final content = [
+      Content.multi([TextPart(prompt), DataPart(mimeType, pdfBytes)]),
+    ];
+    final modelNames = <String>{
+      _configuredModel,
+      _fallbackModel,
+    }.where((name) => name.trim().isNotEmpty).toList();
 
-      final content = [
-        Content.multi([
-          TextPart(prompt),
-          DataPart(mimeType, pdfBytes),
-        ])
-      ];
+    Object? lastModelError;
+    for (var index = 0; index < modelNames.length; index++) {
+      final modelName = modelNames[index];
 
-      final response = await model.generateContent(content);
-      final jsonString = response.text;
-      
-      if (jsonString != null && jsonString.isNotEmpty) {
+      try {
+        final model = GenerativeModel(
+          model: modelName,
+          apiKey: _apiKey,
+          generationConfig: GenerationConfig(
+            responseMimeType: 'application/json',
+          ),
+        );
+        final response = await model.generateContent(content);
+        final jsonString = response.text;
+
+        if (jsonString == null || jsonString.trim().isEmpty) {
+          throw const FormatException('Gemini returned an empty response.');
+        }
+
         return _parseQuizzesJson(jsonString, moduleTitle);
+      } catch (error, stackTrace) {
+        lastModelError = error;
+        final hasFallback = index < modelNames.length - 1;
+
+        if (hasFallback && _isModelAvailabilityError(error)) {
+          debugPrint(
+            'Gemini model $modelName is unavailable; trying ${modelNames[index + 1]}.',
+          );
+          continue;
+        }
+
+        _recordFailure(error, stackTrace);
+        return null;
       }
-      
-      return null;
-    } catch (e) {
-      print('Failed to generate quiz: $e');
-      return null;
     }
+
+    if (lastModelError != null) {
+      _recordFailure(lastModelError, StackTrace.current);
+    }
+    return null;
   }
 
   List<CourseQuiz> _parseQuizzesJson(String jsonString, String defaultTitle) {
-    try {
-      // Sometimes Gemini returns JSON wrapped in markdown even when told not to. Clean it.
-      var cleanJson = jsonString.trim();
-      if (cleanJson.startsWith('```json')) {
-        cleanJson = cleanJson.substring(7);
-      }
-      if (cleanJson.endsWith('```')) {
-        cleanJson = cleanJson.substring(0, cleanJson.length - 3);
-      }
-      
-      final List<dynamic> decodedList = jsonDecode(cleanJson);
-      
-      return decodedList.map((quizData) {
-        final qList = quizData['questions'] as List<dynamic>;
-        final questions = qList.map((q) {
-          return CourseQuestion(
-            id: const Uuid().v4(),
-            question: q['question'] as String,
-            options: List<String>.from(q['options']),
-            correctIndex: q['correctIndex'] as int,
-            explanation: q['explanation'] as String? ?? '',
-          );
-        }).toList();
+    var cleanJson = jsonString.trim();
+    if (cleanJson.startsWith('```json')) {
+      cleanJson = cleanJson.substring(7);
+    } else if (cleanJson.startsWith('```')) {
+      cleanJson = cleanJson.substring(3);
+    }
+    if (cleanJson.endsWith('```')) {
+      cleanJson = cleanJson.substring(0, cleanJson.length - 3);
+    }
 
-        return CourseQuiz(
+    final decoded = jsonDecode(cleanJson.trim());
+    if (decoded is! List || decoded.isEmpty) {
+      throw const FormatException('Gemini did not return a quiz array.');
+    }
+
+    return decoded.map<CourseQuiz>((quizData) {
+      if (quizData is! Map<String, dynamic>) {
+        throw const FormatException('A generated quiz has an invalid format.');
+      }
+
+      final rawQuestions = quizData['questions'];
+      if (rawQuestions is! List || rawQuestions.isEmpty) {
+        throw const FormatException('A generated quiz has no questions.');
+      }
+
+      final questions = rawQuestions.map<CourseQuestion>((rawQuestion) {
+        if (rawQuestion is! Map<String, dynamic>) {
+          throw const FormatException(
+            'A generated question has an invalid format.',
+          );
+        }
+
+        final options = rawQuestion['options'];
+        final correctIndex = rawQuestion['correctIndex'];
+        if (options is! List ||
+            options.length != 4 ||
+            correctIndex is! int ||
+            correctIndex < 0 ||
+            correctIndex >= options.length) {
+          throw const FormatException(
+            'A generated question has invalid answer choices.',
+          );
+        }
+
+        return CourseQuestion(
           id: const Uuid().v4(),
-          title: quizData['title'] as String? ?? 'Quiz: $defaultTitle',
-          questions: questions,
+          question: rawQuestion['question'] as String,
+          options: options.map((option) => option.toString()).toList(),
+          correctIndex: correctIndex,
+          explanation: rawQuestion['explanation'] as String? ?? '',
         );
       }).toList();
-    } catch (e) {
-      print('Error parsing JSON from AI: $e');
-      // Fallback
-      return [_generateDummyQuiz(defaultTitle)];
-    }
+
+      return CourseQuiz(
+        id: const Uuid().v4(),
+        title: quizData['title'] as String? ?? 'Quiz: $defaultTitle',
+        questions: questions,
+        createdAt: DateTime.now(),
+      );
+    }).toList();
   }
 
-  CourseQuiz _generateDummyQuiz(String title) {
-    return CourseQuiz(
-      id: const Uuid().v4(),
-      title: 'Auto-Generated Quiz: $title',
-      questions: [
-        CourseQuestion(
-          id: const Uuid().v4(),
-          question: 'What is the main topic of this module?',
-          options: ['Option A', 'Option B', 'Option C', 'Option D'],
-          correctIndex: 0,
-          explanation: 'This is a placeholder explanation.',
-        ),
-      ],
-    );
+  bool _isModelAvailabilityError(Object error) {
+    final message = error.toString().toLowerCase();
+    final mentionsModel =
+        message.contains('model') || message.contains('generatecontent');
+    final unavailable =
+        message.contains('not found') ||
+        message.contains('not supported') ||
+        message.contains('unavailable') ||
+        message.contains('404') ||
+        message.contains('503');
+    return mentionsModel && unavailable;
+  }
+
+  void _recordFailure(Object error, StackTrace stackTrace) {
+    final message = error.toString().toLowerCase();
+    if (_isModelAvailabilityError(error)) {
+      lastErrorMessage =
+          'The Gemini quiz model is temporarily unavailable. Please try again.';
+    } else if (message.contains('api key') ||
+        message.contains('invalid_api_key') ||
+        message.contains('401')) {
+      lastErrorMessage =
+          'The Gemini API key is invalid. Update the app configuration and try again.';
+    } else if (message.contains('prepayment') ||
+        message.contains('credits are depleted') ||
+        message.contains('payment required') ||
+        message.contains('402')) {
+      lastErrorMessage =
+          'Gemini credits are depleted. Add credits in Google AI Studio Billing, then try again.';
+    } else if (message.contains('quota') || message.contains('429')) {
+      lastErrorMessage =
+          'The Gemini quota has been reached. Please wait and try again.';
+    } else if (error is FormatException || error is TypeError) {
+      lastErrorMessage =
+          'Gemini returned invalid quiz data. Please generate the quiz again.';
+    } else {
+      lastErrorMessage = 'AI quiz generation failed. Please try again.';
+    }
+
+    debugPrint('Failed to generate quiz: $error');
+    debugPrintStack(stackTrace: stackTrace);
   }
 }
