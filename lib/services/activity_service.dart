@@ -66,12 +66,20 @@ class ActivityService {
 
   Future<ActivitySyncStatus> markExperimentCompleted(
     String uid,
-    String experimentId,
-  ) async {
+    String experimentId, {
+    int? ppeScore,
+    List<String>? selectedPpe,
+    List<String>? requiredPpe,
+    Map<String, dynamic>? rubricScores,
+  }) async {
     final completion = _PendingCompletion(
       uid: uid,
       experimentId: experimentId,
       completedAt: DateTime.now().toUtc(),
+      ppeScore: ppeScore,
+      selectedPpe: selectedPpe,
+      requiredPpe: requiredPpe,
+      rubricScores: rubricScores,
     );
     await _saveToOutbox(completion);
 
@@ -120,6 +128,13 @@ class ActivityService {
           .doc(completion.experimentId)
           .set({
             'completedAt': Timestamp.fromDate(completion.completedAt),
+            if (completion.ppeScore != null) 'ppeScore': completion.ppeScore,
+            if (completion.selectedPpe != null)
+              'selectedPpe': completion.selectedPpe,
+            if (completion.requiredPpe != null)
+              'requiredPpe': completion.requiredPpe,
+            if (completion.rubricScores != null)
+              'rubricScores': completion.rubricScores,
           }, SetOptions(merge: true))
           .timeout(_writeTimeout);
       return ActivitySyncStatus.synced;
@@ -218,11 +233,19 @@ class _PendingCompletion {
     required this.uid,
     required this.experimentId,
     required this.completedAt,
+    this.ppeScore,
+    this.selectedPpe,
+    this.requiredPpe,
+    this.rubricScores,
   });
 
   final String uid;
   final String experimentId;
   final DateTime completedAt;
+  final int? ppeScore;
+  final List<String>? selectedPpe;
+  final List<String>? requiredPpe;
+  final Map<String, dynamic>? rubricScores;
 
   String get key => '$uid/$experimentId';
 
@@ -231,6 +254,12 @@ class _PendingCompletion {
       uid: json['uid'] as String,
       experimentId: json['experimentId'] as String,
       completedAt: DateTime.parse(json['completedAt'] as String).toUtc(),
+      ppeScore: (json['ppeScore'] as num?)?.toInt(),
+      selectedPpe: (json['selectedPpe'] as List?)?.cast<String>(),
+      requiredPpe: (json['requiredPpe'] as List?)?.cast<String>(),
+      rubricScores: json['rubricScores'] is Map
+          ? Map<String, dynamic>.from(json['rubricScores'] as Map)
+          : null,
     );
   }
 
@@ -238,5 +267,9 @@ class _PendingCompletion {
     'uid': uid,
     'experimentId': experimentId,
     'completedAt': completedAt.toIso8601String(),
+    if (ppeScore != null) 'ppeScore': ppeScore,
+    if (selectedPpe != null) 'selectedPpe': selectedPpe,
+    if (requiredPpe != null) 'requiredPpe': requiredPpe,
+    if (rubricScores != null) 'rubricScores': rubricScores,
   };
 }
