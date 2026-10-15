@@ -229,8 +229,8 @@ p { color: var(--text-secondary); line-height: 1.5; }
 .main-content {
   flex: 1;
   margin-left: 280px;
-  padding: 32px 48px;
-  max-width: 1200px;
+  padding: 32px 40px;
+  min-width: 0;
 }
 
 .page-header {
@@ -427,6 +427,38 @@ p { color: var(--text-secondary); line-height: 1.5; }
   }
 }
 
+/* ── Wide-screen layout: maximize the content area ── */
+@media (min-width: 1400px) {
+  .main-content {
+    padding: 36px 56px;
+  }
+
+  /* Let the 3-col KPI grid stretch to fill width */
+  .grid-main {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  /* 4-col secondary grid on xl screens */
+  .grid-secondary {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+
+@media (min-width: 1800px) {
+  .main-content {
+    padding: 40px 72px;
+  }
+
+  /* 4-col primary on huge screens */
+  .grid-main {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+
+  .grid-secondary {
+    grid-template-columns: repeat(5, 1fr) !important;
+  }
+}
+
 
 /* Overview Dashboard Responsiveness */
 .overview-title {
@@ -495,6 +527,25 @@ p { color: var(--text-secondary); line-height: 1.5; }
   .grid-main, .grid-secondary {
     gap: 16px !important;
     margin-bottom: 24px !important;
+  }
+  .system-tools-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    align-items: stretch !important;
+  }
+  .system-tools-grid > .stat-card-padding {
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+  }
+  .system-tools-grid .stat-value.small {
+    font-size: 2rem;
+  }
+  .system-tools-grid .stat-title.small {
+    font-size: 1rem;
+  }
+  .system-tools-grid p {
+    overflow-wrap: anywhere;
   }
   .icon-wrapper {
     padding: 8px !important;
@@ -741,4 +792,3 @@ p { color: var(--text-secondary); line-height: 1.5; }
     max-width: 100%;
   }
 }
-

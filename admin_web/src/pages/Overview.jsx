@@ -327,9 +327,10 @@ export default function Overview() {
         </div>
       )}
 
-      {/* Main KPI Grid */}
-      <div className="grid-main" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', marginBottom: '40px' }}>
-        
+      {/* Unified 3-column grid for both top KPI and Platform Content rows */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '40px', alignItems: 'start' }}>
+
+        {/* ── Row 1: User Stats ── */}
         <StatCard 
           title="Active Students" 
           value={loading ? "..." : stats.students} 
@@ -357,49 +358,45 @@ export default function Overview() {
           onClick={() => navigate('/users')}
           color="#fbbf24"
         />
-        
-      </div>
 
-      <h2 style={{ fontSize: '1.5rem', marginBottom: '20px', color: 'var(--text-primary)' }}>Platform Content & Modules</h2>
-      
-      {/* Secondary KPI Grid */}
-      <div className="grid-secondary" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '40px' }}>
-        
+        {/* ── Section heading spanning all 3 columns ── */}
+        <h2 style={{ gridColumn: '1 / -1', fontSize: '1.5rem', color: 'var(--text-primary)', marginTop: '16px', marginBottom: '4px' }}>
+          Platform Content &amp; Modules
+        </h2>
+
+        {/* ── Row 2: Content Stats ── */}
         <StatCard 
           title="Class Sections" 
           value={loading ? "..." : stats.totalSections} 
-          icon={<Layers size={24} color="#a78bfa" />} 
+          icon={<Layers size={28} color="#a78bfa" />}
           trend="Manage curriculum"
           onClick={() => navigate('/sections')}
           color="#a78bfa"
-          small
         />
         
         <StatCard 
           title="AR Experiments" 
           value={loading ? "..." : stats.totalArLabs} 
-          icon={<Hexagon size={24} color="#f472b6" />} 
+          icon={<Hexagon size={28} color="#f472b6" />}
           trend="Immersive learning labs"
           onClick={() => navigate('/ar-labs')}
           color="#f472b6"
-          small
         />
 
         <StatCard 
           title="Teacher Uploads" 
           value={loading ? "..." : stats.totalCourses} 
-          icon={<BookOpen size={24} color="#38bdf8" />} 
+          icon={<BookOpen size={28} color="#38bdf8" />}
           trend="Uploaded course materials"
           onClick={() => navigate('/uploads')}
           color="#38bdf8"
-          small
         />
-        
+
       </div>
 
-      <h2 style={{ fontSize: '1.5rem', marginBottom: '20px', color: 'var(--text-primary)', marginTop: '40px' }}>System Tools & Admin</h2>
+      <h2 style={{ fontSize: '1.5rem', marginBottom: '20px', color: 'var(--text-primary)', marginTop: '8px' }}>System Tools &amp; Admin</h2>
       
-      <div className="grid-secondary" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
+      <div className="grid-secondary system-tools-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', alignItems: 'start' }}>
         <StatCard 
           title="AR Marker" 
           value="VuMark" 
@@ -681,7 +678,6 @@ function StatCard({ title, value, icon, trend, alert, onClick, color, small }) {
         border: '1px solid rgba(255,255,255,0.05)',
         display: 'flex',
         flexDirection: 'column',
-        height: '100%',
         boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
       }}
       onMouseEnter={(e) => {

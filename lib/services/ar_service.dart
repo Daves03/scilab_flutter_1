@@ -6,12 +6,42 @@ import '../data/dummy_ar_experiments.dart';
 class ArService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   static const _collection = 'ar_experiments';
+  static const _periodicTableId = 'ar8';
+  static const _periodicTableThumbnail =
+      'assets/images/ar_periodic_table_thumbnail.png';
+
+  ArExperimentModel _withBundledPeriodicTableThumbnail(
+    ArExperimentModel experiment,
+  ) {
+    if (experiment.id != _periodicTableId ||
+        experiment.thumbnailUrl == _periodicTableThumbnail) {
+      return experiment;
+    }
+    return ArExperimentModel(
+      id: experiment.id,
+      title: experiment.title,
+      topic: experiment.topic,
+      category: experiment.category,
+      backgroundInfo: experiment.backgroundInfo,
+      safetyNote: experiment.safetyNote,
+      relatedConcepts: experiment.relatedConcepts,
+      requiredMaterials: experiment.requiredMaterials,
+      thumbnailUrl: _periodicTableThumbnail,
+      iconName: experiment.iconName,
+      tintColorValue: experiment.tintColorValue,
+      semanticLabel: experiment.semanticLabel,
+      steps: experiment.steps,
+    );
+  }
 
   Stream<List<ArExperimentModel>> experimentsStream() async* {
     try {
       await for (final snap in _db.collection(_collection).snapshots()) {
-        final exps = snap.docs.map((d) => ArExperimentModel.fromMap(d.id, d.data())).toList();
-        
+        final exps = snap.docs
+            .map((d) => ArExperimentModel.fromMap(d.id, d.data()))
+            .map(_withBundledPeriodicTableThumbnail)
+            .toList();
+
         // Merge Firestore experiments with our local dummy experiments
         final List<ArExperimentModel> merged = [...exps];
         for (var dummy in dummyArExperiments) {
@@ -29,15 +59,24 @@ class ArService {
 
   Future<List<ArExperimentModel>> fetchExperiments() async {
     final snap = await _db.collection(_collection).get();
-    return snap.docs.map((d) => ArExperimentModel.fromMap(d.id, d.data())).toList();
+    return snap.docs
+        .map((d) => ArExperimentModel.fromMap(d.id, d.data()))
+        .map(_withBundledPeriodicTableThumbnail)
+        .toList();
   }
 
   Future<void> addExperiment(ArExperimentModel experiment) async {
-    await _db.collection(_collection).doc(experiment.id).set(experiment.toMap());
+    await _db
+        .collection(_collection)
+        .doc(experiment.id)
+        .set(experiment.toMap());
   }
 
   Future<void> updateExperiment(ArExperimentModel experiment) async {
-    await _db.collection(_collection).doc(experiment.id).update(experiment.toMap());
+    await _db
+        .collection(_collection)
+        .doc(experiment.id)
+        .update(experiment.toMap());
   }
 
   Future<void> deleteExperiment(String id) async {
@@ -54,10 +93,11 @@ class ArService {
     }
 
     try {
-      await for (final snap in _db
-          .collection('ar_locks')
-          .where(FieldPath.documentId, whereIn: sections.take(10).toList())
-          .snapshots()) {
+      await for (final snap
+          in _db
+              .collection('ar_locks')
+              .where(FieldPath.documentId, whereIn: sections.take(10).toList())
+              .snapshots()) {
         final lockedIds = <String>{};
         for (final doc in snap.docs) {
           final list = List<String>.from(
@@ -85,10 +125,11 @@ class ArService {
     }
 
     try {
-      await for (final snap in _db
-          .collection('ar_locks')
-          .where(FieldPath.documentId, whereIn: sections.take(10).toList())
-          .snapshots()) {
+      await for (final snap
+          in _db
+              .collection('ar_locks')
+              .where(FieldPath.documentId, whereIn: sections.take(10).toList())
+              .snapshots()) {
         final map = <String, List<String>>{};
         for (final doc in snap.docs) {
           map[doc.id] = List<String>.from(
@@ -104,15 +145,19 @@ class ArService {
   }
 
   /// Toggle the lock state of an AR experiment for a specific section
-  Future<void> toggleExperimentLockForSection(String section, String experimentId, bool lock) async {
+  Future<void> toggleExperimentLockForSection(
+    String section,
+    String experimentId,
+    bool lock,
+  ) async {
     final docRef = _db.collection('ar_locks').doc(section);
     if (lock) {
       await docRef.set({
-        'lockedExperiments': FieldValue.arrayUnion([experimentId])
+        'lockedExperiments': FieldValue.arrayUnion([experimentId]),
       }, SetOptions(merge: true));
     } else {
       await docRef.set({
-        'lockedExperiments': FieldValue.arrayRemove([experimentId])
+        'lockedExperiments': FieldValue.arrayRemove([experimentId]),
       }, SetOptions(merge: true));
     }
   }

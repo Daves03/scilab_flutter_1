@@ -2,17 +2,15 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:fl_chart/fl_chart.dart';
 
-import 'package:go_router/go_router.dart';
 import '../../core/app_export.dart';
-import '../../widgets/custom_icon_widget.dart';
+import '../../core/course_assignment.dart';
+import '../../data/dummy_ar_experiments.dart';
 import '../../widgets/dashboard_datetime_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/user_model.dart';
 import '../../models/course_model.dart';
 import '../../models/activity_model.dart';
-import '../teacher_profile_screen/teacher_profile_screen.dart';
 import 'widgets/student_approval_dialog.dart';
-import '../student_home_screen/widgets/user_header_widget.dart';
 import '../../services/auth_service.dart';
 import 'package:provider/provider.dart';
 
@@ -88,18 +86,23 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   bool _loading = true;
   DashboardTab _currentTab = DashboardTab.allStudents;
   String _selectedSummarySection = _allSummarySections;
-  
-  final StreamController<List<Map<String, dynamic>>> _notifController = StreamController.broadcast();
+
   StreamSubscription? _usersSub;
-  StreamSubscription? _quizSub;
-  StreamSubscription? _arSub;
+  StreamSubscription? _approvedStudentsSub;
+  final List<StreamSubscription> _quizNotifSubs = [];
+  final Map<String, StreamSubscription> _arNotifSubs = {};
   StreamSubscription? _teacherCoursesSub;
 
-  List<QueryDocumentSnapshot> _pendingUsers = [];
-  List<QueryDocumentSnapshot> _quizAttempts = [];
-  List<QueryDocumentSnapshot> _arAttempts = [];
-  
-  List<Course> _allCourses = [];
+  List<QueryDocumentSnapshot<Map<String, dynamic>>> _pendingUsers = [];
+  final Map<int, List<QueryDocumentSnapshot<Map<String, dynamic>>>>
+  _quizAttemptChunks = {};
+  final Map<String, List<QueryDocumentSnapshot<Map<String, dynamic>>>>
+  _arAttemptsByStudent = {};
+  final Map<String, AppUser> _approvedStudentsById = {};
+  List<QuizAttempt> _notificationQuizAttempts = [];
+  List<Map<String, dynamic>> _notifications = [];
+  int _quizSubscriptionGeneration = 0;
+
   List<Course> _teacherCourses = [];
   List<QuizAttempt> _allAttempts = [];
 
@@ -143,10 +146,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     setState(() {
       _allAttempts = attempts;
       _students = _students.map((student) {
-        final studentAttempts = _latestAttemptsForStudent(
-          attempts,
-          student.id,
-        );
+        final studentAttempts = _latestAttemptsForStudent(attempts, student.id);
         return _StudentSummary(
           id: student.id,
           name: student.name,
@@ -166,68 +166,104 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   Future<void> _loadData() async {
     try {
       final db = FirebaseFirestore.instance;
-      final teacherSections = context.read<AuthService>().currentUser?.sections ?? [];
+      final teacher = context.read<AuthService>().currentUser;
+      if (teacher == null) {
+        if (mounted) setState(() => _loading = false);
+        return;
+      }
+
+      final coursesSnap = await db
+          .collection('courses')
+          .where('teacherUid', isEqualTo: teacher.id)
+          .get();
+      final courses = coursesSnap.docs
+          .map((document) => Course.fromMap(document.id, document.data()))
+          .toList();
 
       final studentsSnap = await db
           .collection('users')
           .where('role', whereIn: [UserRole.grade9.id, UserRole.grade10.id])
           .where('status', isEqualTo: VerificationStatus.approved.id)
           .get();
-          
+
       final users = studentsSnap.docs
-          .map((d) => AppUser.fromMap(d.id, d.data()))
-          .where((u) => u.sections.any((sec) => teacherSections.contains(sec)))
+          .map((document) => AppUser.fromMap(document.id, document.data()))
+          .where(
+            (student) => courses.any(
+              (course) =>
+                  CourseAssignment.courseMatchesStudent(course, student),
+            ),
+          )
           .toList();
 
-      final coursesSnap = await db.collection('courses').get();
-      final courses = coursesSnap.docs.map((d) => Course.fromMap(d.id, d.data())).toList();
-
       final attemptsSnap = await db.collection('quiz_attempts').get();
-      final allAttempts = attemptsSnap.docs.map((d) => QuizAttempt.fromMap(d.id, d.data())).toList();
+      final coursesById = {for (final course in courses) course.id: course};
+      final usersById = {for (final student in users) student.id: student};
+      final allAttempts = attemptsSnap.docs
+          .map((document) => QuizAttempt.fromMap(document.id, document.data()))
+          .where((attempt) {
+            final course = coursesById[attempt.courseId];
+            final student = usersById[attempt.studentId];
+            return course != null &&
+                student != null &&
+                CourseAssignment.courseMatchesStudent(course, student);
+          })
+          .toList();
 
       if (mounted) {
-        _allCourses = courses;
         _allAttempts = allAttempts;
       }
 
       List<_StudentSummary> dynamicStudents = [];
       for (var u in users) {
-         final uAttempts = _latestAttemptsForStudent(allAttempts, u.id);
-         final avgQuizScore = _averageQuizScore(uAttempts);
+        final uAttempts = _latestAttemptsForStudent(allAttempts, u.id);
+        final avgQuizScore = _averageQuizScore(uAttempts);
 
-         int arAttempts = 0;
-         double avgArScore = 0.0;
-         try {
-           final uArSnap = await db.collection('users').doc(u.id).collection('experiment_activity').get();
-           arAttempts = uArSnap.docs.length;
-           int completed = 0;
-           for (var d in uArSnap.docs) {
-             final act = ExperimentActivity.fromMap(d.id, d.data());
-             if (act.completed) completed++;
-           }
-           if (arAttempts > 0) {
-              avgArScore = (completed / arAttempts) * 100.0;
-           }
-         } catch (e) {
-           print('Error fetching AR records for ${u.id}: $e');
-         }
+        int arAttempts = 0;
+        double avgArScore = 0.0;
+        try {
+          final uArSnap = await db
+              .collection('users')
+              .doc(u.id)
+              .collection('experiment_activity')
+              .get();
+          arAttempts = uArSnap.docs.length;
+          int completed = 0;
+          for (var d in uArSnap.docs) {
+            final act = ExperimentActivity.fromMap(d.id, d.data());
+            if (act.completed) completed++;
+          }
+          if (arAttempts > 0) {
+            avgArScore = (completed / arAttempts) * 100.0;
+          }
+        } catch (e) {
+          print('Error fetching AR records for ${u.id}: $e');
+        }
 
-         final section = u.sections.firstWhere(
-           teacherSections.contains,
-           orElse: () => u.sections.isNotEmpty ? u.sections.first : 'No Section',
-         );
+        final matchingSections = courses
+            .expand(
+              (course) =>
+                  CourseAssignment.matchingSectionsForStudent(course, u),
+            )
+            .toSet()
+            .toList();
+        final section = matchingSections.isNotEmpty
+            ? matchingSections.first
+            : (u.sections.isNotEmpty ? u.sections.first : 'No Section');
 
-         dynamicStudents.add(_StudentSummary(
-           id: u.id,
-           name: u.name,
-           section: section,
-           studentNumber: u.studentNumber,
-           avatarUrl: u.avatarUrl,
-           avgQuizScore: avgQuizScore,
-           avgArScore: avgArScore,
-           quizzesTaken: uAttempts.length,
-           arAttempts: arAttempts,
-         ));
+        dynamicStudents.add(
+          _StudentSummary(
+            id: u.id,
+            name: u.name,
+            section: section,
+            studentNumber: u.studentNumber,
+            avatarUrl: u.avatarUrl,
+            avgQuizScore: avgQuizScore,
+            avgArScore: avgArScore,
+            quizzesTaken: uAttempts.length,
+            arAttempts: arAttempts,
+          ),
+        );
       }
 
       if (mounted) {
@@ -245,7 +281,9 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     } catch (e) {
       print('Error loading dynamic progress: $e');
       if (mounted) {
-        setState(() { _loading = false; });
+        setState(() {
+          _loading = false;
+        });
       }
     }
   }
@@ -257,9 +295,6 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   }
 
   int get _needsHelpCount => _students.where((s) => s.overallScore < 60).length;
-
-  int get _excellentCount =>
-      _students.where((s) => s.overallScore >= 80).length;
 
   bool _isSearching = false;
   String _searchQuery = '';
@@ -286,6 +321,37 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     });
   }
 
+  bool _studentMatchesAnyTeacherCourse(AppUser student) {
+    if (_teacherCourses.isNotEmpty) {
+      return _teacherCourses.any(
+        (course) => CourseAssignment.courseMatchesStudent(course, student),
+      );
+    }
+    // Fallback: use teacher's own sections field when no courses are assigned yet
+    final user = context.read<AuthService>().currentUser;
+    if (user == null) return false;
+    return student.sections.any((s) => user.sections.contains(s));
+  }
+
+  Set<String> get _handledStudentIds => _approvedStudentsById.values
+      .where(_studentMatchesAnyTeacherCourse)
+      .map((student) => student.id)
+      .toSet();
+
+  String _matchingSectionLabel(AppUser student, [Course? course]) {
+    final matches = course == null
+        ? _teacherCourses
+              .expand(
+                (item) =>
+                    CourseAssignment.matchingSectionsForStudent(item, student),
+              )
+              .toSet()
+              .toList()
+        : CourseAssignment.matchingSectionsForStudent(course, student);
+    if (matches.isNotEmpty) return matches.join(', ');
+    return student.sections.isNotEmpty ? student.sections.first : 'No Section';
+  }
+
   void _initNotificationStreams() {
     final db = FirebaseFirestore.instance;
     final user = context.read<AuthService>().currentUser;
@@ -295,184 +361,390 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
         .collection('courses')
         .where('teacherUid', isEqualTo: user.id)
         .snapshots()
-        .listen((snapshot) {
-          if (!mounted) return;
-          setState(() {
-            _teacherCourses = snapshot.docs
+        .listen(
+          (snapshot) {
+            if (!mounted) return;
+            final courses = snapshot.docs
                 .map((document) => Course.fromMap(document.id, document.data()))
                 .toList();
-          });
-        });
+            setState(() {
+              _teacherCourses = courses;
+            });
+            _refreshQuizAttemptSubscriptions(db);
+            _refreshArActivitySubscriptions(db);
+            _updateNotifs();
+          },
+          onError: (Object error) {
+            debugPrint('Teacher course notification stream failed: $error');
+          },
+        );
 
-    _usersSub = db.collection('users')
-      .where('role', whereIn: [UserRole.grade9.id, UserRole.grade10.id])
-      .where('status', isEqualTo: VerificationStatus.pending.id)
-      .snapshots().listen((snap) {
-        _pendingUsers = snap.docs;
-        _updateNotifs();
-      });
+    _usersSub = db
+        .collection('users')
+        .where('role', whereIn: [UserRole.grade9.id, UserRole.grade10.id])
+        .where('status', isEqualTo: VerificationStatus.pending.id)
+        .snapshots()
+        .listen(
+          (snapshot) {
+            if (!mounted) return;
+            _pendingUsers = snapshot.docs;
+            _updateNotifs();
+          },
+          onError: (Object error) {
+            debugPrint('Pending-student notification stream failed: $error');
+          },
+        );
 
-    _quizSub = db.collection('quiz_attempts')
-      .orderBy('submittedAt', descending: true)
-      .snapshots().listen((snap) {
-        _quizAttempts = snap.docs.take(10).toList();
-        final attempts = snap.docs
-            .map((doc) => QuizAttempt.fromMap(doc.id, doc.data()))
-            .toList();
-        _applyLiveQuizAttempts(attempts);
-      });
-      
-    try {
-      _arSub = db.collectionGroup('experiment_activity')
-        .where('completed', isEqualTo: true)
-        .snapshots().listen((snap) {
-          final sorted = snap.docs.toList()..sort((a, b) {
-            final ta = (a.data() as Map<String, dynamic>)['completedAt'] as Timestamp?;
-            final tb = (b.data() as Map<String, dynamic>)['completedAt'] as Timestamp?;
-            if (ta == null || tb == null) return 0;
-            return tb.compareTo(ta);
-          });
-          _arAttempts = sorted.take(10).toList();
-          _updateNotifs();
-        });
-    } catch (e) {
-      print('AR notification stream failed: $e');
+    _approvedStudentsSub = db
+        .collection('users')
+        .where('role', whereIn: [UserRole.grade9.id, UserRole.grade10.id])
+        .where('status', isEqualTo: VerificationStatus.approved.id)
+        .snapshots()
+        .listen(
+          (snapshot) {
+            if (!mounted) return;
+            _approvedStudentsById
+              ..clear()
+              ..addEntries(
+                snapshot.docs.map((document) {
+                  final student = AppUser.fromMap(document.id, document.data());
+                  return MapEntry(student.id, student);
+                }),
+              );
+            _applyCurrentQuizAttempts();
+            _refreshArActivitySubscriptions(db);
+            _updateNotifs();
+          },
+          onError: (Object error) {
+            debugPrint('Approved-student notification stream failed: $error');
+          },
+        );
+  }
+
+  void _refreshQuizAttemptSubscriptions(FirebaseFirestore db) {
+    final generation = ++_quizSubscriptionGeneration;
+    for (final subscription in _quizNotifSubs) {
+      unawaited(subscription.cancel());
+    }
+    _quizNotifSubs.clear();
+    _quizAttemptChunks.clear();
+
+    final courseIds = _teacherCourses
+        .map((course) => course.id)
+        .where((id) => id.isNotEmpty)
+        .toList();
+    if (courseIds.isEmpty) {
+      // No courses assigned: fall back to section-based quiz attempt filtering
+      _subscribeQuizAttemptsBySections(db, generation);
+      return;
+    }
+
+    const chunkSize = 30;
+    for (
+      var start = 0, chunkIndex = 0;
+      start < courseIds.length;
+      start += chunkSize, chunkIndex++
+    ) {
+      final end = start + chunkSize > courseIds.length
+          ? courseIds.length
+          : start + chunkSize;
+      final chunk = courseIds.sublist(start, end);
+      final currentChunk = chunkIndex;
+      final subscription = db
+          .collection('quiz_attempts')
+          .where('courseId', whereIn: chunk)
+          .snapshots()
+          .listen(
+            (snapshot) {
+              if (!mounted || generation != _quizSubscriptionGeneration) return;
+              _quizAttemptChunks[currentChunk] = snapshot.docs;
+              _applyCurrentQuizAttempts();
+            },
+            onError: (Object error) {
+              debugPrint('Quiz notification stream failed: $error');
+              if (!mounted || generation != _quizSubscriptionGeneration) return;
+              _quizAttemptChunks[currentChunk] = [];
+              _applyCurrentQuizAttempts();
+            },
+          );
+      _quizNotifSubs.add(subscription);
     }
   }
 
-  void _updateNotifs() async {
+  void _subscribeQuizAttemptsBySections(FirebaseFirestore db, int generation) {
+    // When teacher has no courses yet, subscribe to ALL quiz_attempts and
+    // filter in-memory by whether the student belongs to the teacher's sections.
+    final subscription = db
+        .collection('quiz_attempts')
+        .orderBy('submittedAt', descending: true)
+        .snapshots()
+        .listen(
+          (snapshot) {
+            if (!mounted || generation != _quizSubscriptionGeneration) return;
+            _quizAttemptChunks[0] = snapshot.docs;
+            _applyCurrentQuizAttempts();
+          },
+          onError: (Object error) {
+            debugPrint('Section-based quiz notification stream failed: $error');
+          },
+        );
+    _quizNotifSubs.add(subscription);
+  }
+
+  void _applyCurrentQuizAttempts() {
+    final coursesById = {
+      for (final course in _teacherCourses) course.id: course,
+    };
+    final attempts = <QuizAttempt>[];
+    for (final document in _quizAttemptChunks.values.expand((docs) => docs)) {
+      final attempt = QuizAttempt.fromMap(document.id, document.data());
+      final student = _approvedStudentsById[attempt.studentId];
+      if (student == null) continue;
+      if (coursesById.isNotEmpty) {
+        // Prefer strict course-based matching
+        final course = coursesById[attempt.courseId];
+        if (course == null || !CourseAssignment.courseMatchesStudent(course, student)) continue;
+      } else {
+        // Fallback: student must be in one of the teacher's sections
+        if (!_studentMatchesAnyTeacherCourse(student)) continue;
+      }
+      attempts.add(attempt);
+    }
+    attempts.sort(
+      (a, b) => (b.submittedAt ?? DateTime(2000)).compareTo(
+        a.submittedAt ?? DateTime(2000),
+      ),
+    );
+    _notificationQuizAttempts = attempts;
+    _applyLiveQuizAttempts(attempts);
+  }
+
+  void _refreshArActivitySubscriptions(FirebaseFirestore db) {
+    final desiredStudentIds = _handledStudentIds;
+    final removedStudentIds = _arNotifSubs.keys
+        .where((studentId) => !desiredStudentIds.contains(studentId))
+        .toList();
+
+    for (final studentId in removedStudentIds) {
+      final subscription = _arNotifSubs.remove(studentId);
+      if (subscription != null) unawaited(subscription.cancel());
+      _arAttemptsByStudent.remove(studentId);
+    }
+
+    for (final studentId in desiredStudentIds) {
+      if (_arNotifSubs.containsKey(studentId)) continue;
+      _arNotifSubs[studentId] = db
+          .collection('users')
+          .doc(studentId)
+          .collection('experiment_activity')
+          .snapshots()
+          .listen(
+            (snapshot) {
+              if (!mounted || !_handledStudentIds.contains(studentId)) return;
+              _arAttemptsByStudent[studentId] = snapshot.docs;
+              _updateNotifs();
+            },
+            onError: (Object error) {
+              debugPrint(
+                'AR notification stream failed for $studentId: $error',
+              );
+              if (!mounted) return;
+              _arAttemptsByStudent[studentId] = [];
+              _updateNotifs();
+            },
+          );
+    }
+    _updateNotifs();
+  }
+
+  String _arExperimentTitle(String experimentId) {
+    for (final experiment in dummyArExperiments) {
+      if (experiment.id == experimentId) return experiment.title;
+    }
+    final label = experimentId
+        .replaceAll(RegExp(r'[_-]+'), ' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+    if (label.isEmpty) return 'AR experiment';
+    return label
+        .split(' ')
+        .map(
+          (word) => word.isEmpty
+              ? word
+              : '${word[0].toUpperCase()}${word.substring(1)}',
+        )
+        .join(' ');
+  }
+
+  void _updateNotifs() {
     if (!mounted) return;
-    final db = FirebaseFirestore.instance;
     final user = context.read<AuthService>().currentUser;
     if (user == null) return;
 
-    List<Map<String, dynamic>> notifications = [];
+    final notifications = <Map<String, dynamic>>[];
     final teacherSections = user.sections;
-    
-    // 1. Pending Users
-    for (var doc in _pendingUsers) {
-      final u = AppUser.fromMap(doc.id, doc.data() as Map<String, dynamic>);
-      if (u.sections.any((s) => teacherSections.contains(s))) {
-        if (!_pendingUserTimestamps.containsKey(u.id)) {
-          _pendingUserTimestamps[u.id] = DateTime.now();
+
+    // Pending approvals stay section-scoped. Once courses are available, use
+    // their grade + section assignment so Grade 9 A never matches Grade 10 A.
+    for (final document in _pendingUsers) {
+      final student = AppUser.fromMap(document.id, document.data());
+      final belongsToTeacher = _teacherCourses.isNotEmpty
+          ? _studentMatchesAnyTeacherCourse(student)
+          : student.sections.any(teacherSections.contains);
+      if (belongsToTeacher) {
+        if (!_pendingUserTimestamps.containsKey(student.id)) {
+          _pendingUserTimestamps[student.id] = DateTime.now();
         }
         notifications.add({
           'title': 'New Student Approval',
-          'desc': '${u.name} requested to join ${u.sections.first}.',
+          'desc':
+              '${student.name} requested to join ${_matchingSectionLabel(student)}.',
           'icon': 'person_add',
           'color': const Color(0xFF7C3AED),
-          'timestamp': _pendingUserTimestamps[u.id]!,
+          'timeStr': _formatNotificationTime(
+            _pendingUserTimestamps[student.id],
+          ),
+          'timestamp': _pendingUserTimestamps[student.id]!,
           'action': 'approval',
         });
       }
     }
 
-    final studentMap = {for (var s in _students) s.id: s.name};
-
-    // 2. Answered Quizzes (from _quizAttempts)
-    Map<String, List<Map<String, dynamic>>> answeredQuizzes = {};
-    for (var doc in _quizAttempts) {
-       final data = doc.data() as Map<String, dynamic>;
-       final sId = data['studentId'] as String? ?? '';
-       if (studentMap.containsKey(sId)) {
-          final title = data['quizTitle'] as String? ?? 'Quiz';
-          answeredQuizzes.putIfAbsent(title, () => []).add(data);
-       }
-    }
-    for (var entry in answeredQuizzes.entries) {
-       final title = entry.key;
-       final attempts = entry.value;
-       final count = attempts.length;
-       final ts = attempts.first['submittedAt'] as Timestamp?;
-       notifications.add({
-          'title': 'Quiz Submitted',
-          'desc': count == 1 ? '${studentMap[attempts.first['studentId']]} answered $title.' : '$count students answered $title.',
-          'icon': 'assignment_turned_in',
-          'color': const Color(0xFF00D4FF),
-          'timeStr': _formatNotificationTime(ts?.toDate()),
-          'timestamp': ts?.toDate() ?? DateTime.now(),
-       });
-    }
-
-    // 3. AR Results
-    final Map<String, String> arExpMap = {
-      'lab_1': 'Experiment 1: Microscope',
-      'lab_2': 'Experiment 2: Cell Structure',
-      'lab_3': 'Experiment 3: Mitosis',
+    final coursesById = {
+      for (final course in _teacherCourses) course.id: course,
     };
-    
-    Map<String, List<Map<String, dynamic>>> arResults = {};
-    for (var doc in _arAttempts) {
-       final data = doc.data() as Map<String, dynamic>;
-       final parentRef = doc.reference.parent.parent;
-       if (parentRef != null && studentMap.containsKey(parentRef.id)) {
-          final expId = data['experimentId'] as String? ?? 'Experiment';
-          final title = arExpMap[expId] ?? expId;
-          arResults.putIfAbsent(title, () => []).add({
-             'data': data,
-             'studentId': parentRef.id,
-          });
-       }
+
+    // Every quiz event must belong to this teacher's course and that exact
+    // course must match the student's grade and section.
+    for (final attempt in _notificationQuizAttempts) {
+      final student = _approvedStudentsById[attempt.studentId];
+      final course = coursesById[attempt.courseId];
+      if (student == null ||
+          course == null ||
+          !CourseAssignment.courseMatchesStudent(course, student)) {
+        continue;
+      }
+      final total = attempt.totalQuestions;
+      final percent = total > 0 ? ((attempt.score / total) * 100).round() : 0;
+      final submittedAt = attempt.submittedAt ?? DateTime(2000);
+      notifications.add({
+        'title': 'Quiz Submitted',
+        'desc':
+            '${student.name} (${_matchingSectionLabel(student, course)}) '
+            'answered "${attempt.quizTitle}" — '
+            '${attempt.score}/$total ($percent%).',
+        'icon': 'assignment_turned_in',
+        'color': const Color(0xFF00D4FF),
+        'timeStr': attempt.submittedAt == null
+            ? ''
+            : _formatNotificationTime(submittedAt),
+        'timestamp': submittedAt,
+      });
     }
-    for (var entry in arResults.entries) {
-       final title = entry.key;
-       final acts = entry.value;
-       final count = acts.length;
-       final ts = acts.first['data']['completedAt'] as Timestamp?;
-       notifications.add({
-          'title': 'AR Activity Completed',
-          'desc': count == 1 ? '${studentMap[acts.first['studentId']]} completed $title.' : '$count students completed $title.',
+
+    // AR activity stores launchedAt/completedAt in each student's nested
+    // collection. A newer launch means the student started a new simulation.
+    for (final entry in _arAttemptsByStudent.entries) {
+      final student = _approvedStudentsById[entry.key];
+      if (student == null || !_studentMatchesAnyTeacherCourse(student)) {
+        continue;
+      }
+      for (final document in entry.value) {
+        final data = document.data();
+        final launchedAt = data['launchedAt'] is Timestamp
+            ? (data['launchedAt'] as Timestamp).toDate()
+            : null;
+        final completedAt = data['completedAt'] is Timestamp
+            ? (data['completedAt'] as Timestamp).toDate()
+            : null;
+        if (launchedAt == null && completedAt == null) continue;
+
+        final isCompletion =
+            completedAt != null &&
+            (launchedAt == null || !completedAt.isBefore(launchedAt));
+        final eventAt = isCompletion ? completedAt : launchedAt;
+        if (eventAt == null) continue;
+        final experimentTitle = _arExperimentTitle(document.id);
+        final section = _matchingSectionLabel(student);
+        notifications.add({
+          'title': isCompletion ? 'AR Lab Completed' : 'AR Lab Simulated',
+          'desc': isCompletion
+              ? '${student.name} ($section) completed "$experimentTitle".'
+              : '${student.name} ($section) started "$experimentTitle".',
           'icon': 'view_in_ar',
-          'color': const Color(0xFFFFB300),
-          'timeStr': _formatNotificationTime(ts?.toDate()),
-          'timestamp': ts?.toDate() ?? DateTime.now(),
-       });
+          'color': isCompletion
+              ? const Color(0xFF22C55E)
+              : const Color(0xFFFFB300),
+          'timeStr': _formatNotificationTime(eventAt),
+          'timestamp': eventAt,
+        });
+      }
     }
 
-    // 4. Missed Quizzes (from _allCourses and _allAttempts)
-    Map<String, List<String>> missedQuizzes = {};
-    Map<String, DateTime> missedQuizTimes = {};
-    for (var s in _students) {
-       for (var course in _allCourses) {
-          if (course.sections.contains(s.section)) {
-             for (var quiz in course.quizzes) {
-                final hasAttempted = _allAttempts.any((a) => a.quizId == quiz.id && a.studentId == s.id);
-                if (!hasAttempted && quiz.dueDate != null && quiz.dueDate!.isBefore(DateTime.now())) {
-                   missedQuizzes.putIfAbsent(quiz.title, () => []).add(s.id);
-                   if (!missedQuizTimes.containsKey(quiz.title)) {
-                       missedQuizTimes[quiz.title] = quiz.dueDate!;
-                   }
-                }
-             }
+    // Missed quizzes use the same exact teacher/course/student assignment.
+    final missedQuizzes = <String, List<String>>{};
+    final missedQuizTitles = <String, String>{};
+    final missedQuizTimes = <String, DateTime>{};
+    for (final student in _approvedStudentsById.values) {
+      for (final course in _teacherCourses) {
+        if (!CourseAssignment.courseMatchesStudent(course, student)) continue;
+        for (final quiz in course.quizzes) {
+          final dueDate = quiz.dueDate;
+          if (dueDate == null || !dueDate.isBefore(DateTime.now())) continue;
+          final hasAttempted = _allAttempts.any(
+            (attempt) =>
+                attempt.courseId == course.id &&
+                attempt.quizId == quiz.id &&
+                attempt.studentId == student.id,
+          );
+          if (!hasAttempted) {
+            final key = '${course.id}/${quiz.id}';
+            missedQuizzes.putIfAbsent(key, () => []).add(student.id);
+            missedQuizTitles[key] = quiz.title;
+            missedQuizTimes[key] = dueDate;
           }
-       }
+        }
+      }
     }
-    for (var entry in missedQuizzes.entries) {
-       final title = entry.key;
-       final ids = entry.value;
-       final count = ids.length;
-       final dueDate = missedQuizTimes[title] ?? DateTime.now();
-       notifications.add({
-          'title': 'Quiz Missed',
-          'desc': count == 1 ? '${studentMap[ids.first]} missed $title.' : '$count students missed $title.',
-          'icon': 'warning',
-          'color': const Color(0xFFFF4757),
-          'timeStr': _formatNotificationTime(dueDate),
-          'timestamp': dueDate,
-       });
+    for (final entry in missedQuizzes.entries) {
+      final title = missedQuizTitles[entry.key] ?? 'Quiz';
+      final studentIds = entry.value;
+      final count = studentIds.length;
+      final dueDate = missedQuizTimes[entry.key] ?? DateTime(2000);
+      final firstStudent = _approvedStudentsById[studentIds.first];
+      notifications.add({
+        'title': 'Quiz Missed',
+        'desc': count == 1
+            ? '${firstStudent?.name ?? 'A student'} missed "$title".'
+            : '$count students missed "$title".',
+        'icon': 'warning',
+        'color': const Color(0xFFFF4757),
+        'timeStr': _formatNotificationTime(dueDate),
+        'timestamp': dueDate,
+      });
     }
 
-    notifications.sort((a, b) => (b['timestamp'] as DateTime).compareTo(a['timestamp'] as DateTime));
-    _notifController.add(notifications);
+    notifications.sort(
+      (a, b) =>
+          (b['timestamp'] as DateTime).compareTo(a['timestamp'] as DateTime),
+    );
+    setState(() {
+      _notifications = notifications.take(50).toList(growable: false);
+    });
   }
 
   @override
   void dispose() {
+    _quizSubscriptionGeneration++;
     _usersSub?.cancel();
-    _quizSub?.cancel();
-    _arSub?.cancel();
+    _approvedStudentsSub?.cancel();
+    for (final sub in _quizNotifSubs) {
+      sub.cancel();
+    }
+    for (final sub in _arNotifSubs.values) {
+      sub.cancel();
+    }
     _teacherCoursesSub?.cancel();
-    _notifController.close();
     _searchCtrl.dispose();
     _entranceController.dispose();
     _clockTimer.cancel();
@@ -481,20 +753,21 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    final summarySections = _students
-        .map((student) => student.section.trim())
-        .where((section) => section.isNotEmpty && section != 'No Section')
-        .toSet()
-        .toList()
-      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    final summarySections =
+        _students
+            .map((student) => student.section.trim())
+            .where((section) => section.isNotEmpty && section != 'No Section')
+            .toSet()
+            .toList()
+          ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
     final summarySectionOptions = <String>[
       _allSummarySections,
       ...summarySections,
     ];
     final selectedSummarySection =
         summarySectionOptions.contains(_selectedSummarySection)
-            ? _selectedSummarySection
-            : _allSummarySections;
+        ? _selectedSummarySection
+        : _allSummarySections;
 
     List<_StudentSummary> activeStudents = _students;
     if (_currentTab == DashboardTab.needsHelp) {
@@ -509,8 +782,9 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     final filteredStudents = activeStudents.where((s) {
       final q = _searchQuery.toLowerCase();
       return s.name.toLowerCase().contains(q) ||
-             s.section.toLowerCase().contains(q) ||
-             (s.studentNumber != null && s.studentNumber!.toLowerCase().contains(q));
+          s.section.toLowerCase().contains(q) ||
+          (s.studentNumber != null &&
+              s.studentNumber!.toLowerCase().contains(q));
     }).toList();
 
     return Scaffold(
@@ -519,86 +793,107 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
         bottom: false,
         child: Stack(
           children: [
-            _loading ? const Center(child: CircularProgressIndicator(color: Color(0xFF00D4FF))) : CustomScrollView(
-              slivers: [
-            SliverToBoxAdapter(
-              child: _buildHeader()
-            ),
-            SliverToBoxAdapter(child: _buildDateTimeCard()),
-            SliverToBoxAdapter(child: _buildClassOverview()),
-            if (_currentTab == DashboardTab.classAvg)
-              SliverToBoxAdapter(
-                child: _buildClassAvgChart(),
-              )
-            else ...[
-              SliverToBoxAdapter(
-                child: _buildSectionLabel(
-                  'Student Progress Summary',
-                  sectionOptions: summarySectionOptions,
-                  selectedSection: selectedSummarySection,
-                ),
-              ),
-              filteredStudents.isEmpty
-                  ? SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 40),
-                        child: Center(
-                          child: Text(
-                            _searchQuery.isNotEmpty
-                                ? 'No students match your search'
-                                : selectedSummarySection !=
-                                        _allSummarySections
-                                    ? 'No students found in Section $selectedSummarySection'
-                                    : _currentTab == DashboardTab.needsHelp
-                                        ? 'No students currently need help'
-                                        : 'No students found',
-                            style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 14),
+            _loading
+                ? const Center(
+                    child: CircularProgressIndicator(color: Color(0xFF00D4FF)),
+                  )
+                : CustomScrollView(
+                    slivers: [
+                      SliverToBoxAdapter(child: _buildHeader()),
+                      SliverToBoxAdapter(child: _buildDateTimeCard()),
+                      SliverToBoxAdapter(child: _buildClassOverview()),
+                      if (_currentTab == DashboardTab.classAvg)
+                        SliverToBoxAdapter(child: _buildClassAvgChart())
+                      else ...[
+                        SliverToBoxAdapter(
+                          child: _buildSectionLabel(
+                            'Student Progress Summary',
+                            sectionOptions: summarySectionOptions,
+                            selectedSection: selectedSummarySection,
                           ),
                         ),
-                      ),
-                    )
-                  : SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        final delay = index * 80;
-                        return AnimatedBuilder(
-                          animation: _entranceController,
-                          builder: (context, child) {
-                            final slide =
-                                Tween<Offset>(
-                                  begin: const Offset(0, 0.15),
-                                  end: Offset.zero,
-                                ).animate(
-                                  CurvedAnimation(
-                                    parent: _entranceController,
-                                    curve: Interval(
-                                      (delay / 700).clamp(0.0, 0.8),
-                                      ((delay + 300) / 700).clamp(0.0, 1.0),
-                                      curve: Curves.easeOutCubic,
+                        filteredStudents.isEmpty
+                            ? SliverToBoxAdapter(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 40),
+                                  child: Center(
+                                    child: Text(
+                                      _searchQuery.isNotEmpty
+                                          ? 'No students match your search'
+                                          : selectedSummarySection !=
+                                                _allSummarySections
+                                          ? 'No students found in Section $selectedSummarySection'
+                                          : _currentTab ==
+                                                DashboardTab.needsHelp
+                                          ? 'No students currently need help'
+                                          : 'No students found',
+                                      style: TextStyle(
+                                        color:
+                                            Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? const Color(0xFF8BA3C0)
+                                            : Colors.grey.shade600,
+                                        fontSize: 14,
+                                      ),
                                     ),
                                   ),
-                                );
-                            return SlideTransition(
-                              position: slide,
-                              child: FadeTransition(
-                                opacity: _entranceController,
-                                child: child,
+                                ),
+                              )
+                            : SliverList(
+                                delegate: SliverChildBuilderDelegate((
+                                  context,
+                                  index,
+                                ) {
+                                  final delay = index * 80;
+                                  return AnimatedBuilder(
+                                    animation: _entranceController,
+                                    builder: (context, child) {
+                                      final slide =
+                                          Tween<Offset>(
+                                            begin: const Offset(0, 0.15),
+                                            end: Offset.zero,
+                                          ).animate(
+                                            CurvedAnimation(
+                                              parent: _entranceController,
+                                              curve: Interval(
+                                                (delay / 700).clamp(0.0, 0.8),
+                                                ((delay + 300) / 700).clamp(
+                                                  0.0,
+                                                  1.0,
+                                                ),
+                                                curve: Curves.easeOutCubic,
+                                              ),
+                                            ),
+                                          );
+                                      return SlideTransition(
+                                        position: slide,
+                                        child: FadeTransition(
+                                          opacity: _entranceController,
+                                          child: child,
+                                        ),
+                                      );
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                        20,
+                                        0,
+                                        20,
+                                        12,
+                                      ),
+                                      child: _StudentProgressCard(
+                                        student: filteredStudents[index],
+                                        showBadge:
+                                            _currentTab ==
+                                            DashboardTab.needsHelp,
+                                      ),
+                                    ),
+                                  );
+                                }, childCount: filteredStudents.length),
                               ),
-                            );
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-                            child: _StudentProgressCard(
-                              student: filteredStudents[index],
-                              showBadge: _currentTab == DashboardTab.needsHelp,
-                            ),
-                          ),
-                        );
-                      }, childCount: filteredStudents.length),
-                    ),
-            ],
-            const SliverToBoxAdapter(child: SizedBox(height: 140)),
-          ],
-        ),
+                      ],
+                      const SliverToBoxAdapter(child: SizedBox(height: 140)),
+                    ],
+                  ),
             Positioned(
               bottom: 124,
               right: 20,
@@ -613,14 +908,18 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                     _loadData();
                   }
                 },
-                backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                backgroundColor: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF00D4FF)
+                    : const Color(0xFF1565C0),
                 elevation: 8,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: CustomIconWidget(
                   iconName: 'person_add_outlined',
-                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF0A1628)
+                      : Colors.white,
                   size: 28,
                 ),
               ),
@@ -632,12 +931,21 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   }
 
   Widget _buildHeader() {
+    final user = context.watch<AuthService>().currentUser;
+    final lastRead = user?.lastNotificationReadAt ?? DateTime(2000);
+    final hasUnread = _notifications.any(
+      (notification) =>
+          (notification['timestamp'] as DateTime).isAfter(lastRead),
+    );
+
     return ClipRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
-          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628).withAlpha(204) : Colors.white.withAlpha(204),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF0A1628).withAlpha(204)
+              : Colors.white.withAlpha(204),
           child: Row(
             children: [
               GestureDetector(
@@ -663,7 +971,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                   child: ClipOval(
                     child: Builder(
                       builder: (context) {
-                        final avatarUrl = context.watch<AuthService>().currentUser?.avatarUrl;
+                        final avatarUrl = context
+                            .watch<AuthService>()
+                            .currentUser
+                            ?.avatarUrl;
                         Widget fallback = Container(
                           decoration: const BoxDecoration(
                             gradient: LinearGradient(
@@ -698,10 +1009,20 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                 child: _isSearching
                     ? TextField(
                         controller: _searchCtrl,
-                        style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87, fontSize: 14),
+                        style: TextStyle(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black87,
+                          fontSize: 14,
+                        ),
                         decoration: InputDecoration(
                           hintText: 'Search students...',
-                          hintStyle: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
+                          hintStyle: TextStyle(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF8BA3C0)
+                                : Colors.grey.shade600,
+                          ),
                           border: InputBorder.none,
                           isDense: true,
                         ),
@@ -716,13 +1037,24 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black87,
                             ),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             'Here\'s your class overview',
-                            style: TextStyle(fontSize: 12, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? const Color(0xFF8BA3C0)
+                                  : Colors.grey.shade600,
+                            ),
                           ),
                         ],
                       ),
@@ -742,67 +1074,75 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                   height: 44,
                   margin: const EdgeInsets.only(right: 8),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.grey.shade100,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF142240)
+                        : Colors.grey.shade100,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+                    border: Border.all(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF1E3A5F)
+                          : Colors.grey.shade300,
+                    ),
                   ),
                   child: Center(
                     child: CustomIconWidget(
                       iconName: _isSearching ? 'close' : 'search',
-                      color: _isSearching ? const Color(0xFFFF4757) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
+                      color: _isSearching
+                          ? const Color(0xFFFF4757)
+                          : (Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF8BA3C0)
+                                : Colors.grey.shade600),
                       size: 22,
                     ),
                   ),
                 ),
               ),
-              StreamBuilder<List<Map<String, dynamic>>>(
-                stream: _notifController.stream,
-                builder: (context, snapshot) {
-                  final user = context.watch<AuthService>().currentUser;
-                  final lastRead = user?.lastNotificationReadAt ?? DateTime(2000);
-                  final notifs = snapshot.data ?? [];
-                  final hasUnread = notifs.any((n) => (n['timestamp'] as DateTime).isAfter(lastRead));
-                  
-                  return GestureDetector(
-                    onTap: () {
-                      context.read<AuthService>().markNotificationsAsRead();
-                      _showNotificationsDialog(context, notifs);
-                    },
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.grey.shade100,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+              GestureDetector(
+                onTap: () {
+                  context.read<AuthService>().markNotificationsAsRead();
+                  _showNotificationsDialog(context, _notifications);
+                },
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF142240)
+                        : Colors.grey.shade100,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF1E3A5F)
+                          : Colors.grey.shade300,
+                    ),
+                  ),
+                  child: Stack(
+                    children: [
+                      Center(
+                        child: CustomIconWidget(
+                          iconName: 'notifications_outlined',
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF8BA3C0)
+                              : Colors.grey.shade600,
+                          size: 22,
+                        ),
                       ),
-                      child: Stack(
-                        children: [
-                          Center(
-                            child: CustomIconWidget(
-                              iconName: 'notifications_outlined',
-                              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
-                              size: 22,
+                      if (hasUnread)
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF00D4FF),
+                              shape: BoxShape.circle,
                             ),
                           ),
-                          if (hasUnread)
-                            Positioned(
-                              top: 10,
-                              right: 10,
-                              child: Container(
-                                width: 8,
-                                height: 8,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFF00D4FF),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
+                        ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
@@ -821,21 +1161,35 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
 
   // _fetchDynamicNotifications removed, replaced by Stream
 
-
-  void _showNotificationsDialog(BuildContext context, List<Map<String, dynamic>> notifs) {
+  void _showNotificationsDialog(
+    BuildContext context,
+    List<Map<String, dynamic>> notifs,
+  ) {
     showDialog(
       context: context,
       builder: (context) {
         return Dialog(
           backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 24,
+          ),
           child: Container(
             width: 400,
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(context).height * 0.75,
+            ),
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF142240)
+                  : Colors.white,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+              border: Border.all(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF1E3A5F)
+                    : Colors.grey.shade300,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.3),
@@ -848,73 +1202,105 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            const CustomIconWidget(iconName: 'notifications', color: Color(0xFF7C3AED), size: 24),
-                            const SizedBox(width: 10),
-                            Text(
-                              'Notifications',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
-                              ),
-                            ),
-                          ],
+                        const CustomIconWidget(
+                          iconName: 'notifications',
+                          color: Color(0xFF7C3AED),
+                          size: 24,
                         ),
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade200,
-                              shape: BoxShape.circle,
-                            ),
-                            child: CustomIconWidget(iconName: 'close', color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, size: 16),
+                        const SizedBox(width: 10),
+                        Text(
+                          'Notifications',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.black87,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    if (notifs.isEmpty)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 20),
-                        child: Text(
-                          'No recent activity.',
-                          style: TextStyle(color: Colors.grey),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF0A1628)
+                              : Colors.grey.shade200,
+                          shape: BoxShape.circle,
                         ),
-                      )
-                    else
-                      ...notifs.map((n) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: _buildNotificationItem(
-                            n['title'] as String,
-                            n['desc'] as String,
-                            n['icon'] as String,
-                            n['color'] as Color,
-                            n['timeStr'] as String,
-                          ),
-                        );
-                      }).toList(),
+                        child: CustomIconWidget(
+                          iconName: 'close',
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF8BA3C0)
+                              : Colors.grey.shade600,
+                          size: 16,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
+                const SizedBox(height: 20),
+                if (notifs.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    child: Text(
+                      'No recent activity.',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  )
+                else
+                  Flexible(
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: notifs.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        final notification = notifs[index];
+                        return _buildNotificationItem(
+                          notification['title'] as String,
+                          notification['desc'] as String,
+                          notification['icon'] as String,
+                          notification['color'] as Color,
+                          (notification['timeStr'] as String?) ?? '',
+                        );
+                      },
+                    ),
+                  ),
+              ],
+            ),
           ),
         );
       },
     );
   }
 
-  Widget _buildNotificationItem(String title, String desc, String icon, Color color, String time) {
+  Widget _buildNotificationItem(
+    String title,
+    String desc,
+    String icon,
+    Color color,
+    String time,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF0A1628)
+            : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF1E3A5F)
+              : Colors.grey.shade300,
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -941,7 +1327,9 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black87,
                         ),
                       ),
                     ),
@@ -1008,10 +1396,16 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
               icon: 'groups',
               label: 'Total Students',
               value: '${_students.length}',
-              color: _currentTab == DashboardTab.allStudents 
-                  ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0))
-                  : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)).withAlpha(128),
-              onTap: () => setState(() => _currentTab = DashboardTab.allStudents),
+              color: _currentTab == DashboardTab.allStudents
+                  ? (Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF00D4FF)
+                        : const Color(0xFF1565C0))
+                  : (Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF00D4FF)
+                            : const Color(0xFF1565C0))
+                        .withAlpha(128),
+              onTap: () =>
+                  setState(() => _currentTab = DashboardTab.allStudents),
             ),
           ),
           const SizedBox(width: 10),
@@ -1020,7 +1414,9 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
               icon: 'warning_amber',
               label: 'Needs Help',
               value: '$_needsHelpCount',
-              color: _currentTab == DashboardTab.needsHelp ? const Color(0xFFFF6B6B) : const Color(0xFFFF6B6B).withAlpha(128),
+              color: _currentTab == DashboardTab.needsHelp
+                  ? const Color(0xFFFF6B6B)
+                  : const Color(0xFFFF6B6B).withAlpha(128),
               onTap: () => setState(() => _currentTab = DashboardTab.needsHelp),
             ),
           ),
@@ -1030,7 +1426,9 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
               icon: 'bar_chart',
               label: 'Class Avg',
               value: '${_classAvgScore.toStringAsFixed(0)}%',
-              color: _currentTab == DashboardTab.classAvg ? const Color(0xFF7C3AED) : const Color(0xFF7C3AED).withAlpha(128),
+              color: _currentTab == DashboardTab.classAvg
+                  ? const Color(0xFF7C3AED)
+                  : const Color(0xFF7C3AED).withAlpha(128),
               onTap: () => setState(() => _currentTab = DashboardTab.classAvg),
             ),
           ),
@@ -1046,7 +1444,12 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
         child: Center(
           child: Text(
             'No student data available',
-            style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 14),
+            style: TextStyle(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF8BA3C0)
+                  : Colors.grey.shade600,
+              fontSize: 14,
+            ),
           ),
         ),
       );
@@ -1069,36 +1472,45 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
       for (var s in _students) {
         grouped.putIfAbsent(s.section, () => []).add(s);
       }
-      
+
       final sortedSections = grouped.keys.toList()..sort();
       for (var sec in sortedSections) {
         final sectionStudents = grouped[sec]!;
-        final avg = sectionStudents.map((s) => s.overallScore).reduce((a, b) => a + b) / sectionStudents.length;
-        
+        final avg =
+            sectionStudents.map((s) => s.overallScore).reduce((a, b) => a + b) /
+            sectionStudents.length;
+
         Color c = const Color(0xFF00D4FF);
-        if (avg >= 80) c = const Color(0xFF00D4FF);
-        else if (avg >= 60) c = const Color(0xFF7C3AED);
-        else c = const Color(0xFFFF6B6B);
-        
+        if (avg >= 80)
+          c = const Color(0xFF00D4FF);
+        else if (avg >= 60)
+          c = const Color(0xFF7C3AED);
+        else
+          c = const Color(0xFFFF6B6B);
+
         String shortSec = sec.length > 10 ? sec.substring(0, 10) + '...' : sec;
-        
+
         xAxisLabels.add(shortSec);
         yValues.add(avg);
         barColors.add(c);
         tooltips.add('Section $sec\nAvg: ${avg.toStringAsFixed(1)}%');
       }
     } else {
-      final filteredStudents = _students.where((s) => s.section == _selectedChartSection).toList();
+      final filteredStudents = _students
+          .where((s) => s.section == _selectedChartSection)
+          .toList();
       filteredStudents.sort((a, b) => a.name.compareTo(b.name));
-      
+
       for (var s in filteredStudents) {
         String shortName = s.name.split(' ').first;
         if (shortName.length > 6) shortName = shortName.substring(0, 6) + '.';
-        
+
         xAxisLabels.add(shortName);
         yValues.add(s.overallScore);
         barColors.add(s.performanceColor);
-        tooltips.add('${s.name}\n${s.section}\n${s.overallScore.toStringAsFixed(1)}%');
+        tooltips.add(
+          '${s.name}\n${s.section}\n${s.overallScore.toStringAsFixed(1)}%',
+        );
       }
     }
 
@@ -1107,7 +1519,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Student Overall Scores', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text(
+            'Student Overall Scores',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 12),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -1124,22 +1539,35 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                     },
                     borderRadius: BorderRadius.circular(20),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFF00D4FF).withAlpha(40) : Colors.transparent,
+                        color: isSelected
+                            ? const Color(0xFF00D4FF).withAlpha(40)
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: isSelected ? const Color(0xFF00D4FF) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+                          color: isSelected
+                              ? const Color(0xFF00D4FF)
+                              : (Theme.of(context).brightness == Brightness.dark
+                                    ? const Color(0xFF1E3A5F)
+                                    : Colors.grey.shade300),
                         ),
                       ),
                       child: Text(
                         sec == 'All' ? 'All Sections' : 'Section $sec',
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          color: isSelected 
-                              ? const Color(0xFF00D4FF) 
-                              : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                          color: isSelected
+                              ? const Color(0xFF00D4FF)
+                              : (Theme.of(context).brightness == Brightness.dark
+                                    ? const Color(0xFF8BA3C0)
+                                    : Colors.grey.shade600),
                         ),
                       ),
                     ),
@@ -1151,95 +1579,136 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
           const SizedBox(height: 24),
           SizedBox(
             height: 250,
-            child: yValues.isEmpty 
-              ? Center(
-                  child: Text(
-                    'No data in this section',
-                    style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 14),
-                  ),
-                )
-              : BarChart(
-              BarChartData(
-                alignment: BarChartAlignment.spaceAround,
-                maxY: 100,
-                barTouchData: BarTouchData(
-                  enabled: true,
-                  touchTooltipData: BarTouchTooltipData(
-                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                      return BarTooltipItem(
-                        tooltips[group.x],
-                        const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                      );
-                    },
-                  ),
-                ),
-                titlesData: FlTitlesData(
-                  show: true,
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 40,
-                      getTitlesWidget: (value, meta) {
-                        if (value.toInt() >= 0 && value.toInt() < xAxisLabels.length) {
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(xAxisLabels[value.toInt()], style: const TextStyle(fontSize: 10)),
-                          );
-                        }
-                        return const Text('');
-                      },
+            child: yValues.isEmpty
+                ? Center(
+                    child: Text(
+                      'No data in this section',
+                      style: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF8BA3C0)
+                            : Colors.grey.shade600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  )
+                : BarChart(
+                    BarChartData(
+                      alignment: BarChartAlignment.spaceAround,
+                      maxY: 100,
+                      barTouchData: BarTouchData(
+                        enabled: true,
+                        touchTooltipData: BarTouchTooltipData(
+                          getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                            return BarTooltipItem(
+                              tooltips[group.x],
+                              const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      titlesData: FlTitlesData(
+                        show: true,
+                        bottomTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            reservedSize: 40,
+                            getTitlesWidget: (value, meta) {
+                              if (value.toInt() >= 0 &&
+                                  value.toInt() < xAxisLabels.length) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Text(
+                                    xAxisLabels[value.toInt()],
+                                    style: const TextStyle(fontSize: 10),
+                                  ),
+                                );
+                              }
+                              return const Text('');
+                            },
+                          ),
+                        ),
+                        leftTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            reservedSize: 40,
+                            getTitlesWidget: (value, meta) {
+                              if (value % 20 != 0)
+                                return const SizedBox.shrink();
+                              return Text(
+                                '${value.toInt()}',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? const Color(0xFF8BA3C0)
+                                      : Colors.grey.shade600,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        topTitles: const AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        rightTitles: const AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                      ),
+                      borderData: FlBorderData(show: false),
+                      gridData: FlGridData(
+                        show: true,
+                        drawVerticalLine: false,
+                        getDrawingHorizontalLine: (value) => FlLine(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF1E3A5F)
+                              : Colors.grey.shade300,
+                          strokeWidth: 1,
+                        ),
+                      ),
+                      barGroups: List.generate(yValues.length, (i) {
+                        return BarChartGroupData(
+                          x: i,
+                          barRods: [
+                            BarChartRodData(
+                              toY: yValues[i],
+                              color: barColors[i],
+                              width: 20,
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(6),
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
                     ),
                   ),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 40,
-                      getTitlesWidget: (value, meta) {
-                        if (value % 20 != 0) return const SizedBox.shrink();
-                        return Text('${value.toInt()}', style: TextStyle(fontSize: 10, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600));
-                      },
-                    ),
-                  ),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                ),
-                borderData: FlBorderData(show: false),
-                gridData: FlGridData(
-                  show: true,
-                  drawVerticalLine: false,
-                  getDrawingHorizontalLine: (value) => FlLine(
-                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300,
-                    strokeWidth: 1,
-                  ),
-                ),
-                barGroups: List.generate(yValues.length, (i) {
-                  return BarChartGroupData(
-                    x: i,
-                    barRods: [
-                      BarChartRodData(
-                        toY: yValues[i],
-                        color: barColors[i],
-                        width: 20,
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
-                      )
-                    ],
-                  );
-                }),
-              ),
-            ),
           ),
           const SizedBox(height: 32),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.grey.shade100,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF142240)
+                  : Colors.grey.shade100,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+              border: Border.all(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF1E3A5F)
+                    : Colors.grey.shade300,
+              ),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const CustomIconWidget(iconName: 'info_outline', color: Color(0xFF00D4FF), size: 24),
+                const CustomIconWidget(
+                  iconName: 'info_outline',
+                  color: Color(0xFF00D4FF),
+                  size: 24,
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -1247,7 +1716,9 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                     style: TextStyle(
                       fontSize: 13,
                       height: 1.5,
-                      color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF8BA3C0)
+                          : Colors.grey.shade700,
                     ),
                   ),
                 ),
@@ -1265,10 +1736,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     required String selectedSection,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor =
-        isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0);
-    final mutedColor =
-        isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade600;
+    final accentColor = isDark
+        ? const Color(0xFF00D4FF)
+        : const Color(0xFF1565C0);
+    final mutedColor = isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade600;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
@@ -1301,9 +1772,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(
-                color: isDark
-                    ? const Color(0xFF1E3A5F)
-                    : Colors.grey.shade300,
+                color: isDark ? const Color(0xFF1E3A5F) : Colors.grey.shade300,
               ),
             ),
             onSelected: (section) {
@@ -1314,8 +1783,8 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
               final studentCount = section == _allSummarySections
                   ? _students.length
                   : _students
-                      .where((student) => student.section == section)
-                      .length;
+                        .where((student) => student.section == section)
+                        .length;
               return PopupMenuItem<String>(
                 value: section,
                 child: Row(
@@ -1324,8 +1793,8 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                       isSelected
                           ? Icons.check_circle_rounded
                           : section == _allSummarySections
-                              ? Icons.groups_outlined
-                              : Icons.class_outlined,
+                          ? Icons.groups_outlined
+                          : Icons.class_outlined,
                       color: isSelected ? accentColor : mutedColor,
                       size: 19,
                     ),
@@ -1364,16 +1833,14 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
               padding: const EdgeInsets.symmetric(horizontal: 9),
               decoration: BoxDecoration(
                 color: selectedSection == _allSummarySections
-                    ? (isDark
-                        ? const Color(0xFF142240)
-                        : Colors.grey.shade50)
+                    ? (isDark ? const Color(0xFF142240) : Colors.grey.shade50)
                     : accentColor.withAlpha(isDark ? 30 : 20),
                 borderRadius: BorderRadius.circular(11),
                 border: Border.all(
                   color: selectedSection == _allSummarySections
                       ? (isDark
-                          ? const Color(0xFF1E3A5F)
-                          : Colors.grey.shade300)
+                            ? const Color(0xFF1E3A5F)
+                            : Colors.grey.shade300)
                       : accentColor,
                 ),
               ),
@@ -1444,34 +1911,46 @@ class _StatCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF142240)
+              : Colors.white,
           borderRadius: BorderRadius.circular(14.0),
-          border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+          border: Border.all(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF1E3A5F)
+                : Colors.grey.shade300,
+          ),
         ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CustomIconWidget(iconName: icon, color: color, size: 18),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: color,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CustomIconWidget(iconName: icon, color: color, size: 18),
+            const SizedBox(height: 6),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: color,
+              ),
             ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(fontSize: 9, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 9,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF8BA3C0)
+                    : Colors.grey.shade600,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
-    ));
+    );
   }
 }
 
@@ -1488,9 +1967,15 @@ class _StudentProgressCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF142240)
+            : Colors.white,
         borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF1E3A5F)
+              : Colors.grey.shade300,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1506,7 +1991,9 @@ class _StudentProgressCard extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: ClipOval(
-                  child: (student.avatarUrl != null && student.avatarUrl!.isNotEmpty)
+                  child:
+                      (student.avatarUrl != null &&
+                          student.avatarUrl!.isNotEmpty)
                       ? Image.network(
                           student.avatarUrl!,
                           fit: BoxFit.cover,
@@ -1543,7 +2030,9 @@ class _StudentProgressCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black87,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -1551,7 +2040,9 @@ class _StudentProgressCard extends StatelessWidget {
                       'Section ${student.section}',
                       style: TextStyle(
                         fontSize: 11,
-                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF8BA3C0)
+                            : Colors.grey.shade600,
                       ),
                     ),
                   ],
@@ -1560,7 +2051,8 @@ class _StudentProgressCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  if (student.studentNumber != null && student.studentNumber!.isNotEmpty)
+                  if (student.studentNumber != null &&
+                      student.studentNumber!.isNotEmpty)
                     Padding(
                       padding: EdgeInsets.only(bottom: showBadge ? 6.0 : 0),
                       child: Text(
@@ -1568,7 +2060,9 @@ class _StudentProgressCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF00D4FF)
+                              : const Color(0xFF1565C0),
                         ),
                       ),
                     ),
@@ -1604,7 +2098,12 @@ class _StudentProgressCard extends StatelessWidget {
             children: [
               Text(
                 'Overall',
-                style: TextStyle(fontSize: 11, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF8BA3C0)
+                      : Colors.grey.shade600,
+                ),
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -1612,7 +2111,10 @@ class _StudentProgressCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(4.0),
                   child: LinearProgressIndicator(
                     value: student.overallScore / 100,
-                    backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300,
+                    backgroundColor:
+                        Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF1E3A5F)
+                        : Colors.grey.shade300,
                     valueColor: AlwaysStoppedAnimation<Color>(
                       student.performanceColor,
                     ),
@@ -1639,7 +2141,9 @@ class _StudentProgressCard extends StatelessWidget {
                 icon: 'quiz',
                 label: 'Quiz Avg',
                 value: '${(student.avgQuizScore * 100).toStringAsFixed(0)}%',
-                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF00D4FF)
+                    : const Color(0xFF1565C0),
               ),
               const SizedBox(width: 8),
               _MiniStat(
@@ -1689,7 +2193,9 @@ class _MiniStat extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
         decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade100,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF0A1628)
+              : Colors.grey.shade100,
           borderRadius: BorderRadius.circular(10.0),
         ),
         child: Column(
@@ -1707,7 +2213,12 @@ class _MiniStat extends StatelessWidget {
             ),
             Text(
               label,
-              style: TextStyle(fontSize: 9, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
+              style: TextStyle(
+                fontSize: 9,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF8BA3C0)
+                    : Colors.grey.shade600,
+              ),
               overflow: TextOverflow.ellipsis,
             ),
           ],
