@@ -50,6 +50,8 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
   late AnimationController _entranceController;
   late final AuthService _authService;
 
+  static const int _pageSize = 3;
+
   bool _loading = true;
   List<_QuizResult> _quizzes = [];
   List<_MissedQuizResult> _missedQuizzes = [];
@@ -61,6 +63,10 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
   String? _studentDataKey;
   int _dataVersion = 0;
   int _missedLoadVersion = 0;
+
+  int _quizPage = 0;
+  int _missedPage = 0;
+  int _arPage = 0;
 
   @override
   void initState() {
@@ -211,6 +217,7 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
     setState(() {
       _quizzes = quizzes;
       _avgQuiz = '${average.toStringAsFixed(0)}%';
+      _quizPage = 0;
       _loading = false;
     });
   }
@@ -241,6 +248,7 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
 
     setState(() {
       _arExperiments = experiments;
+      _arPage = 0;
       _avgAr = experiments.isEmpty
           ? '0.0'
           : (totalScore / experiments.length).toStringAsFixed(1);
@@ -274,7 +282,10 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
       if (mounted &&
           version == _dataVersion &&
           missedLoadVersion == _missedLoadVersion) {
-        setState(() => _missedQuizzes = missedQuizzes);
+        setState(() {
+          _missedQuizzes = missedQuizzes;
+          _missedPage = 0;
+        });
       }
     } catch (error) {
       debugPrint('Error fetching missed quizzes: $error');
@@ -316,33 +327,7 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
                       child: _buildSectionHeader('Quiz Results', 'quiz'),
                     ),
                   ),
-                  _quizzes.isEmpty
-                      ? SliverToBoxAdapter(
-                          child: Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: Center(
-                              child: Text(
-                                'No quizzes completed yet.',
-                                style: TextStyle(
-                                  color:
-                                      Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? const Color(0xFF8BA3C0)
-                                      : Colors.grey.shade600,
-                                ),
-                              ),
-                            ),
-                          ),
-                        )
-                      : SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) => _buildAnimatedSection(
-                              delay: 200 + (index * 50),
-                              child: _buildQuizCard(_quizzes[index]),
-                            ),
-                            childCount: _quizzes.length,
-                          ),
-                        ),
+                  ..._buildPagedQuizSection(),
                   SliverToBoxAdapter(
                     child: _buildAnimatedSection(
                       delay: 250,
@@ -353,70 +338,14 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
                       ),
                     ),
                   ),
-                  _missedQuizzes.isEmpty
-                      ? SliverToBoxAdapter(
-                          child: Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: Center(
-                              child: Text(
-                                'No missed quizzes.',
-                                style: TextStyle(
-                                  color:
-                                      Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? const Color(0xFF8BA3C0)
-                                      : Colors.grey.shade600,
-                                ),
-                              ),
-                            ),
-                          ),
-                        )
-                      : SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) => _buildAnimatedSection(
-                              delay: 300 + (index * 50),
-                              child: _buildMissedQuizCard(
-                                _missedQuizzes[index],
-                              ),
-                            ),
-                            childCount: _missedQuizzes.length,
-                          ),
-                        ),
+                  ..._buildPagedMissedSection(),
                   SliverToBoxAdapter(
                     child: _buildAnimatedSection(
                       delay: 300,
                       child: _buildSectionHeader('AR Experiments', 'science'),
                     ),
                   ),
-                  _arExperiments.isEmpty
-                      ? SliverToBoxAdapter(
-                          child: Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: Center(
-                              child: Text(
-                                'No AR experiments completed yet.',
-                                style: TextStyle(
-                                  color:
-                                      Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? const Color(0xFF8BA3C0)
-                                      : Colors.grey.shade600,
-                                ),
-                              ),
-                            ),
-                          ),
-                        )
-                      : SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) => _buildAnimatedSection(
-                              delay: 400 + (index * 50),
-                              child: _buildArExperimentCard(
-                                _arExperiments[index],
-                              ),
-                            ),
-                            childCount: _arExperiments.length,
-                          ),
-                        ),
+                  ..._buildPagedArSection(),
                   const SliverToBoxAdapter(child: SizedBox(height: 140)),
                 ],
               ),
@@ -448,6 +377,237 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
         );
       },
       child: child,
+    );
+  }
+
+  // ── Paged section builders ───────────────────────────────────────────
+
+  List<Widget> _buildPagedQuizSection() {
+    if (_quizzes.isEmpty) {
+      return [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Center(
+              child: Text(
+                'No quizzes completed yet.',
+                style: TextStyle(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF8BA3C0)
+                      : Colors.grey.shade600,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ];
+    }
+    final start = _quizPage * _pageSize;
+    final visible = _quizzes.skip(start).take(_pageSize).toList();
+    return [
+      SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) => _buildAnimatedSection(
+            delay: 200 + (index * 50),
+            child: _buildQuizCard(visible[index]),
+          ),
+          childCount: visible.length,
+        ),
+      ),
+      if (_quizzes.length > _pageSize)
+        SliverToBoxAdapter(
+          child: _buildPaginationControls(
+            currentPage: _quizPage,
+            totalItems: _quizzes.length,
+            onPrevious: _quizPage > 0
+                ? () => setState(() => _quizPage--)
+                : null,
+            onNext: (start + _pageSize) < _quizzes.length
+                ? () => setState(() => _quizPage++)
+                : null,
+          ),
+        ),
+    ];
+  }
+
+  List<Widget> _buildPagedMissedSection() {
+    if (_missedQuizzes.isEmpty) {
+      return [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Center(
+              child: Text(
+                'No missed quizzes.',
+                style: TextStyle(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF8BA3C0)
+                      : Colors.grey.shade600,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ];
+    }
+    final start = _missedPage * _pageSize;
+    final visible = _missedQuizzes.skip(start).take(_pageSize).toList();
+    return [
+      SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) => _buildAnimatedSection(
+            delay: 300 + (index * 50),
+            child: _buildMissedQuizCard(visible[index]),
+          ),
+          childCount: visible.length,
+        ),
+      ),
+      if (_missedQuizzes.length > _pageSize)
+        SliverToBoxAdapter(
+          child: _buildPaginationControls(
+            currentPage: _missedPage,
+            totalItems: _missedQuizzes.length,
+            onPrevious: _missedPage > 0
+                ? () => setState(() => _missedPage--)
+                : null,
+            onNext: (start + _pageSize) < _missedQuizzes.length
+                ? () => setState(() => _missedPage++)
+                : null,
+          ),
+        ),
+    ];
+  }
+
+  List<Widget> _buildPagedArSection() {
+    if (_arExperiments.isEmpty) {
+      return [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Center(
+              child: Text(
+                'No AR experiments completed yet.',
+                style: TextStyle(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF8BA3C0)
+                      : Colors.grey.shade600,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ];
+    }
+    final start = _arPage * _pageSize;
+    final visible = _arExperiments.skip(start).take(_pageSize).toList();
+    return [
+      SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) => _buildAnimatedSection(
+            delay: 400 + (index * 50),
+            child: _buildArExperimentCard(visible[index]),
+          ),
+          childCount: visible.length,
+        ),
+      ),
+      if (_arExperiments.length > _pageSize)
+        SliverToBoxAdapter(
+          child: _buildPaginationControls(
+            currentPage: _arPage,
+            totalItems: _arExperiments.length,
+            onPrevious: _arPage > 0
+                ? () => setState(() => _arPage--)
+                : null,
+            onNext: (start + _pageSize) < _arExperiments.length
+                ? () => setState(() => _arPage++)
+                : null,
+          ),
+        ),
+    ];
+  }
+
+  Widget _buildPaginationControls({
+    required int currentPage,
+    required int totalItems,
+    required VoidCallback? onPrevious,
+    required VoidCallback? onNext,
+  }) {
+    final totalPages = (totalItems / _pageSize).ceil();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _buildNavButton(
+            icon: 'chevron_left',
+            onPressed: onPrevious,
+            isDark: isDark,
+          ),
+          const SizedBox(width: 12),
+          Text(
+            '${currentPage + 1} / $totalPages',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+            ),
+          ),
+          const SizedBox(width: 12),
+          _buildNavButton(
+            icon: 'chevron_right',
+            onPressed: onNext,
+            isDark: isDark,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavButton({
+    required String icon,
+    required VoidCallback? onPressed,
+    required bool isDark,
+  }) {
+    final enabled = onPressed != null;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: isDark
+                ? (enabled ? const Color(0xFF0D2E3F) : const Color(0xFF0A1929))
+                : (enabled ? const Color(0xFFE8F9FD) : Colors.grey.shade100),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: isDark
+                  ? (enabled
+                      ? const Color(0x3300D4FF)
+                      : const Color(0xFF1E3A5F).withOpacity(0.3))
+                  : (enabled
+                      ? const Color(0xFF1565C0).withOpacity(0.3)
+                      : Colors.grey.shade300),
+            ),
+          ),
+          child: Center(
+            child: CustomIconWidget(
+              iconName: icon,
+              size: 20,
+              color: isDark
+                  ? (enabled
+                      ? const Color(0xFF00D4FF)
+                      : const Color(0xFF8BA3C0).withOpacity(0.3))
+                  : (enabled
+                      ? const Color(0xFF1565C0)
+                      : Colors.grey.shade400),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
