@@ -10,6 +10,7 @@ import '../../models/ar_experiment_model.dart';
 import '../../models/experiment_grade.dart';
 import '../../models/ppe_selection.dart';
 import '../../data/dummy_ar_experiments.dart';
+import '../../data/ar_experiment_catalog.dart';
 import '../../data/experiment_assessment_data.dart';
 import '../../data/periodic_table_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -258,6 +259,19 @@ class _UnityArScreenState extends State<UnityArScreen>
   Future<void> _launchExperiment(String experimentId) async {
     // Extract only digits: "Exp1" or "ar1" becomes "1"
     final normalizedId = experimentId.replaceAll(RegExp(r'[^0-9]'), '');
+
+    final role = context.read<AuthService>().currentUser?.role;
+    if (!canRoleAccessExperiment(role, experimentId)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'This experiment is not available for your grade level.',
+          ),
+        ),
+      );
+      Navigator.of(context).pop();
+      return;
+    }
 
     final requiredPpe = requiredPpeForExperiment(experimentId);
     if (requiredPpe.isNotEmpty) {
