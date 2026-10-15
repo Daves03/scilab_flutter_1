@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
-import { collection, query, where, onSnapshot, doc, updateDoc, deleteDoc, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, getDocs } from 'firebase/firestore';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { db, auth } from '../firebase';
-import { CheckCircle, XCircle, Key, RefreshCcw, Trash2, AlertTriangle, Search, Edit, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CheckCircle, XCircle, Key, RefreshCcw, AlertTriangle, Search, Edit, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function ManageUsers() {
   const [activeTab, setActiveTab] = useState('pending'); // 'pending' | 'approved' | 'rejected'
   const [roleFilter, setRoleFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [users, setUsers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
   const [sectionsMap, setSectionsMap] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
@@ -26,9 +26,7 @@ export default function ManageUsers() {
   const [editStudentNumber, setEditStudentNumber] = useState('');
 
   useEffect(() => {
-    const q = query(collection(db, 'users'), where('status', '==', activeTab));
-    
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(collection(db, 'users'), (snapshot) => {
       const usersData = [];
       snapshot.forEach(doc => {
         const data = doc.data();
@@ -36,11 +34,19 @@ export default function ManageUsers() {
           usersData.push({ id: doc.id, ...data });
         }
       });
-      setUsers(usersData);
+      setAllUsers(usersData);
     });
 
     return () => unsubscribe();
-  }, [activeTab]);
+  }, []);
+
+  const users = allUsers.filter(user => user.status === activeTab);
+  const userCounts = allUsers.reduce((counts, user) => {
+    if (Object.hasOwn(counts, user.status)) {
+      counts[user.status] += 1;
+    }
+    return counts;
+  }, { pending: 0, approved: 0, rejected: 0 });
 
   useEffect(() => {
     const fetchSections = async () => {
@@ -150,21 +156,21 @@ export default function ManageUsers() {
               onClick={() => setActiveTab('pending')}
               style={{ flex: 1, textAlign: 'center', padding: '12px 4px', fontSize: '0.85rem' }}
             >
-              <span style={{ color: 'var(--accent-pending)' }}>Pending Approvals ({activeTab === 'pending' ? users.length : '...'})</span>
+              <span style={{ color: 'var(--accent-pending)' }}>Pending Approvals ({userCounts.pending})</span>
             </button>
             <button 
               className={`tab ${activeTab === 'approved' ? 'active' : ''}`}
               onClick={() => setActiveTab('approved')}
               style={{ flex: 1, textAlign: 'center', padding: '12px 4px', fontSize: '0.85rem' }}
             >
-              <span style={{ color: 'var(--accent-green)' }}>Active Users ({activeTab === 'approved' ? users.length : '...'})</span>
+              <span style={{ color: 'var(--accent-green)' }}>Active Users ({userCounts.approved})</span>
             </button>
             <button 
               className={`tab ${activeTab === 'rejected' ? 'active' : ''}`}
               onClick={() => setActiveTab('rejected')}
               style={{ flex: 1, textAlign: 'center', padding: '12px 4px', fontSize: '0.85rem' }}
             >
-              <span style={{ color: 'var(--accent-red)' }}>Rejected Users ({activeTab === 'rejected' ? users.length : '...'})</span>
+              <span style={{ color: 'var(--accent-red)' }}>Rejected Users ({userCounts.rejected})</span>
             </button>
           </div>
           

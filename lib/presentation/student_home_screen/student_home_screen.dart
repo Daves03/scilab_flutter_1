@@ -1014,6 +1014,25 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
   }
 
   Widget _buildDateTimeSection() {
+    final calendarEvents = <DashboardCalendarEvent>[];
+    for (final bucket in const ['upcoming', 'missed']) {
+      for (final deadline in _deadlines[bucket] ?? const []) {
+        final course = deadline['course'] as Course;
+        final quiz = deadline['quiz'] as CourseQuiz;
+        final dueDate = deadline['dueDate'] as DateTime;
+        calendarEvents.add(
+          DashboardCalendarEvent(
+            id: '${course.id}:${quiz.id}',
+            quizName: quiz.title,
+            courseName: course.title,
+            // Keep calendar dates and the dashboard clock in Philippine time.
+            dueDate: dueDate.toUtc().add(const Duration(hours: 8)),
+          ),
+        );
+      }
+    }
+    calendarEvents.sort((a, b) => a.dueDate.compareTo(b.dueDate));
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
       child: Column(
@@ -1030,7 +1049,11 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
             ),
           ),
           const SizedBox(height: 14),
-          DashboardDateTimeCard(dateTime: _philippinesTime),
+          DashboardDateTimeCard(
+            dateTime: _philippinesTime,
+            calendarEvents: calendarEvents,
+            showQuizDeadlines: true,
+          ),
         ],
       ),
     );

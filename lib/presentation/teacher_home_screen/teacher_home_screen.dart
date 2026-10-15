@@ -93,12 +93,14 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   StreamSubscription? _usersSub;
   StreamSubscription? _quizSub;
   StreamSubscription? _arSub;
+  StreamSubscription? _teacherCoursesSub;
 
   List<QueryDocumentSnapshot> _pendingUsers = [];
   List<QueryDocumentSnapshot> _quizAttempts = [];
   List<QueryDocumentSnapshot> _arAttempts = [];
   
   List<Course> _allCourses = [];
+  List<Course> _teacherCourses = [];
   List<QuizAttempt> _allAttempts = [];
 
   final Map<String, DateTime> _pendingUserTimestamps = {};
@@ -289,6 +291,19 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     final user = context.read<AuthService>().currentUser;
     if (user == null) return;
 
+    _teacherCoursesSub = db
+        .collection('courses')
+        .where('teacherUid', isEqualTo: user.id)
+        .snapshots()
+        .listen((snapshot) {
+          if (!mounted) return;
+          setState(() {
+            _teacherCourses = snapshot.docs
+                .map((document) => Course.fromMap(document.id, document.data()))
+                .toList();
+          });
+        });
+
     _usersSub = db.collection('users')
       .where('role', whereIn: [UserRole.grade9.id, UserRole.grade10.id])
       .where('status', isEqualTo: VerificationStatus.pending.id)
@@ -456,6 +471,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     _usersSub?.cancel();
     _quizSub?.cancel();
     _arSub?.cancel();
+    _teacherCoursesSub?.cancel();
     _notifController.close();
     _searchCtrl.dispose();
     _entranceController.dispose();
@@ -956,9 +972,29 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   }
 
   Widget _buildDateTimeCard() {
+    final calendarEvents = <DashboardCalendarEvent>[];
+    for (final course in _teacherCourses) {
+      for (final quiz in course.quizzes) {
+        final quizDate = quiz.dueDate;
+        if (quizDate == null) continue;
+        calendarEvents.add(
+          DashboardCalendarEvent(
+            id: '${course.id}:${quiz.id}',
+            quizName: quiz.title,
+            courseName: course.title,
+            dueDate: quizDate.toUtc().add(const Duration(hours: 8)),
+          ),
+        );
+      }
+    }
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-      child: DashboardDateTimeCard(dateTime: _now),
+      child: DashboardDateTimeCard(
+        dateTime: _now,
+        calendarEvents: calendarEvents,
+        showTeacherQuizSummary: true,
+      ),
     );
   }
 
