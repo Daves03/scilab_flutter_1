@@ -27,7 +27,7 @@ class AiQuizGeneratorService {
 
     if (_apiKey.isEmpty) {
       lastErrorMessage =
-          'Gemini is not configured. Add GEMINI_API_KEY when building the app.';
+          'AI quiz generation is not configured in this app build. Rebuild the app with the Gemini configuration, then try again.';
       return null;
     }
 
