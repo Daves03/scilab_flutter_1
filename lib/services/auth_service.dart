@@ -52,8 +52,9 @@ class AuthService extends ChangeNotifier {
       notifyListeners();
       return;
     }
-    _userDocSub =
-        _db.collection('users').doc(fbUser.uid).snapshots().listen((doc) {
+    _userDocSub = _db.collection('users').doc(fbUser.uid).snapshots().listen((
+      doc,
+    ) {
       if (doc.exists) {
         currentUser = AppUser.fromMap(doc.id, doc.data()!);
       }
@@ -81,8 +82,10 @@ class AuthService extends ChangeNotifier {
       );
       final uid = cred.user!.uid;
       final isStudent = role == UserRole.grade9 || role == UserRole.grade10;
-      final generatedStudentNumber = isStudent ? _generateStudentNumber() : null;
-      
+      final generatedStudentNumber = isStudent
+          ? _generateStudentNumber()
+          : null;
+
       final newUser = AppUser(
         id: uid,
         name: name,
@@ -106,12 +109,18 @@ class AuthService extends ChangeNotifier {
   /// matching sign_up_login_screen's `_onLoginSuccess(String role)`
   /// signature. Callers should still check [isApproved] before routing
   /// anywhere — app_routes.dart's redirect enforces this regardless.
-  Future<String> login({required String email, required String password}) async {
+  Future<String> login({
+    required String email,
+    required String password,
+  }) async {
     loading = true;
     notifyListeners();
     try {
-      final cred = await _auth.signInWithEmailAndPassword(email: email, password: password);
-      
+      final cred = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
       if (cred.user != null && !cred.user!.emailVerified) {
         await _auth.signOut();
         throw AuthFailure('Please verify your email first. Check your inbox.');
@@ -119,12 +128,14 @@ class AuthService extends ChangeNotifier {
 
       final doc = await _db.collection('users').doc(cred.user!.uid).get();
       final roleData = doc.data()?['role'];
-      
+
       if (roleData == 'admin') {
         await _auth.signOut();
-        throw AuthFailure('Admins must use the separate Admin Web Portal to log in.');
+        throw AuthFailure(
+          'Admins must use the separate Admin Web Portal to log in.',
+        );
       }
-      
+
       return roleData == 'teacher' ? 'teacher' : 'student';
     } on fb.FirebaseAuthException catch (e) {
       throw AuthFailure(_friendlyAuthError(e));
@@ -157,7 +168,9 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
     try {
       final googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) { return null; }
+      if (googleUser == null) {
+        return null;
+      }
 
       final googleAuth = await googleUser.authentication;
       final credential = fb.GoogleAuthProvider.credential(
@@ -180,7 +193,8 @@ class AuthService extends ChangeNotifier {
           status: VerificationStatus.pending,
         );
         await docRef.set(newUser.toMap());
-        userRoleStr = null; // Return null so router redirects to complete profile
+        userRoleStr =
+            null; // Return null so router redirects to complete profile
       } else {
         // Update name to match Google account if it exists
         if (fbUser.displayName != null && fbUser.displayName!.isNotEmpty) {
@@ -219,14 +233,17 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
     try {
       final isStudent = role == 'grade9' || role == 'grade10';
-      final generatedStudentNumber = isStudent ? _generateStudentNumber() : null;
+      final generatedStudentNumber = isStudent
+          ? _generateStudentNumber()
+          : null;
 
       final docRef = _db.collection('users').doc(user.uid);
       await docRef.set({
         'name': name,
         'role': role,
         'sections': sections,
-        if (generatedStudentNumber != null) 'studentNumber': generatedStudentNumber,
+        if (generatedStudentNumber != null)
+          'studentNumber': generatedStudentNumber,
       }, SetOptions(merge: true));
       if (currentUser != null) {
         currentUser!.role = UserRoleX.fromId(role);
@@ -258,8 +275,10 @@ class AuthService extends ChangeNotifier {
         .collection('users')
         .where('status', isEqualTo: VerificationStatus.pending.id)
         .snapshots()
-        .map((snap) =>
-            snap.docs.map((d) => AppUser.fromMap(d.id, d.data())).toList());
+        .map(
+          (snap) =>
+              snap.docs.map((d) => AppUser.fromMap(d.id, d.data())).toList(),
+        );
   }
 
   /// Approve an account that already has a role (the normal case, since
@@ -285,11 +304,36 @@ class AuthService extends ChangeNotifier {
     try {
       await _db.collection('users').doc(currentUser!.id).update({
         'notificationsClearedAt': FieldValue.serverTimestamp(),
+        'dismissedNotificationIds': <String>[],
       });
       currentUser!.notificationsClearedAt = DateTime.now();
+      currentUser!.dismissedNotificationIds = [];
       notifyListeners();
     } catch (e) {
       debugPrint('Error clearing notifications: $e');
+    }
+  }
+
+  Future<void> dismissNotification(String notificationId) async {
+    final user = currentUser;
+    if (user == null || notificationId.isEmpty) return;
+    if (user.dismissedNotificationIds.contains(notificationId)) return;
+
+    user.dismissedNotificationIds = [
+      ...user.dismissedNotificationIds,
+      notificationId,
+    ];
+    notifyListeners();
+    try {
+      await _db.collection('users').doc(user.id).update({
+        'dismissedNotificationIds': FieldValue.arrayUnion([notificationId]),
+      });
+    } catch (e) {
+      user.dismissedNotificationIds = user.dismissedNotificationIds
+          .where((id) => id != notificationId)
+          .toList(growable: false);
+      notifyListeners();
+      debugPrint('Error dismissing notification: $e');
     }
   }
 
@@ -332,7 +376,10 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  Future<void> updateProfilePicture(Uint8List fileBytes, String fileName) async {
+  Future<void> updateProfilePicture(
+    Uint8List fileBytes,
+    String fileName,
+  ) async {
     if (currentUser == null) return;
     loading = true;
     notifyListeners();
@@ -344,7 +391,7 @@ class AuthService extends ChangeNotifier {
           .child(
             '${currentUser!.id}_${DateTime.now().millisecondsSinceEpoch}_$fileName',
           );
-      
+
       final uploadTask = storageRef.putData(fileBytes);
       final snapshot = await uploadTask;
       final downloadUrl = await snapshot.ref.getDownloadURL();
@@ -357,7 +404,7 @@ class AuthService extends ChangeNotifier {
       if (user != null) {
         await user.updatePhotoURL(downloadUrl);
       }
-      
+
       currentUser!.avatarUrl = downloadUrl;
 
       if (previousAvatarUrl != downloadUrl) {
@@ -437,14 +484,16 @@ class AuthService extends ChangeNotifier {
         .where('role', whereIn: [UserRole.grade9.id, UserRole.grade10.id])
         .where('status', isEqualTo: VerificationStatus.approved.id)
         .snapshots()
-        .map((snap) =>
-            snap.docs.map((d) => AppUser.fromMap(d.id, d.data())).toList());
+        .map(
+          (snap) =>
+              snap.docs.map((d) => AppUser.fromMap(d.id, d.data())).toList(),
+        );
   }
 
   /// Counts the total number of approved students in the given sections.
   Future<int> countStudentsInSections(List<String> sections) async {
     if (sections.isEmpty) return 0;
-    
+
     // array-contains-any limits to 10 elements
     final chunked = sections.take(10).toList();
     try {
@@ -496,4 +545,3 @@ class AuthFailure implements Exception {
   @override
   String toString() => message;
 }
-

@@ -6,6 +6,31 @@ import '../../core/theme_provider.dart';
 import '../../routes/app_routes.dart';
 import '../../theme/app_theme.dart';
 
+bool _landingIsDark(BuildContext context) =>
+    Theme.of(context).brightness == Brightness.dark;
+
+Color _landingPrimaryText(BuildContext context) =>
+    Theme.of(context).colorScheme.onSurface;
+
+Color _landingMutedText(BuildContext context) =>
+    Theme.of(context).textTheme.bodySmall?.color ??
+    Theme.of(context).colorScheme.onSurfaceVariant;
+
+Color _landingCaptionText(BuildContext context) =>
+    Theme.of(context).textTheme.labelSmall?.color ??
+    Theme.of(context).colorScheme.onSurfaceVariant;
+
+Color _landingSurface(BuildContext context) =>
+    Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface;
+
+Color _landingAccent(
+  BuildContext context, [
+  Color color = AppTheme.accentCyan,
+]) {
+  if (_landingIsDark(context)) return color;
+  return Color.lerp(color, AppTheme.primaryNavy, 0.38)!;
+}
+
 class OverviewScreen extends StatefulWidget {
   const OverviewScreen({super.key});
 
@@ -151,7 +176,7 @@ class _OverviewScreenState extends State<OverviewScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           _buildAnimatedBackground(),
@@ -180,11 +205,12 @@ class _OverviewScreenState extends State<OverviewScreen>
   }
 
   Widget _buildAnimatedBackground() {
+    final isDark = _landingIsDark(context);
     return AnimatedBuilder(
       animation: _floatController,
       builder: (context, _) {
         return CustomPaint(
-          painter: _BackgroundPainter(_floatController.value),
+          painter: _BackgroundPainter(_floatController.value, isDark: isDark),
           size: Size.infinite,
         );
       },
@@ -192,6 +218,10 @@ class _OverviewScreenState extends State<OverviewScreen>
   }
 
   Widget _buildTopBar() {
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDark = themeProvider.isDark;
+    final accent = _landingAccent(context);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       child: Row(
@@ -200,10 +230,10 @@ class _OverviewScreenState extends State<OverviewScreen>
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: AppTheme.accentCyan.withAlpha(38),
+              color: accent.withAlpha(isDark ? 38 : 24),
               borderRadius: BorderRadius.circular(10.0),
               border: Border.all(
-                color: AppTheme.accentCyan.withAlpha(77),
+                color: accent.withAlpha(isDark ? 77 : 64),
                 width: 1,
               ),
             ),
@@ -224,21 +254,60 @@ class _OverviewScreenState extends State<OverviewScreen>
             style: GoogleFonts.manrope(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: AppTheme.textPrimary,
+              color: _landingPrimaryText(context),
               letterSpacing: -0.3,
             ),
           ),
           const Spacer(),
-
+          Tooltip(
+            message: isDark ? 'Switch to light mode' : 'Switch to dark mode',
+            child: Semantics(
+              button: true,
+              label: isDark ? 'Switch to light mode' : 'Switch to dark mode',
+              child: GestureDetector(
+                onTap: () => context.read<ThemeProvider>().toggleTheme(),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: _landingSurface(context),
+                    borderRadius: BorderRadius.circular(50),
+                    border: Border.all(
+                      color: accent.withAlpha(isDark ? 77 : 60),
+                    ),
+                    boxShadow: isDark
+                        ? const []
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withAlpha(15),
+                              blurRadius: 10,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                  ),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    child: Icon(
+                      isDark
+                          ? Icons.light_mode_rounded
+                          : Icons.dark_mode_rounded,
+                      key: ValueKey(isDark),
+                      color: isDark ? AppTheme.warningAmber : accent,
+                      size: 19,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
           GestureDetector(
             onTap: () => context.go(AppRoutes.signUpLoginScreen),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                border: Border.all(
-                  color: AppTheme.accentCyan.withAlpha(128),
-                  width: 1,
-                ),
+                border: Border.all(color: accent.withAlpha(128), width: 1),
                 borderRadius: BorderRadius.circular(50),
               ),
               child: Text(
@@ -246,7 +315,7 @@ class _OverviewScreenState extends State<OverviewScreen>
                 style: GoogleFonts.manrope(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: AppTheme.accentCyan,
+                  color: accent,
                 ),
               ),
             ),
@@ -257,6 +326,8 @@ class _OverviewScreenState extends State<OverviewScreen>
   }
 
   Widget _buildHeroSection() {
+    final accent = _landingAccent(context);
+    final isDark = _landingIsDark(context);
     return AnimatedBuilder(
       animation: _heroController,
       builder: (context, child) {
@@ -287,10 +358,10 @@ class _OverviewScreenState extends State<OverviewScreen>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: AppTheme.accentCyan.withAlpha(31),
+                color: accent.withAlpha(isDark ? 31 : 20),
                 borderRadius: BorderRadius.circular(50),
                 border: Border.all(
-                  color: AppTheme.accentCyan.withAlpha(64),
+                  color: accent.withAlpha(isDark ? 64 : 52),
                   width: 1,
                 ),
               ),
@@ -323,7 +394,7 @@ class _OverviewScreenState extends State<OverviewScreen>
                     style: GoogleFonts.manrope(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.accentCyan,
+                      color: accent,
                       letterSpacing: 0.3,
                     ),
                   ),
@@ -339,7 +410,7 @@ class _OverviewScreenState extends State<OverviewScreen>
                     style: GoogleFonts.manrope(
                       fontSize: 32,
                       fontWeight: FontWeight.w800,
-                      color: AppTheme.textPrimary,
+                      color: _landingPrimaryText(context),
                       height: 1.15,
                       letterSpacing: -0.8,
                     ),
@@ -349,7 +420,7 @@ class _OverviewScreenState extends State<OverviewScreen>
                     style: GoogleFonts.manrope(
                       fontSize: 32,
                       fontWeight: FontWeight.w800,
-                      color: AppTheme.accentCyan,
+                      color: accent,
                       height: 1.15,
                       letterSpacing: -0.8,
                     ),
@@ -363,7 +434,7 @@ class _OverviewScreenState extends State<OverviewScreen>
               style: GoogleFonts.manrope(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
-                color: AppTheme.textMuted,
+                color: _landingMutedText(context),
                 height: 1.6,
               ),
             ),
@@ -382,10 +453,7 @@ class _OverviewScreenState extends State<OverviewScreen>
                         image: AssetImage(_arPreviewImages[index]),
                         fit: BoxFit.cover,
                       ),
-                      border: Border.all(
-                        color: AppTheme.accentCyan.withAlpha(51),
-                        width: 1,
-                      ),
+                      border: Border.all(color: accent.withAlpha(51), width: 1),
                     ),
                   );
                 },
@@ -405,8 +473,8 @@ class _OverviewScreenState extends State<OverviewScreen>
                     height: 6,
                     decoration: BoxDecoration(
                       color: isActive
-                          ? AppTheme.accentCyan
-                          : AppTheme.textCaption.withAlpha(102),
+                          ? accent
+                          : _landingCaptionText(context).withAlpha(102),
                       borderRadius: BorderRadius.circular(3.0),
                     ),
                   );
@@ -418,7 +486,9 @@ class _OverviewScreenState extends State<OverviewScreen>
               children: [
                 Expanded(
                   child: GestureDetector(
-                    onTap: () => context.go('${AppRoutes.signUpLoginScreen}?isLogin=false'),
+                    onTap: () => context.go(
+                      '${AppRoutes.signUpLoginScreen}?isLogin=false',
+                    ),
                     child: Container(
                       height: 50,
                       decoration: BoxDecoration(
@@ -450,7 +520,8 @@ class _OverviewScreenState extends State<OverviewScreen>
                 const SizedBox(width: 12),
                 GestureDetector(
                   onTap: () {
-                    final nextPage = (_currentArPreviewPage + 1) % _arPreviewImages.length;
+                    final nextPage =
+                        (_currentArPreviewPage + 1) % _arPreviewImages.length;
                     _arPreviewController.animateToPage(
                       nextPage,
                       duration: const Duration(milliseconds: 400),
@@ -461,16 +532,13 @@ class _OverviewScreenState extends State<OverviewScreen>
                     height: 50,
                     width: 50,
                     decoration: BoxDecoration(
-                      color: AppTheme.surfaceCard,
+                      color: _landingSurface(context),
                       borderRadius: BorderRadius.circular(50),
-                      border: Border.all(
-                        color: AppTheme.accentCyan.withAlpha(51),
-                        width: 1,
-                      ),
+                      border: Border.all(color: accent.withAlpha(51), width: 1),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.arrow_forward_rounded,
-                      color: AppTheme.accentCyan,
+                      color: accent,
                       size: 22,
                     ),
                   ),
@@ -484,6 +552,7 @@ class _OverviewScreenState extends State<OverviewScreen>
   }
 
   Widget _buildStatsRow() {
+    final accent = _landingAccent(context);
     final stats = [
       {'label': 'Courses', 'icon': 'menu_book'},
       {'label': 'AR Experiments', 'icon': 'view_in_ar'},
@@ -514,19 +583,16 @@ class _OverviewScreenState extends State<OverviewScreen>
               width: 90,
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
               decoration: BoxDecoration(
-                color: AppTheme.surfaceCard,
+                color: _landingSurface(context),
                 borderRadius: BorderRadius.circular(16.0),
-                border: Border.all(
-                  color: AppTheme.accentCyan.withAlpha(31),
-                  width: 1,
-                ),
+                border: Border.all(color: accent.withAlpha(31), width: 1),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CustomIconWidget(
                     iconName: s['icon']!,
-                    color: AppTheme.accentCyan,
+                    color: accent,
                     size: 20,
                   ),
                   const SizedBox(height: 6),
@@ -535,7 +601,7 @@ class _OverviewScreenState extends State<OverviewScreen>
                     style: GoogleFonts.manrope(
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textMuted,
+                      color: _landingMutedText(context),
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 2,
@@ -561,7 +627,7 @@ class _OverviewScreenState extends State<OverviewScreen>
             style: GoogleFonts.manrope(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: AppTheme.textPrimary,
+              color: _landingPrimaryText(context),
               letterSpacing: -0.3,
             ),
           ),
@@ -596,8 +662,11 @@ class _OverviewScreenState extends State<OverviewScreen>
                 height: 6,
                 decoration: BoxDecoration(
                   color: isActive
-                      ? _features[_currentFeaturePage].color
-                      : AppTheme.textCaption.withAlpha(102),
+                      ? _landingAccent(
+                          context,
+                          _features[_currentFeaturePage].color,
+                        )
+                      : _landingCaptionText(context).withAlpha(102),
                   borderRadius: BorderRadius.circular(3.0),
                 ),
               );
@@ -608,8 +677,9 @@ class _OverviewScreenState extends State<OverviewScreen>
     );
   }
 
-
   Widget _buildCTASection() {
+    final accent = _landingAccent(context);
+    final isDark = _landingIsDark(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
@@ -619,15 +689,15 @@ class _OverviewScreenState extends State<OverviewScreen>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppTheme.accentCyan.withAlpha(38),
-              AppTheme.accentPurple.withAlpha(31),
+              accent.withAlpha(isDark ? 38 : 20),
+              _landingAccent(
+                context,
+                AppTheme.accentPurple,
+              ).withAlpha(isDark ? 31 : 18),
             ],
           ),
           borderRadius: BorderRadius.circular(24.0),
-          border: Border.all(
-            color: AppTheme.accentCyan.withAlpha(51),
-            width: 1,
-          ),
+          border: Border.all(color: accent.withAlpha(51), width: 1),
         ),
         child: Column(
           children: [
@@ -641,16 +711,13 @@ class _OverviewScreenState extends State<OverviewScreen>
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: AppTheme.accentCyan.withAlpha(38),
+                  color: accent.withAlpha(isDark ? 38 : 24),
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppTheme.accentCyan.withAlpha(77),
-                    width: 1.5,
-                  ),
+                  border: Border.all(color: accent.withAlpha(77), width: 1.5),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.rocket_launch_rounded,
-                  color: AppTheme.accentCyan,
+                  color: accent,
                   size: 26,
                 ),
               ),
@@ -661,7 +728,7 @@ class _OverviewScreenState extends State<OverviewScreen>
               style: GoogleFonts.manrope(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                color: AppTheme.textPrimary,
+                color: _landingPrimaryText(context),
                 letterSpacing: -0.4,
               ),
               textAlign: TextAlign.center,
@@ -672,7 +739,7 @@ class _OverviewScreenState extends State<OverviewScreen>
               style: GoogleFonts.manrope(
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
-                color: AppTheme.textMuted,
+                color: _landingMutedText(context),
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
@@ -681,7 +748,8 @@ class _OverviewScreenState extends State<OverviewScreen>
             SizedBox(
               width: double.infinity,
               child: GestureDetector(
-                onTap: () => context.go('${AppRoutes.signUpLoginScreen}?isLogin=false'),
+                onTap: () =>
+                    context.go('${AppRoutes.signUpLoginScreen}?isLogin=false'),
                 child: Container(
                   height: 52,
                   decoration: BoxDecoration(
@@ -718,7 +786,7 @@ class _OverviewScreenState extends State<OverviewScreen>
                 style: GoogleFonts.manrope(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: AppTheme.textMuted,
+                  color: _landingMutedText(context),
                 ),
               ),
             ),
@@ -762,147 +830,156 @@ class _FeatureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final surface = _landingSurface(context);
+    final accent = _landingAccent(context, feature.color);
     return GestureDetector(
       onTap: () => _showPreviewDialog(context),
       child: Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceCard,
-        borderRadius: BorderRadius.circular(24.0),
-        border: Border.all(color: feature.color.withAlpha(51), width: 1),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 5,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  CachedNetworkImage(
-                    imageUrl: feature.imageUrl,
-                    fit: BoxFit.cover,
-                    placeholder: (_, __) => Container(color: feature.tint),
-                    errorWidget: (_, __, ___) => Container(
-                      color: feature.tint,
-                      child: Icon(
-                        Icons.image_not_supported_outlined,
-                        color: feature.color.withAlpha(102),
-                        size: 32,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          AppTheme.surfaceCard.withAlpha(230),
-                        ],
-                        stops: const [0.4, 1.0],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 14,
-                    left: 14,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: feature.color.withAlpha(51),
-                        borderRadius: BorderRadius.circular(12.0),
-                        border: Border.all(
-                          color: feature.color.withAlpha(89),
-                          width: 1,
-                        ),
-                      ),
-                      child: Icon(
-                        _iconData(feature.icon),
-                        color: feature.color,
-                        size: 18,
-                      ),
-                    ),
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+        decoration: BoxDecoration(
+          color: surface,
+          borderRadius: BorderRadius.circular(24.0),
+          border: Border.all(color: accent.withAlpha(51), width: 1),
+          boxShadow: _landingIsDark(context)
+              ? const []
+              : [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(12),
+                    blurRadius: 18,
+                    offset: const Offset(0, 6),
                   ),
                 ],
-              ),
-            ),
-            Expanded(
-              flex: 4,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                flex: 5,
+                child: Stack(
+                  fit: StackFit.expand,
                   children: [
-                    Text(
-                      feature.title,
-                      style: GoogleFonts.manrope(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.textPrimary,
-                        letterSpacing: -0.2,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      feature.subtitle,
-                      style: GoogleFonts.manrope(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: feature.color,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 8),
-                    Expanded(
-                      child: Text(
-                        feature.description,
-                        style: GoogleFonts.manrope(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                          color: AppTheme.textMuted,
-                          height: 1.5,
+                    CachedNetworkImage(
+                      imageUrl: feature.imageUrl,
+                      fit: BoxFit.cover,
+                      placeholder: (_, __) => Container(color: feature.tint),
+                      errorWidget: (_, __, ___) => Container(
+                        color: feature.tint,
+                        child: Icon(
+                          Icons.image_not_supported_outlined,
+                          color: feature.color.withAlpha(102),
+                          size: 32,
                         ),
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Colors.transparent, surface.withAlpha(230)],
+                          stops: const [0.4, 1.0],
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 14,
+                      left: 14,
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: accent.withAlpha(51),
+                          borderRadius: BorderRadius.circular(12.0),
+                          border: Border.all(
+                            color: accent.withAlpha(89),
+                            width: 1,
+                          ),
+                        ),
+                        child: Icon(
+                          _iconData(feature.icon),
+                          color: accent,
+                          size: 18,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-          ],
+              Expanded(
+                flex: 4,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        feature.title,
+                        style: GoogleFonts.manrope(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: _landingPrimaryText(context),
+                          letterSpacing: -0.2,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        feature.subtitle,
+                        style: GoogleFonts.manrope(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: accent,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+                      Expanded(
+                        child: Text(
+                          feature.description,
+                          style: GoogleFonts.manrope(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: _landingMutedText(context),
+                            height: 1.5,
+                          ),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
 
   void _showPreviewDialog(BuildContext context) {
+    final accent = _landingAccent(context, feature.color);
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: AppTheme.surfaceCard,
+        backgroundColor: _landingSurface(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(_iconData(feature.icon), size: 48, color: feature.color),
+              Icon(_iconData(feature.icon), size: 48, color: accent),
               const SizedBox(height: 16),
               Text(
                 feature.title,
                 style: GoogleFonts.manrope(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
+                  color: _landingPrimaryText(context),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -912,7 +989,7 @@ class _FeatureCard extends StatelessWidget {
                 style: GoogleFonts.manrope(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: feature.color,
+                  color: accent,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -921,7 +998,7 @@ class _FeatureCard extends StatelessWidget {
                 'Sign in or create an account to explore ${feature.title} and access our full suite of interactive learning tools.',
                 style: GoogleFonts.manrope(
                   fontSize: 14,
-                  color: AppTheme.textMuted,
+                  color: _landingMutedText(context),
                   height: 1.5,
                 ),
                 textAlign: TextAlign.center,
@@ -935,7 +1012,7 @@ class _FeatureCard extends StatelessWidget {
                     context.go(AppRoutes.signUpLoginScreen);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: feature.color,
+                    backgroundColor: accent,
                     foregroundColor: AppTheme.primaryNavy,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
@@ -951,7 +1028,7 @@ class _FeatureCard extends StatelessWidget {
                 child: Text(
                   'Maybe Later',
                   style: GoogleFonts.manrope(
-                    color: AppTheme.textMuted,
+                    color: _landingMutedText(context),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -983,20 +1060,20 @@ class _FeatureCard extends StatelessWidget {
   }
 }
 
-
 // ── Animated background painter ───────────────────────────────────────────────
 
 class _BackgroundPainter extends CustomPainter {
   final double progress;
+  final bool isDark;
 
-  _BackgroundPainter(this.progress);
+  _BackgroundPainter(this.progress, {required this.isDark});
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..style = PaintingStyle.fill;
 
     // Top-right glow
-    paint.color = const Color(0xFF00D4FF).withAlpha(10);
+    paint.color = const Color(0xFF00D4FF).withAlpha(isDark ? 10 : 16);
     canvas.drawCircle(
       Offset(size.width * 0.85, size.height * 0.08 + 20 * progress),
       180,
@@ -1004,7 +1081,7 @@ class _BackgroundPainter extends CustomPainter {
     );
 
     // Bottom-left glow
-    paint.color = const Color(0xFF7C5CBF).withAlpha(13);
+    paint.color = const Color(0xFF7C5CBF).withAlpha(isDark ? 13 : 12);
     canvas.drawCircle(
       Offset(size.width * 0.1, size.height * 0.65 - 15 * progress),
       160,
@@ -1012,7 +1089,7 @@ class _BackgroundPainter extends CustomPainter {
     );
 
     // Mid accent
-    paint.color = const Color(0xFF00FF88).withAlpha(8);
+    paint.color = const Color(0xFF00A86B).withAlpha(isDark ? 8 : 10);
     canvas.drawCircle(
       Offset(
         size.width * 0.5 + 20 * math.sin(progress * math.pi),
@@ -1024,5 +1101,6 @@ class _BackgroundPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_BackgroundPainter old) => old.progress != progress;
+  bool shouldRepaint(_BackgroundPainter old) =>
+      old.progress != progress || old.isDark != isDark;
 }

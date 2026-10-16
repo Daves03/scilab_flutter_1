@@ -4,27 +4,24 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/app_export.dart';
 import '../../../services/auth_service.dart';
-import '../../student_profile_screen/student_profile_screen.dart';
 
 class UserHeaderWidget extends StatelessWidget {
   final VoidCallback onNotificationTap;
   final bool hasUnreadNotifications;
-  final String? progressText;
-  final double? progressPercent;
 
   const UserHeaderWidget({
     required this.onNotificationTap,
     this.hasUnreadNotifications = false,
-    this.progressText,
-    this.progressPercent,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final avatarUrl =
-        context.watch<AuthService>().currentUser?.avatarUrl?.trim() ?? '';
+    final currentUser = context.watch<AuthService>().currentUser;
+    final avatarUrl = currentUser?.avatarUrl?.trim() ?? '';
+    final savedStudentName = currentUser?.name.trim() ?? '';
+    final studentName = savedStudentName.isEmpty ? 'Student' : savedStudentName;
     
     return ClipRect(
       child: BackdropFilter(
@@ -87,48 +84,56 @@ class UserHeaderWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Hello ${context.watch<AuthService>().currentUser?.name ?? 'User'} 👋',
+                      studentName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                         color: isDark ? Colors.white : const Color(0xFF0A1628),
                       ),
                     ),
-                    if (progressText != null && progressPercent != null) ...[
-                      const SizedBox(height: 6),
-                      Row(
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 9,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0x2200D4FF)
+                            : const Color(0x1A1565C0),
+                        borderRadius: BorderRadius.circular(50),
+                        border: Border.all(
+                          color: isDark
+                              ? const Color(0x5500D4FF)
+                              : const Color(0x331565C0),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           CustomIconWidget(
-                            iconName: 'menu_book',
-                            color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
-                            size: 14,
+                            iconName: 'school',
+                            color: isDark
+                                ? const Color(0xFF00D4FF)
+                                : const Color(0xFF1565C0),
+                            size: 12,
                           ),
                           const SizedBox(width: 4),
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(50),
-                              child: LinearProgressIndicator(
-                                value: progressPercent,
-                                backgroundColor: isDark ? const Color(0xFF1E3A5F) : Colors.grey.shade300,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
-                                ),
-                                minHeight: 6,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 6),
                           Text(
-                            progressText!,
+                            'Student',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                              color: isDark
+                                  ? const Color(0xFF00D4FF)
+                                  : const Color(0xFF1565C0),
                             ),
                           ),
                         ],
                       ),
-                    ],
+                    ),
                   ],
                 ),
               ),
