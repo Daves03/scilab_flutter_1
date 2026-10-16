@@ -1,7 +1,92 @@
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+@immutable
+class _DashboardWeather {
+  final double temperature;
+  final int weatherCode;
+  final bool isDay;
+
+  const _DashboardWeather({
+    required this.temperature,
+    required this.weatherCode,
+    required this.isDay,
+  });
+}
+
+class _DashboardWeatherService {
+  // CvSU Bacoor City Campus. These can be overridden per deployment without
+  // changing the app source.
+  static final _latitude =
+      double.tryParse(
+        const String.fromEnvironment(
+          'WEATHER_LATITUDE',
+          defaultValue: '14.41276233',
+        ),
+      ) ??
+      14.41276233;
+  static final _longitude =
+      double.tryParse(
+        const String.fromEnvironment(
+          'WEATHER_LONGITUDE',
+          defaultValue: '120.9813331',
+        ),
+      ) ??
+      120.9813331;
+
+  static _DashboardWeather? _cachedWeather;
+  static DateTime? _cachedAt;
+
+  static Future<_DashboardWeather> load({bool forceRefresh = false}) async {
+    final now = DateTime.now();
+    final cachedAt = _cachedAt;
+    if (!forceRefresh &&
+        _cachedWeather != null &&
+        cachedAt != null &&
+        now.difference(cachedAt) < const Duration(minutes: 15)) {
+      return _cachedWeather!;
+    }
+
+    final uri = Uri.https('api.open-meteo.com', '/v1/forecast', {
+      'latitude': _latitude.toString(),
+      'longitude': _longitude.toString(),
+      'current': 'temperature_2m,weather_code,is_day',
+      'timezone': 'Asia/Manila',
+    });
+    final response = await http.get(uri).timeout(const Duration(seconds: 8));
+    if (response.statusCode != 200) {
+      throw StateError('Weather request failed (${response.statusCode}).');
+    }
+
+    final payload = jsonDecode(response.body);
+    if (payload is! Map<String, dynamic>) {
+      throw const FormatException('Invalid weather response.');
+    }
+    final current = payload['current'];
+    if (current is! Map<String, dynamic>) {
+      throw const FormatException('Current weather is missing.');
+    }
+    final temperature = current['temperature_2m'];
+    final weatherCode = current['weather_code'];
+    final isDay = current['is_day'];
+    if (temperature is! num || weatherCode is! num || isDay is! num) {
+      throw const FormatException('Current weather values are invalid.');
+    }
+
+    final weather = _DashboardWeather(
+      temperature: temperature.toDouble(),
+      weatherCode: weatherCode.toInt(),
+      isDay: isDay.toInt() == 1,
+    );
+    _cachedWeather = weather;
+    _cachedAt = now;
+    return weather;
+  }
+}
 
 @immutable
 class DashboardCalendarEvent {
@@ -41,6 +126,9 @@ class DashboardDateTimeCard extends StatefulWidget {
 class _DashboardDateTimeCardState extends State<DashboardDateTimeCard> {
   late final ValueNotifier<List<DashboardCalendarEvent>> _eventsNotifier;
   late String _eventsSignature;
+  _DashboardWeather? _weather;
+  bool _isLoadingWeather = true;
+  bool _weatherFailed = false;
 
   static const _weekdays = <String>[
     'Monday',
@@ -91,6 +179,165 @@ class _DashboardDateTimeCardState extends State<DashboardDateTimeCard> {
     _eventsSignature = _calendarEventsSignature(widget.calendarEvents);
     _eventsNotifier = ValueNotifier(
       List<DashboardCalendarEvent>.unmodifiable(widget.calendarEvents),
+    );
+    _loadWeather();
+  }
+
+  Future<void> _loadWeather({bool forceRefresh = false}) async {
+    if (mounted) {
+      setState(() {
+        _isLoadingWeather = true;
+        _weatherFailed = false;
+      });
+    }
+    try {
+      final weather = await _DashboardWeatherService.load(
+        forceRefresh: forceRefresh,
+      );
+      if (!mounted) return;
+      setState(() {
+        _weather = weather;
+        _isLoadingWeather = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isLoadingWeather = false;
+        _weatherFailed = true;
+      });
+    }
+  }
+
+  String _weatherDescription(int code) {
+    if (code == 0) return 'Clear';
+    if (code <= 3) return 'Cloudy';
+    if (code == 45 || code == 48) return 'Foggy';
+    if (code >= 51 && code <= 57) return 'Drizzle';
+    if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) {
+      return 'Rainy';
+    }
+    if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) {
+      return 'Snowy';
+    }
+    if (code >= 95) return 'Stormy';
+    return 'Weather';
+  }
+
+  IconData _weatherIcon(_DashboardWeather weather) {
+    final code = weather.weatherCode;
+    if (code == 0) {
+      return weather.isDay ? Icons.wb_sunny_rounded : Icons.nights_stay_rounded;
+    }
+    if (code <= 3) return Icons.cloud_outlined;
+    if (code == 45 || code == 48) return Icons.foggy;
+    if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) {
+      return Icons.water_drop_outlined;
+    }
+    if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) {
+      return Icons.ac_unit_rounded;
+    }
+    if (code >= 95) return Icons.thunderstorm_outlined;
+    return Icons.cloud_outlined;
+  }
+
+  Widget _buildWeatherTile(bool isDark) {
+    const accent = Color(0xFFF59E0B);
+    final primaryText = isDark ? Colors.white : const Color(0xFF0F172A);
+    final secondaryText = isDark
+        ? const Color(0xFF9FB3CC)
+        : const Color(0xFF64748B);
+    final weather = _weather;
+
+    String value;
+    IconData icon;
+    if (_isLoadingWeather) {
+      value = 'Updating...';
+      icon = Icons.cloud_sync_outlined;
+    } else if (_weatherFailed || weather == null) {
+      value = 'Tap to retry';
+      icon = Icons.cloud_off_outlined;
+    } else {
+      value = '${weather.temperature.round()}°C · '
+          '${_weatherDescription(weather.weatherCode)}';
+      icon = _weatherIcon(weather);
+    }
+
+    return Semantics(
+      button: true,
+      label: weather == null
+          ? 'Bacoor weather $value'
+          : 'Bacoor weather, $value. Tap to refresh.',
+      child: Tooltip(
+        message: weather == null
+            ? 'Bacoor campus weather'
+            : 'Bacoor campus weather • Tap to refresh',
+        child: InkWell(
+          onTap: _isLoadingWeather
+              ? null
+              : () => _loadWeather(forceRefresh: true),
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            height: 34,
+            padding: const EdgeInsets.symmetric(horizontal: 9),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF101D34) : const Color(0xFFFFFBEB),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: isDark
+                    ? const Color(0xFF29405F)
+                    : const Color(0xFFFDE68A),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (_isLoadingWeather)
+                  const SizedBox(
+                    width: 15,
+                    height: 15,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: accent,
+                    ),
+                  )
+                else
+                  Icon(icon, color: accent, size: 17),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'WEATHER',
+                        maxLines: 1,
+                        style: TextStyle(
+                          color: accent,
+                          fontSize: 8,
+                          fontWeight: FontWeight.w700,
+                          height: 1,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        value,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: weather == null ? secondaryText : primaryText,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          height: 1,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -207,34 +454,40 @@ class _DashboardDateTimeCardState extends State<DashboardDateTimeCard> {
               ],
             ),
             const SizedBox(height: 10),
-            SizedBox(
-              height: 34,
-              child: OutlinedButton.icon(
-                onPressed: () => _showCalendar(context),
-                icon: const Icon(Icons.calendar_month_outlined, size: 17),
-                label: const Text('Calendar'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: isDark
-                      ? const Color(0xFFE2E8F0)
-                      : const Color(0xFF0F172A),
-                  backgroundColor: isDark
-                      ? const Color(0xFF101D34)
-                      : const Color(0xFFF8FAFC),
-                  side: BorderSide(
-                    color: isDark
-                        ? const Color(0xFF29405F)
-                        : const Color(0xFFDCE3EC),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 11),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  textStyle: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
+            Row(
+              children: [
+                SizedBox(
+                  height: 34,
+                  child: OutlinedButton.icon(
+                    onPressed: () => _showCalendar(context),
+                    icon: const Icon(Icons.calendar_month_outlined, size: 17),
+                    label: const Text('Calendar'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: isDark
+                          ? const Color(0xFFE2E8F0)
+                          : const Color(0xFF0F172A),
+                      backgroundColor: isDark
+                          ? const Color(0xFF101D34)
+                          : const Color(0xFFF8FAFC),
+                      side: BorderSide(
+                        color: isDark
+                            ? const Color(0xFF29405F)
+                            : const Color(0xFFDCE3EC),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 11),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(width: 8),
+                Expanded(child: _buildWeatherTile(isDark)),
+              ],
             ),
           ],
         ),

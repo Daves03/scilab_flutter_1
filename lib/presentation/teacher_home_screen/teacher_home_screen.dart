@@ -77,6 +77,9 @@ class TeacherHomeScreen extends StatefulWidget {
 class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     with SingleTickerProviderStateMixin {
   static const String _allSummarySections = 'All Sections';
+  static const double _notificationCardHeight = 116;
+  static const double _notificationListMaxHeight =
+      (_notificationCardHeight * 4) + (12 * 3);
 
   late AnimationController _entranceController;
   late Timer _clockTimer;
@@ -146,13 +149,14 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     setState(() {
       _allAttempts = attempts;
       _students = _students.map((student) {
+        final currentProfile = _approvedStudentsById[student.id];
         final studentAttempts = _latestAttemptsForStudent(attempts, student.id);
         return _StudentSummary(
           id: student.id,
-          name: student.name,
+          name: currentProfile?.name ?? student.name,
           section: student.section,
-          studentNumber: student.studentNumber,
-          avatarUrl: student.avatarUrl,
+          studentNumber: currentProfile?.studentNumber ?? student.studentNumber,
+          avatarUrl: currentProfile?.avatarUrl ?? student.avatarUrl,
           avgQuizScore: _averageQuizScore(studentAttempts),
           avgArScore: student.avgArScore,
           quizzesTaken: studentAttempts.length,
@@ -503,7 +507,9 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
       if (coursesById.isNotEmpty) {
         // Prefer strict course-based matching
         final course = coursesById[attempt.courseId];
-        if (course == null || !CourseAssignment.courseMatchesStudent(course, student)) continue;
+        if (course == null ||
+            !CourseAssignment.courseMatchesStudent(course, student))
+          continue;
       } else {
         // Fallback: student must be in one of the teacher's sections
         if (!_studentMatchesAnyTeacherCourse(student)) continue;
@@ -596,6 +602,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
           _pendingUserTimestamps[student.id] = DateTime.now();
         }
         notifications.add({
+          'id': 'teacher-pending-student:${student.id}',
           'title': 'New Student Approval',
           'desc':
               '${student.name} requested to join ${_matchingSectionLabel(student)}.',
@@ -628,6 +635,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
       final percent = total > 0 ? ((attempt.score / total) * 100).round() : 0;
       final submittedAt = attempt.submittedAt ?? DateTime(2000);
       notifications.add({
+        'id': 'teacher-quiz-attempt:${attempt.id}',
         'title': 'Quiz Submitted',
         'desc':
             '${student.name} (${_matchingSectionLabel(student, course)}) '
@@ -667,6 +675,8 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
         final experimentTitle = _arExperimentTitle(document.id);
         final section = _matchingSectionLabel(student);
         notifications.add({
+          'id':
+              'teacher-ar:${student.id}:${document.id}:${isCompletion ? 'completed' : 'launched'}:${eventAt.millisecondsSinceEpoch}',
           'title': isCompletion ? 'AR Lab Completed' : 'AR Lab Simulated',
           'desc': isCompletion
               ? '${student.name} ($section) completed "$experimentTitle".'
@@ -713,6 +723,8 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
       final dueDate = missedQuizTimes[entry.key] ?? DateTime(2000);
       final firstStudent = _approvedStudentsById[studentIds.first];
       notifications.add({
+        'id':
+            'teacher-missed-quiz:${entry.key}:${dueDate.millisecondsSinceEpoch}',
         'title': 'Quiz Missed',
         'desc': count == 1
             ? '${firstStudent?.name ?? 'A student'} missed "$title".'
@@ -729,7 +741,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
           (b['timestamp'] as DateTime).compareTo(a['timestamp'] as DateTime),
     );
     setState(() {
-      _notifications = notifications.take(50).toList(growable: false);
+      _notifications = notifications;
     });
   }
 
@@ -770,10 +782,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
         : _allSummarySections;
 
     List<_StudentSummary> activeStudents = _students;
-    if (_currentTab == DashboardTab.needsHelp) {
+    if (!_isSearching && _currentTab == DashboardTab.needsHelp) {
       activeStudents = _students.where((s) => s.overallScore < 60).toList();
     }
-    if (selectedSummarySection != _allSummarySections) {
+    if (!_isSearching && selectedSummarySection != _allSummarySections) {
       activeStudents = activeStudents
           .where((student) => student.section == selectedSummarySection)
           .toList();
@@ -800,17 +812,23 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                 : CustomScrollView(
                     slivers: [
                       SliverToBoxAdapter(child: _buildHeader()),
-                      SliverToBoxAdapter(child: _buildDateTimeCard()),
-                      SliverToBoxAdapter(child: _buildClassOverview()),
-                      if (_currentTab == DashboardTab.classAvg)
+                      if (!_isSearching)
+                        SliverToBoxAdapter(child: _buildDateTimeCard()),
+                      if (!_isSearching)
+                        SliverToBoxAdapter(child: _buildClassOverview()),
+                      if (!_isSearching && _currentTab == DashboardTab.classAvg)
                         SliverToBoxAdapter(child: _buildClassAvgChart())
                       else ...[
                         SliverToBoxAdapter(
-                          child: _buildSectionLabel(
-                            'Student Progress Summary',
-                            sectionOptions: summarySectionOptions,
-                            selectedSection: selectedSummarySection,
-                          ),
+                          child: _isSearching
+                              ? _buildSearchResultsLabel(
+                                  filteredStudents.length,
+                                )
+                              : _buildSectionLabel(
+                                  'Student Progress Summary',
+                                  sectionOptions: summarySectionOptions,
+                                  selectedSection: selectedSummarySection,
+                                ),
                         ),
                         filteredStudents.isEmpty
                             ? SliverToBoxAdapter(
@@ -818,8 +836,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                                   padding: const EdgeInsets.only(top: 40),
                                   child: Center(
                                     child: Text(
-                                      _searchQuery.isNotEmpty
-                                          ? 'No students match your search'
+                                      _isSearching
+                                          ? _searchQuery.trim().isNotEmpty
+                                                ? 'No students match your search'
+                                                : 'No students found'
                                           : selectedSummarySection !=
                                                 _allSummarySections
                                           ? 'No students found in Section $selectedSummarySection'
@@ -883,8 +903,9 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                                       child: _StudentProgressCard(
                                         student: filteredStudents[index],
                                         showBadge:
+                                            !_isSearching &&
                                             _currentTab ==
-                                            DashboardTab.needsHelp,
+                                                DashboardTab.needsHelp,
                                       ),
                                     ),
                                   );
@@ -894,36 +915,38 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                       const SliverToBoxAdapter(child: SizedBox(height: 140)),
                     ],
                   ),
-            Positioned(
-              bottom: 124,
-              right: 20,
-              child: FloatingActionButton(
-                heroTag: null,
-                onPressed: () async {
-                  final result = await showDialog(
-                    context: context,
-                    builder: (_) => const StudentApprovalDialog(),
-                  );
-                  if (result == true) {
-                    _loadData();
-                  }
-                },
-                backgroundColor: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0xFF00D4FF)
-                    : const Color(0xFF1565C0),
-                elevation: 8,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: CustomIconWidget(
-                  iconName: 'person_add_outlined',
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? const Color(0xFF0A1628)
-                      : Colors.white,
-                  size: 28,
+            if (!_isSearching)
+              Positioned(
+                bottom: 124,
+                right: 20,
+                child: FloatingActionButton(
+                  heroTag: null,
+                  onPressed: () async {
+                    final result = await showDialog(
+                      context: context,
+                      builder: (_) => const StudentApprovalDialog(),
+                    );
+                    if (result == true) {
+                      _loadData();
+                    }
+                  },
+                  backgroundColor:
+                      Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF00D4FF)
+                      : const Color(0xFF1565C0),
+                  elevation: 8,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: CustomIconWidget(
+                    iconName: 'person_add_outlined',
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF0A1628)
+                        : Colors.white,
+                    size: 28,
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -931,9 +954,29 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   }
 
   Widget _buildHeader() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final teacherAccent = isDark
+        ? const Color(0xFF34F5A1)
+        : const Color(0xFF15803D);
     final user = context.watch<AuthService>().currentUser;
+    final savedTeacherName = user?.name.trim() ?? '';
+    final teacherName = savedTeacherName.isEmpty ? 'Teacher' : savedTeacherName;
     final lastRead = user?.lastNotificationReadAt ?? DateTime(2000);
-    final hasUnread = _notifications.any(
+    final clearedAt = user?.notificationsClearedAt;
+    final dismissedIds = user?.dismissedNotificationIds.toSet() ?? <String>{};
+    final visibleNotifications = _notifications
+        .where((notification) {
+          final notificationId = notification['id'] as String?;
+          final isAfterClear =
+              clearedAt == null ||
+              (notification['timestamp'] as DateTime).isAfter(clearedAt);
+          final isDismissed =
+              notificationId != null && dismissedIds.contains(notificationId);
+          return isAfterClear && !isDismissed;
+        })
+        .take(50)
+        .toList(growable: false);
+    final hasUnread = visibleNotifications.any(
       (notification) =>
           (notification['timestamp'] as DateTime).isAfter(lastRead),
     );
@@ -1033,10 +1076,12 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Welcome, Teacher 👋',
+                            teacherName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w700,
                               color:
                                   Theme.of(context).brightness ==
                                       Brightness.dark
@@ -1044,16 +1089,69 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                                   : Colors.black87,
                             ),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Here\'s your class overview',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? const Color(0xFF8BA3C0)
-                                  : Colors.grey.shade600,
+                          const SizedBox(height: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: isDark
+                                    ? const [
+                                        Color(0xFF063C2C),
+                                        Color(0xFF082F2B),
+                                      ]
+                                    : const [
+                                        Color(0xFFDCFCE7),
+                                        Color(0xFFF0FDF4),
+                                      ],
+                              ),
+                              borderRadius: BorderRadius.circular(50),
+                              border: Border.all(
+                                color: teacherAccent,
+                                width: 1.2,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: teacherAccent.withAlpha(
+                                    isDark ? 55 : 35,
+                                  ),
+                                  blurRadius: 9,
+                                  spreadRadius: 0.5,
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 18,
+                                  height: 18,
+                                  decoration: BoxDecoration(
+                                    color: teacherAccent.withAlpha(
+                                      isDark ? 45 : 24,
+                                    ),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: CustomIconWidget(
+                                    iconName: 'verified',
+                                    color: teacherAccent,
+                                    size: 11,
+                                  ),
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  'Teacher',
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.15,
+                                    color: teacherAccent,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -1100,7 +1198,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
               GestureDetector(
                 onTap: () {
                   context.read<AuthService>().markNotificationsAsRead();
-                  _showNotificationsDialog(context, _notifications);
+                  _showNotificationsDialog(context, visibleNotifications);
                 },
                 child: Container(
                   width: 44,
@@ -1165,6 +1263,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     BuildContext context,
     List<Map<String, dynamic>> notifs,
   ) {
+    final dialogNotifications = List<Map<String, dynamic>>.from(notifs);
     showDialog(
       context: context,
       builder: (context) {
@@ -1198,87 +1297,250 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                 ),
               ],
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        const CustomIconWidget(
-                          iconName: 'notifications',
-                          color: Color(0xFF7C3AED),
-                          size: 24,
+            child: StatefulBuilder(
+              builder: (context, setDialogState) => Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Row(
+                          children: [
+                            const CustomIconWidget(
+                              iconName: 'notifications',
+                              color: Color(0xFF7C3AED),
+                              size: 24,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                'Notifications',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : Colors.black87,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 10),
-                        Text(
-                          'Notifications',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                ? Colors.white
-                                : Colors.black87,
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (dialogNotifications.isNotEmpty)
+                            TextButton(
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (confirmCtx) {
+                                    final isDark =
+                                        Theme.of(context).brightness ==
+                                        Brightness.dark;
+                                    return AlertDialog(
+                                      backgroundColor: isDark
+                                          ? const Color(0xFF142240)
+                                          : Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        side: BorderSide(
+                                          color: isDark
+                                              ? const Color(0xFF1E3A5F)
+                                              : Colors.grey.shade300,
+                                        ),
+                                      ),
+                                      title: Text(
+                                        'Clear All Notifications',
+                                        style: TextStyle(
+                                          color: isDark
+                                              ? Colors.white
+                                              : Colors.black87,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                      content: Text(
+                                        'Are you sure you want to clear all notifications?',
+                                        style: TextStyle(
+                                          color: isDark
+                                              ? const Color(0xFF8BA3C0)
+                                              : Colors.grey.shade700,
+                                        ),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(confirmCtx),
+                                          child: const Text(
+                                            'Cancel',
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            context
+                                                .read<AuthService>()
+                                                .clearAllNotifications();
+                                            Navigator.pop(confirmCtx);
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text(
+                                            'Clear',
+                                            style: TextStyle(
+                                              color: Color(0xFFFF4757),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              child: Text(
+                                'Clear All',
+                                style: TextStyle(
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? const Color(0xFF8BA3C0)
+                                      : Colors.grey.shade600,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          if (dialogNotifications.isNotEmpty)
+                            const SizedBox(width: 12),
+                          GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? const Color(0xFF0A1628)
+                                    : Colors.grey.shade200,
+                                shape: BoxShape.circle,
+                              ),
+                              child: CustomIconWidget(
+                                iconName: 'close',
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? const Color(0xFF8BA3C0)
+                                    : Colors.grey.shade600,
+                                size: 16,
+                              ),
+                            ),
                           ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  if (dialogNotifications.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 20),
+                      child: Text(
+                        'No recent activity.',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    )
+                  else
+                    Flexible(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          maxHeight: _notificationListMaxHeight,
                         ),
-                      ],
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? const Color(0xFF0A1628)
-                              : Colors.grey.shade200,
-                          shape: BoxShape.circle,
-                        ),
-                        child: CustomIconWidget(
-                          iconName: 'close',
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? const Color(0xFF8BA3C0)
-                              : Colors.grey.shade600,
-                          size: 16,
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          itemCount: dialogNotifications.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 12),
+                          itemBuilder: (context, index) {
+                            final notification = dialogNotifications[index];
+                            final notificationId = notification['id'] as String;
+                            return Dismissible(
+                              key: ValueKey(notificationId),
+                              direction: DismissDirection.endToStart,
+                              background: _buildDismissBackground(),
+                              onDismissed: (_) {
+                                setDialogState(() {
+                                  dialogNotifications.removeWhere(
+                                    (item) => item['id'] == notificationId,
+                                  );
+                                });
+                                unawaited(
+                                  context
+                                      .read<AuthService>()
+                                      .dismissNotification(notificationId),
+                                );
+                              },
+                              child: _buildNotificationItem(
+                                notification['title'] as String,
+                                notification['desc'] as String,
+                                notification['icon'] as String,
+                                notification['color'] as Color,
+                                (notification['timeStr'] as String?) ?? '',
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                if (notifs.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20),
-                    child: Text(
-                      'No recent activity.',
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  )
-                else
-                  Flexible(
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      itemCount: notifs.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        final notification = notifs[index];
-                        return _buildNotificationItem(
-                          notification['title'] as String,
-                          notification['desc'] as String,
-                          notification['icon'] as String,
-                          notification['color'] as Color,
-                          (notification['timeStr'] as String?) ?? '',
-                        );
-                      },
-                    ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildDismissBackground() {
+    return Container(
+      alignment: Alignment.centerRight,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFF4757),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Clear',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          SizedBox(width: 8),
+          CustomIconWidget(
+            iconName: 'delete_outline',
+            color: Colors.white,
+            size: 20,
+          ),
+        ],
+      ),
     );
   }
 
@@ -1289,72 +1551,80 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     Color color,
     String time,
   ) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? const Color(0xFF0A1628)
-            : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
+    return SizedBox(
+      height: _notificationCardHeight,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
           color: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0xFF1E3A5F)
-              : Colors.grey.shade300,
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: CustomIconWidget(iconName: icon, color: color, size: 20),
+              ? const Color(0xFF0A1628)
+              : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF1E3A5F)
+                : Colors.grey.shade300,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white
-                              : Colors.black87,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: CustomIconWidget(iconName: icon, color: color, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.black87,
+                          ),
                         ),
                       ),
-                    ),
-                    Text(
-                      time,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: Color(0xFF8BA3C0),
+                      Text(
+                        time,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFF8BA3C0),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  desc,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF8BA3C0),
-                    height: 1.4,
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    desc,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF8BA3C0),
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -1377,11 +1647,27 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     }
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-      child: DashboardDateTimeCard(
-        dateTime: _now,
-        calendarEvents: calendarEvents,
-        showTeacherQuizSummary: true,
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Teacher Dashboard',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 14),
+          DashboardDateTimeCard(
+            dateTime: _now,
+            calendarEvents: calendarEvents,
+            showTeacherQuizSummary: true,
+          ),
+        ],
       ),
     );
   }
@@ -1730,6 +2016,49 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     );
   }
 
+  Widget _buildSearchResultsLabel(int resultCount) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentColor = isDark
+        ? const Color(0xFF00D4FF)
+        : const Color(0xFF1565C0);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+      child: Row(
+        children: [
+          CustomIconWidget(iconName: 'search', color: accentColor, size: 18),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Search Results',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: isDark ? Colors.white : Colors.black87,
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+            decoration: BoxDecoration(
+              color: accentColor.withAlpha(isDark ? 28 : 18),
+              borderRadius: BorderRadius.circular(50),
+              border: Border.all(color: accentColor.withAlpha(100)),
+            ),
+            child: Text(
+              '$resultCount',
+              style: TextStyle(
+                color: accentColor,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSectionLabel(
     String label, {
     required List<String> sectionOptions,
@@ -1828,14 +2157,13 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
               );
             }).toList(),
             child: Container(
-              width: 92,
-              height: 38,
-              padding: const EdgeInsets.symmetric(horizontal: 9),
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 color: selectedSection == _allSummarySections
                     ? (isDark ? const Color(0xFF142240) : Colors.grey.shade50)
                     : accentColor.withAlpha(isDark ? 30 : 20),
-                borderRadius: BorderRadius.circular(11),
+                shape: BoxShape.circle,
                 border: Border.all(
                   color: selectedSection == _allSummarySections
                       ? (isDark
@@ -1844,40 +2172,14 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                       : accentColor,
                 ),
               ),
-              child: Row(
-                children: [
-                  CustomIconWidget(
-                    iconName: 'filter_alt_outlined',
-                    color: selectedSection == _allSummarySections
-                        ? mutedColor
-                        : accentColor,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 5),
-                  Expanded(
-                    child: Text(
-                      selectedSection == _allSummarySections
-                          ? 'All'
-                          : selectedSection,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: selectedSection == _allSummarySections
-                            ? mutedColor
-                            : accentColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    color: selectedSection == _allSummarySections
-                        ? mutedColor
-                        : accentColor,
-                    size: 16,
-                  ),
-                ],
+              child: Center(
+                child: CustomIconWidget(
+                  iconName: 'filter_alt_outlined',
+                  color: selectedSection == _allSummarySections
+                      ? mutedColor
+                      : accentColor,
+                  size: 18,
+                ),
               ),
             ),
           ),

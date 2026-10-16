@@ -22,6 +22,10 @@ class StudentHomeScreen extends StatefulWidget {
 
 class _StudentHomeScreenState extends State<StudentHomeScreen>
     with SingleTickerProviderStateMixin {
+  static const double _notificationCardHeight = 116;
+  static const double _notificationListMaxHeight =
+      (_notificationCardHeight * 4) + (12 * 3);
+
   late AnimationController _entranceController;
   late Timer _timer;
   late final AuthService _authService;
@@ -45,15 +49,18 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
   bool _hasShownDeadlinePopup = false;
 
   List<Map<String, dynamic>> get _notifications {
-    final clearedAt = _authService.currentUser?.notificationsClearedAt;
-    final visible = clearedAt == null
-        ? _courseActivity
-        : _courseActivity
-              .where(
-                (activity) =>
-                    (activity['timestamp'] as DateTime).isAfter(clearedAt),
-              )
-              .toList();
+    final user = _authService.currentUser;
+    final clearedAt = user?.notificationsClearedAt;
+    final dismissedIds = user?.dismissedNotificationIds.toSet() ?? <String>{};
+    final visible = _courseActivity.where((activity) {
+      final notificationId = activity['id'] as String?;
+      final isAfterClear =
+          clearedAt == null ||
+          (activity['timestamp'] as DateTime).isAfter(clearedAt);
+      final isDismissed =
+          notificationId != null && dismissedIds.contains(notificationId);
+      return isAfterClear && !isDismissed;
+    });
     return visible.take(5).toList(growable: false);
   }
 
@@ -188,9 +195,9 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
               }
               final current = latestByQuiz[attempt.quizId];
               final submittedAt = attempt.submittedAt ?? DateTime(2000);
-              final currentSubmittedAt =
-                  current?.submittedAt ?? DateTime(2000);
-              if (current == null || !submittedAt.isBefore(currentSubmittedAt)) {
+              final currentSubmittedAt = current?.submittedAt ?? DateTime(2000);
+              if (current == null ||
+                  !submittedAt.isBefore(currentSubmittedAt)) {
                 latestByQuiz[attempt.quizId] = attempt;
               }
             }
@@ -410,15 +417,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                 (n) => (n['timestamp'] as DateTime).isAfter(lastRead),
               );
 
-              final avgStr = _progressStats['avgQuiz'] as String;
-              final doubleVal =
-                  double.tryParse(avgStr.replaceAll('%', '')) ?? 0.0;
-              final double progressPercent = doubleVal / 100.0;
-
               return UserHeaderWidget(
                 hasUnreadNotifications: hasUnread,
-                progressText: avgStr,
-                progressPercent: progressPercent,
                 onNotificationTap: () {
                   context.read<AuthService>().markNotificationsAsRead();
                   _showNotificationsDialog(context);
@@ -463,15 +463,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                 (n) => (n['timestamp'] as DateTime).isAfter(lastRead),
               );
 
-              final avgStr = _progressStats['avgQuiz'] as String;
-              final doubleVal =
-                  double.tryParse(avgStr.replaceAll('%', '')) ?? 0.0;
-              final double progressPercent = doubleVal / 100.0;
-
               return UserHeaderWidget(
                 hasUnreadNotifications: hasUnread,
-                progressText: avgStr,
-                progressPercent: progressPercent,
                 onNotificationTap: () {
                   context.read<AuthService>().markNotificationsAsRead();
                   _showNotificationsDialog(context);
@@ -563,6 +556,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
         // deterministic old timestamp instead of disappearing from the feed.
         final courseCreatedAt = course.createdAt;
         notifications.add({
+          'id': 'student-course:${course.id}',
           'title': courseCreatedAt == null
               ? 'Course Available'
               : 'New Course Added',
@@ -582,7 +576,11 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
 
         // Modules
         for (var m in course.modules) {
+          final moduleId = m.id.isNotEmpty
+              ? m.id
+              : '${m.title}:${m.uploadedAt?.millisecondsSinceEpoch ?? 0}';
           notifications.add({
+            'id': 'student-module:${course.id}:$moduleId',
             'title': 'New Module Uploaded',
             'desc':
                 '${course.teacherName} uploaded ${m.title} in ${course.title}.',
@@ -597,7 +595,9 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
 
         // Quizzes
         for (var q in course.quizzes) {
+          final quizId = q.id.isNotEmpty ? q.id : q.title;
           notifications.add({
+            'id': 'student-quiz:${course.id}:$quizId',
             'title': 'New Quiz Available',
             'desc':
                 '${course.teacherName} posted ${q.title} in ${course.title}.',
@@ -614,6 +614,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
             final diff = q.dueDate!.difference(DateTime.now());
             if (diff.inHours <= 48) {
               notifications.add({
+                'id':
+                    'student-deadline:${course.id}:$quizId:${q.dueDate!.millisecondsSinceEpoch}',
                 'title': 'Quiz Deadline Approaching',
                 'desc': '${q.title} is due in ${diff.inHours} hours.',
                 'icon': 'schedule',
@@ -674,6 +676,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
   }
 
   void _showNotificationsDialog(BuildContext context) {
+    final dialogNotifications = List<Map<String, dynamic>>.from(_notifications);
     showDialog(
       context: context,
       builder: (context) {
@@ -704,8 +707,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                 ),
               ],
             ),
-            child: Builder(
-              builder: (ctx) {
+            child: StatefulBuilder(
+              builder: (ctx, setDialogState) {
                 if (_isLoadingNotifications) {
                   return const SizedBox(
                     height: 200,
@@ -713,7 +716,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                   );
                 }
 
-                final notifs = _notifications;
+                final notifs = dialogNotifications;
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -878,42 +881,69 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                     ),
                     const SizedBox(height: 20),
                     Flexible(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (notifs.isEmpty)
-                              const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 20),
-                                child: Text(
-                                  'No recent activity.',
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                              )
-                            else
-                              ...notifs.map((n) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
-                                  child: _buildNotificationItem(
-                                    n['title'] as String,
-                                    n['desc'] as String,
-                                    n['icon'] as String,
-                                    n['color'] as Color,
-                                    n['timeStr'] as String,
-                                    onTap: () {
-                                      Navigator.pop(context);
-                                      if (n['course'] != null) {
-                                        context.go(
-                                          AppRoutes.studentCoursesScreen,
-                                          extra: n['course'],
-                                        );
-                                      }
-                                    },
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          maxHeight: _notificationListMaxHeight,
+                        ),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (notifs.isEmpty)
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 20),
+                                  child: Text(
+                                    'No recent activity.',
+                                    style: TextStyle(color: Colors.grey),
                                   ),
-                                );
-                              }).toList(),
-                          ],
+                                )
+                              else
+                                ...notifs.map((n) {
+                                  final notificationId = n['id'] as String;
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: Dismissible(
+                                      key: ValueKey(notificationId),
+                                      direction: DismissDirection.endToStart,
+                                      background: _buildDismissBackground(),
+                                      onDismissed: (_) {
+                                        setDialogState(() {
+                                          dialogNotifications.removeWhere(
+                                            (notification) =>
+                                                notification['id'] ==
+                                                notificationId,
+                                          );
+                                        });
+                                        unawaited(
+                                          context
+                                              .read<AuthService>()
+                                              .dismissNotification(
+                                                notificationId,
+                                              ),
+                                        );
+                                      },
+                                      child: _buildNotificationItem(
+                                        n['title'] as String,
+                                        n['desc'] as String,
+                                        n['icon'] as String,
+                                        n['color'] as Color,
+                                        n['timeStr'] as String,
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                          if (n['course'] != null) {
+                                            context.go(
+                                              AppRoutes.studentCoursesScreen,
+                                              extra: n['course'],
+                                            );
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -927,6 +957,36 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     );
   }
 
+  Widget _buildDismissBackground() {
+    return Container(
+      alignment: Alignment.centerRight,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFF4757),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Clear',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          SizedBox(width: 8),
+          CustomIconWidget(
+            iconName: 'delete_outline',
+            color: Colors.white,
+            size: 20,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildNotificationItem(
     String title,
     String desc,
@@ -937,77 +997,86 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0xFF0A1628)
-              : Colors.grey.shade50,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
+      child: SizedBox(
+        height: _notificationCardHeight,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
             color: Theme.of(context).brightness == Brightness.dark
-                ? const Color(0xFF1E3A5F)
-                : Colors.grey.shade300,
-          ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: CustomIconWidget(iconName: icon, color: color, size: 20),
+                ? const Color(0xFF0A1628)
+                : Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF1E3A5F)
+                  : Colors.grey.shade300,
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          title,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                ? Colors.white
-                                : Colors.black87,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: CustomIconWidget(iconName: icon, color: color, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black87,
+                            ),
                           ),
                         ),
-                      ),
-                      Text(
-                        time,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? const Color(0xFF8BA3C0)
-                              : Colors.grey.shade600,
+                        Text(
+                          time,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF8BA3C0)
+                                : Colors.grey.shade600,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    desc,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0xFF8BA3C0)
-                          : Colors.grey.shade600,
-                      height: 1.4,
+                      ],
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 4),
+                    Text(
+                      desc,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF8BA3C0)
+                            : Colors.grey.shade600,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -1039,10 +1108,10 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Dashboard',
+            'Student Dashboard',
             style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w700,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
               color: Theme.of(context).brightness == Brightness.dark
                   ? Colors.white
                   : Colors.black87,
@@ -1196,7 +1265,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Progress Summary',
+            'My Progress Summary',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -1212,30 +1281,109 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                 return const Center(child: CircularProgressIndicator());
               }
               final stats = _progressStats;
-              return Row(
+              final quizProgressText = stats['avgQuiz'] as String;
+              final quizProgressPercent =
+                  (double.tryParse(quizProgressText.replaceAll('%', '')) ?? 0) /
+                  100;
+              return Column(
                 children: [
-                  Expanded(
-                    child: _buildSummaryCard(
-                      'Avg Quiz Score',
-                      stats['avgQuiz'] as String,
-                      'quiz',
-                      Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0xFF00D4FF)
-                          : const Color(0xFF1565C0),
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildSummaryCard(
+                          'Avg Quiz Score',
+                          quizProgressText,
+                          'quiz',
+                          Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF00D4FF)
+                              : const Color(0xFF1565C0),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildSummaryCard(
+                          'Completed Labs',
+                          stats['labs'] as String,
+                          'biotech',
+                          const Color(0xFF7C3AED),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildSummaryCard(
-                      'Completed Labs',
-                      stats['labs'] as String,
-                      'biotech',
-                      const Color(0xFF7C3AED),
-                    ),
+                  const SizedBox(height: 12),
+                  _buildStudentProgressBar(
+                    quizProgressText,
+                    quizProgressPercent.clamp(0.0, 1.0),
                   ),
                 ],
               );
             },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStudentProgressBar(
+    String progressText,
+    double progressPercent,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentColor = isDark
+        ? const Color(0xFF00D4FF)
+        : const Color(0xFF1565C0);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF142240) : Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isDark ? const Color(0xFF1E3A5F) : Colors.grey.shade300,
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              CustomIconWidget(
+                iconName: 'menu_book',
+                color: accentColor,
+                size: 16,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Overall Progress',
+                  style: TextStyle(
+                    color: isDark ? Colors.white : const Color(0xFF0A1628),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Text(
+                progressText,
+                style: TextStyle(
+                  color: accentColor,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(50),
+            child: LinearProgressIndicator(
+              value: progressPercent,
+              backgroundColor: isDark
+                  ? const Color(0xFF1E3A5F)
+                  : Colors.grey.shade300,
+              valueColor: AlwaysStoppedAnimation<Color>(accentColor),
+              minHeight: 7,
+            ),
           ),
         ],
       ),

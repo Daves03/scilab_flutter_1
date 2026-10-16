@@ -33,6 +33,7 @@ class AuthService extends ChangeNotifier {
 
   StreamSubscription<fb.User?>? _authSub;
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _userDocSub;
+  String? _lastDisplayNameSyncKey;
 
   AuthService._internal() {
     _authSub = _auth.authStateChanges().listen(_onAuthChanged);
@@ -49,16 +50,35 @@ class AuthService extends ChangeNotifier {
     _userDocSub?.cancel();
     if (fbUser == null) {
       currentUser = null;
+      _lastDisplayNameSyncKey = null;
       notifyListeners();
       return;
     }
-    _userDocSub =
-        _db.collection('users').doc(fbUser.uid).snapshots().listen((doc) {
+    _userDocSub = _db.collection('users').doc(fbUser.uid).snapshots().listen((
+      doc,
+    ) {
       if (doc.exists) {
         currentUser = AppUser.fromMap(doc.id, doc.data()!);
+        _scheduleDisplayNameSync(currentUser!);
       }
       notifyListeners();
     });
+  }
+
+  void _scheduleDisplayNameSync(AppUser account) {
+    final name = account.name.trim();
+    if (name.isEmpty) return;
+    final syncKey = '${account.id}|${account.role?.id ?? ''}|$name';
+    if (_lastDisplayNameSyncKey == syncKey) return;
+    _lastDisplayNameSyncKey = syncKey;
+    unawaited(
+      _syncDisplayNameReferences(account, name).catchError((Object error) {
+        if (_lastDisplayNameSyncKey == syncKey) {
+          _lastDisplayNameSyncKey = null;
+        }
+        debugPrint('Could not reconcile saved display names: $error');
+      }),
+    );
   }
 
   bool get isLoggedIn => currentUser != null;
@@ -81,8 +101,10 @@ class AuthService extends ChangeNotifier {
       );
       final uid = cred.user!.uid;
       final isStudent = role == UserRole.grade9 || role == UserRole.grade10;
-      final generatedStudentNumber = isStudent ? _generateStudentNumber() : null;
-      
+      final generatedStudentNumber = isStudent
+          ? _generateStudentNumber()
+          : null;
+
       final newUser = AppUser(
         id: uid,
         name: name,
@@ -106,12 +128,18 @@ class AuthService extends ChangeNotifier {
   /// matching sign_up_login_screen's `_onLoginSuccess(String role)`
   /// signature. Callers should still check [isApproved] before routing
   /// anywhere — app_routes.dart's redirect enforces this regardless.
-  Future<String> login({required String email, required String password}) async {
+  Future<String> login({
+    required String email,
+    required String password,
+  }) async {
     loading = true;
     notifyListeners();
     try {
-      final cred = await _auth.signInWithEmailAndPassword(email: email, password: password);
-      
+      final cred = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
       if (cred.user != null && !cred.user!.emailVerified) {
         await _auth.signOut();
         throw AuthFailure('Please verify your email first. Check your inbox.');
@@ -119,12 +147,14 @@ class AuthService extends ChangeNotifier {
 
       final doc = await _db.collection('users').doc(cred.user!.uid).get();
       final roleData = doc.data()?['role'];
-      
+
       if (roleData == 'admin') {
         await _auth.signOut();
-        throw AuthFailure('Admins must use the separate Admin Web Portal to log in.');
+        throw AuthFailure(
+          'Admins must use the separate Admin Web Portal to log in.',
+        );
       }
-      
+
       return roleData == 'teacher' ? 'teacher' : 'student';
     } on fb.FirebaseAuthException catch (e) {
       throw AuthFailure(_friendlyAuthError(e));
@@ -157,7 +187,9 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
     try {
       final googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) { return null; }
+      if (googleUser == null) {
+        return null;
+      }
 
       final googleAuth = await googleUser.authentication;
       final credential = fb.GoogleAuthProvider.credential(
@@ -180,7 +212,8 @@ class AuthService extends ChangeNotifier {
           status: VerificationStatus.pending,
         );
         await docRef.set(newUser.toMap());
-        userRoleStr = null; // Return null so router redirects to complete profile
+        userRoleStr =
+            null; // Return null so router redirects to complete profile
       } else {
         // Update name to match Google account if it exists
         if (fbUser.displayName != null && fbUser.displayName!.isNotEmpty) {
@@ -219,14 +252,17 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
     try {
       final isStudent = role == 'grade9' || role == 'grade10';
-      final generatedStudentNumber = isStudent ? _generateStudentNumber() : null;
+      final generatedStudentNumber = isStudent
+          ? _generateStudentNumber()
+          : null;
 
       final docRef = _db.collection('users').doc(user.uid);
       await docRef.set({
         'name': name,
         'role': role,
         'sections': sections,
-        if (generatedStudentNumber != null) 'studentNumber': generatedStudentNumber,
+        if (generatedStudentNumber != null)
+          'studentNumber': generatedStudentNumber,
       }, SetOptions(merge: true));
       if (currentUser != null) {
         currentUser!.role = UserRoleX.fromId(role);
@@ -258,8 +294,10 @@ class AuthService extends ChangeNotifier {
         .collection('users')
         .where('status', isEqualTo: VerificationStatus.pending.id)
         .snapshots()
-        .map((snap) =>
-            snap.docs.map((d) => AppUser.fromMap(d.id, d.data())).toList());
+        .map(
+          (snap) =>
+              snap.docs.map((d) => AppUser.fromMap(d.id, d.data())).toList(),
+        );
   }
 
   /// Approve an account that already has a role (the normal case, since
@@ -285,11 +323,36 @@ class AuthService extends ChangeNotifier {
     try {
       await _db.collection('users').doc(currentUser!.id).update({
         'notificationsClearedAt': FieldValue.serverTimestamp(),
+        'dismissedNotificationIds': <String>[],
       });
       currentUser!.notificationsClearedAt = DateTime.now();
+      currentUser!.dismissedNotificationIds = [];
       notifyListeners();
     } catch (e) {
       debugPrint('Error clearing notifications: $e');
+    }
+  }
+
+  Future<void> dismissNotification(String notificationId) async {
+    final user = currentUser;
+    if (user == null || notificationId.isEmpty) return;
+    if (user.dismissedNotificationIds.contains(notificationId)) return;
+
+    user.dismissedNotificationIds = [
+      ...user.dismissedNotificationIds,
+      notificationId,
+    ];
+    notifyListeners();
+    try {
+      await _db.collection('users').doc(user.id).update({
+        'dismissedNotificationIds': FieldValue.arrayUnion([notificationId]),
+      });
+    } catch (e) {
+      user.dismissedNotificationIds = user.dismissedNotificationIds
+          .where((id) => id != notificationId)
+          .toList(growable: false);
+      notifyListeners();
+      debugPrint('Error dismissing notification: $e');
     }
   }
 
@@ -311,19 +374,42 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<void> updateName(String newName) async {
-    if (currentUser == null) return;
+    final account = currentUser;
+    if (account == null) return;
+    final normalizedName = newName.trim();
+    if (normalizedName.isEmpty) {
+      throw AuthFailure('Name cannot be empty.');
+    }
     loading = true;
     notifyListeners();
     try {
-      await _db.collection('users').doc(currentUser!.id).update({
-        'name': newName,
+      final syncKey = '${account.id}|${account.role?.id ?? ''}|$normalizedName';
+      _lastDisplayNameSyncKey = syncKey;
+      await _db.collection('users').doc(account.id).update({
+        'name': normalizedName,
       });
       final user = _auth.currentUser;
       if (user != null) {
-        await user.updateDisplayName(newName);
+        await user.updateDisplayName(normalizedName);
       }
-      currentUser!.name = newName;
+      if (currentUser?.id == account.id) {
+        currentUser!.name = normalizedName;
+      }
+
+      try {
+        await _syncDisplayNameReferences(account, normalizedName);
+      } catch (error) {
+        if (_lastDisplayNameSyncKey == syncKey) {
+          _lastDisplayNameSyncKey = null;
+        }
+        // The user profile is the source of truth. Screens resolve names from
+        // that document, while these copied fields remain useful offline.
+        debugPrint(
+          'Profile name saved; reference sync will retry later: $error',
+        );
+      }
     } catch (e) {
+      _lastDisplayNameSyncKey = null;
       debugPrint('Error updating name: $e');
       throw AuthFailure('Failed to update name: $e');
     } finally {
@@ -332,7 +418,105 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  Future<void> updateProfilePicture(Uint8List fileBytes, String fileName) async {
+  Future<void> _syncDisplayNameReferences(
+    AppUser account,
+    String newName,
+  ) async {
+    if (account.isTeacher) {
+      await _syncTeacherDisplayName(account.id, newName);
+    } else if (account.isStudent) {
+      await _syncStudentDisplayName(account.id, newName);
+    }
+  }
+
+  Future<void> _syncTeacherDisplayName(String uid, String newName) async {
+    final courseSnapshot = await _db
+        .collection('courses')
+        .where('teacherUid', isEqualTo: uid)
+        .get();
+    final courseUpdates =
+        <
+          MapEntry<
+            DocumentReference<Map<String, dynamic>>,
+            Map<String, dynamic>
+          >
+        >[];
+
+    for (final document in courseSnapshot.docs) {
+      final update = <String, dynamic>{'teacherName': newName};
+      final rawModules = document.data()['modules'];
+      if (rawModules is List) {
+        update['modules'] = rawModules
+            .map((rawModule) {
+              if (rawModule is! Map) return rawModule;
+              final module = Map<String, dynamic>.from(rawModule);
+              final uploaderUid = module['uploadedByUid']?.toString() ?? '';
+              if (uploaderUid.isEmpty || uploaderUid == uid) {
+                module['uploadedByUid'] = uid;
+                module['uploadedByName'] = newName;
+              }
+              return module;
+            })
+            .toList(growable: false);
+      }
+      courseUpdates.add(MapEntry(document.reference, update));
+    }
+    await _commitNameUpdates(courseUpdates);
+
+    final attachmentSnapshot = await _db
+        .collection('module_attachments')
+        .where('uploadedByUid', isEqualTo: uid)
+        .get();
+    await _commitNameUpdates(
+      attachmentSnapshot.docs
+          .map(
+            (document) => MapEntry(document.reference, <String, dynamic>{
+              'uploadedByName': newName,
+            }),
+          )
+          .toList(growable: false),
+    );
+  }
+
+  Future<void> _syncStudentDisplayName(String uid, String newName) async {
+    final attemptSnapshot = await _db
+        .collection('quiz_attempts')
+        .where('studentId', isEqualTo: uid)
+        .get();
+    await _commitNameUpdates(
+      attemptSnapshot.docs
+          .map(
+            (document) => MapEntry(document.reference, <String, dynamic>{
+              'studentName': newName,
+            }),
+          )
+          .toList(growable: false),
+    );
+  }
+
+  Future<void> _commitNameUpdates(
+    List<
+      MapEntry<DocumentReference<Map<String, dynamic>>, Map<String, dynamic>>
+    >
+    updates,
+  ) async {
+    const batchSize = 400;
+    for (var start = 0; start < updates.length; start += batchSize) {
+      final end = (start + batchSize < updates.length)
+          ? start + batchSize
+          : updates.length;
+      final batch = _db.batch();
+      for (final update in updates.sublist(start, end)) {
+        batch.update(update.key, update.value);
+      }
+      await batch.commit();
+    }
+  }
+
+  Future<void> updateProfilePicture(
+    Uint8List fileBytes,
+    String fileName,
+  ) async {
     if (currentUser == null) return;
     loading = true;
     notifyListeners();
@@ -344,7 +528,7 @@ class AuthService extends ChangeNotifier {
           .child(
             '${currentUser!.id}_${DateTime.now().millisecondsSinceEpoch}_$fileName',
           );
-      
+
       final uploadTask = storageRef.putData(fileBytes);
       final snapshot = await uploadTask;
       final downloadUrl = await snapshot.ref.getDownloadURL();
@@ -357,7 +541,7 @@ class AuthService extends ChangeNotifier {
       if (user != null) {
         await user.updatePhotoURL(downloadUrl);
       }
-      
+
       currentUser!.avatarUrl = downloadUrl;
 
       if (previousAvatarUrl != downloadUrl) {
@@ -437,14 +621,16 @@ class AuthService extends ChangeNotifier {
         .where('role', whereIn: [UserRole.grade9.id, UserRole.grade10.id])
         .where('status', isEqualTo: VerificationStatus.approved.id)
         .snapshots()
-        .map((snap) =>
-            snap.docs.map((d) => AppUser.fromMap(d.id, d.data())).toList());
+        .map(
+          (snap) =>
+              snap.docs.map((d) => AppUser.fromMap(d.id, d.data())).toList(),
+        );
   }
 
   /// Counts the total number of approved students in the given sections.
   Future<int> countStudentsInSections(List<String> sections) async {
     if (sections.isEmpty) return 0;
-    
+
     // array-contains-any limits to 10 elements
     final chunked = sections.take(10).toList();
     try {
@@ -496,4 +682,3 @@ class AuthFailure implements Exception {
   @override
   String toString() => message;
 }
-

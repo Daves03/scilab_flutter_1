@@ -77,10 +77,12 @@ class AppUser {
   String? avatarUrl;
   UserRole? role;
   VerificationStatus status;
-  List<String> sections; // teacher's class sections, e.g. ['9-Rizal', '10-Luna']
+  /// Teacher class sections, for example `9-A` or `10-C`.
+  List<String> sections;
   String? studentNumber; // unique identifier for students
   DateTime? lastNotificationReadAt;
   DateTime? notificationsClearedAt;
+  List<String> dismissedNotificationIds;
   bool hasAcceptedTerms;
 
   AppUser({
@@ -94,6 +96,7 @@ class AppUser {
     this.studentNumber,
     this.lastNotificationReadAt,
     this.notificationsClearedAt,
+    this.dismissedNotificationIds = const [],
     this.hasAcceptedTerms = false,
   });
 
@@ -117,20 +120,31 @@ class AppUser {
       sections: List<String>.from(data['sections'] ?? const []),
       studentNumber: data['studentNumber'] as String?,
       lastNotificationReadAt: ts is Timestamp ? ts.toDate() : null,
-      notificationsClearedAt: clearedTs is Timestamp ? clearedTs.toDate() : null,
+      notificationsClearedAt: clearedTs is Timestamp
+          ? clearedTs.toDate()
+          : null,
+      dismissedNotificationIds: List<String>.from(
+        data['dismissedNotificationIds'] ?? const [],
+      ),
       hasAcceptedTerms: data['hasAcceptedTerms'] as bool? ?? false,
     );
   }
 
   Map<String, dynamic> toMap() => {
-        'name': name,
-        'email': email,
-        if (avatarUrl != null) 'avatarUrl': avatarUrl,
-        'role': role?.id,
-        'status': status.id,
-        'sections': sections,
-        if (studentNumber != null) 'studentNumber': studentNumber,
-        'lastNotificationReadAt': lastNotificationReadAt != null ? Timestamp.fromDate(lastNotificationReadAt!) : null,
-        'hasAcceptedTerms': hasAcceptedTerms,
-      };
+    'name': name,
+    'email': email,
+    if (avatarUrl != null) 'avatarUrl': avatarUrl,
+    'role': role?.id,
+    'status': status.id,
+    'sections': sections,
+    if (studentNumber != null) 'studentNumber': studentNumber,
+    'lastNotificationReadAt': lastNotificationReadAt != null
+        ? Timestamp.fromDate(lastNotificationReadAt!)
+        : null,
+    'notificationsClearedAt': notificationsClearedAt != null
+        ? Timestamp.fromDate(notificationsClearedAt!)
+        : null,
+    'dismissedNotificationIds': dismissedNotificationIds,
+    'hasAcceptedTerms': hasAcceptedTerms,
+  };
 }

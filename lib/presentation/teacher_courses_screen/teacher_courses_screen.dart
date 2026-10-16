@@ -23,6 +23,9 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
   Course? _selectedCourse;
   String _mainSearchQuery = '';
   final TextEditingController _mainSearchCtrl = TextEditingController();
+  final FocusNode _mainSearchFocusNode = FocusNode();
+  Stream<List<Course>>? _coursesStream;
+  String? _coursesStreamTeacherId;
   Future<int>? _studentCountFuture;
 
   @override
@@ -42,8 +45,19 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
   @override
   void dispose() {
     _mainSearchCtrl.dispose();
+    _mainSearchFocusNode.dispose();
     _entranceController.dispose();
     super.dispose();
+  }
+
+  Stream<List<Course>> _courseStreamFor(String? teacherId) {
+    if (_coursesStream == null || _coursesStreamTeacherId != teacherId) {
+      _coursesStreamTeacherId = teacherId;
+      _coursesStream = teacherId == null
+          ? Stream.value(const <Course>[])
+          : context.read<CourseService>().coursesForTeacherStream(teacherId);
+    }
+    return _coursesStream!;
   }
 
   void _openCourse(Course course) {
@@ -77,6 +91,7 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
 
   @override
   Widget build(BuildContext context) {
+    final teacherId = context.watch<AuthService>().currentUser?.id;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
@@ -90,9 +105,10 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
                     onUpdated: _onCourseUpdated,
                   )
                 : StreamBuilder<List<Course>>(
-                    stream: context.read<CourseService>().coursesForTeacherStream(context.read<AuthService>().currentUser!.id),
+                    stream: _courseStreamFor(teacherId),
                     builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
+                      if (snapshot.connectionState == ConnectionState.waiting &&
+                          !snapshot.hasData) {
                         return const Center(child: CircularProgressIndicator(color: Color(0xFF00D4FF)));
                       }
                       if (snapshot.hasError) {
@@ -123,8 +139,12 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
   }
 
   Widget _buildCourseList(List<Course> courses) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentColor = isDark
+        ? const Color(0xFF00FF88)
+        : const Color(0xFF00994C);
     final filteredCourses = courses.where((c) {
-      final query = _mainSearchQuery.toLowerCase();
+      final query = _mainSearchQuery.trim().toLowerCase();
       return c.title.toLowerCase().contains(query) || 
              c.subject.toLowerCase().contains(query) ||
              c.grade.toLowerCase().contains(query);
@@ -137,32 +157,76 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-            child: Container(
-              height: 48,
-              decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
-                borderRadius: BorderRadius.circular(12.0),
-                border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x3300FF88) : const Color(0xFF00FF88).withOpacity(0.3), width: 1),
-              ),
+            child: SizedBox(
+              height: 52,
               child: TextField(
                 controller: _mainSearchCtrl,
-                style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87, fontSize: 14),
+                focusNode: _mainSearchFocusNode,
+                cursorColor: accentColor,
+                textInputAction: TextInputAction.search,
+                onTapOutside: (_) => _mainSearchFocusNode.unfocus(),
+                style: TextStyle(
+                  color: isDark ? Colors.white : const Color(0xFF172033),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
                 textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(
                   hintText: 'Search courses...',
-                  hintStyle: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
-                  prefixIcon: Icon(Icons.search, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, size: 20),
-                  isDense: true,
+                  hintStyle: TextStyle(
+                    color: isDark
+                        ? const Color(0xFF8BA3C0)
+                        : const Color(0xFF75859A),
+                    fontSize: 14,
+                  ),
+                  filled: true,
+                  fillColor: isDark
+                      ? const Color(0xFF142240)
+                      : const Color(0xFFF7FAFD),
+                  prefixIcon: Icon(
+                    Icons.search_rounded,
+                    color: isDark
+                        ? const Color(0xFF8BA3C0)
+                        : const Color(0xFF60758D),
+                    size: 21,
+                  ),
                   suffixIcon: _mainSearchQuery.isNotEmpty
-                      ? GestureDetector(
-                          onTap: () {
+                      ? IconButton(
+                          tooltip: 'Clear search',
+                          onPressed: () {
                             _mainSearchCtrl.clear();
                             setState(() => _mainSearchQuery = '');
+                            _mainSearchFocusNode.requestFocus();
                           },
-                          child: Icon(Icons.close, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, size: 18),
+                          icon: Icon(
+                            Icons.close_rounded,
+                            color: isDark
+                                ? const Color(0xFF8BA3C0)
+                                : const Color(0xFF60758D),
+                            size: 19,
+                          ),
                         )
                       : null,
-                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 15,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(
+                      color: isDark
+                          ? const Color(0xFF244363)
+                          : const Color(0xFFD5E0EB),
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(color: accentColor, width: 1.5),
+                  ),
                 ),
                 onChanged: (val) {
                   setState(() => _mainSearchQuery = val);
@@ -222,7 +286,7 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
                 ),
               ),
             );
-          }, childCount: courses.length),
+          }, childCount: filteredCourses.length),
         ),
         const SliverToBoxAdapter(child: SizedBox(height: 140)),
       ],

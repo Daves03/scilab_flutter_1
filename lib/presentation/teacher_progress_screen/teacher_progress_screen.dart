@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/user_model.dart';
@@ -7,7 +9,6 @@ import '../../services/ar_service.dart';
 import '../../models/ar_experiment_model.dart';
 import '../../data/dummy_ar_experiments.dart';
 import '../../models/activity_model.dart';
-
 
 import '../../core/app_export.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +28,7 @@ class MissedQuiz {
 }
 
 class StudentProgress {
+  final String id;
   final String name;
   final String section;
   final List<QuizResult> quizResults;
@@ -36,6 +38,7 @@ class StudentProgress {
   final String? avatarUrl;
 
   const StudentProgress({
+    required this.id,
     required this.name,
     required this.section,
     required this.quizResults,
@@ -44,6 +47,23 @@ class StudentProgress {
     this.studentNumber,
     this.avatarUrl,
   });
+
+  StudentProgress copyWith({
+    String? name,
+    String? studentNumber,
+    String? avatarUrl,
+  }) {
+    return StudentProgress(
+      id: id,
+      name: name ?? this.name,
+      section: section,
+      quizResults: quizResults,
+      missedQuizzes: missedQuizzes,
+      arLabRecords: arLabRecords,
+      studentNumber: studentNumber ?? this.studentNumber,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+    );
+  }
 }
 
 class QuizResult {
@@ -91,6 +111,9 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
   List<String> _teacherSections = [];
   String _selectedSection = 'All Sections';
   List<StudentProgress> _allStudents = [];
+  Map<String, AppUser> _liveStudentProfiles = {};
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
+  _studentProfilesSubscription;
   bool _loading = true;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
@@ -99,19 +122,62 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _subscribeToStudentProfiles();
     _loadData();
   }
 
   @override
   void dispose() {
+    _studentProfilesSubscription?.cancel();
     _tabController.dispose();
     _searchController.dispose();
     super.dispose();
   }
 
+  void _subscribeToStudentProfiles() {
+    _studentProfilesSubscription = FirebaseFirestore.instance
+        .collection('users')
+        .where('role', whereIn: [UserRole.grade9.id, UserRole.grade10.id])
+        .where('status', isEqualTo: VerificationStatus.approved.id)
+        .snapshots()
+        .listen((snapshot) {
+          _liveStudentProfiles = {
+            for (final document in snapshot.docs)
+              document.id: AppUser.fromMap(document.id, document.data()),
+          };
+          if (!mounted || _allStudents.isEmpty) return;
+          setState(() {
+            _allStudents = _allStudents
+                .map((student) {
+                  final profile = _liveStudentProfiles[student.id];
+                  if (profile == null) return student;
+                  return student.copyWith(
+                    name: profile.name,
+                    studentNumber: profile.studentNumber,
+                    avatarUrl: profile.avatarUrl,
+                  );
+                })
+                .toList(growable: false);
+          });
+        });
+  }
+
   String _formatDate(DateTime? dt) {
     if (dt == null) return '';
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     String pad(int n) => n.toString().padLeft(2, '0');
     final hour = dt.hour > 12 ? dt.hour - 12 : (dt.hour == 0 ? 12 : dt.hour);
     final ampm = dt.hour >= 12 ? 'PM' : 'AM';
@@ -134,7 +200,7 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
           .where('role', whereIn: [UserRole.grade9.id, UserRole.grade10.id])
           .where('status', isEqualTo: VerificationStatus.approved.id)
           .get();
-          
+
       final users = studentsSnap.docs
           .map((d) => AppUser.fromMap(d.id, d.data()))
           .where((u) => u.sections.any((sec) => _teacherSections.contains(sec)))
@@ -142,80 +208,105 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
 
       // 2. Fetch all quiz attempts
       final attemptsSnap = await db.collection('quiz_attempts').get();
-      final allAttempts = attemptsSnap.docs.map((d) => QuizAttempt.fromMap(d.id, d.data())).toList();
+      final allAttempts = attemptsSnap.docs
+          .map((d) => QuizAttempt.fromMap(d.id, d.data()))
+          .toList();
 
       // 2.5 Fetch all courses to check for missed quizzes
       final coursesSnap = await db.collection('courses').get();
-      final allCourses = coursesSnap.docs.map((d) => Course.fromMap(d.id, d.data())).toList();
+      final allCourses = coursesSnap.docs
+          .map((d) => Course.fromMap(d.id, d.data()))
+          .toList();
 
       // 3. Fetch AR experiments to map IDs to titles (with fallback if permission denied)
       List<ArExperimentModel> arExps = [];
       try {
         final arSnap = await db.collection('ar_experiments').get();
-        arExps = arSnap.docs.map((d) => ArExperimentModel.fromMap(d.id, d.data())).toList();
+        arExps = arSnap.docs
+            .map((d) => ArExperimentModel.fromMap(d.id, d.data()))
+            .toList();
       } catch (e) {
         print('Using fallback AR experiments due to error: $e');
         arExps = dummyArExperiments;
       }
-      final arExpMap = { for (var e in arExps) e.id : e.title };
+      final arExpMap = {for (var e in arExps) e.id: e.title};
 
       // 4. Build StudentProgress objects
       List<StudentProgress> dynamicStudents = [];
       for (var u in users) {
-         // get quiz results for u.id
-         final uAttempts = allAttempts.where((a) => a.studentId == u.id).toList();
-         final quizResults = uAttempts.map((a) => QuizResult(
-           quizTitle: a.quizTitle,
-           score: a.score,
-           total: a.totalQuestions,
-           date: _formatDate(a.submittedAt),
-         )).toList();
+        // get quiz results for u.id
+        final uAttempts = allAttempts
+            .where((a) => a.studentId == u.id)
+            .toList();
+        final quizResults = uAttempts
+            .map(
+              (a) => QuizResult(
+                quizTitle: a.quizTitle,
+                score: a.score,
+                total: a.totalQuestions,
+                date: _formatDate(a.submittedAt),
+              ),
+            )
+            .toList();
 
-         // get AR records for u.id
-         List<ArLabRecord> uArRecords = [];
-         try {
-           final uArSnap = await db.collection('users').doc(u.id).collection('experiment_activity').get();
-           uArRecords = uArSnap.docs.map((d) {
-             final expId = d.id;
-             final act = ExperimentActivity.fromMap(expId, d.data());
-             return ArLabRecord(
-               experimentName: arExpMap[expId] ?? 'Unknown Experiment',
-               attempts: 1, 
-               rubricScore: act.completed ? 100.0 : 0.0,
-               lastAttemptDate: _formatDate(act.completedAt ?? act.launchedAt),
-             );
-           }).toList();
-         } catch (e) {
-           print('Permission denied or error fetching AR records for ${u.id}: $e');
-         }
+        // get AR records for u.id
+        List<ArLabRecord> uArRecords = [];
+        try {
+          final uArSnap = await db
+              .collection('users')
+              .doc(u.id)
+              .collection('experiment_activity')
+              .get();
+          uArRecords = uArSnap.docs.map((d) {
+            final expId = d.id;
+            final act = ExperimentActivity.fromMap(expId, d.data());
+            return ArLabRecord(
+              experimentName: arExpMap[expId] ?? 'Unknown Experiment',
+              attempts: 1,
+              rubricScore: act.completed ? 100.0 : 0.0,
+              lastAttemptDate: _formatDate(act.completedAt ?? act.launchedAt),
+            );
+          }).toList();
+        } catch (e) {
+          print(
+            'Permission denied or error fetching AR records for ${u.id}: $e',
+          );
+        }
 
-         final section = u.sections.isNotEmpty ? u.sections.first : 'No Section';
+        final section = u.sections.isNotEmpty ? u.sections.first : 'No Section';
 
-         List<MissedQuiz> uMissedQuizzes = [];
-         for (var course in allCourses) {
-           if (course.sections.contains(section)) {
-             for (var quiz in course.quizzes) {
-               final hasAttempted = uAttempts.any((a) => a.quizId == quiz.id);
-               if (!hasAttempted && quiz.dueDate != null && quiz.dueDate!.isBefore(DateTime.now())) {
-                 uMissedQuizzes.add(MissedQuiz(
-                   quizTitle: quiz.title,
-                   courseTitle: course.title,
-                   dueDate: _formatDate(quiz.dueDate),
-                 ));
-               }
-             }
-           }
-         }
+        List<MissedQuiz> uMissedQuizzes = [];
+        for (var course in allCourses) {
+          if (course.sections.contains(section)) {
+            for (var quiz in course.quizzes) {
+              final hasAttempted = uAttempts.any((a) => a.quizId == quiz.id);
+              if (!hasAttempted &&
+                  quiz.dueDate != null &&
+                  quiz.dueDate!.isBefore(DateTime.now())) {
+                uMissedQuizzes.add(
+                  MissedQuiz(
+                    quizTitle: quiz.title,
+                    courseTitle: course.title,
+                    dueDate: _formatDate(quiz.dueDate),
+                  ),
+                );
+              }
+            }
+          }
+        }
 
-         dynamicStudents.add(StudentProgress(
-           name: u.name,
-           section: section,
-           quizResults: quizResults,
-           missedQuizzes: uMissedQuizzes,
-           arLabRecords: uArRecords,
-           studentNumber: u.studentNumber,
-           avatarUrl: u.avatarUrl,
-         ));
+        dynamicStudents.add(
+          StudentProgress(
+            id: u.id,
+            name: u.name,
+            section: section,
+            quizResults: quizResults,
+            missedQuizzes: uMissedQuizzes,
+            arLabRecords: uArRecords,
+            studentNumber: u.studentNumber,
+            avatarUrl: u.avatarUrl,
+          ),
+        );
       }
 
       setState(() {
@@ -224,7 +315,9 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
       });
     } catch (e) {
       print('Error loading dynamic progress: $e');
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
@@ -251,8 +344,9 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
       final q = _searchQuery.toLowerCase();
       students = students
           .where(
-            (s) => s.name.toLowerCase().contains(q) || 
-                   (s.studentNumber ?? '').toLowerCase().contains(q),
+            (s) =>
+                s.name.toLowerCase().contains(q) ||
+                (s.studentNumber ?? '').toLowerCase().contains(q),
           )
           .toList();
     }
@@ -303,14 +397,28 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
                           width: 40,
                           height: 40,
                           decoration: BoxDecoration(
-                            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1A2E1A) : const Color(0xFFE8F5E9),
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF1A2E1A)
+                                : const Color(0xFFE8F5E9),
                             borderRadius: BorderRadius.circular(12.0),
-                            border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x3300FF88) : const Color(0xFF00994C).withOpacity(0.3), width: 1),
+                            border: Border.all(
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? const Color(0x3300FF88)
+                                  : const Color(0xFF00994C).withOpacity(0.3),
+                              width: 1,
+                            ),
                           ),
                           child: Center(
                             child: CustomIconWidget(
                               iconName: 'insights',
-                              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? const Color(0xFF00FF88)
+                                  : const Color(0xFF00994C),
                               size: 20,
                             ),
                           ),
@@ -325,29 +433,57 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
                                 style: TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.w700,
-                                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : Colors.black87,
                                 ),
                               ),
                               Text(
                                 'Teacher Dashboard',
-                                style: TextStyle(fontSize: 12, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C)),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? const Color(0xFF00FF88)
+                                      : const Color(0xFF00994C),
+                                ),
                               ),
                             ],
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200FF88) : const Color(0xFF00994C).withOpacity(0.1),
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0x2200FF88)
+                                : const Color(0xFF00994C).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(50.0),
-                            border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x5500FF88) : const Color(0xFF00994C).withOpacity(0.3), width: 1),
+                            border: Border.all(
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? const Color(0x5500FF88)
+                                  : const Color(0xFF00994C).withOpacity(0.3),
+                              width: 1,
+                            ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               CustomIconWidget(
                                 iconName: 'verified',
-                                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? const Color(0xFF00FF88)
+                                    : const Color(0xFF00994C),
                                 size: 13,
                               ),
                               const SizedBox(width: 4),
@@ -356,7 +492,11 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
-                                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? const Color(0xFF00FF88)
+                                      : const Color(0xFF00994C),
                                 ),
                               ),
                             ],
@@ -390,7 +530,9 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
                               : Colors.white,
                           icon: CustomIconWidget(
                             iconName: 'keyboard_arrow_down',
-                            color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                            color: isDark
+                                ? const Color(0xFF00D4FF)
+                                : const Color(0xFF1565C0),
                             size: 20,
                           ),
                           style: theme.textTheme.bodyMedium?.copyWith(
@@ -405,7 +547,9 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
                                     iconName: s == 'All Sections'
                                         ? 'groups'
                                         : 'class_',
-                                    color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                                    color: isDark
+                                        ? const Color(0xFF00D4FF)
+                                        : const Color(0xFF1565C0),
                                     size: 16,
                                   ),
                                   const SizedBox(width: 8),
@@ -517,11 +661,15 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
                       child: TabBar(
                         controller: _tabController,
                         indicator: BoxDecoration(
-                          color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                          color: isDark
+                              ? const Color(0xFF00D4FF)
+                              : const Color(0xFF1565C0),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         indicatorSize: TabBarIndicatorSize.tab,
-                        labelColor: isDark ? const Color(0xFF0A1628) : Colors.white,
+                        labelColor: isDark
+                            ? const Color(0xFF0A1628)
+                            : Colors.white,
                         unselectedLabelColor: subTextColor,
                         labelStyle: const TextStyle(
                           fontSize: 12,
@@ -648,20 +796,32 @@ class _QuizResultsTab extends StatelessWidget {
                         width: 36,
                         height: 36,
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0x2200D4FF) : const Color(0xFF1565C0).withOpacity(0.1),
+                          color: isDark
+                              ? const Color(0x2200D4FF)
+                              : const Color(0xFF1565C0).withOpacity(0.1),
                           shape: BoxShape.circle,
-                          border: Border.all(color: isDark ? const Color(0x5500D4FF) : const Color(0xFF1565C0).withOpacity(0.3)),
+                          border: Border.all(
+                            color: isDark
+                                ? const Color(0x5500D4FF)
+                                : const Color(0xFF1565C0).withOpacity(0.3),
+                          ),
                         ),
                         child: ClipOval(
-                          child: (student.avatarUrl != null && student.avatarUrl!.isNotEmpty)
+                          child:
+                              (student.avatarUrl != null &&
+                                  student.avatarUrl!.isNotEmpty)
                               ? Image.network(
                                   student.avatarUrl!,
                                   fit: BoxFit.cover,
                                   errorBuilder: (_, __, ___) => Center(
                                     child: Text(
-                                      student.name.isNotEmpty ? student.name[0] : '?',
+                                      student.name.isNotEmpty
+                                          ? student.name[0]
+                                          : '?',
                                       style: TextStyle(
-                                        color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                                        color: isDark
+                                            ? const Color(0xFF00D4FF)
+                                            : const Color(0xFF1565C0),
                                         fontWeight: FontWeight.w700,
                                         fontSize: 15,
                                       ),
@@ -670,9 +830,13 @@ class _QuizResultsTab extends StatelessWidget {
                                 )
                               : Center(
                                   child: Text(
-                                    student.name.isNotEmpty ? student.name[0] : '?',
+                                    student.name.isNotEmpty
+                                        ? student.name[0]
+                                        : '?',
                                     style: TextStyle(
-                                      color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                                      color: isDark
+                                          ? const Color(0xFF00D4FF)
+                                          : const Color(0xFF1565C0),
                                       fontWeight: FontWeight.w700,
                                       fontSize: 15,
                                     ),
@@ -692,11 +856,14 @@ class _QuizResultsTab extends StatelessWidget {
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
-                            if (student.studentNumber != null && student.studentNumber!.isNotEmpty)
+                            if (student.studentNumber != null &&
+                                student.studentNumber!.isNotEmpty)
                               Text(
                                 '#${student.studentNumber}',
                                 style: theme.textTheme.labelSmall?.copyWith(
-                                  color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                                  color: isDark
+                                      ? const Color(0xFF00D4FF)
+                                      : const Color(0xFF1565C0),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -718,9 +885,15 @@ class _QuizResultsTab extends StatelessWidget {
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: isDark ? const Color(0x22FFB800) : const Color(0xFFFFB800).withOpacity(0.1),
+                              color: isDark
+                                  ? const Color(0x22FFB800)
+                                  : const Color(0xFFFFB800).withOpacity(0.1),
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: isDark ? const Color(0x55FFB800) : const Color(0xFFFFB800).withOpacity(0.3)),
+                              border: Border.all(
+                                color: isDark
+                                    ? const Color(0x55FFB800)
+                                    : const Color(0xFFFFB800).withOpacity(0.3),
+                              ),
                             ),
                             child: Text(
                               '${student.quizResults.length} Quiz${student.quizResults.length != 1 ? 'zes' : ''}',
@@ -739,9 +912,17 @@ class _QuizResultsTab extends StatelessWidget {
                                 vertical: 3,
                               ),
                               decoration: BoxDecoration(
-                                color: isDark ? const Color(0x22FF4757) : const Color(0xFFFF4757).withOpacity(0.1),
+                                color: isDark
+                                    ? const Color(0x22FF4757)
+                                    : const Color(0xFFFF4757).withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: isDark ? const Color(0x55FF4757) : const Color(0xFFFF4757).withOpacity(0.3)),
+                                border: Border.all(
+                                  color: isDark
+                                      ? const Color(0x55FF4757)
+                                      : const Color(
+                                          0xFFFF4757,
+                                        ).withOpacity(0.3),
+                                ),
                               ),
                               child: Text(
                                 '${student.missedQuizzes.length} Missed',
@@ -774,16 +955,15 @@ class _QuizResultsTab extends StatelessWidget {
         final scrollController = ScrollController();
         int currentPage = 0;
         const int itemsPerPage = 6;
-        final allItems = [
-          ...student.quizResults,
-          ...student.missedQuizzes,
-        ];
+        final allItems = [...student.quizResults, ...student.missedQuizzes];
         final totalItems = allItems.length;
 
         return StatefulBuilder(
           builder: (context, setState) {
             final startIndex = currentPage * itemsPerPage;
-            final endIndex = (startIndex + itemsPerPage < totalItems) ? startIndex + itemsPerPage : totalItems;
+            final endIndex = (startIndex + itemsPerPage < totalItems)
+                ? startIndex + itemsPerPage
+                : totalItems;
             final currentItems = allItems.sublist(startIndex, endIndex);
 
             return Dialog(
@@ -792,7 +972,10 @@ class _QuizResultsTab extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 side: BorderSide(color: borderColor),
               ),
-              insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 48,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -804,7 +987,9 @@ class _QuizResultsTab extends StatelessWidget {
                         Expanded(
                           child: Text(
                             '${student.name}\'s Quizzes',
-                            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -858,7 +1043,10 @@ class _QuizResultsTab extends StatelessWidget {
                   if (totalItems > itemsPerPage) ...[
                     Divider(height: 1, color: borderColor),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -872,7 +1060,10 @@ class _QuizResultsTab extends StatelessWidget {
                                 currentPage--;
                                 scrollController.jumpTo(0);
                               }),
-                              child: Text('Previous', style: TextStyle(color: subTextColor)),
+                              child: Text(
+                                'Previous',
+                                style: TextStyle(color: subTextColor),
+                              ),
                             ),
                           ),
                           Text(
@@ -889,7 +1080,14 @@ class _QuizResultsTab extends StatelessWidget {
                                 currentPage++;
                                 scrollController.jumpTo(0);
                               }),
-                              child: Text('Next', style: TextStyle(color: isDark ? const Color(0xFF00FF88) : Colors.green)),
+                              child: Text(
+                                'Next',
+                                style: TextStyle(
+                                  color: isDark
+                                      ? const Color(0xFF00FF88)
+                                      : Colors.green,
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -1065,20 +1263,32 @@ class _ArLabTab extends StatelessWidget {
                         width: 36,
                         height: 36,
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0x2200FF88) : const Color(0xFF00994C).withOpacity(0.1),
+                          color: isDark
+                              ? const Color(0x2200FF88)
+                              : const Color(0xFF00994C).withOpacity(0.1),
                           shape: BoxShape.circle,
-                          border: Border.all(color: isDark ? const Color(0x5500FF88) : const Color(0xFF00994C).withOpacity(0.3)),
+                          border: Border.all(
+                            color: isDark
+                                ? const Color(0x5500FF88)
+                                : const Color(0xFF00994C).withOpacity(0.3),
+                          ),
                         ),
                         child: ClipOval(
-                          child: (student.avatarUrl != null && student.avatarUrl!.isNotEmpty)
+                          child:
+                              (student.avatarUrl != null &&
+                                  student.avatarUrl!.isNotEmpty)
                               ? Image.network(
                                   student.avatarUrl!,
                                   fit: BoxFit.cover,
                                   errorBuilder: (_, __, ___) => Center(
                                     child: Text(
-                                      student.name.isNotEmpty ? student.name[0] : '?',
+                                      student.name.isNotEmpty
+                                          ? student.name[0]
+                                          : '?',
                                       style: TextStyle(
-                                        color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                                        color: isDark
+                                            ? const Color(0xFF00FF88)
+                                            : const Color(0xFF00994C),
                                         fontWeight: FontWeight.w700,
                                         fontSize: 15,
                                       ),
@@ -1087,9 +1297,13 @@ class _ArLabTab extends StatelessWidget {
                                 )
                               : Center(
                                   child: Text(
-                                    student.name.isNotEmpty ? student.name[0] : '?',
+                                    student.name.isNotEmpty
+                                        ? student.name[0]
+                                        : '?',
                                     style: TextStyle(
-                                      color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                                      color: isDark
+                                          ? const Color(0xFF00FF88)
+                                          : const Color(0xFF00994C),
                                       fontWeight: FontWeight.w700,
                                       fontSize: 15,
                                     ),
@@ -1109,11 +1323,14 @@ class _ArLabTab extends StatelessWidget {
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
-                            if (student.studentNumber != null && student.studentNumber!.isNotEmpty)
+                            if (student.studentNumber != null &&
+                                student.studentNumber!.isNotEmpty)
                               Text(
                                 '#${student.studentNumber}',
                                 style: theme.textTheme.labelSmall?.copyWith(
-                                  color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                                  color: isDark
+                                      ? const Color(0xFF00FF88)
+                                      : const Color(0xFF00994C),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -1132,14 +1349,22 @@ class _ArLabTab extends StatelessWidget {
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0x2200FF88) : const Color(0xFF00994C).withOpacity(0.1),
+                          color: isDark
+                              ? const Color(0x2200FF88)
+                              : const Color(0xFF00994C).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: isDark ? const Color(0x5500FF88) : const Color(0xFF00994C).withOpacity(0.3)),
+                          border: Border.all(
+                            color: isDark
+                                ? const Color(0x5500FF88)
+                                : const Color(0xFF00994C).withOpacity(0.3),
+                          ),
                         ),
                         child: Text(
                           '${student.arLabRecords.length} Experiment${student.arLabRecords.length != 1 ? 's' : ''}',
                           style: TextStyle(
-                            color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                            color: isDark
+                                ? const Color(0xFF00FF88)
+                                : const Color(0xFF00994C),
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
                           ),
@@ -1169,8 +1394,13 @@ class _ArLabTab extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setState) {
             final startIndex = currentPage * itemsPerPage;
-            final endIndex = (startIndex + itemsPerPage < totalItems) ? startIndex + itemsPerPage : totalItems;
-            final currentItems = student.arLabRecords.sublist(startIndex, endIndex);
+            final endIndex = (startIndex + itemsPerPage < totalItems)
+                ? startIndex + itemsPerPage
+                : totalItems;
+            final currentItems = student.arLabRecords.sublist(
+              startIndex,
+              endIndex,
+            );
 
             return Dialog(
               backgroundColor: cardColor,
@@ -1178,7 +1408,10 @@ class _ArLabTab extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 side: BorderSide(color: borderColor),
               ),
-              insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 48,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -1190,7 +1423,9 @@ class _ArLabTab extends StatelessWidget {
                         Expanded(
                           child: Text(
                             '${student.name}\'s Records',
-                            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -1234,7 +1469,10 @@ class _ArLabTab extends StatelessWidget {
                   if (totalItems > itemsPerPage) ...[
                     Divider(height: 1, color: borderColor),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -1248,7 +1486,10 @@ class _ArLabTab extends StatelessWidget {
                                 currentPage--;
                                 scrollController.jumpTo(0);
                               }),
-                              child: Text('Previous', style: TextStyle(color: subTextColor)),
+                              child: Text(
+                                'Previous',
+                                style: TextStyle(color: subTextColor),
+                              ),
                             ),
                           ),
                           Text(
@@ -1265,7 +1506,14 @@ class _ArLabTab extends StatelessWidget {
                                 currentPage++;
                                 scrollController.jumpTo(0);
                               }),
-                              child: Text('Next', style: TextStyle(color: isDark ? const Color(0xFF00FF88) : Colors.green)),
+                              child: Text(
+                                'Next',
+                                style: TextStyle(
+                                  color: isDark
+                                      ? const Color(0xFF00FF88)
+                                      : Colors.green,
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -1316,12 +1564,16 @@ class _ArLabRecordRow extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0x2200D4FF) : const Color(0xFF1565C0).withOpacity(0.1),
+                  color: isDark
+                      ? const Color(0x2200D4FF)
+                      : const Color(0xFF1565C0).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: CustomIconWidget(
                   iconName: 'view_in_ar',
-                  color: isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                  color: isDark
+                      ? const Color(0xFF00D4FF)
+                      : const Color(0xFF1565C0),
                   size: 14,
                 ),
               ),
@@ -1437,8 +1689,6 @@ class _ArLabRecordRow extends StatelessWidget {
     );
   }
 }
-
-
 
 class _MissedQuizRow extends StatelessWidget {
   final MissedQuiz quiz;

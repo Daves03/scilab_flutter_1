@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, collectionGroup, getDocs } from 'firebase/firestore';
+import { collection, collectionGroup, getDocs, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Activity, Clock, Box, BookOpen, Search, PlusCircle, FilePlus, HelpCircle, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -16,16 +16,12 @@ export default function ActivityLogs() {
   }, [searchQuery, filterType]);
 
   useEffect(() => {
-    async function fetchActivities() {
-      try {
-        // 1. Fetch all users for lookup
-        const usersSnap = await getDocs(collection(db, 'users'));
-        const usersMap = {};
-        usersSnap.forEach(doc => {
-          usersMap[doc.id] = doc.data();
-        });
+    let disposed = false;
+    let requestVersion = 0;
 
-        // 2. Fetch all experiment activities
+    async function fetchActivities(usersMap, version) {
+      try {
+        // Fetch activity records and resolve every display name by stable uid.
         const activities = [];
         try {
           const expSnap = await getDocs(collectionGroup(db, 'experiment_activity'));
@@ -156,7 +152,7 @@ export default function ActivityLogs() {
             activities.push({
               id: `${doc.id}-attempt`,
               uid,
-              userName: data.studentName || user?.name || user?.displayName || user?.email || 'Unknown Student',
+              userName: user?.name || user?.displayName || data.studentName || user?.email || 'Unknown Student',
               userRole: user?.role === 'teacher' ? 'teacher' : (user?.role || 'student'),
               type: 'quiz_submitted',
               title: `${data.quizTitle || 'Quiz'}${scoreText}`,
@@ -170,14 +166,38 @@ export default function ActivityLogs() {
         // Sort descending by timestamp
         activities.sort((a, b) => b.timestamp - a.timestamp);
         
-        setLogs(activities);
+        if (!disposed && version === requestVersion) {
+          setLogs(activities);
+        }
       } catch (e) {
         console.error("Error fetching activities:", e);
       } finally {
-        setLoading(false);
+        if (!disposed && version === requestVersion) {
+          setLoading(false);
+        }
       }
     }
-    fetchActivities();
+
+    const unsubscribe = onSnapshot(
+      collection(db, 'users'),
+      (usersSnap) => {
+        const usersMap = {};
+        usersSnap.forEach(doc => {
+          usersMap[doc.id] = doc.data();
+        });
+        const version = ++requestVersion;
+        fetchActivities(usersMap, version);
+      },
+      (error) => {
+        console.error('Could not watch user names:', error);
+        setLoading(false);
+      },
+    );
+
+    return () => {
+      disposed = true;
+      unsubscribe();
+    };
   }, []);
 
   const getActionInfo = (type) => {

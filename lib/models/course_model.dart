@@ -6,6 +6,7 @@ class CourseModule {
   final String title;
   final String description;
   final String fileType; // 'pdf', 'video', 'doc', 'ppt'
+  final String uploadedByUid;
   final String uploadedByName;
   final DateTime? uploadedAt;
   final int fileSizeBytes;
@@ -17,6 +18,7 @@ class CourseModule {
     required this.title,
     required this.description,
     required this.fileType,
+    this.uploadedByUid = '',
     required this.uploadedByName,
     required this.uploadedAt,
     required this.fileSizeBytes,
@@ -25,22 +27,37 @@ class CourseModule {
   });
 
   String get friendlySize {
-    if (fileSizeBytes <= 0) { return ''; }
+    if (fileSizeBytes <= 0) {
+      return '';
+    }
     const kb = 1024;
     const mb = kb * 1024;
-    if (fileSizeBytes >= mb) return '${(fileSizeBytes / mb).toStringAsFixed(1)} MB';
+    if (fileSizeBytes >= mb)
+      return '${(fileSizeBytes / mb).toStringAsFixed(1)} MB';
     return '${(fileSizeBytes / kb).ceil()} KB';
   }
 
   static const _months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
 
   /// Formatted like the old mock data ("Jul 10, 2025"), so widgets that
   /// displayed uploadedDate as a string need no further changes.
   String get uploadedDateLabel {
-    if (uploadedAt == null) { return ''; }
+    if (uploadedAt == null) {
+      return '';
+    }
     final d = uploadedAt!;
     return '${_months[d.month - 1]} ${d.day}, ${d.year}';
   }
@@ -52,6 +69,7 @@ class CourseModule {
       title: data['title']?.toString() ?? '',
       description: data['description']?.toString() ?? '',
       fileType: data['fileType']?.toString() ?? '',
+      uploadedByUid: data['uploadedByUid']?.toString() ?? '',
       uploadedByName: data['uploadedByName']?.toString() ?? 'Teacher',
       uploadedAt: ts is Timestamp ? ts.toDate() : null,
       fileSizeBytes: (data['fileSizeBytes'] as num?)?.toInt() ?? 0,
@@ -61,18 +79,34 @@ class CourseModule {
   }
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'title': title,
-        'description': description,
-        'fileType': fileType,
-        'uploadedByName': uploadedByName,
-        // Arrays can't hold FieldValue.serverTimestamp(), so this is
-        // set client-side when the module is created.
-        'uploadedAt': uploadedAt != null ? Timestamp.fromDate(uploadedAt!) : null,
-        'fileSizeBytes': fileSizeBytes,
-        'url': url,
-        'storagePath': storagePath,
-      };
+    'id': id,
+    'title': title,
+    'description': description,
+    'fileType': fileType,
+    if (uploadedByUid.isNotEmpty) 'uploadedByUid': uploadedByUid,
+    'uploadedByName': uploadedByName,
+    // Arrays can't hold FieldValue.serverTimestamp(), so this is
+    // set client-side when the module is created.
+    'uploadedAt': uploadedAt != null ? Timestamp.fromDate(uploadedAt!) : null,
+    'fileSizeBytes': fileSizeBytes,
+    'url': url,
+    'storagePath': storagePath,
+  };
+
+  CourseModule copyWith({String? uploadedByUid, String? uploadedByName}) {
+    return CourseModule(
+      id: id,
+      title: title,
+      description: description,
+      fileType: fileType,
+      uploadedByUid: uploadedByUid ?? this.uploadedByUid,
+      uploadedByName: uploadedByName ?? this.uploadedByName,
+      uploadedAt: uploadedAt,
+      fileSizeBytes: fileSizeBytes,
+      url: url,
+      storagePath: storagePath,
+    );
+  }
 }
 
 class CourseQuestion {
@@ -91,21 +125,22 @@ class CourseQuestion {
   });
 
   factory CourseQuestion.fromMap(Map<String, dynamic> data) => CourseQuestion(
-        id: data['id']?.toString() ?? '',
-        question: data['question']?.toString() ?? '',
-        options: (data['options'] as List?)?.map((e) => e.toString()).toList() ??
-            const [],
-        correctIndex: (data['correctIndex'] as num?)?.toInt() ?? 0,
-        explanation: data['explanation']?.toString() ?? '',
-      );
+    id: data['id']?.toString() ?? '',
+    question: data['question']?.toString() ?? '',
+    options:
+        (data['options'] as List?)?.map((e) => e.toString()).toList() ??
+        const [],
+    correctIndex: (data['correctIndex'] as num?)?.toInt() ?? 0,
+    explanation: data['explanation']?.toString() ?? '',
+  );
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'question': question,
-        'options': options,
-        'correctIndex': correctIndex,
-        'explanation': explanation,
-      };
+    'id': id,
+    'question': question,
+    'options': options,
+    'correctIndex': correctIndex,
+    'explanation': explanation,
+  };
 }
 
 class CourseQuiz {
@@ -147,23 +182,23 @@ class CourseQuiz {
       questions: ((data['questions'] as List<dynamic>?) ?? const [])
           .whereType<Map<dynamic, dynamic>>()
           .map(
-            (q) => CourseQuestion.fromMap(
-              Map<String, dynamic>.from(q as Map),
-            ),
+            (q) => CourseQuestion.fromMap(Map<String, dynamic>.from(q as Map)),
           )
           .toList(),
       createdAt: ts is Timestamp ? ts.toDate() : null,
-      dueDate: data['dueDate'] is Timestamp ? (data['dueDate'] as Timestamp).toDate() : null,
+      dueDate: data['dueDate'] is Timestamp
+          ? (data['dueDate'] as Timestamp).toDate()
+          : null,
     );
   }
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'title': title,
-        'questions': questions.map((q) => q.toMap()).toList(),
-        'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
-        'dueDate': dueDate != null ? Timestamp.fromDate(dueDate!) : null,
-      };
+    'id': id,
+    'title': title,
+    'questions': questions.map((q) => q.toMap()).toList(),
+    'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
+    'dueDate': dueDate != null ? Timestamp.fromDate(dueDate!) : null,
+  };
 }
 
 /// Mirrors one document in the Firestore `courses` collection. Modules
@@ -229,37 +264,48 @@ class Course {
           : const [],
       modules: ((data['modules'] as List<dynamic>?) ?? const [])
           .whereType<Map<dynamic, dynamic>>()
-          .map(
-            (m) => CourseModule.fromMap(
-              Map<String, dynamic>.from(m as Map),
-            ),
-          )
+          .map((m) => CourseModule.fromMap(Map<String, dynamic>.from(m as Map)))
           .toList(),
       quizzes: ((data['quizzes'] as List<dynamic>?) ?? const [])
           .whereType<Map<dynamic, dynamic>>()
-          .map(
-            (q) => CourseQuiz.fromMap(
-              Map<String, dynamic>.from(q as Map),
-            ),
-          )
+          .map((q) => CourseQuiz.fromMap(Map<String, dynamic>.from(q as Map)))
           .toList(),
       createdAt: ts is Timestamp ? ts.toDate() : null,
     );
   }
 
   Map<String, dynamic> toMap() => {
-        'title': title,
-        'subject': subject,
-        'grade': grade,
-        'teacherUid': teacherUid,
-        'teacherName': teacherName,
-        'accentColorValue': accentColorValue,
-        'iconName': iconName,
-        'sections': sections,
-        'modules': modules.map((m) => m.toMap()).toList(),
-        'quizzes': quizzes.map((q) => q.toMap()).toList(),
-        'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
-      };
+    'title': title,
+    'subject': subject,
+    'grade': grade,
+    'teacherUid': teacherUid,
+    'teacherName': teacherName,
+    'accentColorValue': accentColorValue,
+    'iconName': iconName,
+    'sections': sections,
+    'modules': modules.map((m) => m.toMap()).toList(),
+    'quizzes': quizzes.map((q) => q.toMap()).toList(),
+    'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
+  };
+
+  Course copyWith({String? teacherName, List<CourseModule>? modules}) {
+    final updated = Course(
+      id: id,
+      title: title,
+      subject: subject,
+      grade: grade,
+      teacherUid: teacherUid,
+      teacherName: teacherName ?? this.teacherName,
+      accentColorValue: accentColorValue,
+      iconName: iconName,
+      sections: sections,
+      modules: modules ?? this.modules,
+      quizzes: quizzes,
+      createdAt: createdAt,
+    );
+    updated.progress = progress;
+    return updated;
+  }
 }
 
 /// A student's submitted answers for one quiz within one course.
@@ -306,15 +352,14 @@ class QuizAttempt {
   }
 
   Map<String, dynamic> toMap() => {
-        'courseId': courseId,
-        'quizId': quizId,
-        'quizTitle': quizTitle,
-        'studentId': studentId,
-        if (studentName != null) 'studentName': studentName,
-        'selectedAnswers': selectedAnswers,
-        'score': score,
-        'totalQuestions': totalQuestions,
-        'submittedAt': FieldValue.serverTimestamp(),
-      };
+    'courseId': courseId,
+    'quizId': quizId,
+    'quizTitle': quizTitle,
+    'studentId': studentId,
+    if (studentName != null) 'studentName': studentName,
+    'selectedAnswers': selectedAnswers,
+    'score': score,
+    'totalQuestions': totalQuestions,
+    'submittedAt': FieldValue.serverTimestamp(),
+  };
 }
-
