@@ -36,8 +36,11 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
   @override
   Widget build(BuildContext context) {
     final course = widget.course;
+    final progress = course.progress.clamp(0.0, 1.0).toDouble();
     final effectiveAccentColor = course.accentColor == const Color(0xFF00D4FF)
-        ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0))
+        ? (Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF00D4FF)
+              : const Color(0xFF1565C0))
         : course.accentColor;
 
     return Column(
@@ -56,17 +59,23 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
                       width: 38,
                       height: 38,
                       decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF142240)
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(12.0),
                         border: Border.all(
-                          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF1E3A5F)
+                              : Colors.grey.shade300,
                           width: 1,
                         ),
                       ),
                       child: Center(
                         child: CustomIconWidget(
                           iconName: 'arrow_back',
-                          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF8BA3C0)
+                              : Colors.grey.shade600,
                           size: 18,
                         ),
                       ),
@@ -79,7 +88,9 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black87,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -101,7 +112,9 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
                   _MetaBadge(
                     icon: 'school',
                     label: course.grade,
-                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF8BA3C0)
+                        : Colors.grey.shade600,
                   ),
                 ],
               ),
@@ -113,8 +126,11 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(4.0),
                       child: LinearProgressIndicator(
-                        value: 0.0,
-                        backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade200,
+                        value: progress,
+                        backgroundColor:
+                            Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF1E3A5F)
+                            : Colors.grey.shade200,
                         valueColor: AlwaysStoppedAnimation<Color>(
                           effectiveAccentColor,
                         ),
@@ -124,7 +140,7 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    '${(0.0 * 100).toInt()}% complete',
+                    '${(progress * 100).round()}% complete',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -141,7 +157,9 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0F1E35) : Colors.grey.shade100,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF0F1E35)
+                : Colors.grey.shade100,
             borderRadius: BorderRadius.circular(14.0),
           ),
           child: TabBar(
@@ -157,11 +175,11 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
             indicatorSize: TabBarIndicatorSize.tab,
             dividerColor: Colors.transparent,
             labelColor: effectiveAccentColor,
-            unselectedLabelColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
-            labelStyle: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
+            unselectedLabelColor:
+                Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF8BA3C0)
+                : Colors.grey.shade600,
+            labelStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
             unselectedLabelStyle: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
@@ -173,7 +191,9 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
                   children: [
                     CustomIconWidget(
                       iconName: 'quiz',
-                      color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.grey.shade800,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Colors.grey.shade800,
                       size: 16,
                     ),
                     SizedBox(width: 6),
@@ -187,7 +207,9 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
                   children: [
                     CustomIconWidget(
                       iconName: 'folder_open',
-                      color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.grey.shade800,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Colors.grey.shade800,
                       size: 16,
                     ),
                     const SizedBox(width: 6),

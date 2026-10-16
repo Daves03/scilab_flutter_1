@@ -33,6 +33,7 @@ class AuthService extends ChangeNotifier {
 
   StreamSubscription<fb.User?>? _authSub;
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _userDocSub;
+  String? _lastDisplayNameSyncKey;
 
   AuthService._internal() {
     _authSub = _auth.authStateChanges().listen(_onAuthChanged);
@@ -49,6 +50,7 @@ class AuthService extends ChangeNotifier {
     _userDocSub?.cancel();
     if (fbUser == null) {
       currentUser = null;
+      _lastDisplayNameSyncKey = null;
       notifyListeners();
       return;
     }
@@ -57,9 +59,26 @@ class AuthService extends ChangeNotifier {
     ) {
       if (doc.exists) {
         currentUser = AppUser.fromMap(doc.id, doc.data()!);
+        _scheduleDisplayNameSync(currentUser!);
       }
       notifyListeners();
     });
+  }
+
+  void _scheduleDisplayNameSync(AppUser account) {
+    final name = account.name.trim();
+    if (name.isEmpty) return;
+    final syncKey = '${account.id}|${account.role?.id ?? ''}|$name';
+    if (_lastDisplayNameSyncKey == syncKey) return;
+    _lastDisplayNameSyncKey = syncKey;
+    unawaited(
+      _syncDisplayNameReferences(account, name).catchError((Object error) {
+        if (_lastDisplayNameSyncKey == syncKey) {
+          _lastDisplayNameSyncKey = null;
+        }
+        debugPrint('Could not reconcile saved display names: $error');
+      }),
+    );
   }
 
   bool get isLoggedIn => currentUser != null;
@@ -355,24 +374,142 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<void> updateName(String newName) async {
-    if (currentUser == null) return;
+    final account = currentUser;
+    if (account == null) return;
+    final normalizedName = newName.trim();
+    if (normalizedName.isEmpty) {
+      throw AuthFailure('Name cannot be empty.');
+    }
     loading = true;
     notifyListeners();
     try {
-      await _db.collection('users').doc(currentUser!.id).update({
-        'name': newName,
+      final syncKey = '${account.id}|${account.role?.id ?? ''}|$normalizedName';
+      _lastDisplayNameSyncKey = syncKey;
+      await _db.collection('users').doc(account.id).update({
+        'name': normalizedName,
       });
       final user = _auth.currentUser;
       if (user != null) {
-        await user.updateDisplayName(newName);
+        await user.updateDisplayName(normalizedName);
       }
-      currentUser!.name = newName;
+      if (currentUser?.id == account.id) {
+        currentUser!.name = normalizedName;
+      }
+
+      try {
+        await _syncDisplayNameReferences(account, normalizedName);
+      } catch (error) {
+        if (_lastDisplayNameSyncKey == syncKey) {
+          _lastDisplayNameSyncKey = null;
+        }
+        // The user profile is the source of truth. Screens resolve names from
+        // that document, while these copied fields remain useful offline.
+        debugPrint(
+          'Profile name saved; reference sync will retry later: $error',
+        );
+      }
     } catch (e) {
+      _lastDisplayNameSyncKey = null;
       debugPrint('Error updating name: $e');
       throw AuthFailure('Failed to update name: $e');
     } finally {
       loading = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> _syncDisplayNameReferences(
+    AppUser account,
+    String newName,
+  ) async {
+    if (account.isTeacher) {
+      await _syncTeacherDisplayName(account.id, newName);
+    } else if (account.isStudent) {
+      await _syncStudentDisplayName(account.id, newName);
+    }
+  }
+
+  Future<void> _syncTeacherDisplayName(String uid, String newName) async {
+    final courseSnapshot = await _db
+        .collection('courses')
+        .where('teacherUid', isEqualTo: uid)
+        .get();
+    final courseUpdates =
+        <
+          MapEntry<
+            DocumentReference<Map<String, dynamic>>,
+            Map<String, dynamic>
+          >
+        >[];
+
+    for (final document in courseSnapshot.docs) {
+      final update = <String, dynamic>{'teacherName': newName};
+      final rawModules = document.data()['modules'];
+      if (rawModules is List) {
+        update['modules'] = rawModules
+            .map((rawModule) {
+              if (rawModule is! Map) return rawModule;
+              final module = Map<String, dynamic>.from(rawModule);
+              final uploaderUid = module['uploadedByUid']?.toString() ?? '';
+              if (uploaderUid.isEmpty || uploaderUid == uid) {
+                module['uploadedByUid'] = uid;
+                module['uploadedByName'] = newName;
+              }
+              return module;
+            })
+            .toList(growable: false);
+      }
+      courseUpdates.add(MapEntry(document.reference, update));
+    }
+    await _commitNameUpdates(courseUpdates);
+
+    final attachmentSnapshot = await _db
+        .collection('module_attachments')
+        .where('uploadedByUid', isEqualTo: uid)
+        .get();
+    await _commitNameUpdates(
+      attachmentSnapshot.docs
+          .map(
+            (document) => MapEntry(document.reference, <String, dynamic>{
+              'uploadedByName': newName,
+            }),
+          )
+          .toList(growable: false),
+    );
+  }
+
+  Future<void> _syncStudentDisplayName(String uid, String newName) async {
+    final attemptSnapshot = await _db
+        .collection('quiz_attempts')
+        .where('studentId', isEqualTo: uid)
+        .get();
+    await _commitNameUpdates(
+      attemptSnapshot.docs
+          .map(
+            (document) => MapEntry(document.reference, <String, dynamic>{
+              'studentName': newName,
+            }),
+          )
+          .toList(growable: false),
+    );
+  }
+
+  Future<void> _commitNameUpdates(
+    List<
+      MapEntry<DocumentReference<Map<String, dynamic>>, Map<String, dynamic>>
+    >
+    updates,
+  ) async {
+    const batchSize = 400;
+    for (var start = 0; start < updates.length; start += batchSize) {
+      final end = (start + batchSize < updates.length)
+          ? start + batchSize
+          : updates.length;
+      final batch = _db.batch();
+      for (final update in updates.sublist(start, end)) {
+        batch.update(update.key, update.value);
+      }
+      await batch.commit();
     }
   }
 

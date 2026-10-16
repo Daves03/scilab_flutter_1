@@ -49,7 +49,8 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
 
     final student = context.read<AuthService>().currentUser;
     final initialCourse = widget.initialCourse;
-    _selectedCourseId = initialCourse != null &&
+    _selectedCourseId =
+        initialCourse != null &&
             student != null &&
             CourseAssignment.courseMatchesStudent(initialCourse, student)
         ? initialCourse.id
@@ -153,15 +154,16 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
         : const Color(0xFF1565C0);
     final filteredCourses = courses.where((c) {
       final query = _mainSearchQuery.trim().toLowerCase();
-      return c.title.toLowerCase().contains(query) || 
-             c.teacher.toLowerCase().contains(query) ||
-             c.subject.toLowerCase().contains(query) ||
-             c.grade.toLowerCase().contains(query);
+      return c.title.toLowerCase().contains(query) ||
+          c.teacher.toLowerCase().contains(query) ||
+          c.subject.toLowerCase().contains(query) ||
+          c.grade.toLowerCase().contains(query);
     }).toList();
 
     return CustomScrollView(
       slivers: [
-        SliverToBoxAdapter(child: _buildHeader(courses)),
+        SliverToBoxAdapter(child: _buildHeader()),
+        SliverToBoxAdapter(child: _buildSubtitle(courses)),
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
@@ -252,7 +254,12 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
                       courses.isEmpty
                           ? 'No courses are assigned to your grade and section yet.'
                           : 'No courses found matching your search.',
-                      style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 14),
+                      style: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF8BA3C0)
+                            : Colors.grey.shade600,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                 ),
@@ -301,23 +308,32 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
     );
   }
 
-  Widget _buildHeader(List<Course> courses) {
+  Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 4),
       child: Row(
         children: [
           Container(
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0D2E3F) : const Color(0xFFE8F9FD),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF0D2E3F)
+                  : const Color(0xFFE8F9FD),
               borderRadius: BorderRadius.circular(12.0),
-              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x3300D4FF) : const Color(0xFF1565C0).withOpacity(0.3), width: 1),
+              border: Border.all(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0x3300D4FF)
+                    : const Color(0xFF1565C0).withValues(alpha: 0.3),
+                width: 1,
+              ),
             ),
             child: Center(
               child: CustomIconWidget(
                 iconName: 'menu_book',
-                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF00D4FF)
+                    : const Color(0xFF1565C0),
                 size: 20,
               ),
             ),
@@ -332,12 +348,19 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
-                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black87,
                   ),
                 ),
                 Text(
-                  '${courses.length} enrolled courses',
-                  style: TextStyle(fontSize: 12, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)),
+                  'Student Dashboard',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF00FF88)
+                        : const Color(0xFF00994C),
+                  ),
                 ),
               ],
             ),
@@ -345,16 +368,25 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200D4FF) : const Color(0xFF1565C0).withOpacity(0.1),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0x2200D4FF)
+                  : const Color(0xFF1565C0).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(50.0),
-              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x5500D4FF) : const Color(0xFF1565C0).withOpacity(0.2), width: 1),
+              border: Border.all(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0x5500D4FF)
+                    : const Color(0xFF1565C0).withValues(alpha: 0.2),
+                width: 1,
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 CustomIconWidget(
                   iconName: 'school',
-                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF00D4FF)
+                      : const Color(0xFF1565C0),
                   size: 13,
                 ),
                 const SizedBox(width: 4),
@@ -363,13 +395,31 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF00D4FF)
+                        : const Color(0xFF1565C0),
                   ),
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSubtitle(List<Course> courses) {
+    final courseLabel = courses.length == 1 ? 'course' : 'courses';
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
+      child: Text(
+        '${courses.length} enrolled $courseLabel',
+        style: TextStyle(
+          fontSize: 13,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF8BA3C0)
+              : Colors.grey.shade600,
+        ),
       ),
     );
   }
@@ -386,8 +436,11 @@ class _CourseListCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveAccentColor = course.accentColor == const Color(0xFF00D4FF)
-        ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0))
+        ? (Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF00D4FF)
+              : const Color(0xFF1565C0))
         : course.accentColor;
+    final progress = course.progress.clamp(0.0, 1.0).toDouble();
     final student = context.read<AuthService>().currentUser;
     final sections = student == null
         ? const <String>[]
@@ -395,16 +448,23 @@ class _CourseListCard extends StatelessWidget {
     final sectionSummary = sections.isEmpty
         ? 'No section assigned'
         : sections.length == 1
-            ? 'Section ${sections.first}'
-            : 'Sections ${sections.join(', ')}';
+        ? 'Section ${sections.first}'
+        : 'Sections ${sections.join(', ')}';
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF142240)
+              : Colors.white,
           borderRadius: BorderRadius.circular(20.0),
-          border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? effectiveAccentColor.withAlpha(40) : Colors.grey.shade300, width: 1),
+          border: Border.all(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? effectiveAccentColor.withAlpha(40)
+                : Colors.grey.shade300,
+            width: 1,
+          ),
         ),
         padding: const EdgeInsets.all(18),
         child: Column(
@@ -416,7 +476,9 @@ class _CourseListCard extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: effectiveAccentColor.withAlpha(Theme.of(context).brightness == Brightness.dark ? 25 : 40),
+                    color: effectiveAccentColor.withAlpha(
+                      Theme.of(context).brightness == Brightness.dark ? 25 : 40,
+                    ),
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                   child: Center(
@@ -437,7 +499,9 @@ class _CourseListCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black87,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -447,7 +511,9 @@ class _CourseListCard extends StatelessWidget {
                         '${course.teacherName} · ${course.grade} · $sectionSummary',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF8BA3C0)
+                              : Colors.grey.shade700,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -457,7 +523,9 @@ class _CourseListCard extends StatelessWidget {
                 ),
                 CustomIconWidget(
                   iconName: 'chevron_right',
-                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF8BA3C0)
+                      : Colors.grey.shade600,
                   size: 20,
                 ),
               ],
@@ -486,8 +554,11 @@ class _CourseListCard extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(4.0),
                     child: LinearProgressIndicator(
-                      value: course.progress,
-                      backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade200,
+                      value: progress,
+                      backgroundColor:
+                          Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF1E3A5F)
+                          : Colors.grey.shade200,
                       valueColor: AlwaysStoppedAnimation<Color>(
                         effectiveAccentColor,
                       ),
@@ -497,7 +568,7 @@ class _CourseListCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  '${(course.progress * 100).toInt()}%',
+                  '${(progress * 100).round()}%',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, query, where, onSnapshot, doc, setDoc, deleteDoc, getDocs, updateDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { BookOpen, FileText, HelpCircle, Trash2, AlertTriangle, Search, Clock } from 'lucide-react';
 
@@ -8,7 +8,7 @@ export default function TeacherUploads() {
   const [activeTeacherId, setActiveTeacherId] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [teacherEmails, setTeacherEmails] = useState({});
+  const [teacherProfiles, setTeacherProfiles] = useState({});
 
   const formatDateTime = (ts) => {
     if (!ts) return null;
@@ -40,11 +40,15 @@ export default function TeacherUploads() {
   useEffect(() => {
     const q = query(collection(db, 'users'), where('role', '==', 'teacher'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const emails = {};
+      const profiles = {};
       snapshot.forEach(doc => {
-        emails[doc.id] = doc.data().email;
+        const data = doc.data();
+        profiles[doc.id] = {
+          name: data.name || data.displayName || '',
+          email: data.email || '',
+        };
       });
-      setTeacherEmails(emails);
+      setTeacherProfiles(profiles);
     });
     return () => unsubscribe();
   }, []);
@@ -84,12 +88,12 @@ export default function TeacherUploads() {
        const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
        return timeA - timeB;
     });
-    const latestName = sorted[sorted.length - 1]?.teacherName || uid;
+    const latestName = teacherProfiles[uid]?.name || sorted[sorted.length - 1]?.teacherName || uid;
     
     return {
       id: uid,
       name: latestName,
-      email: teacherEmails[uid] || '',
+      email: teacherProfiles[uid]?.email || '',
       courses: teacherCourses
     };
   }).filter(t => (t.name || '').toLowerCase().includes(searchQuery.toLowerCase()));

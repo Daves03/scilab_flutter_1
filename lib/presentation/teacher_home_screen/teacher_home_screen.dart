@@ -149,13 +149,14 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     setState(() {
       _allAttempts = attempts;
       _students = _students.map((student) {
+        final currentProfile = _approvedStudentsById[student.id];
         final studentAttempts = _latestAttemptsForStudent(attempts, student.id);
         return _StudentSummary(
           id: student.id,
-          name: student.name,
+          name: currentProfile?.name ?? student.name,
           section: student.section,
-          studentNumber: student.studentNumber,
-          avatarUrl: student.avatarUrl,
+          studentNumber: currentProfile?.studentNumber ?? student.studentNumber,
+          avatarUrl: currentProfile?.avatarUrl ?? student.avatarUrl,
           avgQuizScore: _averageQuizScore(studentAttempts),
           avgArScore: student.avgArScore,
           quizzesTaken: studentAttempts.length,
@@ -815,8 +816,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                         SliverToBoxAdapter(child: _buildDateTimeCard()),
                       if (!_isSearching)
                         SliverToBoxAdapter(child: _buildClassOverview()),
-                      if (!_isSearching &&
-                          _currentTab == DashboardTab.classAvg)
+                      if (!_isSearching && _currentTab == DashboardTab.classAvg)
                         SliverToBoxAdapter(child: _buildClassAvgChart())
                       else ...[
                         SliverToBoxAdapter(
@@ -905,7 +905,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                                         showBadge:
                                             !_isSearching &&
                                             _currentTab ==
-                                            DashboardTab.needsHelp,
+                                                DashboardTab.needsHelp,
                                       ),
                                     ),
                                   );
@@ -917,35 +917,36 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                   ),
             if (!_isSearching)
               Positioned(
-              bottom: 124,
-              right: 20,
-              child: FloatingActionButton(
-                heroTag: null,
-                onPressed: () async {
-                  final result = await showDialog(
-                    context: context,
-                    builder: (_) => const StudentApprovalDialog(),
-                  );
-                  if (result == true) {
-                    _loadData();
-                  }
-                },
-                backgroundColor: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0xFF00D4FF)
-                    : const Color(0xFF1565C0),
-                elevation: 8,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: CustomIconWidget(
-                  iconName: 'person_add_outlined',
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? const Color(0xFF0A1628)
-                      : Colors.white,
-                  size: 28,
+                bottom: 124,
+                right: 20,
+                child: FloatingActionButton(
+                  heroTag: null,
+                  onPressed: () async {
+                    final result = await showDialog(
+                      context: context,
+                      builder: (_) => const StudentApprovalDialog(),
+                    );
+                    if (result == true) {
+                      _loadData();
+                    }
+                  },
+                  backgroundColor:
+                      Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF00D4FF)
+                      : const Color(0xFF1565C0),
+                  elevation: 8,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: CustomIconWidget(
+                    iconName: 'person_add_outlined',
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF0A1628)
+                        : Colors.white,
+                    size: 28,
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -953,6 +954,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   }
 
   Widget _buildHeader() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final teacherAccent = isDark
+        ? const Color(0xFF34F5A1)
+        : const Color(0xFF15803D);
     final user = context.watch<AuthService>().currentUser;
     final savedTeacherName = user?.name.trim() ?? '';
     final teacherName = savedTeacherName.isEmpty ? 'Teacher' : savedTeacherName;
@@ -1087,47 +1092,63 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                           const SizedBox(height: 4),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 9,
+                              horizontal: 8,
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? const Color(0x2200FF88)
-                                  : const Color(0x1A00994C),
+                              gradient: LinearGradient(
+                                colors: isDark
+                                    ? const [
+                                        Color(0xFF063C2C),
+                                        Color(0xFF082F2B),
+                                      ]
+                                    : const [
+                                        Color(0xFFDCFCE7),
+                                        Color(0xFFF0FDF4),
+                                      ],
+                              ),
                               borderRadius: BorderRadius.circular(50),
                               border: Border.all(
-                                color:
-                                    Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? const Color(0x5500FF88)
-                                    : const Color(0x4D00994C),
+                                color: teacherAccent,
+                                width: 1.2,
                               ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: teacherAccent.withAlpha(
+                                    isDark ? 55 : 35,
+                                  ),
+                                  blurRadius: 9,
+                                  spreadRadius: 0.5,
+                                ),
+                              ],
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                CustomIconWidget(
-                                  iconName: 'verified',
-                                  color:
-                                      Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? const Color(0xFF00FF88)
-                                      : const Color(0xFF00994C),
-                                  size: 12,
+                                Container(
+                                  width: 18,
+                                  height: 18,
+                                  decoration: BoxDecoration(
+                                    color: teacherAccent.withAlpha(
+                                      isDark ? 45 : 24,
+                                    ),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: CustomIconWidget(
+                                    iconName: 'verified',
+                                    color: teacherAccent,
+                                    size: 11,
+                                  ),
                                 ),
-                                const SizedBox(width: 4),
+                                const SizedBox(width: 5),
                                 Text(
                                   'Teacher',
                                   style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                    color:
-                                        Theme.of(context).brightness ==
-                                            Brightness.dark
-                                        ? const Color(0xFF00FF88)
-                                        : const Color(0xFF00994C),
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.15,
+                                    color: teacherAccent,
                                   ),
                                 ),
                               ],
@@ -2005,11 +2026,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
       child: Row(
         children: [
-          CustomIconWidget(
-            iconName: 'search',
-            color: accentColor,
-            size: 18,
-          ),
+          CustomIconWidget(iconName: 'search', color: accentColor, size: 18),
           const SizedBox(width: 8),
           Expanded(
             child: Text(

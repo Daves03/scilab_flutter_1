@@ -87,8 +87,9 @@ class _CourseModulesManagerWidgetState
       context: context,
       builder: (ctx) {
         final isLight = Theme.of(ctx).brightness == Brightness.light;
-        final displayAccentColor = (isLight && widget.course.accentColor == const Color(0xFF00D4FF)) 
-            ? const Color(0xFF1565C0) 
+        final displayAccentColor =
+            (isLight && widget.course.accentColor == const Color(0xFF00D4FF))
+            ? const Color(0xFF1565C0)
             : widget.course.accentColor;
 
         return StatefulBuilder(
@@ -106,343 +107,488 @@ class _CourseModulesManagerWidgetState
                   hint: 'e.g. Introduction to Organic Compounds',
                   errorText: titleError,
                 ),
-              const SizedBox(height: 14),
-              _GlassTextField(
-                controller: descCtrl,
-                label: 'Description',
-                hint: 'Brief description of this module',
-                maxLines: 3,
-                errorText: descError,
-              ),
-              const SizedBox(height: 14),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () async {
-                  final typeGroup = XTypeGroup(
-                    label: 'Files',
-                    extensions: ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'mp4', 'mov', 'jpg', 'png', 'jpeg'],
-                  );
-                  final XFile? result = await openFile(acceptedTypeGroups: [typeGroup]);
-
-                  if (result != null) {
-                    setDialogState(() {
-                      selectedFile = result;
-                      // Auto-select type based on extension or mime type
-                      final lowerName = selectedFile!.name.toLowerCase();
-                      final mime = selectedFile!.mimeType?.toLowerCase() ?? lookupMimeType(selectedFile!.name)?.toLowerCase() ?? '';
-                      
-                      if (lowerName.endsWith('pdf') || mime.contains('pdf')) {
-                        selectedType = 'pdf';
-                      } else if (lowerName.endsWith('doc') || lowerName.endsWith('docx') || mime.contains('word') || mime.contains('document')) {
-                        selectedType = 'doc';
-                      } else if (lowerName.endsWith('ppt') || lowerName.endsWith('pptx') || mime.contains('presentation')) {
-                        selectedType = 'ppt';
-                      } else if (lowerName.endsWith('mp4') || lowerName.endsWith('mov') || mime.startsWith('video/')) {
-                        selectedType = 'video';
-                      } else if (lowerName.endsWith('jpg') || lowerName.endsWith('png') || lowerName.endsWith('jpeg') || mime.startsWith('image/')) {
-                        selectedType = 'image';
-                      } else {
-                        selectedType = 'other';
-                      }
-                    });
-                  }
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: isLight ? Colors.white : const Color(0xFF142240),
-                    borderRadius: BorderRadius.circular(12.0),
-                    border: Border.all(
-                      color: displayAccentColor.withAlpha(isLight ? 70 : 50),
-                      width: 1,
-                      style: BorderStyle.solid,
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      CustomIconWidget(
-                        iconName: selectedFile != null ? 'description' : 'cloud_upload',
-                        color: displayAccentColor,
-                        size: 28,
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        selectedFile != null ? selectedFile!.name : 'Tap to attach file',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: displayAccentColor,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      if (selectedFile == null) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          'PDF, DOC, PPT supported',
-                          style: TextStyle(fontSize: 11, color: isLight ? Colors.grey.shade500 : const Color(0xFF8BA3C0)),
-                        ),
-                      ],
-                    ],
-                  ),
+                const SizedBox(height: 14),
+                _GlassTextField(
+                  controller: descCtrl,
+                  label: 'Description',
+                  hint: 'Brief description of this module',
+                  maxLines: 3,
+                  errorText: descError,
                 ),
-              ),
-              const SizedBox(height: 16),
-              // File Type Dropdown
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'File Type',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: isLight ? Colors.grey.shade600 : const Color(0xFF8BA3C0)),
-                  ),
-                  const SizedBox(height: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                const SizedBox(height: 14),
+                const SizedBox(height: 12),
+                GestureDetector(
+                  onTap: () async {
+                    final typeGroup = XTypeGroup(
+                      label: 'Files',
+                      extensions: [
+                        'pdf',
+                        'doc',
+                        'docx',
+                        'ppt',
+                        'pptx',
+                        'mp4',
+                        'mov',
+                        'jpg',
+                        'png',
+                        'jpeg',
+                      ],
+                    );
+                    final XFile? result = await openFile(
+                      acceptedTypeGroups: [typeGroup],
+                    );
+
+                    if (result != null) {
+                      setDialogState(() {
+                        selectedFile = result;
+                        // Auto-select type based on extension or mime type
+                        final lowerName = selectedFile!.name.toLowerCase();
+                        final mime =
+                            selectedFile!.mimeType?.toLowerCase() ??
+                            lookupMimeType(selectedFile!.name)?.toLowerCase() ??
+                            '';
+
+                        if (lowerName.endsWith('pdf') || mime.contains('pdf')) {
+                          selectedType = 'pdf';
+                        } else if (lowerName.endsWith('doc') ||
+                            lowerName.endsWith('docx') ||
+                            mime.contains('word') ||
+                            mime.contains('document')) {
+                          selectedType = 'doc';
+                        } else if (lowerName.endsWith('ppt') ||
+                            lowerName.endsWith('pptx') ||
+                            mime.contains('presentation')) {
+                          selectedType = 'ppt';
+                        } else if (lowerName.endsWith('mp4') ||
+                            lowerName.endsWith('mov') ||
+                            mime.startsWith('video/')) {
+                          selectedType = 'video';
+                        } else if (lowerName.endsWith('jpg') ||
+                            lowerName.endsWith('png') ||
+                            lowerName.endsWith('jpeg') ||
+                            mime.startsWith('image/')) {
+                          selectedType = 'image';
+                        } else {
+                          selectedType = 'other';
+                        }
+                      });
+                    }
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: isLight ? Colors.white : const Color(0xFF142240),
-                      borderRadius: BorderRadius.circular(10.0),
-                      border: Border.all(color: isLight ? Colors.grey.shade300 : const Color(0xFF1E3A5F), width: 1),
+                      borderRadius: BorderRadius.circular(12.0),
+                      border: Border.all(
+                        color: displayAccentColor.withAlpha(isLight ? 70 : 50),
+                        width: 1,
+                        style: BorderStyle.solid,
+                      ),
                     ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: selectedType,
-                        dropdownColor: isLight ? Colors.white : const Color(0xFF142240),
-                        isExpanded: true,
-                        icon: Icon(Icons.arrow_drop_down, color: isLight ? Colors.grey.shade600 : const Color(0xFF8BA3C0)),
-                        style: TextStyle(color: isLight ? Colors.black87 : Colors.white, fontSize: 13),
-                        items: const [
-                          DropdownMenuItem(value: 'pdf', child: Text('PDF Document')),
-                          DropdownMenuItem(value: 'doc', child: Text('Word Document (DOC/DOCX)')),
-                          DropdownMenuItem(value: 'ppt', child: Text('Presentation (PPT/PPTX)')),
-                          DropdownMenuItem(value: 'video', child: Text('Video (MP4/MOV)')),
-                          DropdownMenuItem(value: 'image', child: Text('Image (JPG/PNG)')),
-                          DropdownMenuItem(value: 'other', child: Text('Other')),
+                    child: Column(
+                      children: [
+                        CustomIconWidget(
+                          iconName: selectedFile != null
+                              ? 'description'
+                              : 'cloud_upload',
+                          color: displayAccentColor,
+                          size: 28,
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          selectedFile != null
+                              ? selectedFile!.name
+                              : 'Tap to attach file',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: displayAccentColor,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        if (selectedFile == null) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            'PDF, DOC, PPT supported',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: isLight
+                                  ? Colors.grey.shade500
+                                  : const Color(0xFF8BA3C0),
+                            ),
+                          ),
                         ],
-                        onChanged: (val) {
-                          if (val != null) {
-                            setDialogState(() => selectedType = val);
-                          }
-                        },
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // File Type Dropdown
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'File Type',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: isLight
+                            ? Colors.grey.shade600
+                            : const Color(0xFF8BA3C0),
                       ),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      decoration: BoxDecoration(
+                        color: isLight ? Colors.white : const Color(0xFF142240),
+                        borderRadius: BorderRadius.circular(10.0),
+                        border: Border.all(
+                          color: isLight
+                              ? Colors.grey.shade300
+                              : const Color(0xFF1E3A5F),
+                          width: 1,
+                        ),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: selectedType,
+                          dropdownColor: isLight
+                              ? Colors.white
+                              : const Color(0xFF142240),
+                          isExpanded: true,
+                          icon: Icon(
+                            Icons.arrow_drop_down,
+                            color: isLight
+                                ? Colors.grey.shade600
+                                : const Color(0xFF8BA3C0),
+                          ),
+                          style: TextStyle(
+                            color: isLight ? Colors.black87 : Colors.white,
+                            fontSize: 13,
+                          ),
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'pdf',
+                              child: Text('PDF Document'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'doc',
+                              child: Text('Word Document (DOC/DOCX)'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'ppt',
+                              child: Text('Presentation (PPT/PPTX)'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'video',
+                              child: Text('Video (MP4/MOV)'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'image',
+                              child: Text('Image (JPG/PNG)'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'other',
+                              child: Text('Other'),
+                            ),
+                          ],
+                          onChanged: (val) {
+                            if (val != null) {
+                              setDialogState(() => selectedType = val);
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                if (selectedType == 'pdf' && existing == null) ...[
+                  const SizedBox(height: 14),
+                  GestureDetector(
+                    onTap: () {
+                      setDialogState(
+                        () => autoGenerateQuiz = !autoGenerateQuiz,
+                      );
+                    },
+                    child: Row(
+                      children: [
+                        Icon(
+                          autoGenerateQuiz
+                              ? Icons.check_box
+                              : Icons.check_box_outline_blank,
+                          color: autoGenerateQuiz
+                              ? displayAccentColor
+                              : Colors.grey,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Auto-generate AI Quiz',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: isLight
+                                      ? Colors.black87
+                                      : Colors.white,
+                                ),
+                              ),
+                              Text(
+                                'Uses AI to read the PDF and create quizzes.',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: isLight
+                                      ? Colors.grey.shade600
+                                      : Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (autoGenerateQuiz) ...[
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Quizzes: $numQuizzes',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isLight
+                                      ? Colors.black87
+                                      : Colors.white,
+                                ),
+                              ),
+                              Slider(
+                                value: numQuizzes.toDouble(),
+                                min: 1,
+                                max: 5,
+                                divisions: 4,
+                                activeColor: displayAccentColor,
+                                onChanged: (val) => setDialogState(
+                                  () => numQuizzes = val.toInt(),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Questions/Quiz: $numQuestions',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isLight
+                                      ? Colors.black87
+                                      : Colors.white,
+                                ),
+                              ),
+                              Slider(
+                                value: numQuestions.toDouble(),
+                                min: 1,
+                                max: 20,
+                                divisions: 19,
+                                activeColor: displayAccentColor,
+                                onChanged: (val) => setDialogState(
+                                  () => numQuestions = val.toInt(),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
+                if (isUploading || isGenerating) ...[
+                  const SizedBox(height: 16),
+                  Center(
+                    child: Column(
+                      children: [
+                        const CircularProgressIndicator(
+                          color: Color(0xFF00D4FF),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          isUploading
+                              ? 'Uploading file...'
+                              : 'AI is reading document...',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
-              ),
-              if (selectedType == 'pdf' && existing == null) ...[
-                const SizedBox(height: 14),
-                GestureDetector(
-                  onTap: () {
-                    setDialogState(() => autoGenerateQuiz = !autoGenerateQuiz);
-                  },
-                  child: Row(
-                    children: [
-                      Icon(
-                        autoGenerateQuiz ? Icons.check_box : Icons.check_box_outline_blank,
-                        color: autoGenerateQuiz ? displayAccentColor : Colors.grey,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Auto-generate AI Quiz',
-                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isLight ? Colors.black87 : Colors.white),
-                            ),
-                            Text(
-                              'Uses AI to read the PDF and create quizzes.',
-                              style: TextStyle(fontSize: 11, color: isLight ? Colors.grey.shade600 : Colors.grey),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (autoGenerateQuiz) ...[
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Quizzes: $numQuizzes', style: TextStyle(fontSize: 12, color: isLight ? Colors.black87 : Colors.white)),
-                            Slider(
-                              value: numQuizzes.toDouble(),
-                              min: 1,
-                              max: 5,
-                              divisions: 4,
-                              activeColor: displayAccentColor,
-                              onChanged: (val) => setDialogState(() => numQuizzes = val.toInt()),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Questions/Quiz: $numQuestions', style: TextStyle(fontSize: 12, color: isLight ? Colors.black87 : Colors.white)),
-                            Slider(
-                              value: numQuestions.toDouble(),
-                              min: 1,
-                              max: 20,
-                              divisions: 19,
-                              activeColor: displayAccentColor,
-                              onChanged: (val) => setDialogState(() => numQuestions = val.toInt()),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
               ],
-              if (isUploading || isGenerating) ...[
-                const SizedBox(height: 16),
-                Center(
-                  child: Column(
-                    children: [
-                      const CircularProgressIndicator(color: Color(0xFF00D4FF)),
-                      const SizedBox(height: 8),
-                      Text(isUploading ? 'Uploading file...' : 'AI is reading document...', style: const TextStyle(color: Colors.white, fontSize: 12)),
-                    ],
-                  ),
-                ),
-              ],
-            ],
-          ),
-          onSave: () async {
-            setDialogState(() {
-              titleError = titleCtrl.text.trim().isEmpty ? 'Module Title is required' : null;
-              descError = descCtrl.text.trim().isEmpty ? 'Description is required' : null;
-            });
-            if (titleError != null || descError != null) return;
+            ),
+            onSave: () async {
+              setDialogState(() {
+                titleError = titleCtrl.text.trim().isEmpty
+                    ? 'Module Title is required'
+                    : null;
+                descError = descCtrl.text.trim().isEmpty
+                    ? 'Description is required'
+                    : null;
+              });
+              if (titleError != null || descError != null) return;
 
-            if (existing == null && selectedFile == null) {
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please tap to attach a file first.')),
-                );
-              }
-              return;
-            }
-            if (isGenerating || isUploading) return;
-
-            final now = DateTime.now();
-            final dateStr = '${_monthName(now.month)} ${now.day}, ${now.year}';
-            
-            Uint8List? fileBytes;
-            String downloadUrl = existing?.url ?? '';
-            String storagePath = existing?.storagePath ?? '';
-            int fileSizeBytes = existing?.fileSizeBytes ?? 0;
-
-            if (selectedFile != null) {
-              setDialogState(() => isUploading = true);
-              
-              fileBytes = await selectedFile!.readAsBytes();
-              fileSizeBytes = fileBytes.length;
-              
-              // Upload to Firebase Storage
-              final safeName = selectedFile!.name.replaceAll(RegExp(r'\s+'), '_');
-              storagePath = 'course_modules/${widget.course.id}/${now.millisecondsSinceEpoch}_$safeName';
-              try {
-                final ref = FirebaseStorage.instance.ref(storagePath);
-                final snapshot = await ref.putData(fileBytes);
-                downloadUrl = await snapshot.ref.getDownloadURL();
-              } catch (e) {
-                print("Error uploading file: $e");
+              if (existing == null && selectedFile == null) {
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Failed to upload file.')),
+                    const SnackBar(
+                      content: Text('Please tap to attach a file first.'),
+                    ),
                   );
                 }
-                setDialogState(() => isUploading = false);
                 return;
               }
-              setDialogState(() => isUploading = false);
-            }
-            
-            if (autoGenerateQuiz && fileBytes != null) {
-              setDialogState(() => isGenerating = true);
-              
-              final aiService = AiQuizGeneratorService();
-              String mimeType = 'application/pdf';
-              if (selectedType == 'doc') mimeType = 'text/plain'; // Gemini might process it better if forced as text, or 'application/octet-stream'
-              if (selectedType == 'ppt') mimeType = 'text/plain';
-              
-              final generatedQuizzes = await aiService.generateQuizzesFromPdf(
-                fileBytes, 
-                titleCtrl.text.trim(),
-                numQuizzes: numQuizzes,
-                numQuestions: numQuestions,
-                mimeType: mimeType,
-              );
-              
-              if (generatedQuizzes != null && generatedQuizzes.isNotEmpty) {
-                widget.course.quizzes.addAll(generatedQuizzes);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('${generatedQuizzes.length} AI Quiz(zes) generated successfully!')),
-                  );
+              if (isGenerating || isUploading) return;
+
+              final now = DateTime.now();
+              final dateStr =
+                  '${_monthName(now.month)} ${now.day}, ${now.year}';
+
+              Uint8List? fileBytes;
+              String downloadUrl = existing?.url ?? '';
+              String storagePath = existing?.storagePath ?? '';
+              int fileSizeBytes = existing?.fileSizeBytes ?? 0;
+
+              if (selectedFile != null) {
+                setDialogState(() => isUploading = true);
+
+                fileBytes = await selectedFile!.readAsBytes();
+                fileSizeBytes = fileBytes.length;
+
+                // Upload to Firebase Storage
+                final safeName = selectedFile!.name.replaceAll(
+                  RegExp(r'\s+'),
+                  '_',
+                );
+                storagePath =
+                    'course_modules/${widget.course.id}/${now.millisecondsSinceEpoch}_$safeName';
+                try {
+                  final ref = FirebaseStorage.instance.ref(storagePath);
+                  final snapshot = await ref.putData(fileBytes);
+                  downloadUrl = await snapshot.ref.getDownloadURL();
+                } catch (e) {
+                  print("Error uploading file: $e");
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Failed to upload file.')),
+                    );
+                  }
+                  setDialogState(() => isUploading = false);
+                  return;
                 }
-              } else {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        aiService.lastErrorMessage ??
-                            'AI quiz generation failed. Please try again.',
+                setDialogState(() => isUploading = false);
+              }
+
+              if (autoGenerateQuiz && fileBytes != null) {
+                setDialogState(() => isGenerating = true);
+
+                final aiService = AiQuizGeneratorService();
+                String mimeType = 'application/pdf';
+                if (selectedType == 'doc')
+                  mimeType =
+                      'text/plain'; // Gemini might process it better if forced as text, or 'application/octet-stream'
+                if (selectedType == 'ppt') mimeType = 'text/plain';
+
+                final generatedQuizzes = await aiService.generateQuizzesFromPdf(
+                  fileBytes,
+                  titleCtrl.text.trim(),
+                  numQuizzes: numQuizzes,
+                  numQuestions: numQuestions,
+                  mimeType: mimeType,
+                );
+
+                if (generatedQuizzes != null && generatedQuizzes.isNotEmpty) {
+                  widget.course.quizzes.addAll(generatedQuizzes);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          '${generatedQuizzes.length} AI Quiz(zes) generated successfully!',
+                        ),
                       ),
+                    );
+                  }
+                } else {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          aiService.lastErrorMessage ??
+                              'AI quiz generation failed. Please try again.',
+                        ),
+                      ),
+                    );
+                  }
+                }
+              }
+
+              setState(() {
+                if (existing == null) {
+                  final uploader = context.read<AuthService>().currentUser;
+                  widget.course.modules.add(
+                    CourseModule(
+                      id: 'tm_${now.millisecondsSinceEpoch}',
+                      title: titleCtrl.text.trim(),
+                      description: descCtrl.text.trim(),
+                      fileType: selectedType,
+                      uploadedByUid: uploader?.id ?? widget.course.teacherUid,
+                      uploadedByName: uploader?.name ?? 'Teacher',
+                      uploadedAt: now,
+                      fileSizeBytes: fileSizeBytes,
+                      url: downloadUrl,
+                      storagePath: storagePath,
                     ),
                   );
-                }
-              }
-            }
-
-            setState(() {
-              if (existing == null) {
-                widget.course.modules.add(
-                  CourseModule(
-                    id: 'tm_${now.millisecondsSinceEpoch}',
-                    title: titleCtrl.text.trim(),
-                    description: descCtrl.text.trim(),
-                    fileType: selectedType,
-                    uploadedByName: context.read<AuthService>().currentUser?.name ?? 'Teacher',
-                    uploadedAt: now,
-                    fileSizeBytes: fileSizeBytes,
-                    url: downloadUrl,
-                    storagePath: storagePath,
-                  ),
-                );
-              } else {
-                final idx = widget.course.modules.indexWhere((m) => m.id == existing.id);
-                if (idx != -1) {
-                  widget.course.modules[idx] = CourseModule(
-                    id: existing.id,
-                    title: titleCtrl.text.trim(),
-                    description: descCtrl.text.trim(),
-                    fileType: selectedType,
-                    uploadedByName: existing.uploadedByName,
-                    uploadedAt: existing.uploadedAt,
-                    fileSizeBytes: fileSizeBytes,
-                    url: downloadUrl,
-                    storagePath: storagePath,
+                } else {
+                  final idx = widget.course.modules.indexWhere(
+                    (m) => m.id == existing.id,
                   );
+                  if (idx != -1) {
+                    widget.course.modules[idx] = CourseModule(
+                      id: existing.id,
+                      title: titleCtrl.text.trim(),
+                      description: descCtrl.text.trim(),
+                      fileType: selectedType,
+                      uploadedByUid: existing.uploadedByUid.isNotEmpty
+                          ? existing.uploadedByUid
+                          : widget.course.teacherUid,
+                      uploadedByName: existing.uploadedByName,
+                      uploadedAt: existing.uploadedAt,
+                      fileSizeBytes: fileSizeBytes,
+                      url: downloadUrl,
+                      storagePath: storagePath,
+                    );
+                  }
                 }
+              });
+              widget.onUpdated();
+              context.read<CourseService>().updateCourse(widget.course);
+              if (mounted) {
+                Navigator.pop(ctx2);
               }
-            });
-            widget.onUpdated();
-            context.read<CourseService>().updateCourse(widget.course);
-            if (mounted) {
-              Navigator.pop(ctx2);
-            }
-          },
-          onCancel: () => Navigator.pop(ctx2),
-        ),
-      );
+            },
+            onCancel: () => Navigator.pop(ctx2),
+          ),
+        );
       },
     );
   }
@@ -488,7 +634,8 @@ class _CourseModulesManagerWidgetState
   Widget build(BuildContext context) {
     final modules = widget.course.modules;
     final isLight = Theme.of(context).brightness == Brightness.light;
-    final accentColor = (isLight && widget.course.accentColor == const Color(0xFF00D4FF))
+    final accentColor =
+        (isLight && widget.course.accentColor == const Color(0xFF00D4FF))
         ? const Color(0xFF1565C0)
         : widget.course.accentColor;
 
@@ -528,20 +675,34 @@ class _CourseModulesManagerWidgetState
                         final type = module.fileType;
                         final url = module.url;
                         final title = module.title;
-                        
+
                         if (url.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('This file is unavailable or not uploaded properly.')),
+                            const SnackBar(
+                              content: Text(
+                                'This file is unavailable or not uploaded properly.',
+                              ),
+                            ),
                           );
                           return;
                         }
-                        
+
                         if (type == 'pdf') {
-                          context.push('/pdf-viewer?url=${Uri.encodeComponent(url)}&title=${Uri.encodeComponent(title)}');
-                        } else if (type == 'video' || url.toLowerCase().endsWith('.mp4') || url.toLowerCase().endsWith('.mov')) {
-                          context.push('/video-viewer?url=${Uri.encodeComponent(url)}&title=${Uri.encodeComponent(title)}');
-                        } else if (url.toLowerCase().endsWith('.jpg') || url.toLowerCase().endsWith('.png') || url.toLowerCase().endsWith('.jpeg')) {
-                          context.push('/image-viewer?url=${Uri.encodeComponent(url)}&title=${Uri.encodeComponent(title)}');
+                          context.push(
+                            '/pdf-viewer?url=${Uri.encodeComponent(url)}&title=${Uri.encodeComponent(title)}',
+                          );
+                        } else if (type == 'video' ||
+                            url.toLowerCase().endsWith('.mp4') ||
+                            url.toLowerCase().endsWith('.mov')) {
+                          context.push(
+                            '/video-viewer?url=${Uri.encodeComponent(url)}&title=${Uri.encodeComponent(title)}',
+                          );
+                        } else if (url.toLowerCase().endsWith('.jpg') ||
+                            url.toLowerCase().endsWith('.png') ||
+                            url.toLowerCase().endsWith('.jpeg')) {
+                          context.push(
+                            '/image-viewer?url=${Uri.encodeComponent(url)}&title=${Uri.encodeComponent(title)}',
+                          );
                         } else {
                           final uri = Uri.parse(url);
                           if (await canLaunchUrl(uri)) {
@@ -549,7 +710,11 @@ class _CourseModulesManagerWidgetState
                           } else {
                             if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Could not open the file link.')),
+                                const SnackBar(
+                                  content: Text(
+                                    'Could not open the file link.',
+                                  ),
+                                ),
                               );
                             }
                           }
@@ -590,7 +755,9 @@ class _ModuleCard extends StatelessWidget {
     final isLight = Theme.of(context).brightness == Brightness.light;
     final cardBg = isLight ? Colors.white : const Color(0xFF142240);
     final titleColor = isLight ? const Color(0xFF1E253F) : Colors.white;
-    final subtitleColor = isLight ? const Color(0xFF6C7B90) : const Color(0xFF8BA3C0);
+    final subtitleColor = isLight
+        ? const Color(0xFF6C7B90)
+        : const Color(0xFF8BA3C0);
     final iconBg = isLight ? typeColor.withAlpha(30) : typeColor.withAlpha(20);
 
     return Container(
@@ -599,14 +766,17 @@ class _ModuleCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cardBg,
         borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: typeColor.withAlpha(isLight ? 60 : 40), width: 1),
+        border: Border.all(
+          color: typeColor.withAlpha(isLight ? 60 : 40),
+          width: 1,
+        ),
         boxShadow: isLight
             ? [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.03),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
-                )
+                ),
               ]
             : null,
       ),
@@ -646,10 +816,7 @@ class _ModuleCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   module.description,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: subtitleColor,
-                  ),
+                  style: TextStyle(fontSize: 12, color: subtitleColor),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -677,13 +844,17 @@ class _ModuleCard extends StatelessWidget {
             children: [
               _ActionIconBtn(
                 icon: 'visibility',
-                color: isLight ? const Color(0xFF00B4D8) : const Color(0xFF00D4FF),
+                color: isLight
+                    ? const Color(0xFF00B4D8)
+                    : const Color(0xFF00D4FF),
                 onTap: onPreview,
               ),
               const SizedBox(height: 6),
               _ActionIconBtn(
                 icon: 'edit',
-                color: isLight ? const Color(0xFFE5A500) : const Color(0xFFFFB800),
+                color: isLight
+                    ? const Color(0xFFE5A500)
+                    : const Color(0xFFFFB800),
                 onTap: onEdit,
               ),
               const SizedBox(height: 6),
@@ -790,8 +961,9 @@ class _GlassDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isLight = Theme.of(context).brightness == Brightness.light;
-    final displayAccentColor = (isLight && accentColor == const Color(0xFF00D4FF)) 
-        ? const Color(0xFF1565C0) 
+    final displayAccentColor =
+        (isLight && accentColor == const Color(0xFF00D4FF))
+        ? const Color(0xFF1565C0)
         : accentColor;
 
     return Dialog(
@@ -890,7 +1062,9 @@ class _GlassDialog extends StatelessWidget {
                       onPressed: onSave,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: displayAccentColor,
-                        foregroundColor: isLight ? Colors.white : const Color(0xFF0A1628),
+                        foregroundColor: isLight
+                            ? Colors.white
+                            : const Color(0xFF0A1628),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(50),
                         ),
@@ -946,11 +1120,17 @@ class _GlassTextField extends StatelessWidget {
         TextField(
           controller: controller,
           maxLines: maxLines,
-          style: TextStyle(fontSize: 13, color: isLight ? Colors.black87 : Colors.white),
+          style: TextStyle(
+            fontSize: 13,
+            color: isLight ? Colors.black87 : Colors.white,
+          ),
           decoration: InputDecoration(
             hintText: hint,
             errorText: errorText,
-            hintStyle: TextStyle(fontSize: 12, color: isLight ? Colors.grey.shade500 : const Color(0xFF4A6A8A)),
+            hintStyle: TextStyle(
+              fontSize: 12,
+              color: isLight ? Colors.grey.shade500 : const Color(0xFF4A6A8A),
+            ),
             errorStyle: const TextStyle(fontSize: 11, color: Color(0xFFFF6B6B)),
             filled: true,
             fillColor: isLight ? Colors.white : const Color(0xFF142240),
@@ -960,16 +1140,24 @@ class _GlassTextField extends StatelessWidget {
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: isLight ? Colors.grey.shade300 : const Color(0xFF1E3A5F), width: 1),
+              borderSide: BorderSide(
+                color: isLight ? Colors.grey.shade300 : const Color(0xFF1E3A5F),
+                width: 1,
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: isLight ? Colors.grey.shade300 : const Color(0xFF1E3A5F), width: 1),
+              borderSide: BorderSide(
+                color: isLight ? Colors.grey.shade300 : const Color(0xFF1E3A5F),
+                width: 1,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
               borderSide: BorderSide(
-                color: isLight ? const Color(0xFF1565C0) : const Color(0xFF00D4FF),
+                color: isLight
+                    ? const Color(0xFF1565C0)
+                    : const Color(0xFF00D4FF),
                 width: 1.5,
               ),
             ),
@@ -995,10 +1183,16 @@ class _ConfirmDeleteDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final isLight = Theme.of(context).brightness == Brightness.light;
     final bgColor = isLight ? Colors.white : const Color(0xFF0F1E35);
-    final borderColor = isLight ? const Color(0x22FF4757) : const Color(0x44FF4757);
+    final borderColor = isLight
+        ? const Color(0x22FF4757)
+        : const Color(0x44FF4757);
     final titleColor = isLight ? const Color(0xFF1E253F) : Colors.white;
-    final textColor = isLight ? const Color(0xFF6C7B90) : const Color(0xFF8BA3C0);
-    final btnBorderColor = isLight ? Colors.grey.shade300 : const Color(0xFF3A5A7A);
+    final textColor = isLight
+        ? const Color(0xFF6C7B90)
+        : const Color(0xFF8BA3C0);
+    final btnBorderColor = isLight
+        ? Colors.grey.shade300
+        : const Color(0xFF3A5A7A);
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -1015,7 +1209,7 @@ class _ConfirmDeleteDialog extends StatelessWidget {
                     color: Colors.black.withOpacity(0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
-                  )
+                  ),
                 ]
               : null,
         ),
@@ -1049,10 +1243,7 @@ class _ConfirmDeleteDialog extends StatelessWidget {
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(
-                        color: btnBorderColor,
-                        width: 1,
-                      ),
+                      side: BorderSide(color: btnBorderColor, width: 1),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50),
                       ),
