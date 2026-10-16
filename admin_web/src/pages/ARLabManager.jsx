@@ -142,8 +142,8 @@ const DUMMY_EXPERIMENTS = [
           'Laboratory balance scale with chemical flasks demonstrating conservation of mass',
       'steps': [
         {'bottleTag': 'Flask', 'instructionTitle': 'STEP 1: SETUP & WEIGHING', 'instructionDetail': 'Place the flask (green arrow) on the electronic scale (red arrow).'},
-        {'bottleTag': 'Vinegar-Bottle', 'instructionTitle': 'STEP 2: ADDING THE VINEGAR', 'instructionDetail': 'Pour 10g of vinegar (green arrow) into the flask (red arrow).'},
-        {'bottleTag': 'Baking-Soda', 'instructionTitle': 'STEP 3: PREPARING THE BALLOON', 'instructionDetail': 'Place a small amount of baking soda (green arrow) inside the balloon (red arrow).'},
+        {'bottleTag': 'Vinegar-Bottle', 'instructionTitle': 'STEP 2: ADDING THE VINEGAR', 'instructionDetail': 'Pour 10 g of vinegar (green arrow) into the flask (red arrow).'},
+        {'bottleTag': 'Baking-Soda', 'instructionTitle': 'STEP 3: PREPARING THE BALLOON', 'instructionDetail': 'Place 2 g of baking soda (green arrow) inside the balloon (red arrow).'},
         {'bottleTag': 'balloon', 'instructionTitle': 'STEP 4: OBSERVATION & REACTION', 'instructionDetail': 'Secure the mouth of the balloon (green arrow) over the opening of the flask (red arrow) and observe the mass as the balloon inflates.'},
       ],
     },

@@ -205,13 +205,13 @@ const List<Map<String, dynamic>> _experimentMaps = [
         'bottleTag': 'Vinegar-Bottle',
         'instructionTitle': 'STEP 2: ADDING THE VINEGAR',
         'instructionDetail':
-            'Pour 10g of vinegar (green arrow) into the flask (red arrow).',
+            'Pour 10 g of vinegar (green arrow) into the flask (red arrow).',
       },
       {
         'bottleTag': 'Baking-Soda',
         'instructionTitle': 'STEP 3: PREPARING THE BALLOON',
         'instructionDetail':
-            'Place a small amount of baking soda (green arrow) inside the balloon (red arrow).',
+            'Place 2 g of baking soda (green arrow) inside the balloon (red arrow).',
       },
       {
         'bottleTag': 'Balloon',

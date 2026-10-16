@@ -7,10 +7,15 @@ import '../../services/auth_service.dart';
 import '../../services/activity_service.dart';
 import '../../models/experiment_step.dart';
 import '../../models/ar_experiment_model.dart';
+import '../../models/experiment_grade.dart';
+import '../../models/ppe_selection.dart';
 import '../../data/dummy_ar_experiments.dart';
+import '../../data/ar_experiment_catalog.dart';
+import '../../data/experiment_assessment_data.dart';
 import '../../data/periodic_table_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'widgets/flame_solution_dialog.dart';
+import 'widgets/ppe_selection_dialog.dart';
 
 class UnityArScreen extends StatefulWidget {
   final String? experimentId;
@@ -27,6 +32,12 @@ class _UnityArScreenState extends State<UnityArScreen>
   String? _activeExperimentId;
   final ActivityService _activityService = ActivityService();
   ActivitySyncStatus? _completionSyncStatus;
+  PpeSelectionResult? _ppeSelectionResult;
+  ExperimentGrade? _experimentGrade;
+  bool _showKnowledgeCheck = false;
+  List<int?> _knowledgeAnswers = const [null, null];
+  int _sequenceErrors = 0;
+  int _equipmentErrors = 0;
 
   // --- NEW: Instructional Guide State ---
   bool _showGuide = false;
@@ -249,6 +260,44 @@ class _UnityArScreenState extends State<UnityArScreen>
     // Extract only digits: "Exp1" or "ar1" becomes "1"
     final normalizedId = experimentId.replaceAll(RegExp(r'[^0-9]'), '');
 
+    final role = context.read<AuthService>().currentUser?.role;
+    if (!canRoleAccessExperiment(role, experimentId)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'This experiment is not available for your grade level.',
+          ),
+        ),
+      );
+      Navigator.of(context).pop();
+      return;
+    }
+
+    final requiredPpe = requiredPpeForExperiment(experimentId);
+    if (requiredPpe.isNotEmpty) {
+      final fallbackExperiment = dummyArExperiments.firstWhere(
+        (experiment) =>
+            experiment.id.replaceAll(RegExp(r'[^0-9]'), '') == normalizedId,
+        orElse: () => dummyArExperiments.first,
+      );
+      final ppeResult = await showDialog<PpeSelectionResult>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => PpeSelectionDialog(
+          experimentTitle: fallbackExperiment.title,
+          requiredPpe: requiredPpe,
+        ),
+      );
+      if (!mounted) return;
+      if (ppeResult == null) {
+        Navigator.of(context).pop();
+        return;
+      }
+      _ppeSelectionResult = ppeResult;
+    } else {
+      _ppeSelectionResult = null;
+    }
+
     final status = await Permission.camera.request();
 
     // --- ADD THIS LINE TO FIX THE ASYNC WARNING ---
@@ -270,6 +319,11 @@ class _UnityArScreenState extends State<UnityArScreen>
         _currentStepIndex = 0; // Reset steps on launch
         _hasCompleted = false;
         _completionSyncStatus = null;
+        _experimentGrade = null;
+        _showKnowledgeCheck = false;
+        _knowledgeAnswers = const [null, null];
+        _sequenceErrors = 0;
+        _equipmentErrors = 0;
         _showCompletionPopup = false;
         _silverNitrateDropCount = 0;
         _isDropButtonCoolingDown = false;
@@ -474,6 +528,7 @@ class _UnityArScreenState extends State<UnityArScreen>
         }
       }
 
+      _sequenceErrors++;
       _showEarlyActivatorWarning(ingredient);
       return;
     }
@@ -523,6 +578,7 @@ class _UnityArScreenState extends State<UnityArScreen>
 
         if (completedItem.isNotEmpty &&
             !_isTagMatching(completedItem, currentTag)) {
+          _sequenceErrors++;
           debugPrint(
             "⚠️ Ignoring out-of-order STEP_COMPLETED for '$completedItem' (current step expects '$currentTag')",
           );
@@ -549,6 +605,7 @@ class _UnityArScreenState extends State<UnityArScreen>
       );
 
       if (matchedStepIndex == -1) {
+        _equipmentErrors++;
         debugPrint(
           "⚠️ Received STEP_COMPLETED for unmapped item: '$completedItem'",
         );
@@ -617,6 +674,7 @@ class _UnityArScreenState extends State<UnityArScreen>
           );
           _handleExperimentComplete();
         } else {
+          _sequenceErrors++;
           debugPrint(
             "⚠️ Activator finished but some prep ingredients were not mixed yet!",
           );
@@ -657,39 +715,210 @@ class _UnityArScreenState extends State<UnityArScreen>
   void _handleExperimentComplete() {
     if (!mounted) return;
     if (_hasCompleted) return;
-    _hasCompleted = true;
+    setState(() {
+      _hasCompleted = true;
+      _knowledgeAnswers = const [null, null];
+      _showKnowledgeCheck = true;
+    });
+  }
 
-    try {
-      final uid = context.read<AuthService>().currentUser?.id;
-      if (uid != null && _activeExperimentId != null) {
-        _activityService
-            .markExperimentCompleted(uid, _activeExperimentId!)
-            .then(
-              (status) {
-                if (mounted) setState(() => _completionSyncStatus = status);
-              },
-              onError: (Object error) {
-                debugPrint('Failed to queue experiment completion: $error');
-                if (mounted) {
-                  setState(
-                    () => _completionSyncStatus = ActivitySyncStatus.pending,
-                  );
-                }
-              },
-            );
-      }
-    } catch (e) {
-      debugPrint("Auth error in _handleExperimentComplete: $e");
+  void _submitKnowledgeCheck() {
+    final experimentId = _activeExperimentId;
+    if (experimentId == null) return;
+    final questions = questionsForExperiment(experimentId);
+    if (_knowledgeAnswers
+        .take(questions.length)
+        .any((answer) => answer == null)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Answer both questions to continue.')),
+      );
+      return;
     }
 
-    if (!mounted) return;
+    var correctAnswers = 0;
+    for (var i = 0; i < questions.length; i++) {
+      if (_knowledgeAnswers[i] == questions[i].correctOption) {
+        correctAnswers++;
+      }
+    }
 
-    // Keep the Unity platform view mounted and visible. A Navigator dialog
-    // changes the Android platform-view visibility, which pauses/resumes Unity
-    // and can replay the last active drag with stale coordinates.
+    final grade = ExperimentGrade(
+      ppeScore: _ppeSelectionResult?.score ?? 15,
+      procedureScore: (35 - (_sequenceErrors * 5)).clamp(0, 35),
+      equipmentScore: (20 - (_equipmentErrors * 2)).clamp(0, 20),
+      resultScore: 20,
+      understandingScore: (correctAnswers * 5).clamp(0, 10),
+      sequenceErrors: _sequenceErrors,
+      equipmentErrors: _equipmentErrors,
+    );
+
     setState(() {
+      _experimentGrade = grade;
+      _showKnowledgeCheck = false;
       _showCompletionPopup = true;
     });
+    _saveExperimentGrade(grade);
+  }
+
+  void _saveExperimentGrade(ExperimentGrade grade) {
+    try {
+      final uid = context.read<AuthService>().currentUser?.id;
+      if (uid == null || _activeExperimentId == null) return;
+      _activityService
+          .markExperimentCompleted(
+            uid,
+            _activeExperimentId!,
+            ppeScore: _ppeSelectionResult?.score,
+            selectedPpe: _ppeSelectionResult?.selected.toList(),
+            requiredPpe: _ppeSelectionResult?.required.toList(),
+            rubricScores: grade.toMap(),
+          )
+          .then(
+            (status) {
+              if (mounted) setState(() => _completionSyncStatus = status);
+            },
+            onError: (Object error) {
+              debugPrint('Failed to queue experiment grade: $error');
+              if (mounted) {
+                setState(
+                  () => _completionSyncStatus = ActivitySyncStatus.pending,
+                );
+              }
+            },
+          );
+    } catch (error) {
+      debugPrint('Could not save experiment grade: $error');
+    }
+  }
+
+  Widget _buildKnowledgeCheck() {
+    final questions = questionsForExperiment(_activeExperimentId ?? '');
+    return Positioned.fill(
+      child: Material(
+        color: Colors.black.withValues(alpha: 0.72),
+        child: Center(
+          child: Container(
+            width: 620,
+            constraints: const BoxConstraints(maxHeight: 520),
+            margin: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(22, 20, 22, 16),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0A1628),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: const Color(0xFF00D4FF).withValues(alpha: 0.5),
+              ),
+            ),
+            child: Column(
+              children: [
+                const Row(
+                  children: [
+                    Icon(Icons.quiz_rounded, color: Color(0xFF00D4FF)),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Experiment Check',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      '10 points',
+                      style: TextStyle(
+                        color: Color(0xFF00D4FF),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Answer using what you observed and learned in the experiment.',
+                    style: TextStyle(color: Color(0xFF8BA3C0)),
+                  ),
+                ),
+                const Divider(height: 22, color: Color(0x3300D4FF)),
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: questions.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 14),
+                    itemBuilder: (context, questionIndex) {
+                      final question = questions[questionIndex];
+                      return Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.04),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${questionIndex + 1}. ${question.prompt}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            RadioGroup<int>(
+                              groupValue: _knowledgeAnswers[questionIndex],
+                              onChanged: (value) {
+                                setState(() {
+                                  final answers = List<int?>.from(
+                                    _knowledgeAnswers,
+                                  );
+                                  answers[questionIndex] = value;
+                                  _knowledgeAnswers = answers;
+                                });
+                              },
+                              child: Column(
+                                children: List.generate(
+                                  question.options.length,
+                                  (optionIndex) {
+                                    return RadioListTile<int>(
+                                      value: optionIndex,
+                                      title: Text(
+                                        question.options[optionIndex],
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      activeColor: const Color(0xFF00D4FF),
+                                      dense: true,
+                                      contentPadding: EdgeInsets.zero,
+                                      visualDensity: VisualDensity.compact,
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: _submitKnowledgeCheck,
+                    icon: const Icon(Icons.check_circle_outline),
+                    label: const Text('Submit and view grade'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildCompletionPopup() {
@@ -698,7 +927,10 @@ class _UnityArScreenState extends State<UnityArScreen>
         color: Colors.black.withValues(alpha: 0.65),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
+            constraints: BoxConstraints(
+              maxWidth: 420,
+              maxHeight: MediaQuery.sizeOf(context).height - 24,
+            ),
             child: Container(
               margin: const EdgeInsets.all(24),
               padding: const EdgeInsets.fromLTRB(24, 24, 24, 18),
@@ -710,74 +942,149 @@ class _UnityArScreenState extends State<UnityArScreen>
                   width: 1.5,
                 ),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.emoji_events, color: Colors.amber, size: 50),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Experiment Complete!',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.emoji_events,
+                      color: Colors.amber,
+                      size: 50,
                     ),
-                  ),
-                  const SizedBox(height: 14),
-                  const Text(
-                    'Great job! You have successfully completed this chemistry experiment.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Color(0xFF8BA3C0), fontSize: 16),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    switch (_completionSyncStatus) {
-                      ActivitySyncStatus.synced => 'Progress synced.',
-                      ActivitySyncStatus.permissionDenied =>
-                        'Progress saved on this device. Sync is waiting for account permission.',
-                      ActivitySyncStatus.pending =>
-                        'Progress saved on this device and will sync when you are online.',
-                      null => 'Saving progress on this device…',
-                    },
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: _completionSyncStatus == ActivitySyncStatus.synced
-                          ? const Color(0xFF00FF88)
-                          : const Color(0xFFFFC857),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF00D4FF),
-                      foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Experiment Complete!',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
                       ),
                     ),
-                    onPressed: () {
-                      if (mounted) {
-                        setState(() {
-                          _showCompletionPopup = false;
-                        });
-                      }
-                    },
-                    child: const Text(
-                      'Finish',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'Great job! You have successfully completed this chemistry experiment.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Color(0xFF8BA3C0), fontSize: 16),
                     ),
-                  ),
-                ],
+                    if (_experimentGrade != null) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        '${_experimentGrade!.totalScore}/100',
+                        style: const TextStyle(
+                          color: Color(0xFF00FF88),
+                          fontSize: 34,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      Text(
+                        _experimentGrade!.performanceLevel,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      _buildGradeRow(
+                        'PPE and safety',
+                        _experimentGrade!.ppeScore,
+                        15,
+                      ),
+                      _buildGradeRow(
+                        'Procedure and sequence',
+                        _experimentGrade!.procedureScore,
+                        35,
+                      ),
+                      _buildGradeRow(
+                        'Equipment handling',
+                        _experimentGrade!.equipmentScore,
+                        20,
+                      ),
+                      _buildGradeRow(
+                        'Experimental result',
+                        _experimentGrade!.resultScore,
+                        20,
+                      ),
+                      _buildGradeRow(
+                        'Scientific understanding',
+                        _experimentGrade!.understandingScore,
+                        10,
+                      ),
+                    ],
+                    const SizedBox(height: 10),
+                    Text(
+                      switch (_completionSyncStatus) {
+                        ActivitySyncStatus.synced => 'Progress synced.',
+                        ActivitySyncStatus.permissionDenied =>
+                          'Progress saved on this device. Sync is waiting for account permission.',
+                        ActivitySyncStatus.pending =>
+                          'Progress saved on this device and will sync when you are online.',
+                        null => 'Saving progress on this device…',
+                      },
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color:
+                            _completionSyncStatus == ActivitySyncStatus.synced
+                            ? const Color(0xFF00FF88)
+                            : const Color(0xFFFFC857),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF00D4FF),
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                      ),
+                      onPressed: () {
+                        if (mounted) {
+                          setState(() {
+                            _showCompletionPopup = false;
+                          });
+                        }
+                      },
+                      child: const Text(
+                        'Finish',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildGradeRow(String label, int score, int maximum) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(color: Color(0xFF8BA3C0), fontSize: 12),
+            ),
+          ),
+          Text(
+            '$score/$maximum',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -909,6 +1216,11 @@ class _UnityArScreenState extends State<UnityArScreen>
       _activeExplanation = null;
       _hasCompleted = false;
       _showCompletionPopup = false;
+      _showKnowledgeCheck = false;
+      _experimentGrade = null;
+      _knowledgeAnswers = const [null, null];
+      _sequenceErrors = 0;
+      _equipmentErrors = 0;
       _selectedFlameChemicalIndex = -1;
       _silverNitrateDropCount = 0;
       _isDropButtonCoolingDown = false;
@@ -1249,49 +1561,12 @@ class _UnityArScreenState extends State<UnityArScreen>
     );
   }
 
-  void _showHint(ExperimentStep? currentStep) {
-    if (currentStep == null) return;
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF0A1628),
-        title: const Row(
-          children: [
-            Icon(Icons.lightbulb, color: Color(0xFF00D4FF)),
-            SizedBox(width: 10),
-            Text("Need a Hint?", style: TextStyle(color: Colors.white)),
-          ],
-        ),
-        content: Text(
-          currentStep.instructionDetail,
-          style: const TextStyle(
-            color: Color(0xFF8BA3C0),
-            height: 1.5,
-            fontSize: 16,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text(
-              "Got it!",
-              style: TextStyle(
-                color: Color(0xFF00D4FF),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(
-            color: const Color(0xFF00D4FF).withValues(alpha: 0.5),
-            width: 1.5,
-          ),
-        ),
-      ),
-    );
+  void _openInteractionGuide() {
+    if (!mounted) return;
+    setState(() {
+      _guideStep = 0;
+      _showGuide = true;
+    });
   }
 
   void _nextGuideStep() {
@@ -1565,15 +1840,16 @@ class _UnityArScreenState extends State<UnityArScreen>
                             ),
                           ),
                         if (!_isPeriodicTable) const SizedBox(height: 12),
-                        // HINT BUTTON
+                        // REOPEN THE ORIGINAL INTERACTION GUIDE
                         if (!_isPeriodicTable)
                           FloatingActionButton(
-                            heroTag: 'btn_hint',
+                            heroTag: 'btn_guide',
                             mini: true,
                             backgroundColor: const Color(0xFF00D4FF),
-                            onPressed: () => _showHint(currentStepData),
+                            tooltip: 'View operating guide',
+                            onPressed: _openInteractionGuide,
                             child: const Icon(
-                              Icons.lightbulb_outline,
+                              Icons.help_outline_rounded,
                               color: Color(0xFF0A1628),
                             ),
                           ),
@@ -1779,6 +2055,7 @@ class _UnityArScreenState extends State<UnityArScreen>
                 ),
               ),
 
+            if (_showKnowledgeCheck) _buildKnowledgeCheck(),
             if (_showCompletionPopup) _buildCompletionPopup(),
           ],
         ),
