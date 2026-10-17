@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:go_router/go_router.dart';
@@ -1150,8 +1149,6 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                             ElevatedButton(
                               onPressed: () async {
                                 Navigator.of(dialogContext).pop();
-                                final prefs = await SharedPreferences.getInstance();
-                                await prefs.clear();
                                 if (context.mounted) {
                                   await context.read<AuthService>().logout();
                                   if (context.mounted) {

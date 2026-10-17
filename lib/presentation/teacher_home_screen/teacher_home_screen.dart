@@ -7,6 +7,7 @@ import '../../core/course_assignment.dart';
 import '../../data/dummy_ar_experiments.dart';
 import '../../widgets/dashboard_datetime_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../models/user_model.dart';
 import '../../models/course_model.dart';
 import '../../models/activity_model.dart';
@@ -95,6 +96,8 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   final List<StreamSubscription> _quizNotifSubs = [];
   final Map<String, StreamSubscription> _arNotifSubs = {};
   StreamSubscription? _teacherCoursesSub;
+  late final AuthService _authService;
+  bool _notificationStreamsStopped = false;
 
   List<QueryDocumentSnapshot<Map<String, dynamic>>> _pendingUsers = [];
   final Map<int, List<QueryDocumentSnapshot<Map<String, dynamic>>>>
@@ -308,6 +311,8 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   @override
   void initState() {
     super.initState();
+    _authService = context.read<AuthService>();
+    _authService.addListener(_handleAuthChanged);
     _loadData();
     _entranceController = AnimationController(
       vsync: this,
@@ -323,6 +328,44 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initNotificationStreams();
     });
+  }
+
+  void _handleAuthChanged() {
+    if (_authService.currentUser == null) {
+      _stopNotificationStreams();
+    }
+  }
+
+  bool get _canUseAuthenticatedStreams =>
+      mounted &&
+      !_notificationStreamsStopped &&
+      FirebaseAuth.instance.currentUser != null &&
+      _authService.currentUser != null;
+
+  void _logNotificationStreamError(String message, Object error) {
+    if (_canUseAuthenticatedStreams) {
+      debugPrint('$message: $error');
+    }
+  }
+
+  void _stopNotificationStreams() {
+    if (_notificationStreamsStopped) return;
+    _notificationStreamsStopped = true;
+    _quizSubscriptionGeneration++;
+    unawaited(_usersSub?.cancel());
+    unawaited(_approvedStudentsSub?.cancel());
+    unawaited(_teacherCoursesSub?.cancel());
+    _usersSub = null;
+    _approvedStudentsSub = null;
+    _teacherCoursesSub = null;
+    for (final subscription in _quizNotifSubs) {
+      unawaited(subscription.cancel());
+    }
+    _quizNotifSubs.clear();
+    for (final subscription in _arNotifSubs.values) {
+      unawaited(subscription.cancel());
+    }
+    _arNotifSubs.clear();
   }
 
   bool _studentMatchesAnyTeacherCourse(AppUser student) {
@@ -359,7 +402,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   void _initNotificationStreams() {
     final db = FirebaseFirestore.instance;
     final user = context.read<AuthService>().currentUser;
-    if (user == null) return;
+    if (user == null || FirebaseAuth.instance.currentUser == null) return;
 
     _teacherCoursesSub = db
         .collection('courses')
@@ -379,7 +422,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
             _updateNotifs();
           },
           onError: (Object error) {
-            debugPrint('Teacher course notification stream failed: $error');
+            _logNotificationStreamError(
+              'Teacher course notification stream failed',
+              error,
+            );
           },
         );
 
@@ -395,7 +441,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
             _updateNotifs();
           },
           onError: (Object error) {
-            debugPrint('Pending-student notification stream failed: $error');
+            _logNotificationStreamError(
+              'Pending-student notification stream failed',
+              error,
+            );
           },
         );
 
@@ -420,7 +469,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
             _updateNotifs();
           },
           onError: (Object error) {
-            debugPrint('Approved-student notification stream failed: $error');
+            _logNotificationStreamError(
+              'Approved-student notification stream failed',
+              error,
+            );
           },
         );
   }
@@ -465,7 +517,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
               _applyCurrentQuizAttempts();
             },
             onError: (Object error) {
-              debugPrint('Quiz notification stream failed: $error');
+              _logNotificationStreamError(
+                'Quiz notification stream failed',
+                error,
+              );
               if (!mounted || generation != _quizSubscriptionGeneration) return;
               _quizAttemptChunks[currentChunk] = [];
               _applyCurrentQuizAttempts();
@@ -489,7 +544,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
             _applyCurrentQuizAttempts();
           },
           onError: (Object error) {
-            debugPrint('Section-based quiz notification stream failed: $error');
+            _logNotificationStreamError(
+              'Section-based quiz notification stream failed',
+              error,
+            );
           },
         );
     _quizNotifSubs.add(subscription);
@@ -551,8 +609,9 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
               _updateNotifs();
             },
             onError: (Object error) {
-              debugPrint(
-                'AR notification stream failed for $studentId: $error',
+              _logNotificationStreamError(
+                'AR notification stream failed for $studentId',
+                error,
               );
               if (!mounted) return;
               _arAttemptsByStudent[studentId] = [];
@@ -747,16 +806,8 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
 
   @override
   void dispose() {
-    _quizSubscriptionGeneration++;
-    _usersSub?.cancel();
-    _approvedStudentsSub?.cancel();
-    for (final sub in _quizNotifSubs) {
-      sub.cancel();
-    }
-    for (final sub in _arNotifSubs.values) {
-      sub.cancel();
-    }
-    _teacherCoursesSub?.cancel();
+    _authService.removeListener(_handleAuthChanged);
+    _stopNotificationStreams();
     _searchCtrl.dispose();
     _entranceController.dispose();
     _clockTimer.cancel();

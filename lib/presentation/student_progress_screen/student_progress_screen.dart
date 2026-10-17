@@ -7,6 +7,7 @@ import '../../models/course_model.dart';
 import '../../services/auth_service.dart';
 import '../../services/course_service.dart';
 import '../../models/user_model.dart';
+import '../../data/dummy_ar_experiments.dart';
 
 class _QuizResult {
   final String title;
@@ -232,11 +233,18 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
       final completedAt = data['completedAt'];
       if (completedAt is! Timestamp) continue;
       final timestamp = completedAt.toDate();
-      final score = (data['score'] as num?)?.toDouble() ?? 100.0;
-      final title = (data['experimentId'] as String?)?.trim();
+      final score = _arScore(data);
+      final experimentId = (data['experimentId'] as String?)?.trim();
+      final storedTitle = (data['experimentTitle'] as String?)?.trim();
       experiments.add(
         _ArExperimentResult(
-          title == null || title.isEmpty ? document.id : title,
+          storedTitle != null && storedTitle.isNotEmpty
+              ? storedTitle
+              : _arExperimentTitle(
+                  experimentId == null || experimentId.isEmpty
+                      ? document.id
+                      : experimentId,
+                ),
           _formatDate(timestamp),
           score,
           timestamp,
@@ -253,6 +261,29 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
           ? '0.0'
           : (totalScore / experiments.length).toStringAsFixed(1);
     });
+  }
+
+  double _arScore(Map<String, dynamic> data) {
+    final legacyScore = data['score'];
+    if (legacyScore is num) {
+      return legacyScore.toDouble().clamp(0, 100).toDouble();
+    }
+
+    final rubric = data['rubricScores'];
+    if (rubric is Map) {
+      final total = rubric['total'];
+      if (total is num) return total.toDouble().clamp(0, 100).toDouble();
+    }
+    return 0;
+  }
+
+  String _arExperimentTitle(String experimentId) {
+    for (final experiment in dummyArExperiments) {
+      if (experiment.id.toLowerCase() == experimentId.toLowerCase()) {
+        return experiment.title;
+      }
+    }
+    return experimentId;
   }
 
   Future<void> _loadMissedQuizzes(

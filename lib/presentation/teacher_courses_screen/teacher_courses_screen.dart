@@ -35,10 +35,12 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
       vsync: this,
       duration: const Duration(milliseconds: 500),
     )..forward();
-    
+
     final currentUser = context.read<AuthService>().currentUser;
     if (currentUser != null) {
-      _studentCountFuture = context.read<AuthService>().countStudentsInSections(currentUser.sections);
+      _studentCountFuture = context.read<AuthService>().countStudentsInSections(
+        currentUser.sections,
+      );
     }
   }
 
@@ -80,11 +82,16 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => StreamBuilder<List<Course>>(
-        stream: context.read<CourseService>().coursesForTeacherStream(context.read<AuthService>().currentUser!.id),
+        stream: context.read<CourseService>().coursesForTeacherStream(
+          context.read<AuthService>().currentUser!.id,
+        ),
         builder: (context, snapshot) {
           final courses = snapshot.data ?? [];
-          return _CoursesCrudPanel(onChanged: () => setState(() {}), courses: courses);
-        }
+          return _CoursesCrudPanel(
+            onChanged: () => setState(() {}),
+            courses: courses,
+          );
+        },
       ),
     );
   }
@@ -98,36 +105,50 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
         bottom: false,
         child: Stack(
           children: [
-            _selectedCourse != null
-                ? CourseDetailWidget(
-                    course: _selectedCourse!,
+            StreamBuilder<List<Course>>(
+              stream: _courseStreamFor(teacherId),
+              builder: (context, snapshot) {
+                final selectedCourse = _selectedCourse;
+                if (selectedCourse != null) {
+                  return CourseDetailWidget(
+                    course: selectedCourse,
                     onBack: _closeCourse,
                     onUpdated: _onCourseUpdated,
-                  )
-                : StreamBuilder<List<Course>>(
-                    stream: _courseStreamFor(teacherId),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting &&
-                          !snapshot.hasData) {
-                        return const Center(child: CircularProgressIndicator(color: Color(0xFF00D4FF)));
-                      }
-                      if (snapshot.hasError) {
-                        return Center(
-                          child: Text('Failed to load courses. Please check permissions.', style: TextStyle(color: Colors.red)),
-                        );
-                      }
-                      final courses = snapshot.data ?? [];
-                      return _buildCourseList(courses);
-                    },
-                  ),
+                  );
+                }
+
+                if (snapshot.connectionState == ConnectionState.waiting &&
+                    !snapshot.hasData) {
+                  return const Center(
+                    child: CircularProgressIndicator(color: Color(0xFF00D4FF)),
+                  );
+                }
+                if (snapshot.hasError) {
+                  return const Center(
+                    child: Text(
+                      'Failed to load courses. Please check permissions.',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  );
+                }
+                final courses = snapshot.data ?? const <Course>[];
+                return _buildCourseList(courses);
+              },
+            ),
             if (_selectedCourse == null)
               Positioned(
                 bottom: 124,
                 right: 20,
                 child: FloatingActionButton(
                   onPressed: _openCrudPanel,
-                  backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
-                  foregroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white,
+                  backgroundColor:
+                      Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF00FF88)
+                      : const Color(0xFF00994C),
+                  foregroundColor:
+                      Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF0A1628)
+                      : Colors.white,
                   tooltip: 'Manage Courses',
                   child: const Icon(Icons.edit, size: 26),
                 ),
@@ -145,9 +166,9 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
         : const Color(0xFF00994C);
     final filteredCourses = courses.where((c) {
       final query = _mainSearchQuery.trim().toLowerCase();
-      return c.title.toLowerCase().contains(query) || 
-             c.subject.toLowerCase().contains(query) ||
-             c.grade.toLowerCase().contains(query);
+      return c.title.toLowerCase().contains(query) ||
+          c.subject.toLowerCase().contains(query) ||
+          c.grade.toLowerCase().contains(query);
     }).toList();
 
     return CustomScrollView(
@@ -242,7 +263,12 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
                   child: Center(
                     child: Text(
                       'No courses found matching search',
-                      style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 14),
+                      style: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF8BA3C0)
+                            : Colors.grey.shade600,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                 ),
@@ -250,44 +276,44 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
             : SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
                   final course = filteredCourses[index];
-            final delay = index * 80;
-            return AnimatedBuilder(
-              animation: _entranceController,
-              builder: (context, child) {
-                final slide =
-                    Tween<Offset>(
-                      begin: const Offset(0, 0.12),
-                      end: Offset.zero,
-                    ).animate(
-                      CurvedAnimation(
-                        parent: _entranceController,
-                        curve: Interval(
-                          (delay / 500).clamp(0.0, 0.8),
-                          ((delay + 300) / 500).clamp(0.0, 1.0),
-                          curve: Curves.easeOutCubic,
+                  final delay = index * 80;
+                  return AnimatedBuilder(
+                    animation: _entranceController,
+                    builder: (context, child) {
+                      final slide =
+                          Tween<Offset>(
+                            begin: const Offset(0, 0.12),
+                            end: Offset.zero,
+                          ).animate(
+                            CurvedAnimation(
+                              parent: _entranceController,
+                              curve: Interval(
+                                (delay / 500).clamp(0.0, 0.8),
+                                ((delay + 300) / 500).clamp(0.0, 1.0),
+                                curve: Curves.easeOutCubic,
+                              ),
+                            ),
+                          );
+                      return SlideTransition(
+                        position: slide,
+                        child: FadeTransition(
+                          opacity: _entranceController,
+                          child: child,
                         ),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
+                      child: _CourseCard(
+                        course: course,
+                        onTap: () => _openCourse(course),
+                        onEdit: () => _showEditCourseDialog(course),
+                        onDelete: () => _showDeleteCourseDialog(course),
                       ),
-                    );
-                return SlideTransition(
-                  position: slide,
-                  child: FadeTransition(
-                    opacity: _entranceController,
-                    child: child,
-                  ),
-                );
-              },
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
-                child: _CourseCard(
-                  course: course,
-                  onTap: () => _openCourse(course),
-                  onEdit: () => _showEditCourseDialog(course),
-                  onDelete: () => _showDeleteCourseDialog(course),
-                ),
+                    ),
+                  );
+                }, childCount: filteredCourses.length),
               ),
-            );
-          }, childCount: filteredCourses.length),
-        ),
         const SliverToBoxAdapter(child: SizedBox(height: 140)),
       ],
     );
@@ -302,14 +328,23 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1A2E1A) : const Color(0xFFE8F5E9),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF1A2E1A)
+                  : const Color(0xFFE8F5E9),
               borderRadius: BorderRadius.circular(12.0),
-              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x3300FF88) : const Color(0xFF00FF88).withOpacity(0.3), width: 1),
+              border: Border.all(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0x3300FF88)
+                    : const Color(0xFF00FF88).withOpacity(0.3),
+                width: 1,
+              ),
             ),
             child: Center(
               child: CustomIconWidget(
                 iconName: 'menu_book',
-                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF00FF88)
+                    : const Color(0xFF00994C),
                 size: 20,
               ),
             ),
@@ -324,12 +359,19 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
-                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black87,
                   ),
                 ),
                 Text(
                   'Teacher Dashboard',
-                  style: TextStyle(fontSize: 12, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C)),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF00FF88)
+                        : const Color(0xFF00994C),
+                  ),
                 ),
               ],
             ),
@@ -337,16 +379,25 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200FF88) : const Color(0xFF00FF88).withOpacity(0.1),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0x2200FF88)
+                  : const Color(0xFF00FF88).withOpacity(0.1),
               borderRadius: BorderRadius.circular(50.0),
-              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x5500FF88) : const Color(0xFF00FF88).withOpacity(0.3), width: 1),
+              border: Border.all(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0x5500FF88)
+                    : const Color(0xFF00FF88).withOpacity(0.3),
+                width: 1,
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 CustomIconWidget(
                   iconName: 'verified',
-                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF00FF88)
+                      : const Color(0xFF00994C),
                   size: 13,
                 ),
                 const SizedBox(width: 4),
@@ -355,7 +406,9 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF00FF88)
+                        : const Color(0xFF00994C),
                   ),
                 ),
               ],
@@ -375,7 +428,12 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
           padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
           child: Text(
             '${courses.length} courses · $totalStudents students enrolled',
-            style: TextStyle(fontSize: 13, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
+            style: TextStyle(
+              fontSize: 13,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF8BA3C0)
+                  : Colors.grey.shade600,
+            ),
           ),
         );
       },
@@ -428,24 +486,39 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF142240)
+            : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.0),
         ),
         title: Text(
           'Delete Course',
-          style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87, fontWeight: FontWeight.w700),
+          style: TextStyle(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : Colors.black87,
+            fontWeight: FontWeight.w700,
+          ),
         ),
         content: Text(
           'Are you sure you want to delete "${course.title}"? This action cannot be undone.',
-          style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
+          style: TextStyle(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF8BA3C0)
+                : Colors.grey.shade600,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
             child: Text(
               'Cancel',
-              style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
+              style: TextStyle(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF8BA3C0)
+                    : Colors.grey.shade600,
+              ),
             ),
           ),
           ElevatedButton(
@@ -516,7 +589,7 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
         onSave: () async {
           if (formKey.currentState!.validate()) {
             final user = context.read<AuthService>().currentUser!;
-            
+
             final chemistryIcons = [
               'science',
               'biotech',
@@ -531,15 +604,25 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
               'blur_on',
               'water_drop',
               'grass',
-              'coronavirus'
+              'coronavirus',
             ];
-            final teacherCourses = await context.read<CourseService>().fetchCoursesForTeacher(user.id);
-            teacherCourses.sort((a, b) => (b.createdAt ?? DateTime.now()).compareTo(a.createdAt ?? DateTime.now()));
-            final lastIcon = teacherCourses.isNotEmpty ? teacherCourses.first.iconName : null;
+            final teacherCourses = await context
+                .read<CourseService>()
+                .fetchCoursesForTeacher(user.id);
+            teacherCourses.sort(
+              (a, b) => (b.createdAt ?? DateTime.now()).compareTo(
+                a.createdAt ?? DateTime.now(),
+              ),
+            );
+            final lastIcon = teacherCourses.isNotEmpty
+                ? teacherCourses.first.iconName
+                : null;
 
-            String randomIcon = chemistryIcons[Random().nextInt(chemistryIcons.length)];
+            String randomIcon =
+                chemistryIcons[Random().nextInt(chemistryIcons.length)];
             while (randomIcon == lastIcon) {
-              randomIcon = chemistryIcons[Random().nextInt(chemistryIcons.length)];
+              randomIcon =
+                  chemistryIcons[Random().nextInt(chemistryIcons.length)];
             }
 
             final newCourse = Course(
@@ -608,24 +691,39 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF142240)
+            : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.0),
         ),
         title: Text(
           'Delete Course',
-          style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87, fontWeight: FontWeight.w700),
+          style: TextStyle(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : Colors.black87,
+            fontWeight: FontWeight.w700,
+          ),
         ),
         content: Text(
           'Delete "${course.title}"? This cannot be undone.',
-          style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
+          style: TextStyle(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF8BA3C0)
+                : Colors.grey.shade600,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
             child: Text(
               'Cancel',
-              style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
+              style: TextStyle(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF8BA3C0)
+                    : Colors.grey.shade600,
+              ),
             ),
           ),
           ElevatedButton(
@@ -653,24 +751,39 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF142240)
+            : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.0),
         ),
         title: Text(
           'Delete Courses',
-          style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87, fontWeight: FontWeight.w700),
+          style: TextStyle(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : Colors.black87,
+            fontWeight: FontWeight.w700,
+          ),
         ),
         content: Text(
           'Delete ${_selectedCourseIds.length} selected course(s)? This cannot be undone.',
-          style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
+          style: TextStyle(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF8BA3C0)
+                : Colors.grey.shade600,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
             child: Text(
               'Cancel',
-              style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
+              style: TextStyle(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF8BA3C0)
+                    : Colors.grey.shade600,
+              ),
             ),
           ),
           ElevatedButton(
@@ -703,21 +816,28 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
-    
+
     final filteredCourses = widget.courses.where((c) {
       final query = _searchQuery.toLowerCase();
-      return c.title.toLowerCase().contains(query) || 
-             c.subject.toLowerCase().contains(query) ||
-             c.grade.toLowerCase().contains(query);
+      return c.title.toLowerCase().contains(query) ||
+          c.subject.toLowerCase().contains(query) ||
+          c.grade.toLowerCase().contains(query);
     }).toList();
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.65,
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF142240)
+            : Colors.white,
         borderRadius: BorderRadius.circular(24.0),
-        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x3300FF88) : const Color(0xFF00FF88).withOpacity(0.3), width: 1),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0x3300FF88)
+              : const Color(0xFF00FF88).withOpacity(0.3),
+          width: 1,
+        ),
       ),
       clipBehavior: Clip.hardEdge,
       child: Column(
@@ -729,7 +849,9 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF3A5070) : Colors.grey.shade300,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF3A5070)
+                    : Colors.grey.shade300,
                 borderRadius: BorderRadius.circular(2.0),
               ),
             ),
@@ -743,11 +865,19 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200FF88) : const Color(0xFF00994C).withOpacity(0.1),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0x2200FF88)
+                        : const Color(0xFF00994C).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                   child: Center(
-                    child: Icon(Icons.edit, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C), size: 18),
+                    child: Icon(
+                      Icons.edit,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF00FF88)
+                          : const Color(0xFF00994C),
+                      size: 18,
+                    ),
                   ),
                 ),
                 SizedBox(width: 12),
@@ -758,7 +888,9 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
                       Text(
                         'Manage Courses',
                         style: TextStyle(
-                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black87,
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),
@@ -766,7 +898,9 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
                       Text(
                         'Create, edit or delete your courses',
                         style: TextStyle(
-                          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF8BA3C0)
+                              : Colors.grey.shade600,
                           fontSize: 12,
                         ),
                       ),
@@ -789,25 +923,42 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
                                 color: const Color(0x22FF4757),
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
-                              child: const Icon(Icons.close, color: Color(0xFFFF4757), size: 16),
+                              child: const Icon(
+                                Icons.close,
+                                color: Color(0xFFFF4757),
+                                size: 16,
+                              ),
                             ),
                           ),
                           GestureDetector(
                             onTap: _showMultiDeleteConfirm,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 8,
+                              ),
                               decoration: BoxDecoration(
-                                color: _selectedCourseIds.isEmpty ? const Color(0xFF3A5070) : const Color(0xFFFF4757),
+                                color: _selectedCourseIds.isEmpty
+                                    ? const Color(0xFF3A5070)
+                                    : const Color(0xFFFF4757),
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(Icons.delete_outline, color: Colors.white, size: 16),
+                                  const Icon(
+                                    Icons.delete_outline,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
                                   const SizedBox(width: 4),
                                   Text(
                                     'Delete (${_selectedCourseIds.length})',
-                                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -823,28 +974,63 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
                               padding: const EdgeInsets.all(8),
                               margin: const EdgeInsets.only(right: 8),
                               decoration: BoxDecoration(
-                                color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200D4FF) : const Color(0xFF1565C0).withOpacity(0.1),
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? const Color(0x2200D4FF)
+                                    : const Color(0xFF1565C0).withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
-                              child: Icon(Icons.checklist, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0), size: 16),
+                              child: Icon(
+                                Icons.checklist,
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? const Color(0xFF00D4FF)
+                                    : const Color(0xFF1565C0),
+                                size: 16,
+                              ),
                             ),
                           ),
                           GestureDetector(
                             onTap: _showCreateDialog,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 8,
+                              ),
                               decoration: BoxDecoration(
-                                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? const Color(0xFF00FF88)
+                                    : const Color(0xFF00994C),
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.add, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white, size: 16),
+                                  Icon(
+                                    Icons.add,
+                                    color:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? const Color(0xFF0A1628)
+                                        : Colors.white,
+                                    size: 16,
+                                  ),
                                   const SizedBox(width: 4),
                                   Text(
                                     'New',
-                                    style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white, fontSize: 12, fontWeight: FontWeight.w700),
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? const Color(0xFF0A1628)
+                                          : Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -911,7 +1097,8 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
                           },
                           icon: Icon(
                             Icons.close_rounded,
-                            color: Theme.of(context).brightness == Brightness.dark
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
                                 ? const Color(0xFF8BA3C0)
                                 : Colors.grey.shade600,
                             size: 18,
@@ -951,7 +1138,12 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
               ),
             ),
           // ── Divider ─────────────────────────────────────────────────────
-          Divider(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x220A1628) : Colors.grey.shade300, height: 1),
+          Divider(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0x220A1628)
+                : Colors.grey.shade300,
+            height: 1,
+          ),
           // ── Course list ─────────────────────────────────────────────────
           Expanded(
             child: widget.courses.isEmpty
@@ -963,14 +1155,21 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
                         children: [
                           Icon(
                             Icons.library_books_outlined,
-                            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF3A5070) : Colors.grey.shade400,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF3A5070)
+                                : Colors.grey.shade400,
                             size: 48,
                           ),
                           const SizedBox(height: 12),
                           Text(
                             'No courses yet',
                             style: TextStyle(
-                              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? const Color(0xFF8BA3C0)
+                                  : Colors.grey.shade600,
                               fontSize: 14,
                             ),
                           ),
@@ -978,7 +1177,11 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
                           Text(
                             'Tap "New Course" to create your first course',
                             style: TextStyle(
-                              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF3A5070) : Colors.grey.shade500,
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? const Color(0xFF3A5070)
+                                  : Colors.grey.shade500,
                               fontSize: 12,
                             ),
                             textAlign: TextAlign.center,
@@ -988,19 +1191,29 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
                     ),
                   )
                 : filteredCourses.isEmpty
-                    ? Center(
-                        child: Text(
-                          'No courses found matching search',
-                          style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 13),
-                        ),
-                      )
-                    : ListView.separated(
-                        padding: EdgeInsets.fromLTRB(16, 8, 16, bottomPadding + 120),
-                        itemCount: filteredCourses.length,
-                        separatorBuilder: (_, __) =>
-                            const Divider(color: Color(0x150A1628), height: 1),
-                        itemBuilder: (context, index) {
-                          final course = filteredCourses[index];
+                ? Center(
+                    child: Text(
+                      'No courses found matching search',
+                      style: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF8BA3C0)
+                            : Colors.grey.shade600,
+                        fontSize: 13,
+                      ),
+                    ),
+                  )
+                : ListView.separated(
+                    padding: EdgeInsets.fromLTRB(
+                      16,
+                      8,
+                      16,
+                      bottomPadding + 120,
+                    ),
+                    itemCount: filteredCourses.length,
+                    separatorBuilder: (_, __) =>
+                        const Divider(color: Color(0x150A1628), height: 1),
+                    itemBuilder: (context, index) {
+                      final course = filteredCourses[index];
                       final isSelected = _selectedCourseIds.contains(course.id);
                       return GestureDetector(
                         onTap: _isSelectMode
@@ -1015,7 +1228,11 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
                               }
                             : null,
                         child: Container(
-                          color: isSelected ? (Theme.of(context).brightness == Brightness.dark ? const Color(0x1100D4FF) : const Color(0xFF1565C0).withOpacity(0.1)) : Colors.transparent,
+                          color: isSelected
+                              ? (Theme.of(context).brightness == Brightness.dark
+                                    ? const Color(0x1100D4FF)
+                                    : const Color(0xFF1565C0).withOpacity(0.1))
+                              : Colors.transparent,
                           child: _PanelCourseRow(
                             course: course,
                             isSelectMode: _isSelectMode,
@@ -1037,12 +1254,13 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
 // ── Panel course row ──────────────────────────────────────────────────────────
 
 String _courseSectionSummary(Course course) {
-  final sections = course.sections
-      .map((section) => section.trim())
-      .where((section) => section.isNotEmpty)
-      .toSet()
-      .toList()
-    ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+  final sections =
+      course.sections
+          .map((section) => section.trim())
+          .where((section) => section.isNotEmpty)
+          .toSet()
+          .toList()
+        ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
 
   if (sections.isEmpty) return 'No sections';
   final label = sections.length == 1 ? 'Section' : 'Sections';
@@ -1076,11 +1294,32 @@ class _PanelCourseRow extends StatelessWidget {
               height: 18,
               margin: const EdgeInsets.only(right: 12),
               decoration: BoxDecoration(
-                color: isSelected ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)) : Colors.transparent,
-                border: Border.all(color: isSelected ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0)) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF3A5070) : Colors.grey.shade400), width: 1.5),
+                color: isSelected
+                    ? (Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF00D4FF)
+                          : const Color(0xFF1565C0))
+                    : Colors.transparent,
+                border: Border.all(
+                  color: isSelected
+                      ? (Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF00D4FF)
+                            : const Color(0xFF1565C0))
+                      : (Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF3A5070)
+                            : Colors.grey.shade400),
+                  width: 1.5,
+                ),
                 borderRadius: BorderRadius.circular(4.0),
               ),
-              child: isSelected ? Icon(Icons.check, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white, size: 14) : null,
+              child: isSelected
+                  ? Icon(
+                      Icons.check,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF142240)
+                          : Colors.white,
+                      size: 14,
+                    )
+                  : null,
             ),
           if (!isSelectMode)
             Container(
@@ -1088,7 +1327,9 @@ class _PanelCourseRow extends StatelessWidget {
               height: 10,
               margin: const EdgeInsets.only(right: 12),
               decoration: BoxDecoration(
-                color: (Theme.of(context).brightness == Brightness.light && course.accentColor == const Color(0xFF00D4FF))
+                color:
+                    (Theme.of(context).brightness == Brightness.light &&
+                        course.accentColor == const Color(0xFF00D4FF))
                     ? const Color(0xFF1565C0)
                     : course.accentColor,
                 shape: BoxShape.circle,
@@ -1102,7 +1343,9 @@ class _PanelCourseRow extends StatelessWidget {
                 Text(
                   course.title,
                   style: TextStyle(
-                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black87,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
@@ -1113,7 +1356,9 @@ class _PanelCourseRow extends StatelessWidget {
                 Text(
                   '${course.subject} · ${course.grade} · ${_courseSectionSummary(course)} · ${0} students',
                   style: TextStyle(
-                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF8BA3C0)
+                        : Colors.grey.shade600,
                     fontSize: 11,
                   ),
                   maxLines: 1,
@@ -1131,13 +1376,17 @@ class _PanelCourseRow extends StatelessWidget {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0x2200D4FF) : const Color(0xFF1565C0).withOpacity(0.1),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0x2200D4FF)
+                      : const Color(0xFF1565C0).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 child: Center(
                   child: Icon(
                     Icons.edit_outlined,
-                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF00D4FF)
+                        : const Color(0xFF1565C0),
                     size: 16,
                   ),
                 ),
@@ -1188,8 +1437,9 @@ class _CourseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isLight = Theme.of(context).brightness == Brightness.light;
-    final displayAccentColor = (isLight && course.accentColor == const Color(0xFF00D4FF)) 
-        ? const Color(0xFF1565C0) 
+    final displayAccentColor =
+        (isLight && course.accentColor == const Color(0xFF00D4FF))
+        ? const Color(0xFF1565C0)
         : course.accentColor;
 
     return GestureDetector(
@@ -1198,7 +1448,10 @@ class _CourseCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: isLight ? Colors.white : const Color(0xFF142240),
           borderRadius: BorderRadius.circular(20.0),
-          border: Border.all(color: displayAccentColor.withOpacity(0.3), width: 1),
+          border: Border.all(
+            color: displayAccentColor.withOpacity(0.3),
+            width: 1,
+          ),
         ),
         padding: const EdgeInsets.all(18),
         child: Column(
@@ -1231,7 +1484,9 @@ class _CourseCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black87,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -1241,7 +1496,9 @@ class _CourseCard extends StatelessWidget {
                         '${course.subject} · ${course.grade} · ${_courseSectionSummary(course)}',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF8BA3C0)
+                              : Colors.grey.shade600,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -1251,7 +1508,9 @@ class _CourseCard extends StatelessWidget {
                 ),
                 CustomIconWidget(
                   iconName: 'chevron_right',
-                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF8BA3C0)
+                      : Colors.grey.shade600,
                   size: 20,
                 ),
               ],
@@ -1262,7 +1521,9 @@ class _CourseCard extends StatelessWidget {
               runSpacing: 8,
               children: [
                 FutureBuilder<int>(
-                  future: context.read<AuthService>().countStudentsInSections(course.sections),
+                  future: context.read<AuthService>().countStudentsInSections(
+                    course.sections,
+                  ),
                   builder: (context, snapshot) {
                     final count = snapshot.data ?? 0;
                     return _InfoChip(
@@ -1270,7 +1531,7 @@ class _CourseCard extends StatelessWidget {
                       label: '$count Students',
                       color: const Color(0xFFFFB800),
                     );
-                  }
+                  },
                 ),
                 _InfoChip(
                   icon: 'quiz',
@@ -1280,7 +1541,9 @@ class _CourseCard extends StatelessWidget {
                 _InfoChip(
                   icon: 'folder_open',
                   label: '${course.modules.length} Modules',
-                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF8BA3C0)
+                      : Colors.grey.shade600,
                 ),
               ],
             ),
@@ -1369,9 +1632,12 @@ class _CourseFormDialogState extends State<_CourseFormDialog> {
 
   Future<void> _fetchSections() async {
     try {
-      _teacherSections = context.read<AuthService>().currentUser?.sections ?? [];
-      
-      final snapshot = await FirebaseFirestore.instance.collection('sections').get();
+      _teacherSections =
+          context.read<AuthService>().currentUser?.sections ?? [];
+
+      final snapshot = await FirebaseFirestore.instance
+          .collection('sections')
+          .get();
       if (mounted) {
         setState(() {
           _allSections = snapshot.docs
@@ -1403,7 +1669,8 @@ class _CourseFormDialogState extends State<_CourseFormDialog> {
   List<String> get _availableSectionsForGrade {
     final sections = <String>[];
     for (var s in _allSections) {
-      if (s['grade'] == widget.gradeCtrl.text && _teacherSections.contains(s['name'])) {
+      if (s['grade'] == widget.gradeCtrl.text &&
+          _teacherSections.contains(s['name'])) {
         sections.add(s['name'] as String);
       }
     }
@@ -1455,7 +1722,9 @@ class _CourseFormDialogState extends State<_CourseFormDialog> {
         maxHeight: MediaQuery.sizeOf(context).height * 0.88,
       ),
       clipBehavior: Clip.antiAlias,
-      backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFF142240)
+          : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
       contentPadding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
@@ -1463,7 +1732,9 @@ class _CourseFormDialogState extends State<_CourseFormDialog> {
       title: Text(
         widget.title,
         style: TextStyle(
-          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white
+              : Colors.black87,
           fontWeight: FontWeight.w700,
           fontSize: 18,
         ),
@@ -1474,169 +1745,236 @@ class _CourseFormDialogState extends State<_CourseFormDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-              _buildField(
-                context,
-                controller: widget.subjectCtrl,
-                label: 'Subject',
-                hint: 'e.g. Chemistry',
-                validator: (v) => (v == null || v.trim().isEmpty)
-                    ? 'Subject is required'
-                    : null,
-              ),
-              const SizedBox(height: 14),
-              _buildField(
-                context,
-                controller: widget.titleCtrl,
-                label: 'Topic',
-                hint: 'e.g. Organic Chemistry Fundamentals',
-                validator: (v) => (v == null || v.trim().isEmpty)
-                    ? 'Topic is required'
-                    : null,
-              ),
-              const SizedBox(height: 14),
-              _isLoadingSections
-                  ? const Center(child: CircularProgressIndicator())
-                  : DropdownButtonFormField<String>(
-                      key: ValueKey(
-                        'course-grade-${widget.gradeCtrl.text}-${_availableGrades.join('|')}',
+            _buildField(
+              context,
+              controller: widget.subjectCtrl,
+              label: 'Subject',
+              hint: 'e.g. Chemistry',
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? 'Subject is required'
+                  : null,
+            ),
+            const SizedBox(height: 14),
+            _buildField(
+              context,
+              controller: widget.titleCtrl,
+              label: 'Topic',
+              hint: 'e.g. Organic Chemistry Fundamentals',
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Topic is required' : null,
+            ),
+            const SizedBox(height: 14),
+            _isLoadingSections
+                ? const Center(child: CircularProgressIndicator())
+                : DropdownButtonFormField<String>(
+                    key: ValueKey(
+                      'course-grade-${widget.gradeCtrl.text}-${_availableGrades.join('|')}',
+                    ),
+                    initialValue:
+                        widget.gradeCtrl.text.isNotEmpty &&
+                            _availableGrades.contains(widget.gradeCtrl.text)
+                        ? widget.gradeCtrl.text
+                        : null,
+                    items: _availableGrades.map((String val) {
+                      return DropdownMenuItem<String>(
+                        value: val,
+                        child: Text(val),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      if (val != null) {
+                        setState(() {
+                          widget.gradeCtrl.text = val;
+                          // Clean up selected sections that don't belong to this grade
+                          widget.selectedSections.removeWhere(
+                            (s) => !_availableSectionsForGrade.contains(s),
+                          );
+                        });
+                      }
+                    },
+                    style: TextStyle(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Colors.black87,
+                      fontSize: 14,
+                    ),
+                    dropdownColor:
+                        Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF142240)
+                        : Colors.white,
+                    decoration: InputDecoration(
+                      labelText: 'Grade',
+                      hintText: 'Select Grade',
+                      labelStyle: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF8BA3C0)
+                            : Colors.grey.shade600,
+                        fontSize: 13,
                       ),
-                      initialValue: widget.gradeCtrl.text.isNotEmpty && _availableGrades.contains(widget.gradeCtrl.text)
-                          ? widget.gradeCtrl.text 
-                          : null,
-                      items: _availableGrades.map((String val) {
-                        return DropdownMenuItem<String>(
-                          value: val,
-                          child: Text(val),
-                        );
-                      }).toList(),
-                      onChanged: (val) {
+                      hintStyle: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0x668BA3C0)
+                            : Colors.grey.shade400,
+                        fontSize: 13,
+                      ),
+                      filled: true,
+                      fillColor: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF0A1628)
+                          : Colors.grey.shade100,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: const BorderSide(color: Color(0x3300FF88)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: const BorderSide(color: Color(0x3300FF88)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: const BorderSide(
+                          color: Color(0xFF00FF88),
+                          width: 1.5,
+                        ),
+                      ),
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: const BorderSide(color: Color(0xFFFF4757)),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: const BorderSide(
+                          color: Color(0xFFFF4757),
+                          width: 1.5,
+                        ),
+                      ),
+                      errorStyle: const TextStyle(
+                        color: Color(0xFFFF4757),
+                        fontSize: 11,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
+                      ),
+                    ),
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? 'Grade is required'
+                        : null,
+                  ),
+            if (!_isLoadingSections && widget.gradeCtrl.text.isNotEmpty) ...[
+              const SizedBox(height: 14),
+              DropdownButtonFormField<String>(
+                key: ValueKey(
+                  'course-section-${widget.gradeCtrl.text}-${widget.selectedSections.join('|')}',
+                ),
+                initialValue: null,
+                hint: Text(
+                  availableSections.isEmpty
+                      ? 'No sections available for this grade'
+                      : remainingSections.isEmpty
+                      ? 'All assigned sections added'
+                      : 'Select section to add',
+                  style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0x668BA3C0)
+                        : Colors.grey.shade400,
+                    fontSize: 13,
+                  ),
+                ),
+                items: remainingSections.map((String val) {
+                  return DropdownMenuItem<String>(value: val, child: Text(val));
+                }).toList(),
+                onChanged: remainingSections.isEmpty
+                    ? null
+                    : (val) {
                         if (val != null) {
                           setState(() {
-                            widget.gradeCtrl.text = val;
-                            // Clean up selected sections that don't belong to this grade
-                            widget.selectedSections.removeWhere((s) => !_availableSectionsForGrade.contains(s));
+                            widget.selectedSections.add(val);
                           });
                         }
                       },
-                      style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87, fontSize: 14),
-                      dropdownColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
-                      decoration: InputDecoration(
-                        labelText: 'Grade',
-                        hintText: 'Select Grade',
-                        labelStyle: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 13),
-                        hintStyle: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x668BA3C0) : Colors.grey.shade400, fontSize: 13),
-                        filled: true,
-                        fillColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade100,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(color: Color(0x3300FF88)),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(color: Color(0x3300FF88)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(color: Color(0xFF00FF88), width: 1.5),
-                        ),
-                        errorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(color: Color(0xFFFF4757)),
-                        ),
-                        focusedErrorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(color: Color(0xFFFF4757), width: 1.5),
-                        ),
-                        errorStyle: const TextStyle(color: Color(0xFFFF4757), fontSize: 11),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      ),
-                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Grade is required' : null,
-                    ),
-              if (!_isLoadingSections && widget.gradeCtrl.text.isNotEmpty) ...[
-                const SizedBox(height: 14),
-                DropdownButtonFormField<String>(
-                  key: ValueKey(
-                    'course-section-${widget.gradeCtrl.text}-${widget.selectedSections.join('|')}',
+                style: TextStyle(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black87,
+                  fontSize: 14,
+                ),
+                dropdownColor: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF142240)
+                    : Colors.white,
+                decoration: InputDecoration(
+                  labelText: 'Sections',
+                  labelStyle: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF8BA3C0)
+                        : Colors.grey.shade600,
+                    fontSize: 13,
                   ),
-                  initialValue: null,
-                  hint: Text(
-                    availableSections.isEmpty
-                        ? 'No sections available for this grade'
-                        : remainingSections.isEmpty
-                            ? 'All assigned sections added'
-                            : 'Select section to add',
-                    style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x668BA3C0) : Colors.grey.shade400, fontSize: 13),
+                  filled: true,
+                  fillColor: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF0A1628)
+                      : Colors.grey.shade100,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: const BorderSide(color: Color(0x3300FF88)),
                   ),
-                  items: remainingSections.map((String val) {
-                    return DropdownMenuItem<String>(
-                      value: val,
-                      child: Text(val),
-                    );
-                  }).toList(),
-                  onChanged: remainingSections.isEmpty
-                      ? null
-                      : (val) {
-                          if (val != null) {
-                            setState(() {
-                              widget.selectedSections.add(val);
-                            });
-                          }
-                        },
-                  style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87, fontSize: 14),
-                  dropdownColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
-                  decoration: InputDecoration(
-                    labelText: 'Sections',
-                    labelStyle: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 13),
-                    filled: true,
-                    fillColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade100,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(color: Color(0x3300FF88)),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: const BorderSide(color: Color(0x3300FF88)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: const BorderSide(
+                      color: Color(0xFF00FF88),
+                      width: 1.5,
                     ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(color: Color(0x3300FF88)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(color: Color(0xFF00FF88), width: 1.5),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
                   ),
                 ),
-                if (widget.selectedSections.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    'Assigned sections',
-                    style: TextStyle(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0xFF8BA3C0)
-                          : Colors.grey.shade700,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
+              ),
+              if (widget.selectedSections.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Text(
+                  'Assigned sections',
+                  style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF8BA3C0)
+                        : Colors.grey.shade700,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
                   ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: widget.selectedSections.map((s) {
-                      return Chip(
-                        label: Text(s, style: TextStyle(fontSize: 12, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87)),
-                        backgroundColor: const Color(0x2200FF88),
-                        visualDensity: VisualDensity.compact,
-                        deleteIconColor: const Color(0xFF00FF88),
-                        onDeleted: () {
-                          setState(() {
-                            widget.selectedSections.remove(s);
-                          });
-                        },
-                        side: const BorderSide(color: Color(0xFF00FF88)),
-                      );
-                    }).toList(),
-                  ),
-                ],
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: widget.selectedSections.map((s) {
+                    return Chip(
+                      label: Text(
+                        s,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black87,
+                        ),
+                      ),
+                      backgroundColor: const Color(0x2200FF88),
+                      visualDensity: VisualDensity.compact,
+                      deleteIconColor: const Color(0xFF00FF88),
+                      onDeleted: () {
+                        setState(() {
+                          widget.selectedSections.remove(s);
+                        });
+                      },
+                      side: const BorderSide(color: Color(0xFF00FF88)),
+                    );
+                  }).toList(),
+                ),
               ],
+            ],
           ],
         ),
       ),
@@ -1645,7 +1983,11 @@ class _CourseFormDialogState extends State<_CourseFormDialog> {
           onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
           child: Text(
             'Cancel',
-            style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
+            style: TextStyle(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF8BA3C0)
+                  : Colors.grey.shade600,
+            ),
           ),
         ),
         ElevatedButton(
@@ -1685,14 +2027,31 @@ class _CourseFormDialogState extends State<_CourseFormDialog> {
     return TextFormField(
       controller: controller,
       validator: validator,
-      style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87, fontSize: 14),
+      style: TextStyle(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.white
+            : Colors.black87,
+        fontSize: 14,
+      ),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        labelStyle: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600, fontSize: 13),
-        hintStyle: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0x668BA3C0) : Colors.grey.shade400, fontSize: 13),
+        labelStyle: TextStyle(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF8BA3C0)
+              : Colors.grey.shade600,
+          fontSize: 13,
+        ),
+        hintStyle: TextStyle(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0x668BA3C0)
+              : Colors.grey.shade400,
+          fontSize: 13,
+        ),
         filled: true,
-        fillColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.grey.shade100,
+        fillColor: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF0A1628)
+            : Colors.grey.shade100,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
           borderSide: const BorderSide(color: Color(0x3300FF88)),

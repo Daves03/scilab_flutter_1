@@ -252,9 +252,10 @@ const List<Map<String, dynamic>> _experimentMaps = [
         'Row of test tubes showing rainbow of colors from pH indicator acid base test',
     'steps': [
       {
-        'bottleTag': 'Indicator',
-        'instructionTitle': 'Step 1: Add Indicator',
-        'instructionDetail': 'Drop the pH indicator into the test tubes.',
+        'bottleTag': 'Litmus',
+        'instructionTitle': 'STEP 1: MIX AND TEST A SOLUTION',
+        'instructionDetail':
+            'Mix any one test solution with water in the beaker, then dip the litmus paper into the mixture to observe its pH. You may add and compare other solutions if you want—the experiment is graded after your first valid litmus result.',
       },
     ],
   },

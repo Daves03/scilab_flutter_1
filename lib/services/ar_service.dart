@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import '../models/ar_experiment_model.dart';
 import '../data/dummy_ar_experiments.dart';
@@ -9,6 +10,8 @@ class ArService {
   static const _periodicTableId = 'ar8';
   static const _periodicTableThumbnail =
       'assets/images/ar_periodic_table_thumbnail.png';
+
+  bool get _isSignedIn => FirebaseAuth.instance.currentUser != null;
 
   ArExperimentModel _withBundledPeriodicTableThumbnail(
     ArExperimentModel experiment,
@@ -35,6 +38,10 @@ class ArService {
   }
 
   Stream<List<ArExperimentModel>> experimentsStream() async* {
+    if (!_isSignedIn) {
+      yield dummyArExperiments;
+      return;
+    }
     try {
       await for (final snap in _db.collection(_collection).snapshots()) {
         final exps = snap.docs
@@ -52,7 +59,11 @@ class ArService {
         yield merged;
       }
     } catch (error) {
-      debugPrint('AR Service fallback due to error: $error');
+      // Firestore closes authenticated listeners when logout clears the token.
+      // That is an expected lifecycle event, not an application error.
+      if (_isSignedIn) {
+        debugPrint('AR Service fallback due to error: $error');
+      }
       yield dummyArExperiments;
     }
   }
@@ -87,7 +98,7 @@ class ArService {
   Stream<List<String>> streamLockedExperimentsForSections(
     List<String> sections,
   ) async* {
-    if (sections.isEmpty) {
+    if (sections.isEmpty || !_isSignedIn) {
       yield const [];
       return;
     }
@@ -108,7 +119,9 @@ class ArService {
         yield lockedIds.toList();
       }
     } catch (error) {
-      debugPrint('AR lock fallback due to error: $error');
+      if (_isSignedIn) {
+        debugPrint('AR lock fallback due to error: $error');
+      }
       // If locks cannot be read, keep the catalogue usable and default to
       // unlocked instead of leaking an unhandled Firestore stream error.
       yield const [];
@@ -119,7 +132,7 @@ class ArService {
   Stream<Map<String, List<String>>> streamSectionLocks(
     List<String> sections,
   ) async* {
-    if (sections.isEmpty) {
+    if (sections.isEmpty || !_isSignedIn) {
       yield const {};
       return;
     }
@@ -139,7 +152,9 @@ class ArService {
         yield map;
       }
     } catch (error) {
-      debugPrint('AR section-lock fallback due to error: $error');
+      if (_isSignedIn) {
+        debugPrint('AR section-lock fallback due to error: $error');
+      }
       yield const {};
     }
   }

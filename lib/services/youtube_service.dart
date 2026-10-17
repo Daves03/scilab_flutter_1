@@ -31,7 +31,10 @@ class YoutubeService {
 
   Future<List<YoutubeVideo>> searchVideos(String query, {int maxResults = 3}) async {
     // If API key is not set, return dummy data to prevent crashes
-    if (_apiKey == 'YOUR_YOUTUBE_API_KEY' || _apiKey.isEmpty) {
+    final normalizedKey = _apiKey.trim().toLowerCase();
+    if (normalizedKey.isEmpty ||
+        normalizedKey == 'your_youtube_api_key' ||
+        normalizedKey == 'yt api here') {
       return [
         YoutubeVideo(
           id: 'jNQXAC9IVRw', // "Me at the zoo" - First YouTube video

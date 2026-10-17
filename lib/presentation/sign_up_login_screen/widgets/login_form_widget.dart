@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/app_export.dart';
 import '../../../services/auth_service.dart';
@@ -15,6 +16,9 @@ class LoginFormWidget extends StatefulWidget {
 
 // TODO: Replace with [Riverpod/Bloc] for production auth
 class _LoginFormWidgetState extends State<LoginFormWidget> {
+  static const _rememberMeKey = 'login_remember_me';
+  static const _rememberedEmailKey = 'login_remembered_email';
+
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -29,6 +33,34 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
   );
 
 
+  @override
+  void initState() {
+    super.initState();
+    _restoreRememberedAccount();
+  }
+
+  Future<void> _restoreRememberedAccount() async {
+    final prefs = await SharedPreferences.getInstance();
+    final rememberMe = prefs.getBool(_rememberMeKey) ?? false;
+    final email = rememberMe ? prefs.getString(_rememberedEmailKey) : null;
+    if (!mounted) return;
+    setState(() {
+      _rememberMe = rememberMe;
+      if (email != null && email.isNotEmpty) {
+        _emailController.text = email;
+      }
+    });
+  }
+
+  Future<void> _saveRememberedAccount(String email, bool rememberMe) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_rememberMeKey, rememberMe);
+    if (rememberMe) {
+      await prefs.setString(_rememberedEmailKey, email);
+    } else {
+      await prefs.remove(_rememberedEmailKey);
+    }
+  }
 
   @override
   void dispose() {
@@ -44,10 +76,13 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
       _errorMessage = null;
     });
     try {
+      final email = _emailController.text.trim();
+      final rememberMe = _rememberMe;
       final role = await context.read<AuthService>().login(
-            email: _emailController.text.trim(),
+            email: email,
             password: _passwordController.text,
           );
+      await _saveRememberedAccount(email, rememberMe);
       if (!mounted) return;
       widget.onSuccess(role);
     } on AuthFailure catch (e) {

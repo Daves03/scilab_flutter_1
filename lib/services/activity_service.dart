@@ -127,6 +127,7 @@ class ActivityService {
       await _experimentsRef(completion.uid)
           .doc(completion.experimentId)
           .set({
+            'experimentId': completion.experimentId,
             'completedAt': Timestamp.fromDate(completion.completedAt),
             if (completion.ppeScore != null) 'ppeScore': completion.ppeScore,
             if (completion.selectedPpe != null)
@@ -135,6 +136,9 @@ class ActivityService {
               'requiredPpe': completion.requiredPpe,
             if (completion.rubricScores != null)
               'rubricScores': completion.rubricScores,
+            if (completion.rubricScores != null &&
+                completion.rubricScores!['total'] is num)
+              'score': completion.rubricScores!['total'],
           }, SetOptions(merge: true))
           .timeout(_writeTimeout);
       return ActivitySyncStatus.synced;

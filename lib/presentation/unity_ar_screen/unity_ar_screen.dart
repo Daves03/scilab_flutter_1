@@ -273,6 +273,15 @@ class _UnityArScreenState extends State<UnityArScreen>
       return;
     }
 
+    // PPE and the AR scene both use landscape. The PPE dialog uses a compact
+    // two-column checklist so every choice remains visible at once.
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    if (!mounted) return;
+
     final requiredPpe = requiredPpeForExperiment(experimentId);
     if (requiredPpe.isNotEmpty) {
       final fallbackExperiment = dummyArExperiments.firstWhere(
@@ -388,6 +397,18 @@ class _UnityArScreenState extends State<UnityArScreen>
                 'Turn on the Bunsen burner flame, then place the coated nichrome wire over the burner to observe the flame color produced!',
           ),
         ];
+      } else if (_isPhExperiment) {
+        // Keep the pH guide aligned with the actual Unity interaction. The
+        // scene reports completion when the litmus result is produced, not as
+        // separate STEP_COMPLETED messages for each poured bottle.
+        _currentSteps = [
+          ExperimentStep(
+            bottleTag: 'Litmus',
+            instructionTitle: 'STEP 1: MIX AND TEST A SOLUTION',
+            instructionDetail:
+                'Mix any one test solution with water in the beaker, then dip the litmus paper into the mixture to observe its pH. You may add and compare other solutions if you want—the experiment is graded after your first valid litmus result.',
+          ),
+        ];
       }
 
       // Tell Unity to load the experiment / scene
@@ -399,6 +420,10 @@ class _UnityArScreenState extends State<UnityArScreen>
         _activityService.logExperimentLaunch(uid, experimentId);
       }
     } else {
+      if (!mounted) return;
+      await SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -539,13 +564,23 @@ class _UnityArScreenState extends State<UnityArScreen>
       String combinationKeys = trimmedMessage.replaceFirst("EXPLANATION:", "");
 
       // Look it up in our dynamic dictionary! If not found, show default.
-      String explanation =
-          _reactionDatabase[combinationKeys] ??
-          "You've mixed a complex soup! Without strong acids or bases, it becomes a murky mix with a default pH.";
+      final knownExplanation = _reactionDatabase[combinationKeys];
+      final explanation =
+          knownExplanation ??
+          (combinationKeys.contains(' ')
+              ? combinationKeys
+              : "You've mixed a complex soup! Without strong acids or bases, it becomes a murky mix with a default pH.");
 
       setState(() {
         _activeExplanation = explanation;
       });
+
+      // LitmusPaperController sends EXPLANATION only after a filled beaker has
+      // been tested and the paper finishes changing color. That is the pH
+      // scene's terminal action, so open the knowledge check and grade flow.
+      if (_isPhExperiment) {
+        _handleExperimentComplete();
+      }
       return;
     }
 
