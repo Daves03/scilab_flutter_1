@@ -35,6 +35,7 @@ class _UnityArScreenState extends State<UnityArScreen>
   PpeSelectionResult? _ppeSelectionResult;
   ExperimentGrade? _experimentGrade;
   bool _showKnowledgeCheck = false;
+  bool _isAwaitingKnowledgeCheck = false;
   List<int?> _knowledgeAnswers = const [null, null];
   int _sequenceErrors = 0;
   int _equipmentErrors = 0;
@@ -330,6 +331,7 @@ class _UnityArScreenState extends State<UnityArScreen>
         _completionSyncStatus = null;
         _experimentGrade = null;
         _showKnowledgeCheck = false;
+        _isAwaitingKnowledgeCheck = false;
         _knowledgeAnswers = const [null, null];
         _sequenceErrors = 0;
         _equipmentErrors = 0;
@@ -753,8 +755,73 @@ class _UnityArScreenState extends State<UnityArScreen>
     setState(() {
       _hasCompleted = true;
       _knowledgeAnswers = const [null, null];
+      _isAwaitingKnowledgeCheck = true;
+    });
+  }
+
+  void _openKnowledgeCheck() {
+    if (!mounted || !_isAwaitingKnowledgeCheck) return;
+    setState(() {
+      _isAwaitingKnowledgeCheck = false;
       _showKnowledgeCheck = true;
     });
+  }
+
+  Widget _buildObservationPrompt() {
+    return SafeArea(
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 520),
+          margin: const EdgeInsets.fromLTRB(84, 12, 84, 18),
+          padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0A1628).withValues(alpha: 0.94),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFF00D4FF), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.45),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.visibility_rounded, color: Color(0xFF00D4FF)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  _isPhExperiment
+                      ? 'Observe the final litmus color and compare it with the pH color scale before continuing.'
+                      : 'Observe the final reaction and result before continuing.',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    height: 1.3,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              FilledButton.icon(
+                onPressed: _openKnowledgeCheck,
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF00D4FF),
+                  foregroundColor: const Color(0xFF07111F),
+                ),
+                icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                label: const Text(
+                  'Continue',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _submitKnowledgeCheck() {
@@ -977,96 +1044,110 @@ class _UnityArScreenState extends State<UnityArScreen>
                   width: 1.5,
                 ),
               ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.emoji_events,
-                      color: Colors.amber,
-                      size: 50,
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'Experiment Complete!',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.emoji_events,
+                            color: Colors.amber,
+                            size: 50,
+                          ),
+                          const SizedBox(height: 10),
+                          const Text(
+                            'Experiment Complete!',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          const Text(
+                            'Great job! You have successfully completed this chemistry experiment.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Color(0xFF8BA3C0),
+                              fontSize: 16,
+                            ),
+                          ),
+                          if (_experimentGrade != null) ...[
+                            const SizedBox(height: 10),
+                            Text(
+                              '${_experimentGrade!.totalScore}/100',
+                              style: const TextStyle(
+                                color: Color(0xFF00FF88),
+                                fontSize: 34,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            Text(
+                              _experimentGrade!.performanceLevel,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            _buildGradeRow(
+                              'PPE and safety',
+                              _experimentGrade!.ppeScore,
+                              15,
+                            ),
+                            _buildGradeRow(
+                              'Procedure and sequence',
+                              _experimentGrade!.procedureScore,
+                              35,
+                            ),
+                            _buildGradeRow(
+                              'Equipment handling',
+                              _experimentGrade!.equipmentScore,
+                              20,
+                            ),
+                            _buildGradeRow(
+                              'Experimental result',
+                              _experimentGrade!.resultScore,
+                              20,
+                            ),
+                            _buildGradeRow(
+                              'Scientific understanding',
+                              _experimentGrade!.understandingScore,
+                              10,
+                            ),
+                          ],
+                          const SizedBox(height: 10),
+                          Text(
+                            switch (_completionSyncStatus) {
+                              ActivitySyncStatus.synced => 'Progress synced.',
+                              ActivitySyncStatus.permissionDenied =>
+                                'Progress saved on this device. Sync is waiting for account permission.',
+                              ActivitySyncStatus.pending =>
+                                'Progress saved on this device and will sync when you are online.',
+                              null => 'Saving progress on this device…',
+                            },
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color:
+                                  _completionSyncStatus ==
+                                      ActivitySyncStatus.synced
+                                  ? const Color(0xFF00FF88)
+                                  : const Color(0xFFFFC857),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 14),
-                    const Text(
-                      'Great job! You have successfully completed this chemistry experiment.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Color(0xFF8BA3C0), fontSize: 16),
-                    ),
-                    if (_experimentGrade != null) ...[
-                      const SizedBox(height: 10),
-                      Text(
-                        '${_experimentGrade!.totalScore}/100',
-                        style: const TextStyle(
-                          color: Color(0xFF00FF88),
-                          fontSize: 34,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      Text(
-                        _experimentGrade!.performanceLevel,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      _buildGradeRow(
-                        'PPE and safety',
-                        _experimentGrade!.ppeScore,
-                        15,
-                      ),
-                      _buildGradeRow(
-                        'Procedure and sequence',
-                        _experimentGrade!.procedureScore,
-                        35,
-                      ),
-                      _buildGradeRow(
-                        'Equipment handling',
-                        _experimentGrade!.equipmentScore,
-                        20,
-                      ),
-                      _buildGradeRow(
-                        'Experimental result',
-                        _experimentGrade!.resultScore,
-                        20,
-                      ),
-                      _buildGradeRow(
-                        'Scientific understanding',
-                        _experimentGrade!.understandingScore,
-                        10,
-                      ),
-                    ],
-                    const SizedBox(height: 10),
-                    Text(
-                      switch (_completionSyncStatus) {
-                        ActivitySyncStatus.synced => 'Progress synced.',
-                        ActivitySyncStatus.permissionDenied =>
-                          'Progress saved on this device. Sync is waiting for account permission.',
-                        ActivitySyncStatus.pending =>
-                          'Progress saved on this device and will sync when you are online.',
-                        null => 'Saving progress on this device…',
-                      },
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color:
-                            _completionSyncStatus == ActivitySyncStatus.synced
-                            ? const Color(0xFF00FF88)
-                            : const Color(0xFFFFC857),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
+                  ),
+                  const Divider(height: 14, color: Color(0x3300D4FF)),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF00D4FF),
                         foregroundColor: Colors.black,
@@ -1078,6 +1159,7 @@ class _UnityArScreenState extends State<UnityArScreen>
                           vertical: 12,
                         ),
                       ),
+                      icon: const Icon(Icons.check_circle_outline_rounded),
                       onPressed: () {
                         if (mounted) {
                           setState(() {
@@ -1085,13 +1167,13 @@ class _UnityArScreenState extends State<UnityArScreen>
                           });
                         }
                       },
-                      child: const Text(
+                      label: const Text(
                         'Finish',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -1252,6 +1334,7 @@ class _UnityArScreenState extends State<UnityArScreen>
       _hasCompleted = false;
       _showCompletionPopup = false;
       _showKnowledgeCheck = false;
+      _isAwaitingKnowledgeCheck = false;
       _experimentGrade = null;
       _knowledgeAnswers = const [null, null];
       _sequenceErrors = 0;
@@ -2089,6 +2172,8 @@ class _UnityArScreenState extends State<UnityArScreen>
                   },
                 ),
               ),
+
+            if (_isAwaitingKnowledgeCheck) _buildObservationPrompt(),
 
             if (_showKnowledgeCheck) _buildKnowledgeCheck(),
             if (_showCompletionPopup) _buildCompletionPopup(),
