@@ -8,6 +8,7 @@ import 'package:universal_html/html.dart' as html;
 import 'package:go_router/go_router.dart';
 
 import '../../core/app_export.dart';
+import '../../widgets/centered_editable_name.dart';
 import '../../services/auth_service.dart';
 import '../../core/theme_provider.dart';
 import '../../routes/app_routes.dart';
@@ -48,8 +49,8 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
       final user = context.read<AuthService>().currentUser;
       _teacherName = user?.name ?? 'Teacher';
       _email = user?.email ?? 'teacher@scilabar.edu';
-      _teacherSections = (user?.sections?.isNotEmpty ?? false) 
-          ? user!.sections! 
+      _teacherSections = (user?.sections?.isNotEmpty ?? false)
+          ? user!.sections!
           : [];
       _avatarUrl = user?.avatarUrl?.trim() ?? '';
     });
@@ -90,9 +91,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final action = await showProfilePictureActionDialog(
       context,
-      accentColor: isDark
-          ? const Color(0xFF00FF88)
-          : const Color(0xFF00994C),
+      accentColor: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
     );
 
     if (!mounted) return;
@@ -110,8 +109,10 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
         label: 'images',
         extensions: <String>['jpg', 'jpeg', 'png', 'gif'],
       );
-      final XFile? file = await openFile(acceptedTypeGroups: <XTypeGroup>[typeGroup]);
-      
+      final XFile? file = await openFile(
+        acceptedTypeGroups: <XTypeGroup>[typeGroup],
+      );
+
       if (file == null) return;
 
       setState(() => _isUploadingProfilePic = true);
@@ -122,10 +123,18 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Profile picture updated successfully', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+            content: const Text(
+              'Profile picture updated successfully',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             backgroundColor: const Color(0xFF00994C),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         );
         _loadProfile();
@@ -134,10 +143,18 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to update picture: $e', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+            content: Text(
+              'Failed to update picture: $e',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             backgroundColor: Colors.redAccent,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         );
       }
@@ -160,11 +177,16 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
           SnackBar(
             content: const Text(
               'Profile picture removed',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             backgroundColor: const Color(0xFF00994C),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         );
       }
@@ -174,11 +196,16 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
           SnackBar(
             content: Text(
               'Failed to remove picture: $e',
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             backgroundColor: Colors.redAccent,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         );
       }
@@ -197,7 +224,9 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           backgroundColor: isDark ? const Color(0xFF142240) : Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: Text(
             'Confirm Download',
             style: theme.textTheme.titleLarge?.copyWith(
@@ -217,7 +246,9 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
               child: Text(
                 'Cancel',
                 style: TextStyle(
-                  color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                  color: isDark
+                      ? const Color(0xFF8BA3C0)
+                      : Colors.grey.shade600,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -231,7 +262,10 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: const Text('Download', style: TextStyle(fontWeight: FontWeight.w600)),
+              child: const Text(
+                'Download',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
             ),
           ],
         );
@@ -275,12 +309,16 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           backgroundColor: isDark ? const Color(0xFF142240) : Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: Text(
             isError ? 'Error' : 'Download Complete',
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w700,
-              color: isError ? const Color(0xFFFF4757) : (isDark ? Colors.white : Colors.black87),
+              color: isError
+                  ? const Color(0xFFFF4757)
+                  : (isDark ? Colors.white : Colors.black87),
             ),
           ),
           content: Text(
@@ -293,13 +331,20 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
             ElevatedButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: isError ? const Color(0xFFFF4757) : const Color(0xFF00FF88),
-                foregroundColor: isError ? Colors.white : const Color(0xFF0A1628),
+                backgroundColor: isError
+                    ? const Color(0xFFFF4757)
+                    : const Color(0xFF00FF88),
+                foregroundColor: isError
+                    ? Colors.white
+                    : const Color(0xFF0A1628),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.w600)),
+              child: const Text(
+                'OK',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
             ),
           ],
         );
@@ -317,7 +362,9 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
       builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: isDark ? const Color(0xFF142240) : Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: Text(
             'Change Name',
             style: theme.textTheme.titleLarge?.copyWith(
@@ -330,14 +377,24 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
             style: TextStyle(color: isDark ? Colors.white : Colors.black87),
             decoration: InputDecoration(
               hintText: 'Enter new name',
-              hintStyle: TextStyle(color: isDark ? Colors.grey.shade500 : Colors.grey.shade400),
+              hintStyle: TextStyle(
+                color: isDark ? Colors.grey.shade500 : Colors.grey.shade400,
+              ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: isDark ? const Color(0xFF334A66) : Colors.grey.shade300),
+                borderSide: BorderSide(
+                  color: isDark
+                      ? const Color(0xFF334A66)
+                      : Colors.grey.shade300,
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C)),
+                borderSide: BorderSide(
+                  color: isDark
+                      ? const Color(0xFF00FF88)
+                      : const Color(0xFF00994C),
+                ),
               ),
             ),
           ),
@@ -347,7 +404,9 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
               child: Text(
                 'Cancel',
                 style: TextStyle(
-                  color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                  color: isDark
+                      ? const Color(0xFF8BA3C0)
+                      : Colors.grey.shade600,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -361,11 +420,20 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
-                foregroundColor: isDark ? const Color(0xFF0A1628) : Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                backgroundColor: isDark
+                    ? const Color(0xFF00FF88)
+                    : const Color(0xFF00994C),
+                foregroundColor: isDark
+                    ? const Color(0xFF0A1628)
+                    : Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
-              child: const Text('Save', style: TextStyle(fontWeight: FontWeight.w600)),
+              child: const Text(
+                'Save',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
             ),
           ],
         );
@@ -382,7 +450,9 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
       builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: isDark ? const Color(0xFF142240) : Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: Text(
             'Confirm Name Change',
             style: theme.textTheme.titleLarge?.copyWith(
@@ -402,7 +472,9 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
               child: Text(
                 'Cancel',
                 style: TextStyle(
-                  color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                  color: isDark
+                      ? const Color(0xFF8BA3C0)
+                      : Colors.grey.shade600,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -418,10 +490,18 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: const Text('Name updated successfully', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                        content: const Text(
+                          'Name updated successfully',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                         backgroundColor: const Color(0xFF00994C),
                         behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                     );
                   }
@@ -429,21 +509,38 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Failed to update name: $e', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                        content: Text(
+                          'Failed to update name: $e',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                         backgroundColor: Colors.redAccent,
                         behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                     );
                   }
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
-                foregroundColor: isDark ? const Color(0xFF0A1628) : Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                backgroundColor: isDark
+                    ? const Color(0xFF00FF88)
+                    : const Color(0xFF00994C),
+                foregroundColor: isDark
+                    ? const Color(0xFF0A1628)
+                    : Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
-              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.w600)),
+              child: const Text(
+                'OK',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
             ),
           ],
         );
@@ -470,14 +567,23 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1A2E1A) : const Color(0xFF00994C).withOpacity(0.1),
+                      color: isDark
+                          ? const Color(0xFF1A2E1A)
+                          : const Color(0xFF00994C).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12.0),
-                      border: Border.all(color: isDark ? const Color(0x3300FF88) : const Color(0xFF00994C).withOpacity(0.3), width: 1),
+                      border: Border.all(
+                        color: isDark
+                            ? const Color(0x3300FF88)
+                            : const Color(0xFF00994C).withOpacity(0.3),
+                        width: 1,
+                      ),
                     ),
                     child: Center(
                       child: CustomIconWidget(
                         iconName: 'person',
-                        color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                        color: isDark
+                            ? const Color(0xFF00FF88)
+                            : const Color(0xFF00994C),
                         size: 20,
                       ),
                     ),
@@ -497,24 +603,41 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                         ),
                         Text(
                           'Teacher Dashboard',
-                          style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C)),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDark
+                                ? const Color(0xFF00FF88)
+                                : const Color(0xFF00994C),
+                          ),
                         ),
                       ],
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0x2200FF88) : const Color(0xFF00994C).withOpacity(0.1),
+                      color: isDark
+                          ? const Color(0x2200FF88)
+                          : const Color(0xFF00994C).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(50.0),
-                      border: Border.all(color: isDark ? const Color(0x5500FF88) : const Color(0xFF00994C).withOpacity(0.3), width: 1),
+                      border: Border.all(
+                        color: isDark
+                            ? const Color(0x5500FF88)
+                            : const Color(0xFF00994C).withOpacity(0.3),
+                        width: 1,
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         CustomIconWidget(
                           iconName: 'verified',
-                          color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                          color: isDark
+                              ? const Color(0xFF00FF88)
+                              : const Color(0xFF00994C),
                           size: 13,
                         ),
                         const SizedBox(width: 4),
@@ -523,7 +646,9 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                            color: isDark
+                                ? const Color(0xFF00FF88)
+                                : const Color(0xFF00994C),
                           ),
                         ),
                       ],
@@ -548,7 +673,9 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                   color: isDark ? null : Colors.white,
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                    color: isDark ? const Color(0x3300FF88) : Colors.grey.shade200,
+                    color: isDark
+                        ? const Color(0x3300FF88)
+                        : Colors.grey.shade200,
                     width: 1,
                   ),
                   boxShadow: isDark
@@ -557,7 +684,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                             color: Color(0x1100FF88),
                             blurRadius: 20,
                             offset: Offset(0, 8),
-                          )
+                          ),
                         ]
                       : [
                           BoxShadow(
@@ -570,16 +697,25 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                 child: Column(
                   children: [
                     GestureDetector(
-                      onTap: _isUploadingProfilePic ? null : _handleProfilePictureTap,
+                      onTap: _isUploadingProfilePic
+                          ? null
+                          : _handleProfilePictureTap,
                       child: Container(
                         width: 100,
                         height: 100,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C), width: 3),
+                          border: Border.all(
+                            color: isDark
+                                ? const Color(0xFF00FF88)
+                                : const Color(0xFF00994C),
+                            width: 3,
+                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: isDark ? const Color(0x4400FF88) : const Color(0xFF00994C).withOpacity(0.3),
+                              color: isDark
+                                  ? const Color(0x4400FF88)
+                                  : const Color(0xFF00994C).withOpacity(0.3),
                               blurRadius: 15,
                               spreadRadius: 2,
                             ),
@@ -637,7 +773,9 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Center(
-                                  child: CircularProgressIndicator(color: Colors.white),
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                           ],
@@ -645,48 +783,53 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            _teacherName,
-                            style: theme.textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: isDark ? Colors.white : Colors.black87,
-                            ),
-                            textAlign: TextAlign.center,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton(
-                          icon: Icon(Icons.edit, color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C), size: 20),
-                          onPressed: () => _showChangeNameDialog(context),
-                        ),
-                      ],
+                    CenteredEditableName(
+                      name: _teacherName.isEmpty ? 'Teacher' : _teacherName,
+                      style:
+                          theme.textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: isDark ? Colors.white : Colors.black87,
+                          ) ??
+                          const TextStyle(fontWeight: FontWeight.w700),
+                      editColor: isDark
+                          ? const Color(0xFF00FF88)
+                          : const Color(0xFF00994C),
+                      onEdit: () => _showChangeNameDialog(context),
                     ),
                     const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0x2200FF88) : const Color(0xFF00994C).withOpacity(0.1),
+                        color: isDark
+                            ? const Color(0x2200FF88)
+                            : const Color(0xFF00994C).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(50),
-                        border: Border.all(color: isDark ? const Color(0x5500FF88) : const Color(0xFF00994C).withOpacity(0.3)),
+                        border: Border.all(
+                          color: isDark
+                              ? const Color(0x5500FF88)
+                              : const Color(0xFF00994C).withOpacity(0.3),
+                        ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           CustomIconWidget(
                             iconName: 'verified',
-                            color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                            color: isDark
+                                ? const Color(0xFF00FF88)
+                                : const Color(0xFF00994C),
                             size: 14,
                           ),
                           const SizedBox(width: 5),
                           Text(
                             'Verified Teacher',
                             style: theme.textTheme.labelMedium?.copyWith(
-                              color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                              color: isDark
+                                  ? const Color(0xFF00FF88)
+                                  : const Color(0xFF00994C),
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -695,9 +838,18 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                     ),
                     const SizedBox(height: 24),
                     Divider(
-                      color: isDark ? const Color(0xFF1E3A5F) : Colors.grey.shade200,
+                      color: isDark
+                          ? const Color(0xFF1E3A5F)
+                          : Colors.grey.shade200,
                     ),
                     const SizedBox(height: 20),
+                    _InfoRow(
+                      icon: 'person_outline',
+                      label: 'Full Name',
+                      value: _teacherName.isEmpty ? 'Teacher' : _teacherName,
+                      isDark: isDark,
+                    ),
+                    const SizedBox(height: 16),
                     _InfoRow(
                       icon: 'email_outlined',
                       label: 'Email Address',
@@ -734,10 +886,14 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                           colors: [Color(0xFF1A2E1A), Color(0xFF0A1F0A)],
                         )
                       : null,
-                  color: isDark ? null : const Color(0xFF00994C).withOpacity(0.05),
+                  color: isDark
+                      ? null
+                      : const Color(0xFF00994C).withOpacity(0.05),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                    color: isDark ? const Color(0x3300FF88) : const Color(0xFF00994C).withOpacity(0.3),
+                    color: isDark
+                        ? const Color(0x3300FF88)
+                        : const Color(0xFF00994C).withOpacity(0.3),
                     width: 1,
                   ),
                   boxShadow: isDark
@@ -746,7 +902,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                             color: Color(0x1100FF88),
                             blurRadius: 20,
                             offset: Offset(0, 8),
-                          )
+                          ),
                         ]
                       : [],
                 ),
@@ -758,12 +914,16 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: isDark ? const Color(0x2200FF88) : const Color(0xFF00994C).withOpacity(0.1),
+                            color: isDark
+                                ? const Color(0x2200FF88)
+                                : const Color(0xFF00994C).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: CustomIconWidget(
                             iconName: 'view_in_ar',
-                            color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                            color: isDark
+                                ? const Color(0xFF00FF88)
+                                : const Color(0xFF00994C),
                             size: 22,
                           ),
                         ),
@@ -782,7 +942,9 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                               Text(
                                 'Download and print for AR experiments',
                                 style: theme.textTheme.bodySmall?.copyWith(
-                                  color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                                  color: isDark
+                                      ? const Color(0xFF8BA3C0)
+                                      : Colors.grey.shade600,
                                 ),
                               ),
                             ],
@@ -832,14 +994,22 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                       child: ElevatedButton.icon(
                         onPressed: _isDownloading ? null : _downloadMarker,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
-                          foregroundColor: isDark ? const Color(0xFF0A1628) : Colors.white,
+                          backgroundColor: isDark
+                              ? const Color(0xFF00FF88)
+                              : const Color(0xFF00994C),
+                          foregroundColor: isDark
+                              ? const Color(0xFF0A1628)
+                              : Colors.white,
                           elevation: 4,
-                          shadowColor: isDark ? const Color(0x6600FF88) : const Color(0xFF00994C).withOpacity(0.4),
+                          shadowColor: isDark
+                              ? const Color(0x6600FF88)
+                              : const Color(0xFF00994C).withOpacity(0.4),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
-                          disabledBackgroundColor: isDark ? const Color(0xFF00FF88).withAlpha(100) : const Color(0xFF00994C).withAlpha(100),
+                          disabledBackgroundColor: isDark
+                              ? const Color(0xFF00FF88).withAlpha(100)
+                              : const Color(0xFF00994C).withAlpha(100),
                         ),
                         icon: _isDownloading
                             ? const SizedBox(
@@ -856,7 +1026,9 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                                 size: 20,
                               ),
                         label: Text(
-                          _isDownloading ? 'Saving to Gallery...' : 'Download AR Marker',
+                          _isDownloading
+                              ? 'Saving to Gallery...'
+                              : 'Download AR Marker',
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
@@ -874,7 +1046,10 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                 height: 52,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFF334A66), width: 1.5),
+                  border: Border.all(
+                    color: const Color(0xFF334A66),
+                    width: 1.5,
+                  ),
                 ),
                 child: Material(
                   color: Colors.transparent,
@@ -892,7 +1067,9 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                           Row(
                             children: [
                               Icon(
-                                isDark ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
+                                isDark
+                                    ? Icons.dark_mode_outlined
+                                    : Icons.light_mode_outlined,
                                 color: const Color(0xFF8BA3C0),
                                 size: 20,
                               ),
@@ -932,8 +1109,12 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                       builder: (BuildContext dialogContext) {
                         final scrollController = ScrollController();
                         return AlertDialog(
-                          backgroundColor: isDark ? const Color(0xFF142240) : Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          backgroundColor: isDark
+                              ? const Color(0xFF142240)
+                              : Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                           title: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -942,13 +1123,21 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                                   'About App & Developer',
                                   style: theme.textTheme.titleLarge?.copyWith(
                                     fontWeight: FontWeight.w700,
-                                    color: isDark ? Colors.white : Colors.black87,
+                                    color: isDark
+                                        ? Colors.white
+                                        : Colors.black87,
                                   ),
                                 ),
                               ),
                               IconButton(
-                                icon: Icon(Icons.close, color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
-                                onPressed: () => Navigator.of(dialogContext).pop(),
+                                icon: Icon(
+                                  Icons.close,
+                                  color: isDark
+                                      ? const Color(0xFF8BA3C0)
+                                      : Colors.grey.shade600,
+                                ),
+                                onPressed: () =>
+                                    Navigator.of(dialogContext).pop(),
                                 padding: EdgeInsets.zero,
                                 constraints: const BoxConstraints(),
                               ),
@@ -967,125 +1156,163 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                                 controller: scrollController,
                                 padding: const EdgeInsets.only(right: 12.0),
                                 child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Image.asset(
-                                      'assets/images/scilab_logo-1784970842098.png',
-                                      width: 56,
-                                      height: 56,
+                                    Row(
+                                      children: [
+                                        Image.asset(
+                                          'assets/images/scilab_logo-1784970842098.png',
+                                          width: 56,
+                                          height: 56,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          'Scilab AR',
+                                          style: theme.textTheme.titleMedium
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.w700,
+                                                color: isDark
+                                                    ? Colors.white
+                                                    : Colors.black87,
+                                              ),
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(width: 12),
+                                    const SizedBox(height: 20),
                                     Text(
-                                      'Scilab AR',
-                                      style: theme.textTheme.titleMedium?.copyWith(
-                                        fontWeight: FontWeight.w700,
-                                        color: isDark ? Colors.white : Colors.black87,
-                                      ),
+                                      'THE APP',
+                                      style: theme.textTheme.titleSmall
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w800,
+                                            color: isDark
+                                                ? Colors.white
+                                                : Colors.black87,
+                                          ),
                                     ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'SciLab AR is an Augmented Reality (AR) mobile application designed to make chemistry education accessible, safe, and interactive. We believe that financial constraints or lack of laboratory equipment should never hinder a student\'s curiosity.',
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: isDark
+                                                ? const Color(0xFF8BA3C0)
+                                                : Colors.grey.shade700,
+                                            height: 1.4,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      'OUR MISSION',
+                                      style: theme.textTheme.titleSmall
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w800,
+                                            color: isDark
+                                                ? Colors.white
+                                                : Colors.black87,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'To provide a virtual laboratory where students can perform chemical experiments with chemical reactions, procedures and explanations without the risk of dangerous or physical exposure to hazardous substances.',
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: isDark
+                                                ? const Color(0xFF8BA3C0)
+                                                : Colors.grey.shade700,
+                                            height: 1.4,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      'THE TEAM',
+                                      style: theme.textTheme.titleSmall
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w800,
+                                            color: isDark
+                                                ? Colors.white
+                                                : Colors.black87,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Developed by a group of Computer Science students from Cavite State University Bacoor Campus, this project aims to modernize chemistry experiments education in the Philippines using cutting-edge mobile technology.',
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: isDark
+                                                ? const Color(0xFF8BA3C0)
+                                                : Colors.grey.shade700,
+                                            height: 1.4,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    Text(
+                                      'Technical Credits: Built by Scilab AR Team',
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            color: isDark
+                                                ? const Color(0xFF8BA3C0)
+                                                : Colors.grey.shade700,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Image.asset(
+                                      'assets/images/unity_logo.png',
+                                      height: 40,
+                                      color: isDark
+                                          ? Colors.grey.shade300
+                                          : Colors.grey.shade800,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'Core Technology AR: Powered by Unity Game Engine',
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            color: isDark
+                                                ? const Color(0xFF8BA3C0)
+                                                : Colors.grey.shade700,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      'Contact us : scilabar@gmail.com',
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            color: isDark
+                                                ? const Color(0xFF8BA3C0)
+                                                : Colors.grey.shade700,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 24),
+                                    Text(
+                                      'Version 1.0',
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            color: isDark
+                                                ? const Color(0xFF8BA3C0)
+                                                : Colors.grey.shade600,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      'Designed and developed exclusively for Las Piñas National High School - Main',
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            color: isDark
+                                                ? const Color(0xFF8BA3C0)
+                                                : Colors.grey.shade700,
+                                            height: 1.4,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 12),
                                   ],
                                 ),
-                                const SizedBox(height: 20),
-                                Text(
-                                  'THE APP',
-                                  style: theme.textTheme.titleSmall?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    color: isDark ? Colors.white : Colors.black87,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'SciLab AR is an Augmented Reality (AR) mobile application designed to make chemistry education accessible, safe, and interactive. We believe that financial constraints or lack of laboratory equipment should never hinder a student\'s curiosity.',
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
-                                    height: 1.4,
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'OUR MISSION',
-                                  style: theme.textTheme.titleSmall?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    color: isDark ? Colors.white : Colors.black87,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'To provide a virtual laboratory where students can perform chemical experiments with chemical reactions, procedures and explanations without the risk of dangerous or physical exposure to hazardous substances.',
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
-                                    height: 1.4,
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'THE TEAM',
-                                  style: theme.textTheme.titleSmall?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    color: isDark ? Colors.white : Colors.black87,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Developed by a group of Computer Science students from Cavite State University Bacoor Campus, this project aims to modernize chemistry experiments education in the Philippines using cutting-edge mobile technology.',
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
-                                    height: 1.4,
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                Text(
-                                  'Technical Credits: Built by Scilab AR Team',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Image.asset(
-                                  'assets/images/unity_logo.png',
-                                  height: 40,
-                                  color: isDark ? Colors.grey.shade300 : Colors.grey.shade800,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Core Technology AR: Powered by Unity Game Engine',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  'Contact us : scilabar@gmail.com',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: isDark ? const Color(0xFF00FF88) : Colors.green,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
-                                Text(
-                                  'Version 1.0',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  'Designed and developed exclusively for Las Piñas National High School - Main',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
-                                    height: 1.4,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                              ],
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    );
+                        );
                       },
                     );
                   },
@@ -1095,7 +1322,10 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
-                      side: const BorderSide(color: Color(0xFF334A66), width: 1.5),
+                      side: const BorderSide(
+                        color: Color(0xFF334A66),
+                        width: 1.5,
+                      ),
                     ),
                   ),
                   icon: Icon(
@@ -1128,8 +1358,12 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                       context: context,
                       builder: (BuildContext dialogContext) {
                         return AlertDialog(
-                          backgroundColor: isDark ? const Color(0xFF142240) : Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          backgroundColor: isDark
+                              ? const Color(0xFF142240)
+                              : Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                           title: Text(
                             'Log Out',
                             style: theme.textTheme.titleLarge?.copyWith(
@@ -1140,16 +1374,21 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                           content: Text(
                             'Are you sure you want to log out?',
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700,
+                              color: isDark
+                                  ? const Color(0xFF8BA3C0)
+                                  : Colors.grey.shade700,
                             ),
                           ),
                           actions: [
                             TextButton(
-                              onPressed: () => Navigator.of(dialogContext).pop(),
+                              onPressed: () =>
+                                  Navigator.of(dialogContext).pop(),
                               child: Text(
                                 'Cancel',
                                 style: TextStyle(
-                                  color: isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                                  color: isDark
+                                      ? const Color(0xFF8BA3C0)
+                                      : Colors.grey.shade600,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -1171,7 +1410,10 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                              child: const Text('Log Out', style: TextStyle(fontWeight: FontWeight.w600)),
+                              child: const Text(
+                                'Log Out',
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
                             ),
                           ],
                         );
@@ -1184,10 +1426,17 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
-                      side: const BorderSide(color: Color(0xFFFF4757), width: 1.5),
+                      side: const BorderSide(
+                        color: Color(0xFFFF4757),
+                        width: 1.5,
+                      ),
                     ),
                   ),
-                  icon: Icon(Icons.logout, size: 20, color: const Color(0xFFFF4757)),
+                  icon: Icon(
+                    Icons.logout,
+                    size: 20,
+                    color: const Color(0xFFFF4757),
+                  ),
                   label: const Text(
                     'Log Out',
                     style: TextStyle(
@@ -1223,9 +1472,15 @@ class _SectionsRow extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: isDark ? const Color(0x1100FF88) : const Color(0xFF00994C).withOpacity(0.05),
+            color: isDark
+                ? const Color(0x1100FF88)
+                : const Color(0xFF00994C).withOpacity(0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: isDark ? const Color(0x3300FF88) : const Color(0xFF00994C).withOpacity(0.2)),
+            border: Border.all(
+              color: isDark
+                  ? const Color(0x3300FF88)
+                  : const Color(0xFF00994C).withOpacity(0.2),
+            ),
           ),
           child: Center(
             child: CustomIconWidget(
@@ -1260,14 +1515,22 @@ class _SectionsRow extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0x2200FF88) : const Color(0xFF00994C).withOpacity(0.1),
+                          color: isDark
+                              ? const Color(0x2200FF88)
+                              : const Color(0xFF00994C).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: isDark ? const Color(0x5500FF88) : const Color(0xFF00994C).withOpacity(0.3)),
+                          border: Border.all(
+                            color: isDark
+                                ? const Color(0x5500FF88)
+                                : const Color(0xFF00994C).withOpacity(0.3),
+                          ),
                         ),
                         child: Text(
                           section,
                           style: theme.textTheme.labelSmall?.copyWith(
-                            color: isDark ? const Color(0xFF00FF88) : const Color(0xFF00994C),
+                            color: isDark
+                                ? const Color(0xFF00FF88)
+                                : const Color(0xFF00994C),
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -1307,9 +1570,15 @@ class _InfoRow extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: isDark ? const Color(0x1100FF88) : const Color(0xFF00994C).withOpacity(0.05),
+            color: isDark
+                ? const Color(0x1100FF88)
+                : const Color(0xFF00994C).withOpacity(0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: isDark ? const Color(0x3300FF88) : const Color(0xFF00994C).withOpacity(0.2)),
+            border: Border.all(
+              color: isDark
+                  ? const Color(0x3300FF88)
+                  : const Color(0xFF00994C).withOpacity(0.2),
+            ),
           ),
           child: Center(
             child: CustomIconWidget(

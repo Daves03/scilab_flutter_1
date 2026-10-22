@@ -3,9 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/user_model.dart';
 import '../../models/course_model.dart';
+import '../../models/student_course_destination.dart';
+import '../../models/class_announcement_model.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../services/auth_service.dart';
 import '../../services/course_service.dart';
+import '../../services/announcement_service.dart';
 
 import '../../core/app_export.dart';
 import '../../routes/app_routes.dart';
@@ -22,6 +26,7 @@ class StudentHomeScreen extends StatefulWidget {
 
 class _StudentHomeScreenState extends State<StudentHomeScreen>
     with SingleTickerProviderStateMixin {
+  static const int _announcementPageSize = 3;
   static const double _notificationCardHeight = 116;
   static const double _notificationListMaxHeight =
       (_notificationCardHeight * 4) + (12 * 3);
@@ -29,30 +34,73 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
   late AnimationController _entranceController;
   late Timer _timer;
   late final AuthService _authService;
+  final AnnouncementService _announcementService = AnnouncementService();
+  final Map<String, Stream<List<AnnouncementReaction>>>
+  _announcementReactionStreams = {};
+  final Set<String> _updatingAnnouncementReactions = {};
   late DateTime _philippinesTime;
   List<Map<String, dynamic>> _courseActivity = [];
+  List<ClassAnnouncement> _announcements = [];
   Map<String, List<Map<String, dynamic>>> _deadlines = {
     'upcoming': [],
     'missed': [],
   };
   Map<String, dynamic> _progressStats = {'avgQuiz': '0%', 'labs': '0'};
   bool _isLoadingNotifications = true;
+  bool _isLoadingAnnouncements = true;
   bool _isLoadingDeadlines = true;
   bool _isLoadingProgress = true;
   Object? _courseActivityError;
   StreamSubscription? _notificationsSub;
+  StreamSubscription<List<ClassAnnouncement>>? _announcementsSub;
   StreamSubscription? _deadlinesSub;
   StreamSubscription<List<QuizAttempt>>? _quizAttemptsSub;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _labActivitySub;
   String? _studentDataKey;
   int _studentDataVersion = 0;
   bool _hasShownDeadlinePopup = false;
+  int _studentAnnouncementPage = 0;
+
+  String _announcementTeacherName(ClassAnnouncement announcement) {
+    for (final activity in _courseActivity) {
+      final course = activity['course'];
+      if (course is Course &&
+          course.teacherUid == announcement.teacherId &&
+          course.teacherName.trim().isNotEmpty) {
+        return course.teacherName;
+      }
+    }
+    return announcement.teacherName;
+  }
 
   List<Map<String, dynamic>> get _notifications {
     final user = _authService.currentUser;
     final clearedAt = user?.notificationsClearedAt;
     final dismissedIds = user?.dismissedNotificationIds.toSet() ?? <String>{};
-    final visible = _courseActivity.where((activity) {
+    final combined =
+        <Map<String, dynamic>>[
+          ..._courseActivity,
+          ..._announcements.map(
+            (announcement) => {
+              'id': 'class-announcement:${announcement.id}',
+              'title': 'Class Announcement',
+              'desc':
+                  '${_announcementTeacherName(announcement)}: ${announcement.message}',
+              'icon': 'campaign',
+              'color': const Color(0xFF00C875),
+              'timeStr': _formatNotificationTime(announcement.createdAt),
+              'timestamp':
+                  announcement.createdAt ??
+                  DateTime.fromMillisecondsSinceEpoch(0),
+              'isCourseContent': false,
+            },
+          ),
+        ]..sort(
+          (first, second) => (second['timestamp'] as DateTime).compareTo(
+            first['timestamp'] as DateTime,
+          ),
+        );
+    final visible = combined.where((activity) {
       final notificationId = activity['id'] as String?;
       final isAfterClear =
           clearedAt == null ||
@@ -115,16 +163,20 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
   void _subscribeToStudentData() {
     final version = ++_studentDataVersion;
     _notificationsSub?.cancel();
+    _announcementsSub?.cancel();
     _deadlinesSub?.cancel();
     _quizAttemptsSub?.cancel();
     _labActivitySub?.cancel();
+    _announcementReactionStreams.clear();
 
     setState(() {
       _courseActivity = [];
+      _announcements = [];
       _deadlines = {'upcoming': [], 'missed': []};
       _progressStats = {'avgQuiz': '0%', 'labs': '0'};
       _courseActivityError = null;
       _isLoadingNotifications = true;
+      _isLoadingAnnouncements = true;
       _isLoadingDeadlines = true;
       _isLoadingProgress = true;
     });
@@ -132,11 +184,31 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     if (_authService.currentUser == null) {
       setState(() {
         _isLoadingNotifications = false;
+        _isLoadingAnnouncements = false;
         _isLoadingDeadlines = false;
         _isLoadingProgress = false;
       });
       return;
     }
+
+    final student = _authService.currentUser!;
+    _announcementsSub = _announcementService
+        .announcementsForStudent(student)
+        .listen(
+          (announcements) {
+            if (!mounted || version != _studentDataVersion) return;
+            setState(() {
+              _announcements = announcements;
+              _studentAnnouncementPage = 0;
+              _isLoadingAnnouncements = false;
+            });
+          },
+          onError: (Object error) {
+            if (!mounted || version != _studentDataVersion) return;
+            debugPrint('Error streaming class announcements: $error');
+            setState(() => _isLoadingAnnouncements = false);
+          },
+        );
 
     _notificationsSub = _streamDynamicNotifications().listen(
       (data) {
@@ -379,6 +451,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     _timer.cancel();
     _entranceController.dispose();
     _notificationsSub?.cancel();
+    _announcementsSub?.cancel();
     _deadlinesSub?.cancel();
     _quizAttemptsSub?.cancel();
     _labActivitySub?.cancel();
@@ -431,6 +504,12 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
         SliverToBoxAdapter(
           child: _buildAnimatedSection(
             delay: 0,
+            child: _buildStudentAnnouncementsSection(),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: _buildAnimatedSection(
+            delay: 0,
             child: _buildNotificationsSection(),
           ),
         ),
@@ -474,6 +553,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
           ),
         ),
         SliverToBoxAdapter(child: _buildDateTimeSection()),
+        SliverToBoxAdapter(child: _buildStudentAnnouncementsSection()),
         SliverToBoxAdapter(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -571,6 +651,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
           'timestamp':
               courseCreatedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
           'course': course,
+          'contentType': 'course',
           'isCourseContent': true,
         });
 
@@ -589,6 +670,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
             'timeStr': _formatNotificationTime(m.uploadedAt),
             'timestamp': m.uploadedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
             'course': course,
+            'module': m,
+            'contentType': 'module',
             'isCourseContent': true,
           });
         }
@@ -606,6 +689,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
             'timeStr': _formatNotificationTime(q.createdAt),
             'timestamp': q.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0),
             'course': course,
+            'quiz': q,
+            'contentType': 'quiz',
             'isCourseContent': true,
           });
 
@@ -1128,6 +1213,419 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     );
   }
 
+  Widget _buildStudentAnnouncementsSection() {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final accent = isLight ? const Color(0xFF087A4F) : const Color(0xFF00FF88);
+    final pageCount = _announcements.isEmpty
+        ? 0
+        : (_announcements.length + _announcementPageSize - 1) ~/
+              _announcementPageSize;
+    final currentPage = pageCount == 0
+        ? 0
+        : _studentAnnouncementPage.clamp(0, pageCount - 1);
+    final pageStart = currentPage * _announcementPageSize;
+    final proposedEnd = pageStart + _announcementPageSize;
+    final pageEnd = proposedEnd < _announcements.length
+        ? proposedEnd
+        : _announcements.length;
+    final visibleAnnouncements = pageCount == 0
+        ? const <ClassAnnouncement>[]
+        : _announcements.sublist(pageStart, pageEnd);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.campaign_rounded, color: accent, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Class Announcements',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: isLight ? Colors.black87 : Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          if (_isLoadingAnnouncements)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 18),
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            )
+          else if (_announcements.isEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: isLight ? Colors.white : const Color(0xFF142240),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isLight
+                      ? Colors.grey.shade300
+                      : const Color(0xFF1E3A5F),
+                ),
+              ),
+              child: Text(
+                'No announcements from your teachers yet.',
+                style: TextStyle(
+                  color: isLight
+                      ? Colors.grey.shade600
+                      : const Color(0xFF8BA3C0),
+                  fontSize: 12.5,
+                ),
+              ),
+            )
+          else
+            ...visibleAnnouncements.map(
+              (announcement) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _buildStudentAnnouncementCard(announcement),
+              ),
+            ),
+          if (!_isLoadingAnnouncements && pageCount > 1)
+            _buildStudentAnnouncementPager(
+              currentPage: currentPage,
+              pageCount: pageCount,
+              accent: accent,
+              isLight: isLight,
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStudentAnnouncementPager({
+    required int currentPage,
+    required int pageCount,
+    required Color accent,
+    required bool isLight,
+  }) {
+    final mutedColor = isLight
+        ? const Color(0xFF667085)
+        : const Color(0xFF9BB0CA);
+    final borderColor = isLight
+        ? const Color(0xFFD7E0EA)
+        : const Color(0xFF294568);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        color: isLight ? Colors.white : const Color(0xFF101F36),
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(color: borderColor),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextButton.icon(
+              onPressed: currentPage > 0
+                  ? () => setState(
+                      () => _studentAnnouncementPage = currentPage - 1,
+                    )
+                  : null,
+              icon: const Icon(Icons.chevron_left_rounded, size: 18),
+              label: const Text('Previous'),
+              style: TextButton.styleFrom(
+                foregroundColor: accent,
+                disabledForegroundColor: mutedColor.withAlpha(90),
+                textStyle: const TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              '${currentPage + 1} / $pageCount',
+              style: TextStyle(
+                color: mutedColor,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          Expanded(
+            child: TextButton.icon(
+              onPressed: currentPage < pageCount - 1
+                  ? () => setState(
+                      () => _studentAnnouncementPage = currentPage + 1,
+                    )
+                  : null,
+              iconAlignment: IconAlignment.end,
+              icon: const Icon(Icons.chevron_right_rounded, size: 18),
+              label: const Text('Next'),
+              style: TextButton.styleFrom(
+                foregroundColor: accent,
+                disabledForegroundColor: mutedColor.withAlpha(90),
+                textStyle: const TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStudentAnnouncementCard(ClassAnnouncement announcement) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final accent = isLight ? const Color(0xFF087A4F) : const Color(0xFF00FF88);
+    final time = announcement.createdAt == null
+        ? 'Just now'
+        : _formatNotificationTime(announcement.createdAt);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: isLight ? Colors.white : const Color(0xFF142240),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: accent.withAlpha(65)),
+        boxShadow: isLight
+            ? [
+                BoxShadow(
+                  color: Colors.black.withAlpha(10),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ]
+            : null,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: accent.withAlpha(20),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(Icons.campaign_rounded, color: accent, size: 20),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _announcementTeacherName(announcement),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: isLight ? Colors.black87 : Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Teacher announcement • $time${announcement.isEdited ? ' • Edited' : ''}',
+                      style: TextStyle(
+                        color: isLight
+                            ? Colors.grey.shade600
+                            : const Color(0xFF8BA3C0),
+                        fontSize: 10.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 11),
+          Text(
+            announcement.message,
+            style: TextStyle(
+              color: isLight
+                  ? const Color(0xFF344054)
+                  : const Color(0xFFD5E2F0),
+              fontSize: 13,
+              height: 1.45,
+            ),
+          ),
+          const SizedBox(height: 12),
+          _buildStudentAnnouncementReactions(announcement),
+        ],
+      ),
+    );
+  }
+
+  Stream<List<AnnouncementReaction>> _reactionStreamFor(
+    ClassAnnouncement announcement,
+  ) {
+    return _announcementReactionStreams.putIfAbsent(
+      announcement.id,
+      () => _announcementService.reactionsForAnnouncement(announcement.id),
+    );
+  }
+
+  Future<void> _toggleAnnouncementReaction(
+    ClassAnnouncement announcement,
+    AnnouncementReactionType type,
+  ) async {
+    final student = _authService.currentUser;
+    if (student == null ||
+        !_updatingAnnouncementReactions.add(announcement.id)) {
+      return;
+    }
+
+    if (mounted) setState(() {});
+    try {
+      await _announcementService.toggleReaction(
+        announcement: announcement,
+        student: student,
+        type: type,
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Unable to update your reaction. Please try again.'),
+        ),
+      );
+      debugPrint('Announcement reaction update failed: $error');
+    } finally {
+      _updatingAnnouncementReactions.remove(announcement.id);
+      if (mounted) setState(() {});
+    }
+  }
+
+  Widget _buildStudentAnnouncementReactions(ClassAnnouncement announcement) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    return StreamBuilder<List<AnnouncementReaction>>(
+      stream: _reactionStreamFor(announcement),
+      builder: (context, snapshot) {
+        final reactions = snapshot.data ?? const <AnnouncementReaction>[];
+        final studentId = _authService.currentUser?.id;
+        AnnouncementReactionType? selectedType;
+        var likeCount = 0;
+        var loveCount = 0;
+
+        for (final reaction in reactions) {
+          switch (reaction.type) {
+            case AnnouncementReactionType.like:
+              likeCount++;
+            case AnnouncementReactionType.love:
+              loveCount++;
+          }
+          if (reaction.studentId == studentId) selectedType = reaction.type;
+        }
+
+        final isUpdating = _updatingAnnouncementReactions.contains(
+          announcement.id,
+        );
+        return Row(
+          children: [
+            Expanded(
+              child: _buildStudentReactionButton(
+                announcement: announcement,
+                type: AnnouncementReactionType.like,
+                count: likeCount,
+                selected: selectedType == AnnouncementReactionType.like,
+                enabled: !isUpdating,
+                isLight: isLight,
+              ),
+            ),
+            const SizedBox(width: 9),
+            Expanded(
+              child: _buildStudentReactionButton(
+                announcement: announcement,
+                type: AnnouncementReactionType.love,
+                count: loveCount,
+                selected: selectedType == AnnouncementReactionType.love,
+                enabled: !isUpdating,
+                isLight: isLight,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildStudentReactionButton({
+    required ClassAnnouncement announcement,
+    required AnnouncementReactionType type,
+    required int count,
+    required bool selected,
+    required bool enabled,
+    required bool isLight,
+  }) {
+    final color = type == AnnouncementReactionType.like
+        ? const Color(0xFF2684FF)
+        : const Color(0xFFFF477E);
+    final neutralBorder = isLight
+        ? const Color(0xFFD5DEE9)
+        : const Color(0xFF294568);
+    final neutralText = isLight
+        ? const Color(0xFF526174)
+        : const Color(0xFFAFC0D5);
+
+    return Material(
+      color: selected
+          ? color.withAlpha(isLight ? 22 : 35)
+          : (isLight ? const Color(0xFFF7F9FC) : const Color(0xFF0C1B30)),
+      borderRadius: BorderRadius.circular(10),
+      child: InkWell(
+        onTap: enabled
+            ? () => _toggleAnnouncementReaction(announcement, type)
+            : null,
+        borderRadius: BorderRadius.circular(10),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          height: 38,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: selected ? color : neutralBorder),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                type == AnnouncementReactionType.like
+                    ? Icons.thumb_up_rounded
+                    : Icons.favorite_rounded,
+                color: selected ? color : neutralText,
+                size: 17,
+              ),
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(
+                  '${type.label}${count > 0 ? '  $count' : ''}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: selected ? color : neutralText,
+                    fontSize: 11.5,
+                    fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildNotificationsSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -1193,6 +1691,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                       subtitle: n['desc'] as String,
                       icon: n['icon'] as String,
                       color: n['color'] as Color,
+                      onTap: () => _openRecentCourseContent(n),
                     ),
                   );
                 }).toList(),
@@ -1209,52 +1708,134 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     required String subtitle,
     required String icon,
     required Color color,
+    required VoidCallback onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withAlpha(20),
+    return Material(
+      color: color.withAlpha(20),
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withAlpha(80), width: 1),
+        side: BorderSide(color: color.withAlpha(80)),
       ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withAlpha(30),
-              shape: BoxShape.circle,
-            ),
-            child: CustomIconWidget(iconName: icon, color: color, size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: color,
-                  ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: color.withAlpha(30),
+                  shape: BoxShape.circle,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white.withAlpha(200)
-                        : Colors.black54,
-                  ),
+                child: CustomIconWidget(iconName: icon, color: color, size: 24),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: color,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white.withAlpha(200)
+                            : Colors.black54,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 8),
+              Icon(Icons.chevron_right_rounded, color: color, size: 22),
+            ],
           ),
-        ],
+        ),
       ),
+    );
+  }
+
+  Future<void> _openRecentCourseContent(Map<String, dynamic> content) async {
+    final course = content['course'];
+    if (course is! Course) return;
+
+    switch (content['contentType']) {
+      case 'quiz':
+        final quiz = content['quiz'];
+        if (quiz is! CourseQuiz) return;
+        context.go(
+          AppRoutes.studentCoursesScreen,
+          extra: StudentCourseDestination(course: course, quizId: quiz.id),
+        );
+        return;
+      case 'module':
+        final module = content['module'];
+        if (module is! CourseModule) return;
+        await _openRecentModule(course, module);
+        return;
+      default:
+        // A newly added course should land on the course catalogue, not on
+        // the course detail's default Quizzes tab.
+        context.go(AppRoutes.studentCoursesScreen);
+    }
+  }
+
+  Future<void> _openRecentModule(Course course, CourseModule module) async {
+    final url = module.url.trim();
+    if (url.isEmpty) {
+      if (!mounted) return;
+      context.go(
+        AppRoutes.studentCoursesScreen,
+        extra: StudentCourseDestination(course: course, initialTabIndex: 1),
+      );
+      return;
+    }
+
+    final encodedUrl = Uri.encodeComponent(url);
+    final encodedTitle = Uri.encodeComponent(module.title);
+    final lowerUrl = url.toLowerCase();
+    if (module.fileType == 'pdf') {
+      context.push(
+        '${AppRoutes.pdfViewerScreen}?url=$encodedUrl&title=$encodedTitle',
+      );
+      return;
+    }
+    if (module.fileType == 'video' ||
+        lowerUrl.endsWith('.mp4') ||
+        lowerUrl.endsWith('.mov')) {
+      context.push(
+        '${AppRoutes.videoViewerScreen}?url=$encodedUrl&title=$encodedTitle',
+      );
+      return;
+    }
+    if (lowerUrl.endsWith('.jpg') ||
+        lowerUrl.endsWith('.jpeg') ||
+        lowerUrl.endsWith('.png')) {
+      context.push(
+        '${AppRoutes.imageViewerScreen}?url=$encodedUrl&title=$encodedTitle',
+      );
+      return;
+    }
+
+    final uri = Uri.tryParse(url);
+    if (uri != null && await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.inAppWebView);
+      return;
+    }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Could not open this course content.')),
     );
   }
 
@@ -1324,10 +1905,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     );
   }
 
-  Widget _buildStudentProgressBar(
-    String progressText,
-    double progressPercent,
-  ) {
+  Widget _buildStudentProgressBar(String progressText, double progressPercent) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final accentColor = isDark
         ? const Color(0xFF00D4FF)
@@ -1545,6 +2123,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                       child: Column(
                         children: upcoming.take(4).map((d) {
                           final date = d['dueDate'] as DateTime;
+                          final course = d['course'] as Course;
+                          final quiz = d['quiz'] as CourseQuiz;
                           const months = [
                             'Jan',
                             'Feb',
@@ -1561,7 +2141,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                           ];
                           final m = months[date.month - 1];
                           final day = date.day.toString();
-                          final title = (d['quiz'] as CourseQuiz).title;
+                          final title = quiz.title;
                           final time = _formatTimeOnly(date);
                           final isUpcoming =
                               date.difference(DateTime.now()).inHours <= 48;
@@ -1572,6 +2152,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                             title,
                             time,
                             isUpcoming,
+                            onTap: () => _openUpcomingQuiz(course, quiz),
                           );
                         }).toList(),
                       ),
@@ -1657,44 +2238,32 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
     String time,
     bool isUpcoming, {
     bool isMissed = false,
+    VoidCallback? onTap,
   }) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          Container(
-            width: 50,
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              color: isMissed
-                  ? const Color(0xFFFF4757).withAlpha(20)
-                  : (isUpcoming
-                        ? (Theme.of(context).brightness == Brightness.dark
-                              ? const Color(0xFF00D4FF).withAlpha(20)
-                              : const Color(0xFF1565C0).withAlpha(20))
-                        : (Theme.of(context).brightness == Brightness.dark
-                              ? const Color(0xFF0A1628)
-                              : Colors.grey.shade50)),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isMissed
-                    ? const Color(0xFFFF4757)
-                    : (isUpcoming
-                          ? (Theme.of(context).brightness == Brightness.dark
-                                ? const Color(0xFF00D4FF)
-                                : const Color(0xFF1565C0))
-                          : (Theme.of(context).brightness == Brightness.dark
-                                ? const Color(0xFF1E3A5F)
-                                : Colors.grey.shade300)),
-              ),
-            ),
-            child: Column(
-              children: [
-                Text(
-                  month,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 50,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  color: isMissed
+                      ? const Color(0xFFFF4757).withAlpha(20)
+                      : (isUpcoming
+                            ? (Theme.of(context).brightness == Brightness.dark
+                                  ? const Color(0xFF00D4FF).withAlpha(20)
+                                  : const Color(0xFF1565C0).withAlpha(20))
+                            : (Theme.of(context).brightness == Brightness.dark
+                                  ? const Color(0xFF0A1628)
+                                  : Colors.grey.shade50)),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
                     color: isMissed
                         ? const Color(0xFFFF4757)
                         : (isUpcoming
@@ -1702,71 +2271,113 @@ class _StudentHomeScreenState extends State<StudentHomeScreen>
                                     ? const Color(0xFF00D4FF)
                                     : const Color(0xFF1565C0))
                               : (Theme.of(context).brightness == Brightness.dark
-                                    ? const Color(0xFF8BA3C0)
-                                    : Colors.grey.shade600)),
+                                    ? const Color(0xFF1E3A5F)
+                                    : Colors.grey.shade300)),
                   ),
                 ),
-                Text(
-                  day,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: isMissed
-                        ? const Color(0xFFFF4757)
-                        : (isUpcoming
-                              ? (Theme.of(context).brightness == Brightness.dark
-                                    ? const Color(0xFF00D4FF)
-                                    : const Color(0xFF1565C0))
-                              : (Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black87)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black87,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Row(
+                child: Column(
                   children: [
-                    CustomIconWidget(
-                      iconName: 'schedule',
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0xFF8BA3C0)
-                          : Colors.grey.shade600,
-                      size: 14,
-                    ),
-                    SizedBox(width: 4),
                     Text(
-                      time,
+                      month,
                       style: TextStyle(
-                        fontSize: 13,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? const Color(0xFF8BA3C0)
-                            : Colors.grey.shade600,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: isMissed
+                            ? const Color(0xFFFF4757)
+                            : (isUpcoming
+                                  ? (Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? const Color(0xFF00D4FF)
+                                        : const Color(0xFF1565C0))
+                                  : (Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? const Color(0xFF8BA3C0)
+                                        : Colors.grey.shade600)),
+                      ),
+                    ),
+                    Text(
+                      day,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: isMissed
+                            ? const Color(0xFFFF4757)
+                            : (isUpcoming
+                                  ? (Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? const Color(0xFF00D4FF)
+                                        : const Color(0xFF1565C0))
+                                  : (Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black87)),
                       ),
                     ),
                   ],
                 ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black87,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Row(
+                      children: [
+                        CustomIconWidget(
+                          iconName: 'schedule',
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF8BA3C0)
+                              : Colors.grey.shade600,
+                          size: 14,
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          time,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF8BA3C0)
+                                : Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              if (onTap != null) ...[
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: 22,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF00D4FF)
+                      : const Color(0xFF1565C0),
+                ),
               ],
-            ),
+            ],
           ),
-        ],
+        ),
       ),
+    );
+  }
+
+  void _openUpcomingQuiz(Course course, CourseQuiz quiz) {
+    context.go(
+      AppRoutes.studentCoursesScreen,
+      extra: StudentCourseDestination(course: course, quizId: quiz.id),
     );
   }
 }

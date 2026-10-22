@@ -11,6 +11,7 @@ import '../student_ar_and_video_lesson_screen/widgets/ar_experiment_card_widget.
 import '../student_ar_and_video_lesson_screen/widgets/ar_experiment_detail_widget.dart';
 import '../ar_and_video_lesson_screen/widgets/video_lesson_section_widget.dart';
 import '../../services/auth_service.dart';
+import '../../widgets/grade9_curriculum_button.dart';
 
 class TeacherArAndVideoLessonScreen extends StatefulWidget {
   const TeacherArAndVideoLessonScreen({super.key});
@@ -106,6 +107,13 @@ class _TeacherArAndVideoLessonScreenState
       }
     }
     return grades;
+  }
+
+  bool _handlesGrade(int gradeLevel) {
+    final expectedGrade = 'grade$gradeLevel';
+    return _teacherGrades.any(
+      (grade) => grade.toLowerCase().replaceAll(' ', '') == expectedGrade,
+    );
   }
 
   bool _isExpLocked(String expId) {
@@ -210,7 +218,10 @@ class _TeacherArAndVideoLessonScreenState
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(child: _buildHeader()),
-        SliverToBoxAdapter(child: _buildCurriculumBanner()),
+        if (_handlesGrade(9))
+          const SliverToBoxAdapter(child: DbowCurriculumButton(gradeLevel: 9)),
+        if (_handlesGrade(10))
+          const SliverToBoxAdapter(child: DbowCurriculumButton(gradeLevel: 10)),
         SliverList(
           delegate: SliverChildListDelegate(_buildCatalogItems(groups)),
         ),
@@ -221,63 +232,6 @@ class _TeacherArAndVideoLessonScreenState
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildCurriculumBanner() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF00D4FF).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: const Color(0xFF00D4FF).withValues(alpha: 0.35),
-              ),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(
-                  Icons.school_rounded,
-                  color: Color(0xFF00D4FF),
-                  size: 20,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        '(DBOW) REVISED K TO 10 CURRICULUM',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'THREE-TERM DEFINITIVE BUDGET OF WORK',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          letterSpacing: 0.2,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 

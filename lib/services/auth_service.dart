@@ -24,8 +24,15 @@ class AuthService extends ChangeNotifier {
 
   final fb.FirebaseAuth _auth = fb.FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    clientId: kIsWeb ? 'dummy-client-id.apps.googleusercontent.com' : null,
+  static const String _googleWebClientId = String.fromEnvironment(
+    'GOOGLE_WEB_CLIENT_ID',
+    defaultValue:
+        '324252227250-7sppgh00la5ogg2clvjf5pc7mr611vnb.apps.googleusercontent.com',
+  );
+  GoogleSignIn? _googleSignInClient;
+
+  GoogleSignIn get _googleSignIn => _googleSignInClient ??= GoogleSignIn(
+    clientId: kIsWeb ? _googleWebClientId : null,
   );
 
   AppUser? currentUser;
@@ -278,7 +285,7 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<void> logout() async {
-    await _googleSignIn.signOut();
+    await _googleSignInClient?.signOut();
     await _auth.signOut();
   }
 

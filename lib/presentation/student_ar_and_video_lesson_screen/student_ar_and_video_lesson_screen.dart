@@ -10,6 +10,8 @@ import '../student_ar_and_video_lesson_screen/widgets/ar_experiment_card_widget.
 import '../student_ar_and_video_lesson_screen/widgets/ar_experiment_detail_widget.dart';
 import '../ar_and_video_lesson_screen/widgets/video_lesson_section_widget.dart';
 import '../../services/auth_service.dart';
+import '../../models/user_model.dart';
+import '../../widgets/grade9_curriculum_button.dart';
 
 class StudentArAndVideoLessonScreen extends StatefulWidget {
   const StudentArAndVideoLessonScreen({super.key});
@@ -130,70 +132,20 @@ class _StudentArAndVideoLessonScreenState
   }
 
   Widget _buildPhoneLayout(List<ArExperimentGroup> groups) {
+    final role = AuthService.instance.currentUser?.role;
+    final curriculumGrade = switch (role) {
+      UserRole.grade9 => 9,
+      UserRole.grade10 => 10,
+      _ => null,
+    };
+
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(child: _buildHeader()),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF00D4FF).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: const Color(0xFF00D4FF).withValues(alpha: 0.35),
-                    ),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Icon(
-                        Icons.school_rounded,
-                        color: Color(0xFF00D4FF),
-                        size: 20,
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              '(DBOW) REVISED K TO 10 CURRICULUM',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'THREE-TERM DEFINITIVE BUDGET OF WORK',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurfaceVariant,
-                                letterSpacing: 0.2,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+        if (curriculumGrade != null)
+          SliverToBoxAdapter(
+            child: DbowCurriculumButton(gradeLevel: curriculumGrade),
           ),
-        ),
         SliverList(
           delegate: SliverChildListDelegate(_buildCatalogItems(groups)),
         ),

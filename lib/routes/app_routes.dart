@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart' as fb;
 
 import '../models/user_model.dart';
 import '../models/course_model.dart';
+import '../models/student_course_destination.dart';
 import '../services/auth_service.dart';
 import '../presentation/teacher_ar_and_video_lesson_screen/teacher_ar_and_video_lesson_screen.dart';
 import '../presentation/student_ar_and_video_lesson_screen/student_ar_and_video_lesson_screen.dart';
@@ -76,11 +77,15 @@ final GoRouter appRouter = GoRouter(
 
     final fbUser = fb.FirebaseAuth.instance.currentUser;
     if (fbUser != null && !fbUser.emailVerified) {
-      return path == AppRoutes.verifyEmailScreen ? null : AppRoutes.verifyEmailScreen;
+      return path == AppRoutes.verifyEmailScreen
+          ? null
+          : AppRoutes.verifyEmailScreen;
     }
 
     if (auth.currentUser?.role == null) {
-      return path == AppRoutes.googleCompleteProfileScreen ? null : AppRoutes.googleCompleteProfileScreen;
+      return path == AppRoutes.googleCompleteProfileScreen
+          ? null
+          : AppRoutes.googleCompleteProfileScreen;
     }
 
     if (auth.currentUser?.hasAcceptedTerms != true) {
@@ -88,7 +93,9 @@ final GoRouter appRouter = GoRouter(
     }
 
     if (!auth.isApproved) {
-      return path == AppRoutes.pendingApprovalScreen ? null : AppRoutes.pendingApprovalScreen;
+      return path == AppRoutes.pendingApprovalScreen
+          ? null
+          : AppRoutes.pendingApprovalScreen;
     }
 
     final isTeacher = auth.currentUser?.role == UserRole.teacher;
@@ -96,7 +103,9 @@ final GoRouter appRouter = GoRouter(
     // Fully approved: bounce away from the pre-auth screens into the
     // right role's home.
     if (_publicRoutes.contains(path) || path == AppRoutes.termsScreen) {
-      return isTeacher ? AppRoutes.teacherHomeScreen : AppRoutes.studentHomeScreen;
+      return isTeacher
+          ? AppRoutes.teacherHomeScreen
+          : AppRoutes.studentHomeScreen;
     }
 
     return null;
@@ -145,15 +154,15 @@ final GoRouter appRouter = GoRouter(
           key: state.pageKey,
           child: SignUpLoginScreen(initialIsLogin: isLogin),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(
-            opacity: CurvedAnimation(
-              parent: animation,
-              curve: Curves.easeOutCubic,
-            ),
-            child: child,
-          );
-        },
-        transitionDuration: const Duration(milliseconds: 280),
+            return FadeTransition(
+              opacity: CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOutCubic,
+              ),
+              child: child,
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 280),
         );
       },
     ),
@@ -210,8 +219,9 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: AppRoutes.unityArScreen,
-      builder: (context, state) => 
-        UnityArScreen(experimentId: state.uri.queryParameters['experimentId']),
+      builder: (context, state) => UnityArScreen(
+        experimentId: state.uri.queryParameters['experimentId'],
+      ),
     ),
     GoRoute(
       path: AppRoutes.verifyEmailScreen,
@@ -233,8 +243,9 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.pdfViewerScreen,
       builder: (context, state) {
         final title = state.uri.queryParameters['title'] ?? 'PDF Document';
-        final url = state.uri.queryParameters['url'] ?? '';
-        return PdfViewerScreen(title: title, url: url);
+        final url = state.uri.queryParameters['url'];
+        final assetPath = state.uri.queryParameters['asset'];
+        return PdfViewerScreen(title: title, url: url, assetPath: assetPath);
       },
     ),
     GoRoute(
@@ -314,28 +325,36 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: AppRoutes.studentCoursesScreen,
               pageBuilder: (context, state) {
-                final course = state.extra as Course?;
+                final extra = state.extra;
+                final destination = switch (extra) {
+                  StudentCourseDestination value => value,
+                  Course value => StudentCourseDestination(course: value),
+                  _ => null,
+                };
                 return CustomTransitionPage(
-                key: state.pageKey,
-                child: StudentCoursesScreen(initialCourse: course),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                      return SlideTransition(
-                        position:
-                            Tween<Offset>(
-                              begin: const Offset(0.04, 0),
-                              end: Offset.zero,
-                            ).animate(
-                              CurvedAnimation(
-                                parent: animation,
-                                curve: Curves.easeOutCubic,
+                  key: state.pageKey,
+                  child: StudentCoursesScreen(initialDestination: destination),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return SlideTransition(
+                          position:
+                              Tween<Offset>(
+                                begin: const Offset(0.04, 0),
+                                end: Offset.zero,
+                              ).animate(
+                                CurvedAnimation(
+                                  parent: animation,
+                                  curve: Curves.easeOutCubic,
+                                ),
                               ),
-                            ),
-                        child: FadeTransition(opacity: animation, child: child),
-                      );
-                    },
-                transitionDuration: const Duration(milliseconds: 280),
-              );
+                          child: FadeTransition(
+                            opacity: animation,
+                            child: child,
+                          ),
+                        );
+                      },
+                  transitionDuration: const Duration(milliseconds: 280),
+                );
               },
             ),
             GoRoute(

@@ -1,11 +1,11 @@
 import 'dart:ui';
 
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/app_export.dart';
 import '../../../services/auth_service.dart';
 import 'package:provider/provider.dart';
+
 class LoginFormWidget extends StatefulWidget {
   final void Function(String role) onSuccess;
   const LoginFormWidget({required this.onSuccess, super.key});
@@ -27,11 +27,6 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
   bool _isGoogleLoading = false;
   bool _rememberMe = false;
   String? _errorMessage;
-
-  static const String _webClientId = String.fromEnvironment(
-    'GOOGLE_WEB_CLIENT_ID',
-  );
-
 
   @override
   void initState() {
@@ -79,16 +74,17 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
       final email = _emailController.text.trim();
       final rememberMe = _rememberMe;
       final role = await context.read<AuthService>().login(
-            email: email,
-            password: _passwordController.text,
-          );
+        email: email,
+        password: _passwordController.text,
+      );
       await _saveRememberedAccount(email, rememberMe);
       if (!mounted) return;
       widget.onSuccess(role);
     } on AuthFailure catch (e) {
       if (mounted) setState(() => _errorMessage = e.message);
     } catch (e) {
-      if (mounted) setState(() => _errorMessage = 'Could not log in. Please try again.');
+      if (mounted)
+        setState(() => _errorMessage = 'Could not log in. Please try again.');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -120,11 +116,12 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
     final email = _emailController.text.trim();
     if (email.isEmpty || !email.contains('@')) {
       setState(() {
-        _errorMessage = 'Please enter a valid email address to reset your password.';
+        _errorMessage =
+            'Please enter a valid email address to reset your password.';
       });
       return;
     }
-    
+
     try {
       await AuthService.instance.resetPassword(email);
       if (mounted) {
@@ -156,13 +153,20 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w700,
-              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black87,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             'Sign in to continue learning',
-            style: TextStyle(fontSize: 14, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700),
+            style: TextStyle(
+              fontSize: 14,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF8BA3C0)
+                  : Colors.grey.shade700,
+            ),
           ),
           const SizedBox(height: 28),
           _buildGlassField(
@@ -190,7 +194,9 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                 iconName: _obscurePassword
                     ? 'visibility_off_outlined'
                     : 'visibility_outlined',
-                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF8BA3C0)
+                    : Colors.grey.shade600,
                 size: 20,
               ),
             ),
@@ -212,13 +218,19 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                       height: 20,
                       decoration: BoxDecoration(
                         color: _rememberMe
-                            ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0))
+                            ? (Theme.of(context).brightness == Brightness.dark
+                                  ? const Color(0xFF00D4FF)
+                                  : const Color(0xFF1565C0))
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(5),
                         border: Border.all(
                           color: _rememberMe
-                              ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0))
-                              : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF5A7A9A) : Colors.grey.shade400),
+                              ? (Theme.of(context).brightness == Brightness.dark
+                                    ? const Color(0xFF00D4FF)
+                                    : const Color(0xFF1565C0))
+                              : (Theme.of(context).brightness == Brightness.dark
+                                    ? const Color(0xFF5A7A9A)
+                                    : Colors.grey.shade400),
                           width: 1.5,
                         ),
                       ),
@@ -226,14 +238,23 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                           ? Icon(
                               Icons.check,
                               size: 14,
-                              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white,
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? const Color(0xFF0A1628)
+                                  : Colors.white,
                             )
                           : null,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'Remember me',
-                      style: TextStyle(fontSize: 13, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade700),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF8BA3C0)
+                            : Colors.grey.shade700,
+                      ),
                     ),
                   ],
                 ),
@@ -246,7 +267,9 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF00D4FF)
+                        : const Color(0xFF1565C0),
                   ),
                 ),
               ),
@@ -289,8 +312,12 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
             child: ElevatedButton(
               onPressed: _isLoading ? null : _submit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
-                foregroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A1628) : Colors.white,
+                backgroundColor: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF00D4FF)
+                    : const Color(0xFF1565C0),
+                foregroundColor: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF0A1628)
+                    : Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50),
                 ),
@@ -324,7 +351,9 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
               onPressed: _isGoogleLoading ? null : _signInWithGoogle,
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Color(0xFF1E3A5F), width: 1.5),
-                backgroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.white,
+                backgroundColor: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF142240)
+                    : Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50),
                 ),
@@ -335,7 +364,9 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                       height: 22,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
-                        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF00D4FF)
+                            : const Color(0xFF1565C0),
                       ),
                     )
                   : Row(
@@ -357,7 +388,10 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.black87,
                           ),
                         ),
                       ],
@@ -368,7 +402,6 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
       ),
     );
   }
-
 
   Widget _buildGlassField({
     required TextEditingController controller,
@@ -397,16 +430,28 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
           obscureText: obscureText,
           keyboardType: keyboardType,
           validator: validator,
-          style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87, fontSize: 14),
+          style: TextStyle(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : Colors.black87,
+            fontSize: 14,
+          ),
           decoration: InputDecoration(
             labelText: label,
             hintText: hint,
-            hintStyle: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black38, fontSize: 14),
+            hintStyle: TextStyle(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white70
+                  : Colors.black38,
+              fontSize: 14,
+            ),
             prefixIcon: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14),
               child: CustomIconWidget(
                 iconName: icon,
-                color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF8BA3C0)
+                    : Colors.grey.shade600,
                 size: 20,
               ),
             ),

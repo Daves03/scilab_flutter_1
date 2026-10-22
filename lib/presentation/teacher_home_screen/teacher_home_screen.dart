@@ -11,14 +11,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../models/user_model.dart';
 import '../../models/course_model.dart';
 import '../../models/activity_model.dart';
+import '../../models/class_announcement_model.dart';
 import 'widgets/student_approval_dialog.dart';
 import '../../services/auth_service.dart';
+import '../../services/announcement_service.dart';
 import 'package:provider/provider.dart';
 
 // ── Reuse data models from teacher_progress_screen ────────────────────────────
 class _StudentSummary {
   final String id;
   final String name;
+  final String grade;
   final String section;
   final String? studentNumber;
   final String? avatarUrl;
@@ -30,6 +33,7 @@ class _StudentSummary {
   const _StudentSummary({
     required this.id,
     required this.name,
+    required this.grade,
     required this.section,
     this.studentNumber,
     this.avatarUrl,
@@ -78,6 +82,7 @@ class TeacherHomeScreen extends StatefulWidget {
 class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     with SingleTickerProviderStateMixin {
   static const String _allSummarySections = 'All Sections';
+  static const int _announcementPageSize = 3;
   static const double _notificationCardHeight = 116;
   static const double _notificationListMaxHeight =
       (_notificationCardHeight * 4) + (12 * 3);
@@ -97,7 +102,12 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   final Map<String, StreamSubscription> _arNotifSubs = {};
   StreamSubscription? _teacherCoursesSub;
   late final AuthService _authService;
+  final AnnouncementService _announcementService = AnnouncementService();
+  Stream<List<ClassAnnouncement>>? _teacherAnnouncementsStream;
+  final Map<String, Stream<List<AnnouncementReaction>>>
+  _announcementReactionStreams = {};
   bool _notificationStreamsStopped = false;
+  int _teacherAnnouncementPage = 0;
 
   List<QueryDocumentSnapshot<Map<String, dynamic>>> _pendingUsers = [];
   final Map<int, List<QueryDocumentSnapshot<Map<String, dynamic>>>>
@@ -157,6 +167,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
         return _StudentSummary(
           id: student.id,
           name: currentProfile?.name ?? student.name,
+          grade: currentProfile?.role?.label ?? student.grade,
           section: student.section,
           studentNumber: currentProfile?.studentNumber ?? student.studentNumber,
           avatarUrl: currentProfile?.avatarUrl ?? student.avatarUrl,
@@ -262,6 +273,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
           _StudentSummary(
             id: u.id,
             name: u.name,
+            grade: u.role?.label ?? 'Grade not set',
             section: section,
             studentNumber: u.studentNumber,
             avatarUrl: u.avatarUrl,
@@ -312,6 +324,11 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   void initState() {
     super.initState();
     _authService = context.read<AuthService>();
+    final currentTeacher = _authService.currentUser;
+    if (currentTeacher != null) {
+      _teacherAnnouncementsStream = _announcementService
+          .announcementsForTeacher(currentTeacher.id);
+    }
     _authService.addListener(_handleAuthChanged);
     _loadData();
     _entranceController = AnimationController(
@@ -606,6 +623,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
             (snapshot) {
               if (!mounted || !_handledStudentIds.contains(studentId)) return;
               _arAttemptsByStudent[studentId] = snapshot.docs;
+              _applyLiveArActivities(studentId, snapshot.docs);
               _updateNotifs();
             },
             onError: (Object error) {
@@ -620,6 +638,37 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
           );
     }
     _updateNotifs();
+  }
+
+  void _applyLiveArActivities(
+    String studentId,
+    List<QueryDocumentSnapshot<Map<String, dynamic>>> documents,
+  ) {
+    if (!mounted) return;
+    final completedCount = documents.where((document) {
+      return ExperimentActivity.fromMap(document.id, document.data()).completed;
+    }).length;
+    final score = documents.isEmpty
+        ? 0.0
+        : (completedCount / documents.length) * 100;
+
+    setState(() {
+      _students = _students.map((student) {
+        if (student.id != studentId) return student;
+        return _StudentSummary(
+          id: student.id,
+          name: student.name,
+          grade: student.grade,
+          section: student.section,
+          studentNumber: student.studentNumber,
+          avatarUrl: student.avatarUrl,
+          avgQuizScore: student.avgQuizScore,
+          avgArScore: score,
+          quizzesTaken: student.quizzesTaken,
+          arAttempts: documents.length,
+        );
+      }).toList();
+    });
   }
 
   String _arExperimentTitle(String experimentId) {
@@ -866,6 +915,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                       if (!_isSearching)
                         SliverToBoxAdapter(child: _buildDateTimeCard()),
                       if (!_isSearching)
+                        SliverToBoxAdapter(
+                          child: _buildTeacherAnnouncementSection(),
+                        ),
+                      if (!_isSearching)
                         SliverToBoxAdapter(child: _buildClassOverview()),
                       if (!_isSearching && _currentTab == DashboardTab.classAvg)
                         SliverToBoxAdapter(child: _buildClassAvgChart())
@@ -953,6 +1006,13 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                                       ),
                                       child: _StudentProgressCard(
                                         student: filteredStudents[index],
+                                        onQuizTap: () =>
+                                            _showStudentQuizProgress(
+                                              filteredStudents[index],
+                                            ),
+                                        onArTap: () => _showStudentArProgress(
+                                          filteredStudents[index],
+                                        ),
                                         showBadge:
                                             !_isSearching &&
                                             _currentTab ==
@@ -1306,6 +1366,44 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     if (diff.inMinutes < 60) return '${diff.inMinutes} mins ago';
     if (diff.inHours < 24) return '${diff.inHours} hrs ago';
     return '${diff.inDays} days ago';
+  }
+
+  void _showStudentQuizProgress(_StudentSummary student) {
+    final attempts = _latestAttemptsForStudent(_allAttempts, student.id)
+      ..sort(
+        (a, b) => (b.submittedAt ?? DateTime(2000)).compareTo(
+          a.submittedAt ?? DateTime(2000),
+        ),
+      );
+    showDialog<void>(
+      context: context,
+      builder: (_) =>
+          _StudentQuizProgressDialog(student: student, attempts: attempts),
+    );
+  }
+
+  void _showStudentArProgress(_StudentSummary student) {
+    final activities =
+        (_arAttemptsByStudent[student.id] ?? const []).map((document) {
+          final activity = ExperimentActivity.fromMap(
+            document.id,
+            document.data(),
+          );
+          return _ArProgressEntry(
+            title: _arExperimentTitle(document.id),
+            completed: activity.completed,
+            activityAt: activity.completedAt ?? activity.launchedAt,
+          );
+        }).toList()..sort(
+          (a, b) => (b.activityAt ?? DateTime(2000)).compareTo(
+            a.activityAt ?? DateTime(2000),
+          ),
+        );
+    showDialog<void>(
+      context: context,
+      builder: (_) =>
+          _StudentArProgressDialog(student: student, activities: activities),
+    );
   }
 
   // _fetchDynamicNotifications removed, replaced by Stream
@@ -1717,6 +1815,1680 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
             dateTime: _now,
             calendarEvents: calendarEvents,
             showTeacherQuizSummary: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<AnnouncementTarget> get _announcementTargets {
+    final sectionsByGrade = <String, Set<String>>{};
+    for (final course in _teacherCourses) {
+      final grade = course.grade.trim();
+      if (grade.isEmpty) continue;
+      final sections = sectionsByGrade.putIfAbsent(grade, () => <String>{});
+      sections.addAll(
+        course.sections
+            .map((section) => section.trim())
+            .where((section) => section.isNotEmpty),
+      );
+    }
+
+    final targets = sectionsByGrade.entries
+        .where((entry) => entry.value.isNotEmpty)
+        .map((entry) {
+          final sections = entry.value.toList()
+            ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+          return AnnouncementTarget(grade: entry.key, sections: sections);
+        })
+        .toList();
+    targets.sort((a, b) => a.grade.compareTo(b.grade));
+    return targets;
+  }
+
+  Future<void> _showAnnouncementComposer() async {
+    final teacher = _authService.currentUser;
+    final targets = _announcementTargets;
+    if (teacher == null) return;
+    if (targets.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Create a course with an assigned grade and section before posting an announcement.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final messageController = TextEditingController();
+    final selectedSectionsByGrade = <String, Set<String>>{
+      for (final target in targets)
+        target.grade: Set<String>.from(target.sections),
+    };
+    List<AnnouncementTarget> selectedTargets() {
+      return targets
+          .map(
+            (target) => AnnouncementTarget(
+              grade: target.grade,
+              sections: target.sections
+                  .where(
+                    (section) =>
+                        selectedSectionsByGrade[target.grade]?.contains(
+                          section,
+                        ) ??
+                        false,
+                  )
+                  .toList(),
+            ),
+          )
+          .where((target) => target.sections.isNotEmpty)
+          .toList();
+    }
+
+    var isPosting = false;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            final isLight = Theme.of(context).brightness == Brightness.light;
+            final accent = isLight
+                ? const Color(0xFF087A4F)
+                : const Color(0xFF00FF88);
+            final chosenTargets = selectedTargets();
+            final selectedCount = chosenTargets.fold<int>(
+              0,
+              (total, target) => total + target.sections.length,
+            );
+            final totalSectionCount = targets.fold<int>(
+              0,
+              (total, target) => total + target.sections.length,
+            );
+            final allSectionsSelected = selectedCount == totalSectionCount;
+            return Dialog(
+              backgroundColor: Colors.transparent,
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 16,
+              ),
+              child: Container(
+                width: double.infinity,
+                constraints: const BoxConstraints(maxWidth: 480),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: isLight ? Colors.white : const Color(0xFF142240),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: accent.withAlpha(80)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(isLight ? 30 : 90),
+                      blurRadius: 24,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: accent.withAlpha(20),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              Icons.campaign_rounded,
+                              color: accent,
+                              size: 22,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Create Announcement',
+                                  style: TextStyle(
+                                    color: isLight
+                                        ? Colors.black87
+                                        : Colors.white,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                Text(
+                                  'Post an update to your handled students.',
+                                  style: TextStyle(
+                                    color: isLight
+                                        ? Colors.grey.shade600
+                                        : const Color(0xFF8BA3C0),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: isPosting
+                                ? null
+                                : () => Navigator.pop(dialogContext),
+                            icon: const Icon(Icons.close_rounded),
+                            color: const Color(0xFF8BA3C0),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 18),
+                      TextField(
+                        controller: messageController,
+                        minLines: 4,
+                        maxLines: 7,
+                        maxLength: 500,
+                        autofocus: true,
+                        textCapitalization: TextCapitalization.sentences,
+                        style: TextStyle(
+                          color: isLight ? Colors.black87 : Colors.white,
+                          fontSize: 14,
+                          height: 1.45,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'Announce something to your class...',
+                          hintStyle: const TextStyle(color: Color(0xFF8BA3C0)),
+                          filled: true,
+                          fillColor: isLight
+                              ? const Color(0xFFF5F8FC)
+                              : const Color(0xFF0A1628),
+                          contentPadding: const EdgeInsets.all(15),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide(
+                              color: isLight
+                                  ? Colors.grey.shade300
+                                  : const Color(0xFF2A4668),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide(
+                              color: isLight
+                                  ? Colors.grey.shade300
+                                  : const Color(0xFF2A4668),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide(color: accent, width: 1.5),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Choose Audience',
+                              style: TextStyle(
+                                color: accent,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: isPosting
+                                ? null
+                                : () {
+                                    setDialogState(() {
+                                      for (final target in targets) {
+                                        final selected =
+                                            selectedSectionsByGrade[target
+                                                .grade]!;
+                                        if (allSectionsSelected) {
+                                          selected.clear();
+                                        } else {
+                                          selected
+                                            ..clear()
+                                            ..addAll(target.sections);
+                                        }
+                                      }
+                                    });
+                                  },
+                            child: Text(
+                              allSectionsSelected ? 'Clear all' : 'Select all',
+                              style: TextStyle(
+                                color: accent,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 7),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: accent.withAlpha(12),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: accent.withAlpha(50)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ...targets.map((target) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      target.grade,
+                                      style: TextStyle(
+                                        color: isLight
+                                            ? const Color(0xFF344054)
+                                            : const Color(0xFFD5E2F0),
+                                        fontSize: 11.5,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 7),
+                                    LayoutBuilder(
+                                      builder: (context, constraints) {
+                                        final columnCount =
+                                            constraints.maxWidth >= 400 ? 4 : 3;
+                                        const spacing = 7.0;
+                                        final itemWidth =
+                                            (constraints.maxWidth -
+                                                (spacing * (columnCount - 1))) /
+                                            columnCount;
+                                        return Wrap(
+                                          spacing: spacing,
+                                          runSpacing: 7,
+                                          children: target.sections.map((
+                                            section,
+                                          ) {
+                                            final isSelected =
+                                                selectedSectionsByGrade[target
+                                                        .grade]!
+                                                    .contains(section);
+                                            return SizedBox(
+                                              width: itemWidth,
+                                              child: Material(
+                                                color: Colors.transparent,
+                                                child: InkWell(
+                                                  onTap: isPosting
+                                                      ? null
+                                                      : () {
+                                                          setDialogState(() {
+                                                            final gradeSections =
+                                                                selectedSectionsByGrade[target
+                                                                    .grade]!;
+                                                            isSelected
+                                                                ? gradeSections
+                                                                      .remove(
+                                                                        section,
+                                                                      )
+                                                                : gradeSections
+                                                                      .add(
+                                                                        section,
+                                                                      );
+                                                          });
+                                                        },
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  child: AnimatedContainer(
+                                                    duration: const Duration(
+                                                      milliseconds: 160,
+                                                    ),
+                                                    height: 40,
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 7,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      color: isSelected
+                                                          ? accent.withAlpha(25)
+                                                          : (isLight
+                                                                ? Colors.white
+                                                                : const Color(
+                                                                    0xFF0A1628,
+                                                                  )),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            10,
+                                                          ),
+                                                      border: Border.all(
+                                                        color: isSelected
+                                                            ? accent
+                                                            : (isLight
+                                                                  ? Colors
+                                                                        .grey
+                                                                        .shade300
+                                                                  : const Color(
+                                                                      0xFF2A4668,
+                                                                    )),
+                                                      ),
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Icon(
+                                                          isSelected
+                                                              ? Icons
+                                                                    .check_rounded
+                                                              : Icons
+                                                                    .groups_outlined,
+                                                          size: 14,
+                                                          color: isSelected
+                                                              ? accent
+                                                              : const Color(
+                                                                  0xFF8BA3C0,
+                                                                ),
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 5,
+                                                        ),
+                                                        Flexible(
+                                                          child: Text(
+                                                            'Section $section',
+                                                            maxLines: 1,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: TextStyle(
+                                                              color: isSelected
+                                                                  ? accent
+                                                                  : (isLight
+                                                                        ? Colors
+                                                                              .grey
+                                                                              .shade700
+                                                                        : const Color(
+                                                                            0xFFB7C9DD,
+                                                                          )),
+                                                              fontSize: 11,
+                                                              fontWeight:
+                                                                  isSelected
+                                                                  ? FontWeight
+                                                                        .w700
+                                                                  : FontWeight
+                                                                        .w500,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
+                            Text(
+                              selectedCount == 0
+                                  ? 'Select at least one handled section.'
+                                  : '$selectedCount section${selectedCount == 1 ? '' : 's'} selected',
+                              style: TextStyle(
+                                color: selectedCount == 0
+                                    ? const Color(0xFFFF6B6B)
+                                    : accent,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: isPosting
+                                  ? null
+                                  : () => Navigator.pop(dialogContext),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: isLight
+                                    ? Colors.grey.shade700
+                                    : const Color(0xFFB7C9DD),
+                                side: BorderSide(
+                                  color: isLight
+                                      ? Colors.grey.shade300
+                                      : const Color(0xFF3A5A7A),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 13,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text('Cancel'),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: isPosting || chosenTargets.isEmpty
+                                  ? null
+                                  : () async {
+                                      final message = messageController.text
+                                          .trim();
+                                      if (message.isEmpty) {
+                                        ScaffoldMessenger.of(
+                                          this.context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Enter an announcement first.',
+                                            ),
+                                          ),
+                                        );
+                                        return;
+                                      }
+                                      setDialogState(() => isPosting = true);
+                                      try {
+                                        final targetStudentIds =
+                                            _approvedStudentsById.values
+                                                .where(
+                                                  (student) =>
+                                                      chosenTargets.any(
+                                                        (target) => target
+                                                            .matchesStudent(
+                                                              student,
+                                                            ),
+                                                      ),
+                                                )
+                                                .map((student) => student.id)
+                                                .toSet()
+                                                .toList(growable: false);
+                                        await _announcementService
+                                            .createAnnouncement(
+                                              teacher: teacher,
+                                              message: message,
+                                              targets: chosenTargets,
+                                              targetStudentIds:
+                                                  targetStudentIds,
+                                            );
+                                        if (!mounted) return;
+                                        setState(
+                                          () => _teacherAnnouncementPage = 0,
+                                        );
+                                        if (dialogContext.mounted) {
+                                          Navigator.pop(dialogContext);
+                                        }
+                                        ScaffoldMessenger.of(
+                                          this.context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Announcement posted.',
+                                            ),
+                                          ),
+                                        );
+                                      } on FirebaseException catch (
+                                        error,
+                                        stackTrace
+                                      ) {
+                                        if (!mounted) return;
+                                        setDialogState(() => isPosting = false);
+                                        debugPrint(
+                                          'Announcement post failed '
+                                          '(${error.code}): ${error.message}',
+                                        );
+                                        debugPrintStack(stackTrace: stackTrace);
+                                        ScaffoldMessenger.of(
+                                          this.context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              error.code == 'permission-denied'
+                                                  ? 'Announcement permission is not enabled in Firestore yet.'
+                                                  : 'Could not post the announcement (${error.code}). Please try again.',
+                                            ),
+                                          ),
+                                        );
+                                      } catch (error, stackTrace) {
+                                        if (!mounted) return;
+                                        setDialogState(() => isPosting = false);
+                                        debugPrint(
+                                          'Announcement post failed: $error',
+                                        );
+                                        debugPrintStack(stackTrace: stackTrace);
+                                        ScaffoldMessenger.of(
+                                          this.context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              error is StateError
+                                                  ? error.message.toString()
+                                                  : 'Could not post the announcement. Please try again.',
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
+                              icon: isPosting
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.send_rounded, size: 17),
+                              label: Text(isPosting ? 'Posting...' : 'Post'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: accent,
+                                foregroundColor: isLight
+                                    ? Colors.white
+                                    : const Color(0xFF06251A),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 13,
+                                ),
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+    messageController.dispose();
+  }
+
+  Future<void> _showAnnouncementEditor(ClassAnnouncement announcement) async {
+    final teacher = _authService.currentUser;
+    if (teacher == null || teacher.id != announcement.teacherId) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You can only edit your own announcements.'),
+        ),
+      );
+      return;
+    }
+
+    final messageController = TextEditingController(text: announcement.message);
+    final audienceLabel = announcement.targets
+        .map(
+          (target) =>
+              '${target.grade}: ${target.sections.map((section) => 'Section $section').join(', ')}',
+        )
+        .join('  •  ');
+    var isSaving = false;
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            final isLight = Theme.of(context).brightness == Brightness.light;
+            final accent = isLight
+                ? const Color(0xFF087A4F)
+                : const Color(0xFF00FF88);
+
+            return Dialog(
+              backgroundColor: Colors.transparent,
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 24,
+              ),
+              child: Container(
+                width: double.infinity,
+                constraints: const BoxConstraints(maxWidth: 460),
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: isLight ? Colors.white : const Color(0xFF142240),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: accent.withAlpha(80)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(isLight ? 30 : 90),
+                      blurRadius: 24,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: accent.withAlpha(20),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              Icons.edit_note_rounded,
+                              color: accent,
+                              size: 23,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Edit Announcement',
+                                  style: TextStyle(
+                                    color: isLight
+                                        ? Colors.black87
+                                        : Colors.white,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                Text(
+                                  'Students will see your correction instantly.',
+                                  style: TextStyle(
+                                    color: isLight
+                                        ? Colors.grey.shade600
+                                        : const Color(0xFF8BA3C0),
+                                    fontSize: 11.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: isSaving
+                                ? null
+                                : () => Navigator.pop(dialogContext),
+                            icon: const Icon(Icons.close_rounded),
+                            color: const Color(0xFF8BA3C0),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: messageController,
+                        minLines: 4,
+                        maxLines: 8,
+                        maxLength: 500,
+                        autofocus: true,
+                        textCapitalization: TextCapitalization.sentences,
+                        style: TextStyle(
+                          color: isLight ? Colors.black87 : Colors.white,
+                          fontSize: 14,
+                          height: 1.45,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: 'Announcement message',
+                          hintText: 'Correct your announcement...',
+                          labelStyle: const TextStyle(color: Color(0xFF8BA3C0)),
+                          hintStyle: const TextStyle(color: Color(0xFF8BA3C0)),
+                          filled: true,
+                          fillColor: isLight
+                              ? const Color(0xFFF5F8FC)
+                              : const Color(0xFF0A1628),
+                          contentPadding: const EdgeInsets.all(15),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide(
+                              color: isLight
+                                  ? Colors.grey.shade300
+                                  : const Color(0xFF2A4668),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide(color: accent, width: 1.5),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: accent.withAlpha(12),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: accent.withAlpha(45)),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              Icons.groups_2_outlined,
+                              color: accent,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 9),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Audience remains unchanged',
+                                    style: TextStyle(
+                                      color: accent,
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    audienceLabel.isEmpty
+                                        ? 'Previously selected students'
+                                        : audienceLabel,
+                                    style: TextStyle(
+                                      color: isLight
+                                          ? const Color(0xFF526174)
+                                          : const Color(0xFFB7C9DD),
+                                      fontSize: 11,
+                                      height: 1.35,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: isSaving
+                                  ? null
+                                  : () => Navigator.pop(dialogContext),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: isLight
+                                    ? Colors.grey.shade700
+                                    : const Color(0xFFB7C9DD),
+                                side: BorderSide(
+                                  color: isLight
+                                      ? Colors.grey.shade300
+                                      : const Color(0xFF3A5A7A),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 13,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text('Cancel'),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: isSaving
+                                  ? null
+                                  : () async {
+                                      final updatedMessage = messageController
+                                          .text
+                                          .trim();
+                                      if (updatedMessage.isEmpty) {
+                                        ScaffoldMessenger.of(
+                                          this.context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Enter an announcement first.',
+                                            ),
+                                          ),
+                                        );
+                                        return;
+                                      }
+                                      if (updatedMessage ==
+                                          announcement.message.trim()) {
+                                        Navigator.pop(dialogContext);
+                                        return;
+                                      }
+
+                                      setDialogState(() => isSaving = true);
+                                      try {
+                                        await _announcementService
+                                            .updateAnnouncementMessage(
+                                              announcement: announcement,
+                                              teacher: teacher,
+                                              message: updatedMessage,
+                                            );
+                                        if (!mounted) return;
+                                        if (dialogContext.mounted) {
+                                          Navigator.pop(dialogContext);
+                                        }
+                                        ScaffoldMessenger.of(
+                                          this.context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Announcement updated.',
+                                            ),
+                                          ),
+                                        );
+                                      } on FirebaseException catch (
+                                        error,
+                                        stackTrace
+                                      ) {
+                                        debugPrint(
+                                          'Announcement update failed '
+                                          '(${error.code}): ${error.message}',
+                                        );
+                                        debugPrintStack(stackTrace: stackTrace);
+                                        if (!dialogContext.mounted) return;
+                                        setDialogState(() => isSaving = false);
+                                        ScaffoldMessenger.of(
+                                          this.context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              error.code == 'permission-denied'
+                                                  ? 'You do not have permission to edit this announcement.'
+                                                  : 'Could not update the announcement (${error.code}). Please try again.',
+                                            ),
+                                          ),
+                                        );
+                                      } catch (error, stackTrace) {
+                                        debugPrint(
+                                          'Announcement update failed: $error',
+                                        );
+                                        debugPrintStack(stackTrace: stackTrace);
+                                        if (!dialogContext.mounted) return;
+                                        setDialogState(() => isSaving = false);
+                                        ScaffoldMessenger.of(
+                                          this.context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              error is StateError
+                                                  ? error.message.toString()
+                                                  : 'Could not update the announcement. Please try again.',
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
+                              icon: isSaving
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.save_rounded, size: 17),
+                              label: Text(
+                                isSaving ? 'Saving...' : 'Save Changes',
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: accent,
+                                foregroundColor: isLight
+                                    ? Colors.white
+                                    : const Color(0xFF06251A),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 13,
+                                ),
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+    messageController.dispose();
+  }
+
+  Widget _buildTeacherAnnouncementSection() {
+    final teacher = _authService.currentUser;
+    if (teacher == null) return const SizedBox.shrink();
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final accent = isLight ? const Color(0xFF087A4F) : const Color(0xFF00FF88);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.campaign_rounded, color: accent, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                'Class Announcements',
+                style: TextStyle(
+                  color: isLight ? Colors.black87 : Colors.white,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Material(
+            color: isLight ? Colors.white : const Color(0xFF142240),
+            borderRadius: BorderRadius.circular(16),
+            child: InkWell(
+              onTap: _showAnnouncementComposer,
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: accent.withAlpha(75)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: accent.withAlpha(20),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.add_rounded, color: accent, size: 22),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Announce something to your class',
+                            style: TextStyle(
+                              color: isLight ? Colors.black87 : Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Your handled students will see it instantly.',
+                            style: TextStyle(
+                              color: isLight
+                                  ? Colors.grey.shade600
+                                  : const Color(0xFF8BA3C0),
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.chevron_right_rounded, color: accent),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          StreamBuilder<List<ClassAnnouncement>>(
+            stream: _teacherAnnouncementsStream,
+            builder: (context, snapshot) {
+              final announcements = snapshot.data ?? const [];
+              if (announcements.isEmpty) return const SizedBox.shrink();
+              final pageCount =
+                  (announcements.length + _announcementPageSize - 1) ~/
+                  _announcementPageSize;
+              final currentPage = _teacherAnnouncementPage.clamp(
+                0,
+                pageCount - 1,
+              );
+              final pageStart = currentPage * _announcementPageSize;
+              final proposedEnd = pageStart + _announcementPageSize;
+              final pageEnd = proposedEnd < announcements.length
+                  ? proposedEnd
+                  : announcements.length;
+              final visibleAnnouncements = announcements.sublist(
+                pageStart,
+                pageEnd,
+              );
+              return Column(
+                children: [
+                  ...visibleAnnouncements.map((announcement) {
+                    final time = announcement.createdAt == null
+                        ? 'Just now'
+                        : _formatNotificationTime(announcement.createdAt);
+                    return Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(top: 10),
+                      padding: const EdgeInsets.all(13),
+                      decoration: BoxDecoration(
+                        color: accent.withAlpha(isLight ? 10 : 14),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: accent.withAlpha(45)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.volume_up_rounded,
+                                color: accent,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 7),
+                              Expanded(
+                                child: Text(
+                                  'Posted to your classes',
+                                  style: TextStyle(
+                                    color: accent,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                announcement.isEdited ? '$time • Edited' : time,
+                                maxLines: 1,
+                                style: const TextStyle(
+                                  color: Color(0xFF8BA3C0),
+                                  fontSize: 10,
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+                              IconButton(
+                                onPressed: () =>
+                                    _showAnnouncementEditor(announcement),
+                                tooltip: 'Edit announcement',
+                                icon: const Icon(Icons.edit_rounded),
+                                iconSize: 15,
+                                color: accent,
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints.tightFor(
+                                  width: 30,
+                                  height: 30,
+                                ),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: accent.withAlpha(18),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 7),
+                          Text(
+                            announcement.message,
+                            style: TextStyle(
+                              color: isLight
+                                  ? const Color(0xFF344054)
+                                  : const Color(0xFFD5E2F0),
+                              fontSize: 12.5,
+                              height: 1.4,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          _buildTeacherAnnouncementReactions(announcement),
+                        ],
+                      ),
+                    );
+                  }),
+                  if (pageCount > 1)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: _buildTeacherAnnouncementPager(
+                        currentPage: currentPage,
+                        pageCount: pageCount,
+                        accent: accent,
+                        isLight: isLight,
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTeacherAnnouncementPager({
+    required int currentPage,
+    required int pageCount,
+    required Color accent,
+    required bool isLight,
+  }) {
+    final mutedColor = isLight
+        ? const Color(0xFF667085)
+        : const Color(0xFF9BB0CA);
+    final borderColor = isLight
+        ? const Color(0xFFD7E0EA)
+        : const Color(0xFF294568);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        color: isLight ? Colors.white : const Color(0xFF101F36),
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(color: borderColor),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextButton.icon(
+              onPressed: currentPage > 0
+                  ? () => setState(
+                      () => _teacherAnnouncementPage = currentPage - 1,
+                    )
+                  : null,
+              icon: const Icon(Icons.chevron_left_rounded, size: 18),
+              label: const Text('Previous'),
+              style: TextButton.styleFrom(
+                foregroundColor: accent,
+                disabledForegroundColor: mutedColor.withAlpha(90),
+                textStyle: const TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              '${currentPage + 1} / $pageCount',
+              style: TextStyle(
+                color: mutedColor,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          Expanded(
+            child: TextButton.icon(
+              onPressed: currentPage < pageCount - 1
+                  ? () => setState(
+                      () => _teacherAnnouncementPage = currentPage + 1,
+                    )
+                  : null,
+              iconAlignment: IconAlignment.end,
+              icon: const Icon(Icons.chevron_right_rounded, size: 18),
+              label: const Text('Next'),
+              style: TextButton.styleFrom(
+                foregroundColor: accent,
+                disabledForegroundColor: mutedColor.withAlpha(90),
+                textStyle: const TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Stream<List<AnnouncementReaction>> _reactionStreamForAnnouncement(
+    ClassAnnouncement announcement,
+  ) {
+    return _announcementReactionStreams.putIfAbsent(
+      announcement.id,
+      () => _announcementService.reactionsForAnnouncement(announcement.id),
+    );
+  }
+
+  Widget _buildTeacherAnnouncementReactions(ClassAnnouncement announcement) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    return StreamBuilder<List<AnnouncementReaction>>(
+      stream: _reactionStreamForAnnouncement(announcement),
+      builder: (context, snapshot) {
+        final reactions = snapshot.data ?? const <AnnouncementReaction>[];
+        final likeCount = reactions
+            .where((reaction) => reaction.type == AnnouncementReactionType.like)
+            .length;
+        final loveCount = reactions.length - likeCount;
+        final hasReactions = reactions.isNotEmpty;
+
+        return Row(
+          children: [
+            _buildTeacherReactionCount(
+              type: AnnouncementReactionType.like,
+              count: likeCount,
+              color: const Color(0xFF2684FF),
+              isLight: isLight,
+              onTap: hasReactions
+                  ? () => _showAnnouncementReactions(announcement)
+                  : null,
+            ),
+            const SizedBox(width: 7),
+            _buildTeacherReactionCount(
+              type: AnnouncementReactionType.love,
+              count: loveCount,
+              color: const Color(0xFFFF477E),
+              isLight: isLight,
+              onTap: hasReactions
+                  ? () => _showAnnouncementReactions(announcement)
+                  : null,
+            ),
+            const Spacer(),
+            if (hasReactions)
+              TextButton.icon(
+                onPressed: () => _showAnnouncementReactions(announcement),
+                icon: const Icon(Icons.people_alt_outlined, size: 15),
+                label: const Text('View reactions'),
+                style: TextButton.styleFrom(
+                  foregroundColor: isLight
+                      ? const Color(0xFF526174)
+                      : const Color(0xFFAFC0D5),
+                  textStyle: const TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  minimumSize: const Size(0, 32),
+                ),
+              )
+            else
+              Text(
+                'No reactions yet',
+                style: TextStyle(
+                  color: isLight
+                      ? Colors.grey.shade600
+                      : const Color(0xFF7890AD),
+                  fontSize: 10.5,
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildTeacherReactionCount({
+    required AnnouncementReactionType type,
+    required int count,
+    required Color color,
+    required bool isLight,
+    required VoidCallback? onTap,
+  }) {
+    return Material(
+      color: color.withAlpha(isLight ? 18 : 28),
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          height: 30,
+          padding: const EdgeInsets.symmetric(horizontal: 9),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: color.withAlpha(80)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                type == AnnouncementReactionType.like
+                    ? Icons.thumb_up_rounded
+                    : Icons.favorite_rounded,
+                color: color,
+                size: 15,
+              ),
+              const SizedBox(width: 5),
+              Text(
+                '$count',
+                style: TextStyle(
+                  color: color,
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showAnnouncementReactions(ClassAnnouncement announcement) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        final isLight = Theme.of(dialogContext).brightness == Brightness.light;
+        final surface = isLight ? Colors.white : const Color(0xFF132340);
+        final primaryText = isLight ? const Color(0xFF172033) : Colors.white;
+        final secondaryText = isLight
+            ? const Color(0xFF64748B)
+            : const Color(0xFF9BB0CA);
+
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 28,
+          ),
+          child: Container(
+            width: 430,
+            constraints: const BoxConstraints(maxHeight: 560),
+            decoration: BoxDecoration(
+              color: surface,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isLight
+                    ? const Color(0xFFDCE4ED)
+                    : const Color(0xFF294568),
+              ),
+            ),
+            child: StreamBuilder<List<AnnouncementReaction>>(
+              // Use a fresh subscription here. The dashboard card keeps a
+              // cached broadcast stream, whose latest event is not replayed
+              // to a dialog that subscribes later.
+              stream: _announcementService.reactionsForAnnouncement(
+                announcement.id,
+              ),
+              builder: (context, snapshot) {
+                final reactions =
+                    snapshot.data ?? const <AnnouncementReaction>[];
+                final likeCount = reactions
+                    .where(
+                      (reaction) =>
+                          reaction.type == AnnouncementReactionType.like,
+                    )
+                    .length;
+                final loveCount = reactions.length - likeCount;
+
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(18, 14, 10, 12),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.emoji_emotions_outlined,
+                            color: Color(0xFF00C875),
+                            size: 22,
+                          ),
+                          const SizedBox(width: 9),
+                          Expanded(
+                            child: Text(
+                              'Announcement Reactions',
+                              style: TextStyle(
+                                color: primaryText,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.pop(dialogContext),
+                            icon: const Icon(Icons.close_rounded),
+                            color: secondaryText,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Divider(
+                      height: 1,
+                      color: isLight
+                          ? const Color(0xFFE7ECF2)
+                          : const Color(0xFF294568),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(18, 13, 18, 10),
+                      child: Row(
+                        children: [
+                          _buildReactionSummaryChip(
+                            AnnouncementReactionType.like,
+                            likeCount,
+                            isLight,
+                          ),
+                          const SizedBox(width: 8),
+                          _buildReactionSummaryChip(
+                            AnnouncementReactionType.love,
+                            loveCount,
+                            isLight,
+                          ),
+                          const Spacer(),
+                          Text(
+                            '${reactions.length} ${reactions.length == 1 ? 'student' : 'students'}',
+                            style: TextStyle(
+                              color: secondaryText,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (snapshot.hasError)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(22, 28, 22, 34),
+                        child: Column(
+                          children: [
+                            const Icon(
+                              Icons.cloud_off_rounded,
+                              size: 40,
+                              color: Color(0xFFFF6B6B),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Could not load reactions. Close this window and try again.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: secondaryText,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else if (snapshot.connectionState ==
+                            ConnectionState.waiting &&
+                        reactions.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 32),
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    else if (reactions.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(22, 28, 22, 34),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.people_outline_rounded,
+                              size: 40,
+                              color: secondaryText.withAlpha(145),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'No students have reacted yet.',
+                              style: TextStyle(
+                                color: secondaryText,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      Flexible(
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          padding: const EdgeInsets.fromLTRB(14, 2, 14, 16),
+                          itemCount: reactions.length,
+                          separatorBuilder: (_, __) => Divider(
+                            height: 1,
+                            indent: 52,
+                            color: isLight
+                                ? const Color(0xFFE7ECF2)
+                                : const Color(0xFF213956),
+                          ),
+                          itemBuilder: (context, index) {
+                            final reaction = reactions[index];
+                            final currentStudent =
+                                _approvedStudentsById[reaction.studentId];
+                            final studentName =
+                                currentStudent?.name.trim().isNotEmpty == true
+                                ? currentStudent!.name
+                                : reaction.studentName;
+                            final avatarUrl = currentStudent?.avatarUrl?.trim();
+                            final fallbackAvatar = reaction.avatarUrl?.trim();
+                            final resolvedAvatar = avatarUrl?.isNotEmpty == true
+                                ? avatarUrl
+                                : fallbackAvatar;
+                            final section = currentStudent == null
+                                ? null
+                                : _matchingSectionLabel(currentStudent);
+                            final grade = currentStudent?.role?.label;
+                            final classLabel = grade == null || section == null
+                                ? null
+                                : '$grade • Section $section';
+
+                            return ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                                vertical: 3,
+                              ),
+                              leading: CircleAvatar(
+                                radius: 19,
+                                backgroundColor: const Color(
+                                  0xFF00C875,
+                                ).withAlpha(28),
+                                backgroundImage:
+                                    resolvedAvatar?.isNotEmpty == true
+                                    ? NetworkImage(resolvedAvatar!)
+                                    : null,
+                                child: resolvedAvatar?.isNotEmpty == true
+                                    ? null
+                                    : Text(
+                                        studentName.isEmpty
+                                            ? 'S'
+                                            : studentName[0].toUpperCase(),
+                                        style: const TextStyle(
+                                          color: Color(0xFF00C875),
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                              ),
+                              title: Text(
+                                studentName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: primaryText,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              subtitle: classLabel == null
+                                  ? null
+                                  : Text(
+                                      classLabel,
+                                      style: TextStyle(
+                                        color: secondaryText,
+                                        fontSize: 10.5,
+                                      ),
+                                    ),
+                              trailing: Container(
+                                width: 34,
+                                height: 34,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color:
+                                      (reaction.type ==
+                                                  AnnouncementReactionType.like
+                                              ? const Color(0xFF2684FF)
+                                              : const Color(0xFFFF477E))
+                                          .withAlpha(isLight ? 18 : 30),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  reaction.type == AnnouncementReactionType.like
+                                      ? Icons.thumb_up_rounded
+                                      : Icons.favorite_rounded,
+                                  color:
+                                      reaction.type ==
+                                          AnnouncementReactionType.like
+                                      ? const Color(0xFF2684FF)
+                                      : const Color(0xFFFF477E),
+                                  size: 17,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildReactionSummaryChip(
+    AnnouncementReactionType type,
+    int count,
+    bool isLight,
+  ) {
+    final color = type == AnnouncementReactionType.like
+        ? const Color(0xFF2684FF)
+        : const Color(0xFFFF477E);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withAlpha(isLight ? 18 : 30),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withAlpha(70)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            type == AnnouncementReactionType.like
+                ? Icons.thumb_up_rounded
+                : Icons.favorite_rounded,
+            color: color,
+            size: 15,
+          ),
+          const SizedBox(width: 5),
+          Text(
+            '$count',
+            style: TextStyle(
+              color: color,
+              fontSize: 11.5,
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ],
       ),
@@ -2309,11 +4081,649 @@ class _StatCard extends StatelessWidget {
 
 // ── Student progress card ─────────────────────────────────────────────────────
 
+class _ArProgressEntry {
+  final String title;
+  final bool completed;
+  final DateTime? activityAt;
+
+  const _ArProgressEntry({
+    required this.title,
+    required this.completed,
+    required this.activityAt,
+  });
+}
+
+String _formatProgressDateTime(DateTime? value) {
+  if (value == null) return 'Date not recorded';
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  final hour = value.hour == 0
+      ? 12
+      : value.hour > 12
+      ? value.hour - 12
+      : value.hour;
+  final minute = value.minute.toString().padLeft(2, '0');
+  final period = value.hour >= 12 ? 'PM' : 'AM';
+  return '${months[value.month - 1]} ${value.day}, ${value.year} at '
+      '$hour:$minute $period';
+}
+
+Color _progressResultColor(double score) {
+  if (score >= 0.8) return const Color(0xFF00E88F);
+  if (score >= 0.6) return const Color(0xFFFFC107);
+  return const Color(0xFFFF4D67);
+}
+
+class _StudentQuizProgressDialog extends StatelessWidget {
+  final _StudentSummary student;
+  final List<QuizAttempt> attempts;
+
+  const _StudentQuizProgressDialog({
+    required this.student,
+    required this.attempts,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final panelColor = isDark ? const Color(0xFF142240) : Colors.white;
+    final cardColor = isDark
+        ? const Color(0xFF0A1628)
+        : const Color(0xFFF5F8FC);
+    final borderColor = isDark
+        ? const Color(0xFF294568)
+        : const Color(0xFFD7E1ED);
+    final primaryText = isDark ? Colors.white : const Color(0xFF12213A);
+    final secondaryText = isDark
+        ? const Color(0xFF9BB0C9)
+        : const Color(0xFF607086);
+    final average = attempts.isEmpty
+        ? student.avgQuizScore
+        : attempts.fold<double>(
+                0,
+                (sum, attempt) => sum + attempt.score / attempt.totalQuestions,
+              ) /
+              attempts.length;
+
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
+      child: Container(
+        width: 420,
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * 0.78,
+        ),
+        decoration: BoxDecoration(
+          color: panelColor,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: borderColor),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x55000000),
+              blurRadius: 24,
+              offset: Offset(0, 12),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _StudentMetricDialogHeader(
+              icon: Icons.quiz_outlined,
+              color: const Color(0xFF00D4FF),
+              title: '${student.name}\'s Quiz Progress',
+              subtitle: '${student.grade} \u2022 Section ${student.section}',
+              onClose: () => Navigator.of(context).pop(),
+            ),
+            Divider(height: 1, color: borderColor),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 16, 18, 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _MetricSummaryBox(
+                      label: 'Quiz Average',
+                      value: '${(average * 100).round()}%',
+                      icon: Icons.analytics_outlined,
+                      color: const Color(0xFF00D4FF),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _MetricSummaryBox(
+                      label: 'Quizzes',
+                      value: '${attempts.length}',
+                      icon: Icons.assignment_turned_in_outlined,
+                      color: const Color(0xFF7C3AED),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
+              child: _MetricExplanation(
+                text:
+                    'Quiz Average uses the latest score for each completed quiz. '
+                    'Quizzes is the number of distinct quizzes completed.',
+                isDark: isDark,
+              ),
+            ),
+            if (attempts.isEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 30),
+                child: _EmptyMetricState(
+                  icon: Icons.quiz_outlined,
+                  message: 'No completed quizzes yet.',
+                  color: secondaryText,
+                ),
+              )
+            else
+              Flexible(
+                child: Scrollbar(
+                  thumbVisibility: attempts.length > 4,
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
+                    itemCount: attempts.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    itemBuilder: (context, index) {
+                      final attempt = attempts[index];
+                      final score = attempt.totalQuestions == 0
+                          ? 0.0
+                          : attempt.score / attempt.totalQuestions;
+                      final resultColor = _progressResultColor(score);
+                      final title = attempt.quizTitle.trim().isEmpty
+                          ? 'Quiz ${index + 1}'
+                          : attempt.quizTitle;
+                      return Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: cardColor,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: borderColor),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    title,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: primaryText,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  '${attempt.score}/${attempt.totalQuestions}',
+                                  style: TextStyle(
+                                    color: resultColor,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              _formatProgressDateTime(attempt.submittedAt),
+                              style: TextStyle(
+                                color: secondaryText,
+                                fontSize: 11,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(5),
+                              child: LinearProgressIndicator(
+                                value: score.clamp(0.0, 1.0),
+                                minHeight: 5,
+                                color: resultColor,
+                                backgroundColor: borderColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StudentArProgressDialog extends StatelessWidget {
+  final _StudentSummary student;
+  final List<_ArProgressEntry> activities;
+
+  const _StudentArProgressDialog({
+    required this.student,
+    required this.activities,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final panelColor = isDark ? const Color(0xFF142240) : Colors.white;
+    final cardColor = isDark
+        ? const Color(0xFF0A1628)
+        : const Color(0xFFF5F8FC);
+    final borderColor = isDark
+        ? const Color(0xFF294568)
+        : const Color(0xFFD7E1ED);
+    final primaryText = isDark ? Colors.white : const Color(0xFF12213A);
+    final secondaryText = isDark
+        ? const Color(0xFF9BB0C9)
+        : const Color(0xFF607086);
+    final completed = activities.where((activity) => activity.completed).length;
+    final tries = activities.isEmpty ? student.arAttempts : activities.length;
+    final score = activities.isEmpty
+        ? student.avgArScore
+        : completed / activities.length * 100;
+
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
+      child: Container(
+        width: 420,
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * 0.78,
+        ),
+        decoration: BoxDecoration(
+          color: panelColor,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: borderColor),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x55000000),
+              blurRadius: 24,
+              offset: Offset(0, 12),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _StudentMetricDialogHeader(
+              icon: Icons.science_outlined,
+              color: const Color(0xFF8B5CF6),
+              title: '${student.name}\'s AR Progress',
+              subtitle: '${student.grade} \u2022 Section ${student.section}',
+              onClose: () => Navigator.of(context).pop(),
+            ),
+            Divider(height: 1, color: borderColor),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 16, 18, 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _MetricSummaryBox(
+                      label: 'AR Score',
+                      value: '${score.round()}%',
+                      icon: Icons.science_outlined,
+                      color: const Color(0xFF8B5CF6),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _MetricSummaryBox(
+                      label: 'AR Tries',
+                      value: '$tries',
+                      icon: Icons.view_in_ar_outlined,
+                      color: const Color(0xFF00D4FF),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
+              child: _MetricExplanation(
+                text:
+                    'AR Score is the percentage of recorded AR labs completed. '
+                    'AR Tries is the number of AR lab records for this student.',
+                isDark: isDark,
+              ),
+            ),
+            if (activities.isEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 30),
+                child: _EmptyMetricState(
+                  icon: Icons.view_in_ar_outlined,
+                  message: 'No AR lab activity yet.',
+                  color: secondaryText,
+                ),
+              )
+            else
+              Flexible(
+                child: Scrollbar(
+                  thumbVisibility: activities.length > 4,
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
+                    itemCount: activities.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    itemBuilder: (context, index) {
+                      final activity = activities[index];
+                      final statusColor = activity.completed
+                          ? const Color(0xFF00E88F)
+                          : const Color(0xFFFFC107);
+                      return Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: cardColor,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: borderColor),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: statusColor.withAlpha(24),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                activity.completed
+                                    ? Icons.check_circle_outline
+                                    : Icons.play_circle_outline,
+                                color: statusColor,
+                                size: 21,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    activity.title,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: primaryText,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    _formatProgressDateTime(
+                                      activity.activityAt,
+                                    ),
+                                    style: TextStyle(
+                                      color: secondaryText,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: statusColor.withAlpha(24),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                activity.completed ? 'Completed' : 'Started',
+                                style: TextStyle(
+                                  color: statusColor,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StudentMetricDialogHeader extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String subtitle;
+  final VoidCallback onClose;
+
+  const _StudentMetricDialogHeader({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.subtitle,
+    required this.onClose,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(18, 16, 12, 14),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: color.withAlpha(24),
+              borderRadius: BorderRadius.circular(13),
+            ),
+            child: Icon(icon, color: color, size: 22),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : const Color(0xFF12213A),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    color: isDark
+                        ? const Color(0xFF9BB0C9)
+                        : const Color(0xFF607086),
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: onClose,
+            tooltip: 'Close',
+            icon: Icon(
+              Icons.close,
+              color: isDark ? const Color(0xFFAFC0D5) : const Color(0xFF52647A),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MetricSummaryBox extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color color;
+
+  const _MetricSummaryBox({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      decoration: BoxDecoration(
+        color: color.withAlpha(isDark ? 18 : 12),
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(color: color.withAlpha(55)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 19),
+          const SizedBox(width: 9),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: isDark
+                        ? const Color(0xFF9BB0C9)
+                        : const Color(0xFF607086),
+                    fontSize: 10,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MetricExplanation extends StatelessWidget {
+  final String text;
+  final bool isDark;
+
+  const _MetricExplanation({required this.text, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(11),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF102039) : const Color(0xFFF0F7FF),
+        borderRadius: BorderRadius.circular(11),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.info_outline, size: 16, color: Color(0xFF00AEEF)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: isDark
+                    ? const Color(0xFFB5C5D9)
+                    : const Color(0xFF52647A),
+                fontSize: 11,
+                height: 1.35,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmptyMetricState extends StatelessWidget {
+  final IconData icon;
+  final String message;
+  final Color color;
+
+  const _EmptyMetricState({
+    required this.icon,
+    required this.message,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Icon(icon, color: color, size: 36),
+        const SizedBox(height: 10),
+        Text(message, style: TextStyle(color: color, fontSize: 13)),
+      ],
+    );
+  }
+}
+
 class _StudentProgressCard extends StatelessWidget {
   final _StudentSummary student;
   final bool showBadge;
+  final VoidCallback? onQuizTap;
+  final VoidCallback? onArTap;
 
-  const _StudentProgressCard({required this.student, this.showBadge = true});
+  const _StudentProgressCard({
+    required this.student,
+    this.showBadge = true,
+    this.onQuizTap,
+    this.onArTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -2390,7 +4800,7 @@ class _StudentProgressCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      'Section ${student.section}',
+                      '${student.grade} • Section ${student.section}',
                       style: TextStyle(
                         fontSize: 11,
                         color: Theme.of(context).brightness == Brightness.dark
@@ -2494,6 +4904,7 @@ class _StudentProgressCard extends StatelessWidget {
                 icon: 'quiz',
                 label: 'Quiz Avg',
                 value: '${(student.avgQuizScore * 100).toStringAsFixed(0)}%',
+                onTap: onQuizTap,
                 color: Theme.of(context).brightness == Brightness.dark
                     ? const Color(0xFF00D4FF)
                     : const Color(0xFF1565C0),
@@ -2503,6 +4914,7 @@ class _StudentProgressCard extends StatelessWidget {
                 icon: 'science',
                 label: 'AR Score',
                 value: '${student.avgArScore.toStringAsFixed(0)}%',
+                onTap: onArTap,
                 color: const Color(0xFF7C3AED),
               ),
               const SizedBox(width: 8),
@@ -2510,6 +4922,7 @@ class _StudentProgressCard extends StatelessWidget {
                 icon: 'assignment_turned_in',
                 label: 'Quizzes',
                 value: '${student.quizzesTaken}',
+                onTap: onQuizTap,
                 color: const Color(0xFF8BA3C0),
               ),
               const SizedBox(width: 8),
@@ -2517,6 +4930,7 @@ class _StudentProgressCard extends StatelessWidget {
                 icon: 'biotech',
                 label: 'AR Tries',
                 value: '${student.arAttempts}',
+                onTap: onArTap,
                 color: const Color(0xFF8BA3C0),
               ),
             ],
@@ -2532,49 +4946,62 @@ class _MiniStat extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
+  final VoidCallback? onTap;
 
   const _MiniStat({
     required this.icon,
     required this.label,
     required this.value,
     required this.color,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
-        decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0xFF0A1628)
-              : Colors.grey.shade100,
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CustomIconWidget(iconName: icon, color: color, size: 14),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: color,
-              ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(10),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF0A1628)
+                  : Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(10.0),
+              border: onTap == null
+                  ? null
+                  : Border.all(color: color.withAlpha(42)),
             ),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 9,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0xFF8BA3C0)
-                    : Colors.grey.shade600,
-              ),
-              overflow: TextOverflow.ellipsis,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CustomIconWidget(iconName: icon, color: color, size: 14),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
+                ),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 9,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF8BA3C0)
+                        : Colors.grey.shade600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

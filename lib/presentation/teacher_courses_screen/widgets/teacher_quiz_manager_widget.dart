@@ -22,13 +22,20 @@ class CourseQuizManagerWidget extends StatefulWidget {
 class _CourseQuizManagerWidgetState extends State<CourseQuizManagerWidget> {
   CourseQuiz? _expandedQuiz;
 
+  Future<void> _addQuiz() async {
+    final selectedTypes = await showDialog<Set<CourseQuestionType>>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => const _QuizTypeSelectionDialog(),
+    );
+    if (!mounted || selectedTypes == null || selectedTypes.isEmpty) return;
 
-  void _addQuiz() {
-    showDialog(
+    showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => _UnifiedQuizEditorDialog(
         course: widget.course,
+        questionTypes: selectedTypes,
         onSave: (CourseQuiz quiz) {
           setState(() {
             widget.course.quizzes.add(quiz);
@@ -42,15 +49,22 @@ class _CourseQuizManagerWidgetState extends State<CourseQuizManagerWidget> {
   }
 
   void _editQuiz(CourseQuiz quiz) {
+    final questionTypes = quiz.questions.map((q) => q.type).toSet();
+    if (questionTypes.isEmpty) {
+      questionTypes.add(CourseQuestionType.multipleChoice);
+    }
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => _UnifiedQuizEditorDialog(
         course: widget.course,
         existingQuiz: quiz,
+        questionTypes: questionTypes,
         onSave: (CourseQuiz updatedQuiz) {
           setState(() {
-            final idx = widget.course.quizzes.indexWhere((q) => q.id == quiz.id);
+            final idx = widget.course.quizzes.indexWhere(
+              (q) => q.id == quiz.id,
+            );
             if (idx != -1) {
               widget.course.quizzes[idx] = updatedQuiz;
               if (_expandedQuiz?.id == quiz.id) _expandedQuiz = updatedQuiz;
@@ -96,12 +110,12 @@ class _CourseQuizManagerWidgetState extends State<CourseQuizManagerWidget> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     final quizzes = widget.course.quizzes;
     final isLight = Theme.of(context).brightness == Brightness.light;
-    final accentColor = (isLight && widget.course.accentColor == const Color(0xFF00D4FF))
+    final accentColor =
+        (isLight && widget.course.accentColor == const Color(0xFF00D4FF))
         ? const Color(0xFF1565C0)
         : widget.course.accentColor;
 
@@ -162,7 +176,7 @@ class _QuizCard extends StatelessWidget {
   final VoidCallback onToggle;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
-  
+
   const _QuizCard({
     required this.quiz,
     required this.isExpanded,
@@ -177,12 +191,16 @@ class _QuizCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF142240) : Colors.grey.shade100,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF142240)
+            : Colors.grey.shade100,
         borderRadius: BorderRadius.circular(16.0),
         border: Border.all(
           color: isExpanded
               ? accentColor.withAlpha(80)
-              : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300),
+              : (Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF1E3A5F)
+                    : Colors.grey.shade300),
           width: 1,
         ),
       ),
@@ -221,7 +239,10 @@ class _QuizCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.black87,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -230,20 +251,35 @@ class _QuizCard extends StatelessWidget {
                           '${quiz.questions.length} question${quiz.questions.length == 1 ? '' : 's'}',
                           style: TextStyle(
                             fontSize: 11,
-                            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF8BA3C0)
+                                : Colors.grey.shade600,
                           ),
                         ),
                         if (quiz.dueDate != null) ...[
                           const SizedBox(height: 2),
                           Row(
                             children: [
-                              CustomIconWidget(iconName: 'schedule', color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0), size: 10),
+                              CustomIconWidget(
+                                iconName: 'schedule',
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? const Color(0xFF00D4FF)
+                                    : const Color(0xFF1565C0),
+                                size: 10,
+                              ),
                               const SizedBox(width: 4),
                               Text(
                                 'Due: ${quiz.dueDateLabel}',
                                 style: TextStyle(
                                   fontSize: 10,
-                                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0),
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? const Color(0xFF00D4FF)
+                                      : const Color(0xFF1565C0),
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -271,7 +307,9 @@ class _QuizCard extends StatelessWidget {
                     duration: const Duration(milliseconds: 200),
                     child: CustomIconWidget(
                       iconName: 'expand_more',
-                      color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF8BA3C0)
+                          : Colors.grey.shade600,
                       size: 20,
                     ),
                   ),
@@ -284,8 +322,45 @@ class _QuizCard extends StatelessWidget {
             Container(
               height: 1,
               margin: const EdgeInsets.symmetric(horizontal: 14),
-              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF1E3A5F)
+                  : Colors.grey.shade300,
             ),
+            if (quiz.directions.trim().isNotEmpty)
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.fromLTRB(14, 10, 14, 2),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: accentColor.withAlpha(15),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: accentColor.withAlpha(45)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Directions',
+                      style: TextStyle(
+                        color: accentColor,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      quiz.directions,
+                      style: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFFB7C9DD)
+                            : Colors.grey.shade700,
+                        fontSize: 12,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 10, 14, 4),
               child: Row(
@@ -309,7 +384,9 @@ class _QuizCard extends StatelessWidget {
                   'No questions yet. Edit the quiz to add questions.',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF8BA3C0)
+                        : Colors.grey.shade600,
                   ),
                 ),
               )
@@ -347,9 +424,16 @@ class _QuestionTile extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(14, 0, 14, 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0F1E35) : Colors.white,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF0F1E35)
+            : Colors.white,
         borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E3A5F) : Colors.grey.shade300, width: 1),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF1E3A5F)
+              : Colors.grey.shade300,
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -377,69 +461,131 @@ class _QuestionTile extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(
-                  question.question,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 7,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: accentColor.withAlpha(18),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        question.type.label,
+                        style: TextStyle(
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w700,
+                          color: accentColor,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      question.question,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black87,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-
             ],
           ),
           const SizedBox(height: 8),
-          ...question.options.asMap().entries.map((entry) {
-            final i = entry.key;
-            final opt = entry.value;
-            final isCorrect = i == question.correctIndex;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 4),
+          if (question.type == CourseQuestionType.identification ||
+              question.type == CourseQuestionType.enumeration)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF00FF88).withAlpha(12),
+                borderRadius: BorderRadius.circular(9),
+                border: Border.all(
+                  color: const Color(0xFF00FF88).withAlpha(55),
+                ),
+              ),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 18,
-                    height: 18,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isCorrect
-                          ? const Color(0xFF00FF88).withAlpha(30)
-                          : Colors.transparent,
-                      border: Border.all(
-                        color: isCorrect
-                            ? const Color(0xFF00FF88)
-                            : const Color(0xFF3A5A7A),
-                        width: 1.5,
-                      ),
-                    ),
-                    child: isCorrect
-                        ? const Icon(
-                            Icons.check,
-                            size: 10,
-                            color: Color(0xFF00FF88),
-                          )
-                        : null,
+                  const Icon(
+                    Icons.check_circle_outline_rounded,
+                    size: 16,
+                    color: Color(0xFF00FF88),
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: 7),
                   Expanded(
                     child: Text(
-                      opt,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isCorrect
-                            ? const Color(0xFF00FF88)
-                            : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
-                        fontWeight: isCorrect
-                            ? FontWeight.w600
-                            : FontWeight.w400,
+                      'Correct: ${question.correctAnswers.join(', ')}',
+                      style: const TextStyle(
+                        fontSize: 11.5,
+                        color: Color(0xFF00C875),
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
                 ],
               ),
-            );
-          }),
+            )
+          else
+            ...question.options.asMap().entries.map((entry) {
+              final i = entry.key;
+              final opt = entry.value;
+              final isCorrect = i == question.correctIndex;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 18,
+                      height: 18,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isCorrect
+                            ? const Color(0xFF00FF88).withAlpha(30)
+                            : Colors.transparent,
+                        border: Border.all(
+                          color: isCorrect
+                              ? const Color(0xFF00FF88)
+                              : const Color(0xFF3A5A7A),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: isCorrect
+                          ? const Icon(
+                              Icons.check,
+                              size: 10,
+                              color: Color(0xFF00FF88),
+                            )
+                          : null,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        opt,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isCorrect
+                              ? const Color(0xFF00FF88)
+                              : (Theme.of(context).brightness == Brightness.dark
+                                    ? const Color(0xFF8BA3C0)
+                                    : Colors.grey.shade600),
+                          fontWeight: isCorrect
+                              ? FontWeight.w600
+                              : FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
         ],
       ),
     );
@@ -627,10 +773,16 @@ class _GlassTextField extends StatelessWidget {
         TextField(
           controller: controller,
           maxLines: maxLines,
-          style: TextStyle(fontSize: 13, color: isLight ? Colors.black87 : Colors.white),
+          style: TextStyle(
+            fontSize: 13,
+            color: isLight ? Colors.black87 : Colors.white,
+          ),
           decoration: InputDecoration(
             hintText: compact ? label : hint,
-            hintStyle: TextStyle(fontSize: 12, color: isLight ? Colors.grey.shade500 : const Color(0xFF4A6A8A)),
+            hintStyle: TextStyle(
+              fontSize: 12,
+              color: isLight ? Colors.grey.shade500 : const Color(0xFF4A6A8A),
+            ),
             filled: true,
             fillColor: isLight ? Colors.white : const Color(0xFF142240),
             contentPadding: EdgeInsets.symmetric(
@@ -639,16 +791,24 @@ class _GlassTextField extends StatelessWidget {
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: isLight ? Colors.grey.shade300 : const Color(0xFF1E3A5F), width: 1),
+              borderSide: BorderSide(
+                color: isLight ? Colors.grey.shade300 : const Color(0xFF1E3A5F),
+                width: 1,
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: isLight ? Colors.grey.shade300 : const Color(0xFF1E3A5F), width: 1),
+              borderSide: BorderSide(
+                color: isLight ? Colors.grey.shade300 : const Color(0xFF1E3A5F),
+                width: 1,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
               borderSide: BorderSide(
-                color: isLight ? const Color(0xFF1565C0) : const Color(0xFF00D4FF),
+                color: isLight
+                    ? const Color(0xFF1565C0)
+                    : const Color(0xFF00D4FF),
                 width: 1.5,
               ),
             ),
@@ -674,10 +834,16 @@ class _ConfirmDeleteDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final isLight = Theme.of(context).brightness == Brightness.light;
     final bgColor = isLight ? Colors.white : const Color(0xFF0F1E35);
-    final borderColor = isLight ? const Color(0x22FF4757) : const Color(0x44FF4757);
+    final borderColor = isLight
+        ? const Color(0x22FF4757)
+        : const Color(0x44FF4757);
     final titleColor = isLight ? const Color(0xFF1E253F) : Colors.white;
-    final textColor = isLight ? const Color(0xFF6C7B90) : const Color(0xFF8BA3C0);
-    final btnBorderColor = isLight ? Colors.grey.shade300 : const Color(0xFF3A5A7A);
+    final textColor = isLight
+        ? const Color(0xFF6C7B90)
+        : const Color(0xFF8BA3C0);
+    final btnBorderColor = isLight
+        ? Colors.grey.shade300
+        : const Color(0xFF3A5A7A);
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -694,7 +860,7 @@ class _ConfirmDeleteDialog extends StatelessWidget {
                     color: Colors.black.withOpacity(0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
-                  )
+                  ),
                 ]
               : null,
         ),
@@ -728,10 +894,7 @@ class _ConfirmDeleteDialog extends StatelessWidget {
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(
-                        color: btnBorderColor,
-                        width: 1,
-                      ),
+                      side: BorderSide(color: btnBorderColor, width: 1),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50),
                       ),
@@ -885,17 +1048,289 @@ class _AddButton extends StatelessWidget {
   }
 }
 
-
 // ── Unified Google Forms-Style Quiz Editor ───────────────────────────────────
+
+class _QuizTypeSelectionDialog extends StatefulWidget {
+  const _QuizTypeSelectionDialog();
+
+  @override
+  State<_QuizTypeSelectionDialog> createState() =>
+      _QuizTypeSelectionDialogState();
+}
+
+class _QuizTypeSelectionDialogState extends State<_QuizTypeSelectionDialog> {
+  final Set<CourseQuestionType> _selectedTypes = {};
+
+  String _description(CourseQuestionType type) => switch (type) {
+    CourseQuestionType.multipleChoice =>
+      'Students choose one correct answer from several options.',
+    CourseQuestionType.trueFalse =>
+      'Students decide whether each statement is true or false.',
+    CourseQuestionType.identification =>
+      'Students type a short answer that identifies the correct term.',
+    CourseQuestionType.enumeration =>
+      'Students provide every item requested by the question.',
+  };
+
+  IconData _icon(CourseQuestionType type) => switch (type) {
+    CourseQuestionType.multipleChoice => Icons.checklist_rounded,
+    CourseQuestionType.trueFalse => Icons.rule_rounded,
+    CourseQuestionType.identification => Icons.short_text_rounded,
+    CourseQuestionType.enumeration => Icons.format_list_numbered_rounded,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final accentColor = isLight
+        ? const Color(0xFF1565C0)
+        : const Color(0xFF00D4FF);
+
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 460, maxHeight: 650),
+        decoration: BoxDecoration(
+          color: isLight ? Colors.white : const Color(0xFF0F1E35),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: accentColor.withAlpha(70)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(isLight ? 30 : 90),
+              blurRadius: 24,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 18, 12, 14),
+              child: Row(
+                children: [
+                  Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: accentColor.withAlpha(22),
+                      borderRadius: BorderRadius.circular(11),
+                    ),
+                    child: Icon(
+                      Icons.quiz_outlined,
+                      color: accentColor,
+                      size: 21,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Choose Quiz Types',
+                          style: TextStyle(
+                            color: isLight ? Colors.black87 : Colors.white,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Select one or more question types.',
+                          style: TextStyle(
+                            color: isLight
+                                ? Colors.grey.shade600
+                                : const Color(0xFF8BA3C0),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close_rounded),
+                    color: const Color(0xFF8BA3C0),
+                  ),
+                ],
+              ),
+            ),
+            Divider(
+              height: 1,
+              color: isLight ? Colors.grey.shade200 : const Color(0xFF1E3A5F),
+            ),
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                padding: const EdgeInsets.all(16),
+                children: CourseQuestionType.values.map((type) {
+                  final selected = _selectedTypes.contains(type);
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: InkWell(
+                      onTap: () => setState(() {
+                        selected
+                            ? _selectedTypes.remove(type)
+                            : _selectedTypes.add(type);
+                      }),
+                      borderRadius: BorderRadius.circular(14),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: selected
+                              ? accentColor.withAlpha(isLight ? 18 : 25)
+                              : (isLight
+                                    ? Colors.grey.shade50
+                                    : const Color(0xFF142240)),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: selected
+                                ? accentColor
+                                : (isLight
+                                      ? Colors.grey.shade200
+                                      : const Color(0xFF1E3A5F)),
+                            width: selected ? 1.5 : 1,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: accentColor.withAlpha(20),
+                                borderRadius: BorderRadius.circular(11),
+                              ),
+                              child: Icon(
+                                _icon(type),
+                                color: accentColor,
+                                size: 21,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    type.label,
+                                    style: TextStyle(
+                                      color: isLight
+                                          ? Colors.black87
+                                          : Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    _description(type),
+                                    style: TextStyle(
+                                      color: isLight
+                                          ? Colors.grey.shade600
+                                          : const Color(0xFF8BA3C0),
+                                      fontSize: 11.5,
+                                      height: 1.35,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(
+                              selected
+                                  ? Icons.check_circle_rounded
+                                  : Icons.radio_button_unchecked_rounded,
+                              color: selected
+                                  ? accentColor
+                                  : const Color(0xFF5A7190),
+                              size: 22,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 6, 16, 18),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: isLight
+                            ? Colors.grey.shade700
+                            : const Color(0xFFB7C9DD),
+                        side: BorderSide(
+                          color: isLight
+                              ? Colors.grey.shade300
+                              : const Color(0xFF3A5A7A),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text('Cancel'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _selectedTypes.isEmpty
+                          ? null
+                          : () => Navigator.pop(
+                              context,
+                              Set<CourseQuestionType>.from(_selectedTypes),
+                            ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: accentColor,
+                        foregroundColor: Colors.white,
+                        disabledBackgroundColor: isLight
+                            ? Colors.grey.shade200
+                            : const Color(0xFF1E3A5F),
+                        disabledForegroundColor: const Color(0xFF8BA3C0),
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        _selectedTypes.isEmpty
+                            ? 'Select a type'
+                            : 'Continue (${_selectedTypes.length})',
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class _UnifiedQuizEditorDialog extends StatefulWidget {
   final Course course;
   final CourseQuiz? existingQuiz;
+  final Set<CourseQuestionType> questionTypes;
   final void Function(CourseQuiz) onSave;
 
   const _UnifiedQuizEditorDialog({
     required this.course,
     this.existingQuiz,
+    required this.questionTypes,
     required this.onSave,
   });
 
@@ -906,19 +1341,27 @@ class _UnifiedQuizEditorDialog extends StatefulWidget {
 
 class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
   late TextEditingController _titleCtrl;
+  late TextEditingController _directionsCtrl;
   late List<_QuestionDraft> _questions;
   DateTime? _selectedDueDate;
+
+  List<CourseQuestionType> get _availableTypes => CourseQuestionType.values
+      .where(widget.questionTypes.contains)
+      .toList(growable: false);
 
   @override
   void initState() {
     super.initState();
     _titleCtrl = TextEditingController(text: widget.existingQuiz?.title ?? '');
+    _directionsCtrl = TextEditingController(
+      text: widget.existingQuiz?.directions ?? '',
+    );
     if (widget.existingQuiz != null) {
       _questions = widget.existingQuiz!.questions
           .map((q) => _QuestionDraft.fromCourseQuestion(q))
           .toList();
     } else {
-      _questions = [_QuestionDraft.empty()];
+      _questions = [_QuestionDraft.empty(_availableTypes.first)];
     }
     _selectedDueDate = widget.existingQuiz?.dueDate;
   }
@@ -926,6 +1369,7 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
   @override
   void dispose() {
     _titleCtrl.dispose();
+    _directionsCtrl.dispose();
     for (var q in _questions) {
       q.dispose();
     }
@@ -934,7 +1378,7 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
 
   void _addQuestion() {
     setState(() {
-      _questions.add(_QuestionDraft.empty());
+      _questions.add(_QuestionDraft.empty(_availableTypes.first));
     });
   }
 
@@ -946,29 +1390,93 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
   }
 
   void _save() {
-    if (_titleCtrl.text.trim().isEmpty) return;
+    if (_titleCtrl.text.trim().isEmpty) {
+      _showValidationMessage('Enter a quiz title.');
+      return;
+    }
 
     final validQuestions = <CourseQuestion>[];
-    for (var draft in _questions) {
-      if (draft.questionCtrl.text.trim().isEmpty) continue;
-      final opts = draft.optionCtrls
-          .map((c) => c.text.trim())
-          .where((s) => s.isNotEmpty)
-          .toList();
-      if (opts.length < 2) continue;
+    for (var index = 0; index < _questions.length; index++) {
+      final draft = _questions[index];
+      final questionText = draft.questionCtrl.text.trim();
+      if (questionText.isEmpty) {
+        _showValidationMessage('Enter the text for question ${index + 1}.');
+        return;
+      }
 
-      validQuestions.add(CourseQuestion(
-        id: draft.id,
-        question: draft.questionCtrl.text.trim(),
-        options: opts,
-        correctIndex: draft.correctIndex.clamp(0, opts.length - 1),
-        explanation: draft.explanationCtrl.text.trim(),
-      ));
+      var options = <String>[];
+      var correctIndex = 0;
+      var correctAnswers = <String>[];
+
+      switch (draft.type) {
+        case CourseQuestionType.multipleChoice:
+          final selectedOption = draft.correctIndex < draft.optionCtrls.length
+              ? draft.optionCtrls[draft.correctIndex].text.trim()
+              : '';
+          options = draft.optionCtrls
+              .map((controller) => controller.text.trim())
+              .where((answer) => answer.isNotEmpty)
+              .toList();
+          if (options.length < 2 || selectedOption.isEmpty) {
+            _showValidationMessage(
+              'Question ${index + 1} needs at least two options and a marked correct answer.',
+            );
+            return;
+          }
+          correctIndex = options
+              .indexOf(selectedOption)
+              .clamp(0, options.length - 1);
+        case CourseQuestionType.trueFalse:
+          options = const ['True', 'False'];
+          correctIndex = draft.correctIndex.clamp(0, 1);
+        case CourseQuestionType.identification:
+          correctAnswers = draft.answerCtrls
+              .map((controller) => controller.text.trim())
+              .where((answer) => answer.isNotEmpty)
+              .toList();
+          if (correctAnswers.isEmpty) {
+            _showValidationMessage(
+              'Enter the correct answer for question ${index + 1}.',
+            );
+            return;
+          }
+        case CourseQuestionType.enumeration:
+          correctAnswers = draft.answerCtrls
+              .map((controller) => controller.text.trim())
+              .where((answer) => answer.isNotEmpty)
+              .toList();
+          if (correctAnswers.length < 2) {
+            _showValidationMessage(
+              'Enumeration question ${index + 1} needs at least two answers.',
+            );
+            return;
+          }
+      }
+
+      validQuestions.add(
+        CourseQuestion(
+          id: draft.id,
+          question: questionText,
+          type: draft.type,
+          options: options,
+          correctIndex: correctIndex,
+          correctAnswers: correctAnswers,
+          explanation: draft.explanationCtrl.text.trim(),
+        ),
+      );
+    }
+
+    if (validQuestions.isEmpty) {
+      _showValidationMessage('Add at least one complete question.');
+      return;
     }
 
     final quiz = CourseQuiz(
-      id: widget.existingQuiz?.id ?? 'tq_${DateTime.now().millisecondsSinceEpoch}',
+      id:
+          widget.existingQuiz?.id ??
+          'tq_${DateTime.now().millisecondsSinceEpoch}',
       title: _titleCtrl.text.trim(),
+      directions: _directionsCtrl.text.trim(),
       questions: validQuestions,
       createdAt: widget.existingQuiz?.createdAt ?? DateTime.now(),
       dueDate: _selectedDueDate,
@@ -976,6 +1484,12 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
 
     widget.onSave(quiz);
     Navigator.pop(context);
+  }
+
+  void _showValidationMessage(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _pickDueDate() async {
@@ -987,16 +1501,16 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
       lastDate: now.add(const Duration(days: 365)),
     );
     if (d == null) return;
-    
+
     if (mounted) {
       final t = await showTimePicker(
         context: context,
-        initialTime: _selectedDueDate != null 
-          ? TimeOfDay.fromDateTime(_selectedDueDate!) 
-          : const TimeOfDay(hour: 23, minute: 59),
+        initialTime: _selectedDueDate != null
+            ? TimeOfDay.fromDateTime(_selectedDueDate!)
+            : const TimeOfDay(hour: 23, minute: 59),
       );
       if (t == null) return;
-      
+
       setState(() {
         _selectedDueDate = DateTime(d.year, d.month, d.day, t.hour, t.minute);
       });
@@ -1009,25 +1523,34 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF162544) : Colors.grey.shade100,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF162544)
+              : Colors.grey.shade100,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: accentColor.withAlpha(40),
-            width: 1,
-          ),
+          border: Border.all(color: accentColor.withAlpha(40), width: 1),
         ),
         child: Row(
           children: [
-            CustomIconWidget(iconName: 'calendar_month', color: accentColor, size: 20),
+            CustomIconWidget(
+              iconName: 'calendar_month',
+              color: accentColor,
+              size: 20,
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                _selectedDueDate != null 
-                  ? 'Due: ${_selectedDueDate!.month.toString().padLeft(2, '0')}/${_selectedDueDate!.day.toString().padLeft(2, '0')}/${_selectedDueDate!.year.toString().substring(2)} at ${_formatTimeOnly(_selectedDueDate!)}'
-                  : 'Set Due Date (Optional)',
+                _selectedDueDate != null
+                    ? 'Due: ${_selectedDueDate!.month.toString().padLeft(2, '0')}/${_selectedDueDate!.day.toString().padLeft(2, '0')}/${_selectedDueDate!.year.toString().substring(2)} at ${_formatTimeOnly(_selectedDueDate!)}'
+                    : 'Set Due Date (Optional)',
                 style: TextStyle(
                   fontSize: 14,
-                  color: _selectedDueDate != null ? (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87) : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF8BA3C0) : Colors.grey.shade600),
+                  color: _selectedDueDate != null
+                      ? (Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black87)
+                      : (Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF8BA3C0)
+                            : Colors.grey.shade600),
                 ),
               ),
             ),
@@ -1036,7 +1559,11 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
                 onTap: () {
                   setState(() => _selectedDueDate = null);
                 },
-                child: const CustomIconWidget(iconName: 'close', color: Color(0xFFFF6B6B), size: 18),
+                child: const CustomIconWidget(
+                  iconName: 'close',
+                  color: Color(0xFFFF6B6B),
+                  size: 18,
+                ),
               ),
           ],
         ),
@@ -1047,7 +1574,8 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
   @override
   Widget build(BuildContext context) {
     final isLight = Theme.of(context).brightness == Brightness.light;
-    final accentColor = (isLight && widget.course.accentColor == const Color(0xFF00D4FF))
+    final accentColor =
+        (isLight && widget.course.accentColor == const Color(0xFF00D4FF))
         ? const Color(0xFF1565C0)
         : widget.course.accentColor;
 
@@ -1059,10 +1587,7 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
         decoration: BoxDecoration(
           color: isLight ? Colors.white : const Color(0xFF0F1E35),
           borderRadius: BorderRadius.circular(20.0),
-          border: Border.all(
-            color: accentColor.withAlpha(60),
-            width: 1,
-          ),
+          border: Border.all(color: accentColor.withAlpha(60), width: 1),
         ),
         child: Column(
           children: [
@@ -1122,6 +1647,14 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
                   ),
                   const SizedBox(height: 16),
                   _buildDueDatePicker(context, accentColor),
+                  const SizedBox(height: 16),
+                  _GlassTextField(
+                    controller: _directionsCtrl,
+                    label: 'Directions (Optional)',
+                    hint:
+                        'e.g. Read each question carefully and select the best answer.',
+                    maxLines: 3,
+                  ),
                   const SizedBox(height: 24),
                   Row(
                     children: [
@@ -1138,7 +1671,9 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
                         '${_questions.length} question(s)',
                         style: TextStyle(
                           fontSize: 12,
-                          color: isLight ? Colors.grey.shade600 : const Color(0xFF8BA3C0),
+                          color: isLight
+                              ? Colors.grey.shade600
+                              : const Color(0xFF8BA3C0),
                         ),
                       ),
                     ],
@@ -1151,7 +1686,12 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
                       index: index,
                       draft: draft,
                       accentColor: accentColor,
+                      availableTypes: _availableTypes,
                       onRemove: () => _removeQuestion(index),
+                      onTypeChanged: (newType) {
+                        setState(() => draft.changeType(newType));
+                      },
+                      onDraftChanged: () => setState(() {}),
                       onCorrectChanged: (newIdx) {
                         setState(() {
                           draft.correctIndex = newIdx;
@@ -1229,7 +1769,9 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
                       onPressed: _save,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: accentColor,
-                        foregroundColor: isLight ? Colors.white : const Color(0xFF0A1628),
+                        foregroundColor: isLight
+                            ? Colors.white
+                            : const Color(0xFF0A1628),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(50),
                         ),
@@ -1256,6 +1798,8 @@ class _QuestionDraft {
   final String id;
   final TextEditingController questionCtrl;
   final List<TextEditingController> optionCtrls;
+  final List<TextEditingController> answerCtrls;
+  CourseQuestionType type;
   int correctIndex;
   final TextEditingController explanationCtrl;
 
@@ -1263,38 +1807,107 @@ class _QuestionDraft {
     required this.id,
     required this.questionCtrl,
     required this.optionCtrls,
+    required this.answerCtrls,
+    required this.type,
     required this.correctIndex,
     required this.explanationCtrl,
   });
 
-  factory _QuestionDraft.empty() {
+  factory _QuestionDraft.empty(CourseQuestionType type) {
     return _QuestionDraft(
       id: 'tqq_${DateTime.now().millisecondsSinceEpoch}_${DateTime.now().microsecond}',
       questionCtrl: TextEditingController(),
-      optionCtrls: List.generate(4, (_) => TextEditingController()),
+      optionCtrls: _newOptionControllers(type),
+      answerCtrls: _newAnswerControllers(type),
+      type: type,
       correctIndex: 0,
       explanationCtrl: TextEditingController(),
     );
   }
 
   factory _QuestionDraft.fromCourseQuestion(CourseQuestion q) {
+    final optionCount = q.options.length > 4 ? q.options.length : 4;
+    final answerValues = q.correctAnswers.isNotEmpty
+        ? q.correctAnswers
+        : const <String>[];
     return _QuestionDraft(
       id: q.id,
       questionCtrl: TextEditingController(text: q.question),
       optionCtrls: List.generate(
-        4,
+        optionCount,
         (i) => TextEditingController(
           text: i < q.options.length ? q.options[i] : '',
         ),
       ),
+      answerCtrls: answerValues.isEmpty
+          ? _newAnswerControllers(q.type)
+          : answerValues
+                .map((answer) => TextEditingController(text: answer))
+                .toList(),
+      type: q.type,
       correctIndex: q.correctIndex,
       explanationCtrl: TextEditingController(text: q.explanation),
     );
   }
 
+  static List<TextEditingController> _newOptionControllers(
+    CourseQuestionType type,
+  ) {
+    if (type == CourseQuestionType.trueFalse) {
+      return [
+        TextEditingController(text: 'True'),
+        TextEditingController(text: 'False'),
+      ];
+    }
+    return List.generate(4, (_) => TextEditingController());
+  }
+
+  static List<TextEditingController> _newAnswerControllers(
+    CourseQuestionType type,
+  ) {
+    return switch (type) {
+      CourseQuestionType.identification => [TextEditingController()],
+      CourseQuestionType.enumeration => List.generate(
+        3,
+        (_) => TextEditingController(),
+      ),
+      _ => <TextEditingController>[],
+    };
+  }
+
+  void changeType(CourseQuestionType newType) {
+    if (newType == type) return;
+    for (final controller in optionCtrls) {
+      controller.dispose();
+    }
+    for (final controller in answerCtrls) {
+      controller.dispose();
+    }
+    optionCtrls
+      ..clear()
+      ..addAll(_newOptionControllers(newType));
+    answerCtrls
+      ..clear()
+      ..addAll(_newAnswerControllers(newType));
+    type = newType;
+    correctIndex = 0;
+  }
+
+  void addEnumerationAnswer() {
+    answerCtrls.add(TextEditingController());
+  }
+
+  void removeEnumerationAnswer(int index) {
+    answerCtrls[index].dispose();
+    answerCtrls.removeAt(index);
+  }
+
   void dispose() {
     questionCtrl.dispose();
     for (var c in optionCtrls) {
+      c.dispose();
+    }
+    for (var c in answerCtrls) {
       c.dispose();
     }
     explanationCtrl.dispose();
@@ -1305,16 +1918,201 @@ class _QuestionEditorCard extends StatelessWidget {
   final int index;
   final _QuestionDraft draft;
   final Color accentColor;
+  final List<CourseQuestionType> availableTypes;
   final VoidCallback onRemove;
+  final VoidCallback onDraftChanged;
+  final ValueChanged<CourseQuestionType> onTypeChanged;
   final void Function(int) onCorrectChanged;
 
   const _QuestionEditorCard({
     required this.index,
     required this.draft,
     required this.accentColor,
+    required this.availableTypes,
     required this.onRemove,
+    required this.onDraftChanged,
+    required this.onTypeChanged,
     required this.onCorrectChanged,
   });
+
+  Widget _buildChoiceEditor(BuildContext context, bool isLight) {
+    final choices = draft.type == CourseQuestionType.trueFalse
+        ? const ['True', 'False']
+        : null;
+    final count = choices?.length ?? draft.optionCtrls.length;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          draft.type == CourseQuestionType.trueFalse
+              ? 'Correct Answer'
+              : 'Answer Options (Mark correct answer)',
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: accentColor,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ...List.generate(count, (i) {
+          final isCorrect = draft.correctIndex == i;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () => onCorrectChanged(i),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: 22,
+                    height: 22,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isCorrect ? accentColor : Colors.transparent,
+                      border: Border.all(
+                        color: isCorrect
+                            ? accentColor
+                            : const Color(0xFF3A5A7A),
+                        width: 2,
+                      ),
+                    ),
+                    child: isCorrect
+                        ? Icon(
+                            Icons.check,
+                            size: 13,
+                            color: isLight
+                                ? Colors.white
+                                : const Color(0xFF0A1628),
+                          )
+                        : null,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: choices != null
+                      ? Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 13,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isLight
+                                ? Colors.white
+                                : const Color(0xFF162544),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: isCorrect
+                                  ? accentColor.withAlpha(100)
+                                  : const Color(0xFF2A4668),
+                            ),
+                          ),
+                          child: Text(
+                            choices[i],
+                            style: TextStyle(
+                              color: isLight ? Colors.black87 : Colors.white,
+                              fontSize: 13,
+                            ),
+                          ),
+                        )
+                      : _GlassTextField(
+                          controller: draft.optionCtrls[i],
+                          label: 'Option ${String.fromCharCode(65 + i)}',
+                          hint: 'Enter option ${String.fromCharCode(65 + i)}',
+                          compact: true,
+                        ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  Widget _buildTextAnswerEditor(BuildContext context) {
+    final isEnumeration = draft.type == CourseQuestionType.enumeration;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          isEnumeration ? 'Correct Answers' : 'Correct Answer',
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: accentColor,
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          isEnumeration
+              ? 'Students must enter all answers. Answer order will not matter.'
+              : 'Capitalization and extra spaces will not affect grading.',
+          style: TextStyle(
+            color: Theme.of(context).brightness == Brightness.light
+                ? Colors.grey.shade600
+                : const Color(0xFF8BA3C0),
+            fontSize: 11,
+            height: 1.35,
+          ),
+        ),
+        const SizedBox(height: 10),
+        ...draft.answerCtrls.asMap().entries.map((entry) {
+          final answerIndex = entry.key;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _GlassTextField(
+                    controller: entry.value,
+                    label: isEnumeration
+                        ? 'Answer ${answerIndex + 1}'
+                        : 'Accepted answer',
+                    hint: isEnumeration
+                        ? 'Enter required answer ${answerIndex + 1}'
+                        : 'Enter the correct answer',
+                    compact: true,
+                  ),
+                ),
+                if (isEnumeration && draft.answerCtrls.length > 2) ...[
+                  const SizedBox(width: 8),
+                  IconButton(
+                    tooltip: 'Remove answer',
+                    onPressed: () {
+                      draft.removeEnumerationAnswer(answerIndex);
+                      onDraftChanged();
+                    },
+                    icon: const Icon(
+                      Icons.remove_circle_outline_rounded,
+                      color: Color(0xFFFF4757),
+                      size: 20,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          );
+        }),
+        if (isEnumeration)
+          TextButton.icon(
+            onPressed: () {
+              draft.addEnumerationAnswer();
+              onDraftChanged();
+            },
+            icon: Icon(Icons.add_rounded, color: accentColor, size: 18),
+            label: Text(
+              'Add another answer',
+              style: TextStyle(
+                color: accentColor,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1325,7 +2123,10 @@ class _QuestionEditorCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: isLight ? Colors.grey.shade50 : const Color(0xFF142240),
         borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: isLight ? Colors.grey.shade200 : const Color(0xFF1E3A5F), width: 1),
+        border: Border.all(
+          color: isLight ? Colors.grey.shade200 : const Color(0xFF1E3A5F),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1362,6 +2163,67 @@ class _QuestionEditorCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
+          if (availableTypes.length > 1) ...[
+            DropdownButtonFormField<CourseQuestionType>(
+              initialValue: draft.type,
+              isExpanded: true,
+              dropdownColor: isLight ? Colors.white : const Color(0xFF162544),
+              decoration: InputDecoration(
+                labelText: 'Question Type',
+                labelStyle: TextStyle(color: accentColor, fontSize: 12),
+                filled: true,
+                fillColor: isLight ? Colors.white : const Color(0xFF162544),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: Color(0xFF2A4668)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: Color(0xFF2A4668)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: accentColor),
+                ),
+              ),
+              style: TextStyle(
+                color: isLight ? Colors.black87 : Colors.white,
+                fontSize: 13,
+              ),
+              items: availableTypes
+                  .map(
+                    (type) =>
+                        DropdownMenuItem(value: type, child: Text(type.label)),
+                  )
+                  .toList(),
+              onChanged: (type) {
+                if (type != null) onTypeChanged(type);
+              },
+            ),
+            const SizedBox(height: 16),
+          ] else ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: accentColor.withAlpha(18),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: accentColor.withAlpha(60)),
+              ),
+              child: Text(
+                draft.type.label,
+                style: TextStyle(
+                  color: accentColor,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
           _GlassTextField(
             controller: draft.questionCtrl,
             label: 'Question',
@@ -1369,57 +2231,11 @@ class _QuestionEditorCard extends StatelessWidget {
             maxLines: 2,
           ),
           const SizedBox(height: 16),
-          Text(
-            'Answer Options (Mark correct answer)',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: accentColor,
-            ),
-          ),
-          const SizedBox(height: 8),
-          ...List.generate(4, (i) {
-            final isCorrect = draft.correctIndex == i;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => onCorrectChanged(i),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: 22,
-                      height: 22,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isCorrect ? accentColor : Colors.transparent,
-                        border: Border.all(
-                          color: isCorrect ? accentColor : const Color(0xFF3A5A7A),
-                          width: 2,
-                        ),
-                      ),
-                      child: isCorrect
-                          ? Icon(
-                              Icons.check,
-                              size: 13,
-                              color: isLight ? Colors.white : const Color(0xFF0A1628),
-                            )
-                          : null,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: _GlassTextField(
-                      controller: draft.optionCtrls[i],
-                      label: 'Option ${String.fromCharCode(65 + i)}',
-                      hint: 'Enter option ${String.fromCharCode(65 + i)}',
-                      compact: true,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }),
+          if (draft.type == CourseQuestionType.multipleChoice ||
+              draft.type == CourseQuestionType.trueFalse)
+            _buildChoiceEditor(context, isLight)
+          else
+            _buildTextAnswerEditor(context),
           const SizedBox(height: 12),
           _GlassTextField(
             controller: draft.explanationCtrl,

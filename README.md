@@ -37,11 +37,16 @@ flutter build apk --release --dart-define-from-file=.gemini.local.json
 ```
 
 On Windows, the checked-in helper validates the local configuration before
-building the APK:
+running Chrome or building the APK:
 
 ```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run_chrome.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build_apk.ps1
 ```
+
+Stop an already-running Flutter process before using the configured launcher.
+Hot reload and hot restart cannot add missing `--dart-define` values to an app
+that was originally started without them.
 
 Values supplied with `--dart-define` are embedded in Flutter web builds. For a
 production deployment, route Gemini requests through Firebase AI Logic with App

@@ -4,14 +4,15 @@ import './widgets/course_detail_widget.dart';
 import 'package:provider/provider.dart';
 import '../../models/course_model.dart';
 import '../../models/user_model.dart';
+import '../../models/student_course_destination.dart';
 import '../../services/auth_service.dart';
 import '../../services/course_service.dart';
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 class StudentCoursesScreen extends StatefulWidget {
-  final Course? initialCourse;
-  const StudentCoursesScreen({this.initialCourse, super.key});
+  final StudentCourseDestination? initialDestination;
+  const StudentCoursesScreen({this.initialDestination, super.key});
 
   @override
   State<StudentCoursesScreen> createState() => _StudentCoursesScreenState();
@@ -21,6 +22,8 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _entranceController;
   String? _selectedCourseId;
+  String? _targetQuizId;
+  int _initialTabIndex = 0;
   String _mainSearchQuery = '';
   final TextEditingController _mainSearchCtrl = TextEditingController();
   final FocusNode _mainSearchFocusNode = FocusNode();
@@ -31,10 +34,13 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
   void initState() {
     super.initState();
     final student = context.read<AuthService>().currentUser;
-    if (widget.initialCourse != null &&
+    final destination = widget.initialDestination;
+    if (destination != null &&
         student != null &&
-        CourseAssignment.courseMatchesStudent(widget.initialCourse!, student)) {
-      _selectedCourseId = widget.initialCourse!.id;
+        CourseAssignment.courseMatchesStudent(destination.course, student)) {
+      _selectedCourseId = destination.course.id;
+      _targetQuizId = destination.quizId;
+      _initialTabIndex = destination.initialTabIndex.clamp(0, 1);
     }
     _entranceController = AnimationController(
       vsync: this,
@@ -45,16 +51,26 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
   @override
   void didUpdateWidget(covariant StudentCoursesScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.initialCourse?.id == widget.initialCourse?.id) return;
+    final oldDestination = oldWidget.initialDestination;
+    final destination = widget.initialDestination;
+    if (oldDestination?.course.id == destination?.course.id &&
+        oldDestination?.quizId == destination?.quizId &&
+        oldDestination?.initialTabIndex == destination?.initialTabIndex) {
+      return;
+    }
 
     final student = context.read<AuthService>().currentUser;
-    final initialCourse = widget.initialCourse;
+    final initialCourse = destination?.course;
     _selectedCourseId =
         initialCourse != null &&
             student != null &&
             CourseAssignment.courseMatchesStudent(initialCourse, student)
         ? initialCourse.id
         : null;
+    _targetQuizId = _selectedCourseId == null ? null : destination?.quizId;
+    _initialTabIndex = _selectedCourseId == null
+        ? 0
+        : (destination?.initialTabIndex ?? 0).clamp(0, 1);
   }
 
   @override
@@ -86,7 +102,11 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
   }
 
   void _closeCourse() {
-    setState(() => _selectedCourseId = null);
+    setState(() {
+      _selectedCourseId = null;
+      _targetQuizId = null;
+      _initialTabIndex = 0;
+    });
   }
 
   @override
@@ -134,9 +154,13 @@ class _StudentCoursesScreenState extends State<StudentCoursesScreen>
                   student,
                 )) {
               return CourseDetailWidget(
-                key: ValueKey('student-course-${selectedCourse.id}'),
+                key: ValueKey(
+                  'student-course-${selectedCourse.id}-${_targetQuizId ?? 'overview'}-$_initialTabIndex',
+                ),
                 course: selectedCourse,
                 onBack: _closeCourse,
+                initialTabIndex: _initialTabIndex,
+                initialQuizId: _targetQuizId,
               );
             }
 

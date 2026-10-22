@@ -953,151 +953,89 @@ class _QuizResultsTab extends StatelessWidget {
       context: context,
       builder: (context) {
         final scrollController = ScrollController();
-        int currentPage = 0;
-        const int itemsPerPage = 6;
         final allItems = [...student.quizResults, ...student.missedQuizzes];
-        final totalItems = allItems.length;
+        final hasScrollableResults = allItems.length > 6;
 
-        return StatefulBuilder(
-          builder: (context, setState) {
-            final startIndex = currentPage * itemsPerPage;
-            final endIndex = (startIndex + itemsPerPage < totalItems)
-                ? startIndex + itemsPerPage
-                : totalItems;
-            final currentItems = allItems.sublist(startIndex, endIndex);
-
-            return Dialog(
-              backgroundColor: cardColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: BorderSide(color: borderColor),
-              ),
-              insetPadding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 48,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            '${student.name}\'s Quizzes',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
+        return Dialog(
+          backgroundColor: cardColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(color: borderColor),
+          ),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 24,
+            vertical: 48,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '${student.name}\'s Quizzes',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
-                        IconButton(
-                          icon: Icon(Icons.close, color: subTextColor),
-                          onPressed: () => Navigator.pop(context),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Divider(height: 1, color: borderColor),
-                  Flexible(
-                    child: RawScrollbar(
-                      controller: scrollController,
-                      thumbColor: Colors.white.withOpacity(0.8),
-                      radius: const Radius.circular(4),
-                      thickness: 4,
-                      thumbVisibility: true,
-                      child: ListView.separated(
-                        controller: scrollController,
-                        shrinkWrap: true,
-                        padding: const EdgeInsets.all(16),
-                        itemCount: currentItems.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 12),
-                        itemBuilder: (context, index) {
-                          final item = currentItems[index];
-                          if (item is QuizResult) {
-                            return _QuizResultRow(
-                              quiz: item,
-                              subTextColor: subTextColor,
-                              scoreColor: scoreColor,
-                              isDark: isDark,
-                              theme: theme,
-                              borderColor: borderColor,
-                            );
-                          } else if (item is MissedQuiz) {
-                            return _MissedQuizRow(
-                              quiz: item,
-                              subTextColor: subTextColor,
-                              isDark: isDark,
-                              theme: theme,
-                            );
-                          }
-                          return const SizedBox();
-                        },
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  ),
-                  if (totalItems > itemsPerPage) ...[
-                    Divider(height: 1, color: borderColor),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Visibility(
-                            visible: currentPage > 0,
-                            maintainSize: true,
-                            maintainAnimation: true,
-                            maintainState: true,
-                            child: TextButton(
-                              onPressed: () => setState(() {
-                                currentPage--;
-                                scrollController.jumpTo(0);
-                              }),
-                              child: Text(
-                                'Previous',
-                                style: TextStyle(color: subTextColor),
-                              ),
-                            ),
-                          ),
-                          Text(
-                            'Page ${currentPage + 1} of ${(totalItems / itemsPerPage).ceil()}',
-                            style: TextStyle(color: subTextColor, fontSize: 12),
-                          ),
-                          Visibility(
-                            visible: endIndex < totalItems,
-                            maintainSize: true,
-                            maintainAnimation: true,
-                            maintainState: true,
-                            child: TextButton(
-                              onPressed: () => setState(() {
-                                currentPage++;
-                                scrollController.jumpTo(0);
-                              }),
-                              child: Text(
-                                'Next',
-                                style: TextStyle(
-                                  color: isDark
-                                      ? const Color(0xFF00FF88)
-                                      : Colors.green,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    IconButton(
+                      icon: Icon(Icons.close, color: subTextColor),
+                      onPressed: () => Navigator.pop(context),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
                     ),
                   ],
-                ],
+                ),
               ),
-            );
-          },
+              Divider(height: 1, color: borderColor),
+              Flexible(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 540),
+                  child: RawScrollbar(
+                    controller: scrollController,
+                    thumbColor: (isDark ? Colors.white : Colors.black)
+                        .withAlpha(150),
+                    radius: const Radius.circular(4),
+                    thickness: 4,
+                    thumbVisibility: hasScrollableResults,
+                    child: ListView.separated(
+                      controller: scrollController,
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.all(16),
+                      itemCount: allItems.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        final item = allItems[index];
+                        if (item is QuizResult) {
+                          return _QuizResultRow(
+                            quiz: item,
+                            subTextColor: subTextColor,
+                            scoreColor: scoreColor,
+                            isDark: isDark,
+                            theme: theme,
+                            borderColor: borderColor,
+                          );
+                        } else if (item is MissedQuiz) {
+                          return _MissedQuizRow(
+                            quiz: item,
+                            subTextColor: subTextColor,
+                            isDark: isDark,
+                            theme: theme,
+                          );
+                        }
+                        return const SizedBox();
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
@@ -1387,143 +1325,78 @@ class _ArLabTab extends StatelessWidget {
       context: context,
       builder: (context) {
         final scrollController = ScrollController();
-        int currentPage = 0;
-        const int itemsPerPage = 6;
-        final totalItems = student.arLabRecords.length;
+        final hasScrollableRecords = student.arLabRecords.length > 5;
 
-        return StatefulBuilder(
-          builder: (context, setState) {
-            final startIndex = currentPage * itemsPerPage;
-            final endIndex = (startIndex + itemsPerPage < totalItems)
-                ? startIndex + itemsPerPage
-                : totalItems;
-            final currentItems = student.arLabRecords.sublist(
-              startIndex,
-              endIndex,
-            );
-
-            return Dialog(
-              backgroundColor: cardColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: BorderSide(color: borderColor),
-              ),
-              insetPadding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 48,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            '${student.name}\'s Records',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
+        return Dialog(
+          backgroundColor: cardColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(color: borderColor),
+          ),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 24,
+            vertical: 48,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '${student.name}\'s Records',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
-                        IconButton(
-                          icon: Icon(Icons.close, color: subTextColor),
-                          onPressed: () => Navigator.pop(context),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Divider(height: 1, color: borderColor),
-                  Flexible(
-                    child: RawScrollbar(
-                      controller: scrollController,
-                      thumbColor: Colors.white.withOpacity(0.8),
-                      radius: const Radius.circular(4),
-                      thickness: 4,
-                      thumbVisibility: true,
-                      child: ListView.separated(
-                        controller: scrollController,
-                        shrinkWrap: true,
-                        padding: const EdgeInsets.all(16),
-                        itemCount: currentItems.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 12),
-                        itemBuilder: (context, index) {
-                          return _ArLabRecordRow(
-                            record: currentItems[index],
-                            subTextColor: subTextColor,
-                            scoreColor: scoreColor,
-                            scoreLabel: scoreLabel,
-                            isDark: isDark,
-                            theme: theme,
-                            borderColor: borderColor,
-                          );
-                        },
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  ),
-                  if (totalItems > itemsPerPage) ...[
-                    Divider(height: 1, color: borderColor),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Visibility(
-                            visible: currentPage > 0,
-                            maintainSize: true,
-                            maintainAnimation: true,
-                            maintainState: true,
-                            child: TextButton(
-                              onPressed: () => setState(() {
-                                currentPage--;
-                                scrollController.jumpTo(0);
-                              }),
-                              child: Text(
-                                'Previous',
-                                style: TextStyle(color: subTextColor),
-                              ),
-                            ),
-                          ),
-                          Text(
-                            'Page ${currentPage + 1} of ${(totalItems / itemsPerPage).ceil()}',
-                            style: TextStyle(color: subTextColor, fontSize: 12),
-                          ),
-                          Visibility(
-                            visible: endIndex < totalItems,
-                            maintainSize: true,
-                            maintainAnimation: true,
-                            maintainState: true,
-                            child: TextButton(
-                              onPressed: () => setState(() {
-                                currentPage++;
-                                scrollController.jumpTo(0);
-                              }),
-                              child: Text(
-                                'Next',
-                                style: TextStyle(
-                                  color: isDark
-                                      ? const Color(0xFF00FF88)
-                                      : Colors.green,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    IconButton(
+                      icon: Icon(Icons.close, color: subTextColor),
+                      onPressed: () => Navigator.pop(context),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
                     ),
                   ],
-                ],
+                ),
               ),
-            );
-          },
+              Divider(height: 1, color: borderColor),
+              Flexible(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 570),
+                  child: RawScrollbar(
+                    controller: scrollController,
+                    thumbColor: (isDark ? Colors.white : Colors.black)
+                        .withAlpha(150),
+                    radius: const Radius.circular(4),
+                    thickness: 4,
+                    thumbVisibility: hasScrollableRecords,
+                    child: ListView.separated(
+                      controller: scrollController,
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.all(16),
+                      itemCount: student.arLabRecords.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        return _ArLabRecordRow(
+                          record: student.arLabRecords[index],
+                          subTextColor: subTextColor,
+                          scoreColor: scoreColor,
+                          scoreLabel: scoreLabel,
+                          isDark: isDark,
+                          theme: theme,
+                          borderColor: borderColor,
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         );
       },
     );

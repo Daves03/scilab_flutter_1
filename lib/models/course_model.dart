@@ -109,36 +109,76 @@ class CourseModule {
   }
 }
 
+enum CourseQuestionType {
+  multipleChoice,
+  trueFalse,
+  identification,
+  enumeration;
+
+  String get storageValue => switch (this) {
+    CourseQuestionType.multipleChoice => 'multipleChoice',
+    CourseQuestionType.trueFalse => 'trueFalse',
+    CourseQuestionType.identification => 'identification',
+    CourseQuestionType.enumeration => 'enumeration',
+  };
+
+  String get label => switch (this) {
+    CourseQuestionType.multipleChoice => 'Multiple Choice',
+    CourseQuestionType.trueFalse => 'True or False',
+    CourseQuestionType.identification => 'Identification',
+    CourseQuestionType.enumeration => 'Enumeration',
+  };
+
+  static CourseQuestionType fromStorageValue(Object? value) {
+    return CourseQuestionType.values.firstWhere(
+      (type) => type.storageValue == value?.toString(),
+      orElse: () => CourseQuestionType.multipleChoice,
+    );
+  }
+}
+
 class CourseQuestion {
   final String id;
   final String question;
+  final CourseQuestionType type;
   final List<String> options;
   final int correctIndex;
+  final List<String> correctAnswers;
   final String explanation;
 
   CourseQuestion({
     required this.id,
     required this.question,
+    this.type = CourseQuestionType.multipleChoice,
     required this.options,
     required this.correctIndex,
+    this.correctAnswers = const [],
     required this.explanation,
   });
 
   factory CourseQuestion.fromMap(Map<String, dynamic> data) => CourseQuestion(
     id: data['id']?.toString() ?? '',
     question: data['question']?.toString() ?? '',
+    type: CourseQuestionType.fromStorageValue(data['type']),
     options:
         (data['options'] as List?)?.map((e) => e.toString()).toList() ??
         const [],
     correctIndex: (data['correctIndex'] as num?)?.toInt() ?? 0,
+    correctAnswers:
+        (data['correctAnswers'] as List?)
+            ?.map((answer) => answer.toString())
+            .toList() ??
+        const [],
     explanation: data['explanation']?.toString() ?? '',
   );
 
   Map<String, dynamic> toMap() => {
     'id': id,
     'question': question,
+    'type': type.storageValue,
     'options': options,
     'correctIndex': correctIndex,
+    'correctAnswers': correctAnswers,
     'explanation': explanation,
   };
 }
@@ -146,6 +186,7 @@ class CourseQuestion {
 class CourseQuiz {
   final String id;
   final String title;
+  final String directions;
   final List<CourseQuestion> questions;
   final DateTime? createdAt;
   final DateTime? dueDate;
@@ -153,6 +194,7 @@ class CourseQuiz {
   CourseQuiz({
     required this.id,
     required this.title,
+    this.directions = '',
     required this.questions,
     this.createdAt,
     this.dueDate,
@@ -179,6 +221,7 @@ class CourseQuiz {
     return CourseQuiz(
       id: data['id']?.toString() ?? '',
       title: data['title']?.toString() ?? '',
+      directions: data['directions']?.toString() ?? '',
       questions: ((data['questions'] as List<dynamic>?) ?? const [])
           .whereType<Map<dynamic, dynamic>>()
           .map(
@@ -195,6 +238,7 @@ class CourseQuiz {
   Map<String, dynamic> toMap() => {
     'id': id,
     'title': title,
+    'directions': directions,
     'questions': questions.map((q) => q.toMap()).toList(),
     'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
     'dueDate': dueDate != null ? Timestamp.fromDate(dueDate!) : null,
@@ -236,11 +280,13 @@ class Course {
     required this.teacherName,
     required this.accentColorValue,
     required this.iconName,
-    required this.sections,
-    required this.modules,
-    required this.quizzes,
+    required List<String> sections,
+    required List<CourseModule> modules,
+    required List<CourseQuiz> quizzes,
     this.createdAt,
-  });
+  }) : sections = List<String>.of(sections),
+       modules = List<CourseModule>.of(modules),
+       quizzes = List<CourseQuiz>.of(quizzes);
 
   factory Course.fromMap(String id, Map<String, dynamic> data) {
     final ts = data['createdAt'];
@@ -318,6 +364,7 @@ class QuizAttempt {
   final String studentId;
   final String? studentName;
   final List<int> selectedAnswers;
+  final Map<String, List<String>> textAnswers;
   final int score;
   final int totalQuestions;
   final DateTime? submittedAt;
@@ -330,6 +377,7 @@ class QuizAttempt {
     required this.studentId,
     this.studentName,
     required this.selectedAnswers,
+    this.textAnswers = const {},
     required this.score,
     required this.totalQuestions,
     this.submittedAt,
@@ -345,6 +393,13 @@ class QuizAttempt {
       studentId: (data['studentId'] as String?) ?? '',
       studentName: data['studentName'] as String?,
       selectedAnswers: List<int>.from(data['selectedAnswers'] ?? const []),
+      textAnswers: ((data['textAnswers'] as Map?) ?? const {}).map(
+        (key, value) => MapEntry(
+          key.toString(),
+          (value as List?)?.map((answer) => answer.toString()).toList() ??
+              const <String>[],
+        ),
+      ),
       score: (data['score'] as num?)?.toInt() ?? 0,
       totalQuestions: (data['totalQuestions'] as num?)?.toInt() ?? 0,
       submittedAt: ts is Timestamp ? ts.toDate() : null,
@@ -358,6 +413,7 @@ class QuizAttempt {
     'studentId': studentId,
     if (studentName != null) 'studentName': studentName,
     'selectedAnswers': selectedAnswers,
+    'textAnswers': textAnswers,
     'score': score,
     'totalQuestions': totalQuestions,
     'submittedAt': FieldValue.serverTimestamp(),

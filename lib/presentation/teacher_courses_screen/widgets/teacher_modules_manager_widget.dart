@@ -1,9 +1,6 @@
-import 'dart:typed_data';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mime/mime.dart';
 import '../../../core/app_export.dart';
@@ -11,8 +8,8 @@ import '../../../models/course_model.dart';
 import '../../../services/course_service.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/ai_quiz_generator_service.dart';
+import '../../../services/office_document_text_extractor.dart';
 import 'package:provider/provider.dart';
-import '../teacher_courses_screen.dart';
 
 class CourseModulesManagerWidget extends StatefulWidget {
   final Course course;
@@ -31,6 +28,10 @@ class CourseModulesManagerWidget extends StatefulWidget {
 
 class _CourseModulesManagerWidgetState
     extends State<CourseModulesManagerWidget> {
+  void _logAiQuiz(String message) {
+    debugPrint('[AI QUIZ UI][${DateTime.now().toIso8601String()}] $message');
+  }
+
   void _addModule() {
     _showModuleDialog(null);
   }
@@ -75,6 +76,9 @@ class _CourseModulesManagerWidgetState
     final descCtrl = TextEditingController(text: existing?.description ?? '');
     String selectedType = existing?.fileType ?? 'pdf';
     bool autoGenerateQuiz = false;
+    final selectedQuizTypes = <CourseQuestionType>{
+      CourseQuestionType.multipleChoice,
+    };
     int numQuizzes = 1;
     int numQuestions = 5;
     XFile? selectedFile;
@@ -82,6 +86,11 @@ class _CourseModulesManagerWidgetState
     bool isUploading = false;
     String? titleError;
     String? descError;
+
+    _logAiQuiz(
+      'Opened ${existing == null ? 'new module' : 'edit module'} dialog '
+      'for course=${widget.course.id}.',
+    );
 
     showDialog(
       context: context,
@@ -210,7 +219,7 @@ class _CourseModulesManagerWidgetState
                         if (selectedFile == null) ...[
                           const SizedBox(height: 2),
                           Text(
-                            'PDF, DOC, PPT supported',
+                            'PDF, DOC/DOCX, PPT/PPTX supported',
                             style: TextStyle(
                               fontSize: 11,
                               color: isLight
@@ -304,7 +313,8 @@ class _CourseModulesManagerWidgetState
                     ),
                   ],
                 ),
-                if (selectedType == 'pdf' && existing == null) ...[
+                if (const {'pdf', 'doc', 'ppt'}.contains(selectedType) &&
+                    existing == null) ...[
                   const SizedBox(height: 14),
                   GestureDetector(
                     onTap: () {
@@ -338,7 +348,7 @@ class _CourseModulesManagerWidgetState
                                 ),
                               ),
                               Text(
-                                'Uses AI to read the PDF and create quizzes.',
+                                'Uses AI to read the PDF, Word, or PowerPoint file and create quizzes.',
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: isLight
@@ -354,6 +364,51 @@ class _CourseModulesManagerWidgetState
                   ),
                   if (autoGenerateQuiz) ...[
                     const SizedBox(height: 12),
+                    Text(
+                      'Quiz Types',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: isLight ? Colors.black87 : Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      'Choose one or more types for the AI-generated quiz.',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: isLight
+                            ? Colors.grey.shade600
+                            : const Color(0xFF8BA3C0),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ...CourseQuestionType.values.map((type) {
+                      final selected = selectedQuizTypes.contains(type);
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: _AiQuizTypeOption(
+                          type: type,
+                          selected: selected,
+                          accentColor: displayAccentColor,
+                          onTap: () {
+                            setDialogState(() {
+                              if (selected) {
+                                if (selectedQuizTypes.length > 1) {
+                                  selectedQuizTypes.remove(type);
+                                }
+                              } else {
+                                selectedQuizTypes.add(type);
+                              }
+                              if (numQuestions < selectedQuizTypes.length) {
+                                numQuestions = selectedQuizTypes.length;
+                              }
+                            });
+                          },
+                        ),
+                      );
+                    }),
+                    const SizedBox(height: 4),
                     Row(
                       children: [
                         Expanded(
@@ -397,9 +452,9 @@ class _CourseModulesManagerWidgetState
                               ),
                               Slider(
                                 value: numQuestions.toDouble(),
-                                min: 1,
+                                min: selectedQuizTypes.length.toDouble(),
                                 max: 20,
-                                divisions: 19,
+                                divisions: 20 - selectedQuizTypes.length,
                                 activeColor: displayAccentColor,
                                 onChanged: (val) => setDialogState(
                                   () => numQuestions = val.toInt(),
@@ -437,6 +492,12 @@ class _CourseModulesManagerWidgetState
               ],
             ),
             onSave: () async {
+              _logAiQuiz(
+                'Save pressed: file=${selectedFile?.name ?? 'none'} '
+                'fileType=$selectedType autoGenerate=$autoGenerateQuiz '
+                'quizzes=$numQuizzes questionsPerQuiz=$numQuestions '
+                'types=${selectedQuizTypes.map((type) => type.storageValue).join(',')}',
+              );
               setDialogState(() {
                 titleError = titleCtrl.text.trim().isEmpty
                     ? 'Module Title is required'
@@ -459,9 +520,9 @@ class _CourseModulesManagerWidgetState
               }
               if (isGenerating || isUploading) return;
 
+              final uploader = context.read<AuthService>().currentUser;
+              final courseService = context.read<CourseService>();
               final now = DateTime.now();
-              final dateStr =
-                  '${_monthName(now.month)} ${now.day}, ${now.year}';
 
               Uint8List? fileBytes;
               String downloadUrl = existing?.url ?? '';
@@ -470,29 +531,63 @@ class _CourseModulesManagerWidgetState
 
               if (selectedFile != null) {
                 setDialogState(() => isUploading = true);
-
-                fileBytes = await selectedFile!.readAsBytes();
-                fileSizeBytes = fileBytes.length;
-
-                // Upload to Firebase Storage
-                final safeName = selectedFile!.name.replaceAll(
-                  RegExp(r'\s+'),
-                  '_',
-                );
-                storagePath =
-                    'course_modules/${widget.course.id}/${now.millisecondsSinceEpoch}_$safeName';
+                final uploadWatch = Stopwatch()..start();
                 try {
+                  _logAiQuiz('READ START: ${selectedFile!.name}');
+                  fileBytes = await selectedFile!.readAsBytes().timeout(
+                    const Duration(seconds: 30),
+                  );
+                  fileSizeBytes = fileBytes.length;
+                  _logAiQuiz(
+                    'READ COMPLETE: $fileSizeBytes bytes in '
+                    '${uploadWatch.elapsedMilliseconds}ms.',
+                  );
+
+                  final safeName = selectedFile!.name.replaceAll(
+                    RegExp(r'\s+'),
+                    '_',
+                  );
+                  storagePath =
+                      'course_modules/${widget.course.id}/${now.millisecondsSinceEpoch}_$safeName';
+                  _logAiQuiz('UPLOAD START: storagePath=$storagePath');
                   final ref = FirebaseStorage.instance.ref(storagePath);
-                  final snapshot = await ref.putData(fileBytes);
-                  downloadUrl = await snapshot.ref.getDownloadURL();
-                } catch (e) {
-                  print("Error uploading file: $e");
+                  final snapshot = await ref
+                      .putData(fileBytes)
+                      .timeout(const Duration(minutes: 2));
+                  downloadUrl = await snapshot.ref.getDownloadURL().timeout(
+                    const Duration(seconds: 30),
+                  );
+                  _logAiQuiz(
+                    'UPLOAD COMPLETE in ${uploadWatch.elapsedMilliseconds}ms.',
+                  );
+                } catch (error, stackTrace) {
+                  _logAiQuiz(
+                    'FILE/UPLOAD ERROR after '
+                    '${uploadWatch.elapsedMilliseconds}ms: '
+                    '${error.runtimeType}: $error',
+                  );
+                  debugPrintStack(stackTrace: stackTrace);
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Failed to upload file.')),
+                      SnackBar(
+                        content: Text(
+                          'Failed to read or upload the file: $error',
+                        ),
+                      ),
                     );
                   }
-                  setDialogState(() => isUploading = false);
+                  if (ctx2.mounted) {
+                    setDialogState(() => isUploading = false);
+                  }
+                  return;
+                } finally {
+                  uploadWatch.stop();
+                }
+                if (!ctx2.mounted) {
+                  _logAiQuiz(
+                    'Dialog was closed before upload completed; '
+                    'stopping the save flow.',
+                  );
                   return;
                 }
                 setDialogState(() => isUploading = false);
@@ -500,21 +595,82 @@ class _CourseModulesManagerWidgetState
 
               if (autoGenerateQuiz && fileBytes != null) {
                 setDialogState(() => isGenerating = true);
+                final generationWatch = Stopwatch()..start();
 
                 final aiService = AiQuizGeneratorService();
-                String mimeType = 'application/pdf';
-                if (selectedType == 'doc')
-                  mimeType =
-                      'text/plain'; // Gemini might process it better if forced as text, or 'application/octet-stream'
-                if (selectedType == 'ppt') mimeType = 'text/plain';
+                final mimeType = selectedType == 'pdf'
+                    ? 'application/pdf'
+                    : 'text/plain';
+                ExtractedOfficeDocument? extractedOfficeDocument;
+                String? preparationError;
 
-                final generatedQuizzes = await aiService.generateQuizzesFromPdf(
-                  fileBytes,
-                  titleCtrl.text.trim(),
-                  numQuizzes: numQuizzes,
-                  numQuestions: numQuestions,
-                  mimeType: mimeType,
+                if (selectedType == 'doc' || selectedType == 'ppt') {
+                  final extractionWatch = Stopwatch()..start();
+                  _logAiQuiz(
+                    'OFFICE EXTRACTION START: ${selectedFile!.name} '
+                    'bytes=${fileBytes.length}.',
+                  );
+                  try {
+                    extractedOfficeDocument =
+                        OfficeDocumentTextExtractor.extract(
+                          bytes: fileBytes,
+                          fileName: selectedFile!.name,
+                        );
+                    _logAiQuiz(
+                      'OFFICE EXTRACTION COMPLETE: '
+                      'format=${extractedOfficeDocument.formatLabel} '
+                      'characters=${extractedOfficeDocument.text.length} '
+                      'bestEffort=${extractedOfficeDocument.bestEffort} '
+                      'elapsed=${extractionWatch.elapsedMilliseconds}ms.',
+                    );
+                  } catch (error, stackTrace) {
+                    preparationError = error.toString().replaceFirst(
+                      'FormatException: ',
+                      '',
+                    );
+                    _logAiQuiz(
+                      'OFFICE EXTRACTION ERROR after '
+                      '${extractionWatch.elapsedMilliseconds}ms: '
+                      '${error.runtimeType}: $error',
+                    );
+                    debugPrintStack(stackTrace: stackTrace);
+                  } finally {
+                    extractionWatch.stop();
+                  }
+                }
+
+                _logAiQuiz(
+                  'GENERATION START: bytes=${fileBytes.length} mime=$mimeType '
+                  'officeTextCharacters='
+                  '${extractedOfficeDocument?.text.length ?? 0}.',
                 );
+                final generatedQuizzes = preparationError == null
+                    ? await aiService.generateQuizzesFromDocument(
+                        fileBytes,
+                        titleCtrl.text.trim(),
+                        numQuizzes: numQuizzes,
+                        numQuestions: numQuestions,
+                        mimeType: mimeType,
+                        extractedDocumentText: extractedOfficeDocument?.text,
+                        sourceFileName: selectedFile!.name,
+                        questionTypes: selectedQuizTypes,
+                      )
+                    : null;
+                generationWatch.stop();
+                _logAiQuiz(
+                  'GENERATION COMPLETE after '
+                  '${generationWatch.elapsedMilliseconds}ms: '
+                  'resultCount=${generatedQuizzes?.length ?? 0} '
+                  'error=${preparationError ?? aiService.lastErrorMessage ?? 'none'}',
+                );
+                if (!ctx2.mounted) {
+                  _logAiQuiz(
+                    'Dialog was closed before generation completed; '
+                    'stopping the save flow.',
+                  );
+                  return;
+                }
+                setDialogState(() => isGenerating = false);
 
                 if (generatedQuizzes != null && generatedQuizzes.isNotEmpty) {
                   widget.course.quizzes.addAll(generatedQuizzes);
@@ -532,7 +688,8 @@ class _CourseModulesManagerWidgetState
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          aiService.lastErrorMessage ??
+                          preparationError ??
+                              aiService.lastErrorMessage ??
                               'AI quiz generation failed. Please try again.',
                         ),
                       ),
@@ -543,7 +700,6 @@ class _CourseModulesManagerWidgetState
 
               setState(() {
                 if (existing == null) {
-                  final uploader = context.read<AuthService>().currentUser;
                   widget.course.modules.add(
                     CourseModule(
                       id: 'tm_${now.millisecondsSinceEpoch}',
@@ -581,8 +737,34 @@ class _CourseModulesManagerWidgetState
                 }
               });
               widget.onUpdated();
-              context.read<CourseService>().updateCourse(widget.course);
-              if (mounted) {
+              final saveWatch = Stopwatch()..start();
+              _logAiQuiz(
+                'COURSE SAVE START: modules=${widget.course.modules.length} '
+                'quizzes=${widget.course.quizzes.length}.',
+              );
+              try {
+                await courseService.updateCourse(widget.course);
+                _logAiQuiz(
+                  'COURSE SAVE COMPLETE in ${saveWatch.elapsedMilliseconds}ms.',
+                );
+              } catch (error, stackTrace) {
+                _logAiQuiz(
+                  'COURSE SAVE ERROR after ${saveWatch.elapsedMilliseconds}ms: '
+                  '${error.runtimeType}: $error',
+                );
+                debugPrintStack(stackTrace: stackTrace);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Could not save the module: $error'),
+                    ),
+                  );
+                }
+                return;
+              } finally {
+                saveWatch.stop();
+              }
+              if (ctx2.mounted) {
                 Navigator.pop(ctx2);
               }
             },
@@ -591,25 +773,6 @@ class _CourseModulesManagerWidgetState
         );
       },
     );
-  }
-
-  String _monthName(int month) {
-    const months = [
-      '',
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return months[month];
   }
 
   Map<String, dynamic> _fileTypeInfo(String type) {
@@ -961,6 +1124,14 @@ class _GlassDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isLight = Theme.of(context).brightness == Brightness.light;
+    final mediaQuery = MediaQuery.of(context);
+    final maxDialogHeight =
+        (mediaQuery.size.height -
+                mediaQuery.viewInsets.bottom -
+                mediaQuery.padding.vertical -
+                32)
+            .clamp(240.0, 720.0)
+            .toDouble();
     final displayAccentColor =
         (isLight && accentColor == const Color(0xFF00D4FF))
         ? const Color(0xFF1565C0)
@@ -970,7 +1141,7 @@ class _GlassDialog extends StatelessWidget {
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 480),
+        constraints: BoxConstraints(maxWidth: 480, maxHeight: maxDialogHeight),
         decoration: BoxDecoration(
           color: isLight ? Colors.white : const Color(0xFF0F1E35),
           borderRadius: BorderRadius.circular(20.0),
@@ -1283,6 +1454,116 @@ class _ConfirmDeleteDialog extends StatelessWidget {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AiQuizTypeOption extends StatelessWidget {
+  final CourseQuestionType type;
+  final bool selected;
+  final Color accentColor;
+  final VoidCallback onTap;
+
+  const _AiQuizTypeOption({
+    required this.type,
+    required this.selected,
+    required this.accentColor,
+    required this.onTap,
+  });
+
+  IconData get _icon => switch (type) {
+    CourseQuestionType.multipleChoice => Icons.checklist_rounded,
+    CourseQuestionType.trueFalse => Icons.rule_rounded,
+    CourseQuestionType.identification => Icons.short_text_rounded,
+    CourseQuestionType.enumeration => Icons.format_list_numbered_rounded,
+  };
+
+  String get _description => switch (type) {
+    CourseQuestionType.multipleChoice =>
+      'AI creates four choices with one correct answer.',
+    CourseQuestionType.trueFalse =>
+      'AI creates statements students mark true or false.',
+    CourseQuestionType.identification =>
+      'AI creates short-answer questions for a term or concept.',
+    CourseQuestionType.enumeration =>
+      'AI asks students to list every required answer.',
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: selected
+                ? accentColor.withAlpha(isLight ? 16 : 24)
+                : (isLight ? Colors.grey.shade50 : const Color(0xFF142240)),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: selected
+                  ? accentColor
+                  : (isLight ? Colors.grey.shade300 : const Color(0xFF1E3A5F)),
+              width: selected ? 1.4 : 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: accentColor.withAlpha(20),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(_icon, color: accentColor, size: 20),
+              ),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      type.label,
+                      style: TextStyle(
+                        color: isLight ? Colors.black87 : Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      _description,
+                      style: TextStyle(
+                        color: isLight
+                            ? Colors.grey.shade600
+                            : const Color(0xFF8BA3C0),
+                        fontSize: 10.5,
+                        height: 1.25,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                selected
+                    ? Icons.check_circle_rounded
+                    : Icons.radio_button_unchecked_rounded,
+                color: selected ? accentColor : const Color(0xFF5A7190),
+                size: 21,
+              ),
+            ],
+          ),
         ),
       ),
     );
