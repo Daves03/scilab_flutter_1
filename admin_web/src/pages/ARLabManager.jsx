@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { collection, query, onSnapshot, doc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import { logAdminActivity } from '../services/adminActivityService';
 import { Edit, Save, X, RefreshCw, Layers } from 'lucide-react';
 
 const DUMMY_EXPERIMENTS = [
@@ -285,6 +286,11 @@ export default function ARLabManager() {
       for (const exp of DUMMY_EXPERIMENTS) {
         await setDoc(doc(db, 'ar_experiments', exp.id), exp);
       }
+      await logAdminActivity({
+        type: 'ar_content_seeded',
+        title: `${DUMMY_EXPERIMENTS.length} AR experiments initialized`,
+        details: { experimentCount: DUMMY_EXPERIMENTS.length },
+      });
       alert('Initial AR experiments seeded successfully!');
     } catch (error) {
       console.error(error);
@@ -310,6 +316,11 @@ export default function ARLabManager() {
         relatedConcepts: editingExp.relatedConcepts,
         requiredMaterials: editingExp.requiredMaterials,
         steps: editingExp.steps || [],
+      });
+      await logAdminActivity({
+        type: 'ar_content_updated',
+        title: editingExp.title || editingExp.topic || editingExp._docId,
+        details: { experimentId: editingExp._docId, category: editingExp.category || '' },
       });
       setEditingExp(null);
       setShowSaveConfirm(false);

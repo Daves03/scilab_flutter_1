@@ -121,7 +121,10 @@ class AuthService extends ChangeNotifier {
         sections: sections,
         studentNumber: generatedStudentNumber,
       );
-      await _db.collection('users').doc(uid).set(newUser.toMap());
+      await _db.collection('users').doc(uid).set({
+        ...newUser.toMap(),
+        'createdAt': FieldValue.serverTimestamp(),
+      });
       await cred.user?.sendEmailVerification();
     } on fb.FirebaseAuthException catch (e) {
       throw AuthFailure(_friendlyAuthError(e));
@@ -218,7 +221,10 @@ class AuthService extends ChangeNotifier {
           role: null, // Keeps role null so we know it's a new google user
           status: VerificationStatus.pending,
         );
-        await docRef.set(newUser.toMap());
+        await docRef.set({
+          ...newUser.toMap(),
+          'createdAt': FieldValue.serverTimestamp(),
+        });
         userRoleStr =
             null; // Return null so router redirects to complete profile
       } else {

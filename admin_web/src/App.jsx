@@ -3,8 +3,10 @@ import { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
+import { ADMIN_DEVICE_VERIFIED_EVENT, isTrustedAdminDevice } from './services/adminDeviceVerification';
 
 import Login from './pages/Login';
+import AdminDeviceApproval from './pages/AdminDeviceApproval';
 import Layout from './components/Layout';
 import Overview from './pages/Overview';
 import ManageUsers from './pages/ManageUsers';
@@ -21,17 +23,18 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    const evaluateUser = async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
         try {
           const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
           const isHardcodedAdmin = currentUser.email === 'scilabar@gmail.com';
-          if (isHardcodedAdmin || (userDoc.exists() && userDoc.data().role === 'admin')) {
+          const hasAdminRole = isHardcodedAdmin || (userDoc.exists() && userDoc.data().role === 'admin');
+          if (hasAdminRole && isTrustedAdminDevice(currentUser)) {
             setIsAdmin(true);
           } else {
             setIsAdmin(false);
-            auth.signOut();
+            if (!hasAdminRole) auth.signOut();
           }
         } catch (error) {
           console.error("Error checking admin status:", error);
@@ -42,9 +45,16 @@ function App() {
         setIsAdmin(false);
       }
       setLoading(false);
-    });
+    };
 
-    return () => unsubscribe();
+    const unsubscribe = onAuthStateChanged(auth, evaluateUser);
+    const handleDeviceVerified = () => evaluateUser(auth.currentUser);
+    window.addEventListener(ADMIN_DEVICE_VERIFIED_EVENT, handleDeviceVerified);
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener(ADMIN_DEVICE_VERIFIED_EVENT, handleDeviceVerified);
+    };
   }, []);
 
   if (loading) {
@@ -58,6 +68,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/device-approval" element={<AdminDeviceApproval />} />
         <Route
           path="/login"
           element={!user || !isAdmin ? <Login /> : <Navigate to="/" />}

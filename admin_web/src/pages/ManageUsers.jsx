@@ -2,7 +2,37 @@ import { useState, useEffect } from 'react';
 import { collection, onSnapshot, doc, updateDoc, getDocs } from 'firebase/firestore';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { db, auth } from '../firebase';
+import { logAdminActivity } from '../services/adminActivityService';
 import { CheckCircle, XCircle, Key, RefreshCcw, AlertTriangle, Search, Edit, ChevronLeft, ChevronRight } from 'lucide-react';
+
+const timestampToMillis = (value) => {
+  if (!value) return 0;
+  if (typeof value.toMillis === 'function') return value.toMillis();
+  if (typeof value.toDate === 'function') return value.toDate().getTime();
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const parsed = Date.parse(value);
+    return Number.isNaN(parsed) ? 0 : parsed;
+  }
+  if (typeof value.seconds === 'number') {
+    return (value.seconds * 1000) + Math.floor((value.nanoseconds || 0) / 1000000);
+  }
+  return 0;
+};
+
+const newestRegistrationFirst = (first, second) => {
+  const firstCreatedAt = timestampToMillis(
+    first.createdAt || first.registeredAt || first.registrationDate
+  );
+  const secondCreatedAt = timestampToMillis(
+    second.createdAt || second.registeredAt || second.registrationDate
+  );
+
+  if (firstCreatedAt !== secondCreatedAt) {
+    return secondCreatedAt - firstCreatedAt;
+  }
+  return 0;
+};
 
 export default function ManageUsers() {
   const [activeTab, setActiveTab] = useState('pending'); // 'pending' | 'approved' | 'rejected'
@@ -40,7 +70,9 @@ export default function ManageUsers() {
     return () => unsubscribe();
   }, []);
 
-  const users = allUsers.filter(user => user.status === activeTab);
+  const users = allUsers
+    .filter(user => user.status === activeTab)
+    .sort(newestRegistrationFirst);
   const userCounts = allUsers.reduce((counts, user) => {
     if (Object.hasOwn(counts, user.status)) {
       counts[user.status] += 1;
@@ -69,9 +101,15 @@ export default function ManageUsers() {
 
   const handleApprove = async (id, currentRole) => {
     try {
+      const targetUser = allUsers.find(user => user.id === id);
       await updateDoc(doc(db, 'users', id), {
         status: 'approved',
         role: currentRole || 'grade9'
+      });
+      await logAdminActivity({
+        type: 'user_approved',
+        title: targetUser?.name || targetUser?.email || 'User',
+        details: { userId: id, email: targetUser?.email || '', role: currentRole || 'grade9' },
       });
     } catch (e) {
       console.error(e);
@@ -86,6 +124,12 @@ export default function ManageUsers() {
         status: 'rejected', // This acts as our Trash
         previousStatus: deleteConfirm.status || 'approved'
       });
+      const wasApproved = deleteConfirm.status === 'approved';
+      await logAdminActivity({
+        type: wasApproved ? 'user_revoked' : 'user_rejected',
+        title: deleteConfirm.name || deleteConfirm.email || 'User',
+        details: { userId: deleteConfirm.id, email: deleteConfirm.email || '', role: deleteConfirm.role || '' },
+      });
       setDeleteConfirm(null);
     } catch (e) {
       console.error(e);
@@ -99,6 +143,11 @@ export default function ManageUsers() {
       await updateDoc(doc(db, 'users', recoverConfirm.id), {
         status: recoverConfirm.previousStatus || 'approved'
       });
+      await logAdminActivity({
+        type: 'user_recovered',
+        title: recoverConfirm.name || recoverConfirm.email || 'User',
+        details: { userId: recoverConfirm.id, email: recoverConfirm.email || '', restoredStatus: recoverConfirm.previousStatus || 'approved' },
+      });
       setRecoverConfirm(null);
     } catch (e) {
       console.error(e);
@@ -110,6 +159,11 @@ export default function ManageUsers() {
     if (!resetConfirm) return;
     try {
       await sendPasswordResetEmail(auth, resetConfirm.email);
+      await logAdminActivity({
+        type: 'user_password_reset',
+        title: resetConfirm.name || resetConfirm.email,
+        details: { userId: resetConfirm.id, email: resetConfirm.email },
+      });
       alert(`Password reset email sent to ${resetConfirm.email}`);
       setResetConfirm(null);
     } catch (e) {
@@ -131,6 +185,11 @@ export default function ManageUsers() {
       await updateDoc(doc(db, 'users', editUser.id), {
         name: editName,
         studentNumber: editStudentNumber
+      });
+      await logAdminActivity({
+        type: 'user_edited',
+        title: editName || editUser.email || 'User',
+        details: { userId: editUser.id, email: editUser.email || '', role: editUser.role || '' },
       });
       setEditUser(null);
     } catch (err) {

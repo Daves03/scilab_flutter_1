@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { collection, collectionGroup, getDocs, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Activity, Clock, Box, BookOpen, Search, PlusCircle, FilePlus, HelpCircle, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Activity, Clock, Box, BookOpen, Search, PlusCircle, FilePlus, HelpCircle, CheckCircle, ChevronLeft, ChevronRight, ShieldCheck, Archive, RotateCcw, UserCheck, UserX, Pencil, Trash2 } from 'lucide-react';
 
 export default function ActivityLogs() {
   const [logs, setLogs] = useState([]);
@@ -18,6 +18,8 @@ export default function ActivityLogs() {
   useEffect(() => {
     let disposed = false;
     let requestVersion = 0;
+    let latestUsersMap = {};
+    let hasLoadedUsers = false;
 
     async function fetchActivities(usersMap, version) {
       try {
@@ -163,6 +165,29 @@ export default function ActivityLogs() {
           console.warn("Could not fetch quiz_attempts:", e);
         }
 
+        // 6. Fetch persistent audit records created by the web administrator.
+        try {
+          const adminLogsSnap = await getDocs(collection(db, 'admin_activity_logs'));
+          adminLogsSnap.forEach(adminLogDoc => {
+            const data = adminLogDoc.data();
+            const timestampValue = data.createdAt;
+            activities.push({
+              id: `admin-${adminLogDoc.id}`,
+              uid: data.adminUid || '',
+              userName: data.adminName || data.adminEmail || 'Administrator',
+              userRole: 'admin',
+              type: data.type || 'admin_action',
+              title: data.title || 'Administrative action',
+              timestamp: timestampValue?.toDate
+                ? timestampValue.toDate()
+                : (timestampValue ? new Date(timestampValue) : new Date()),
+              isAdminActivity: true,
+            });
+          });
+        } catch (e) {
+          console.warn('Could not fetch admin_activity_logs:', e);
+        }
+
         // Sort descending by timestamp
         activities.sort((a, b) => b.timestamp - a.timestamp);
         
@@ -185,6 +210,8 @@ export default function ActivityLogs() {
         usersSnap.forEach(doc => {
           usersMap[doc.id] = doc.data();
         });
+        latestUsersMap = usersMap;
+        hasLoadedUsers = true;
         const version = ++requestVersion;
         fetchActivities(usersMap, version);
       },
@@ -194,9 +221,22 @@ export default function ActivityLogs() {
       },
     );
 
+    const unsubscribeAdminLogs = onSnapshot(
+      collection(db, 'admin_activity_logs'),
+      () => {
+        if (!hasLoadedUsers) return;
+        const version = ++requestVersion;
+        fetchActivities(latestUsersMap, version);
+      },
+      (error) => {
+        console.warn('Could not watch admin activity logs:', error);
+      },
+    );
+
     return () => {
       disposed = true;
       unsubscribe();
+      unsubscribeAdminLogs();
     };
   }, []);
 
@@ -216,6 +256,40 @@ export default function ActivityLogs() {
         return { text: 'Added Quiz', color: '#8b5cf6', icon: <HelpCircle size={16} /> };
       case 'quiz_submitted':
         return { text: 'Answered Quiz', color: '#10b981', icon: <CheckCircle size={16} /> };
+      case 'section_added':
+        return { text: 'Added Section', color: '#22d3ee', icon: <PlusCircle size={16} /> };
+      case 'section_archived':
+        return { text: 'Archived Section', color: '#f59e0b', icon: <Archive size={16} /> };
+      case 'section_recovered':
+        return { text: 'Recovered Section', color: '#34d399', icon: <RotateCcw size={16} /> };
+      case 'section_permanently_deleted':
+        return { text: 'Permanently Deleted Section', color: '#fb7185', icon: <Trash2 size={16} /> };
+      case 'user_approved':
+        return { text: 'Approved User', color: '#34d399', icon: <UserCheck size={16} /> };
+      case 'user_rejected':
+        return { text: 'Rejected User', color: '#fb7185', icon: <UserX size={16} /> };
+      case 'user_revoked':
+        return { text: 'Revoked User', color: '#fb7185', icon: <UserX size={16} /> };
+      case 'user_recovered':
+        return { text: 'Recovered User', color: '#34d399', icon: <RotateCcw size={16} /> };
+      case 'user_edited':
+        return { text: 'Edited User', color: '#60a5fa', icon: <Pencil size={16} /> };
+      case 'user_password_reset':
+        return { text: 'Sent Password Reset', color: '#a78bfa', icon: <ShieldCheck size={16} /> };
+      case 'teacher_upload_archived':
+        return { text: 'Archived Teacher Upload', color: '#f59e0b', icon: <Archive size={16} /> };
+      case 'teacher_upload_restored':
+        return { text: 'Restored Teacher Upload', color: '#34d399', icon: <RotateCcw size={16} /> };
+      case 'teacher_upload_permanently_deleted':
+        return { text: 'Deleted Archived Upload', color: '#fb7185', icon: <Trash2 size={16} /> };
+      case 'ar_content_updated':
+        return { text: 'Edited AR Lab Content', color: '#22d3ee', icon: <Pencil size={16} /> };
+      case 'ar_content_seeded':
+        return { text: 'Initialized AR Lab Content', color: '#8b5cf6', icon: <Box size={16} /> };
+      case 'admin_action':
+        return { text: 'Admin Activity', color: '#22d3ee', icon: <ShieldCheck size={16} /> };
+      case 'admin_device_verified':
+        return { text: 'Verified New Admin Device', color: '#34d399', icon: <ShieldCheck size={16} /> };
       default:
         return { text: 'Unknown Action', color: '#888', icon: <Activity size={16} /> };
     }
@@ -247,6 +321,8 @@ export default function ActivityLogs() {
       typeMatch = log.type === 'quiz_added';
     } else if (filterType === 'student_quizzes') {
       typeMatch = log.type === 'quiz_submitted';
+    } else if (filterType === 'admin') {
+      typeMatch = log.isAdminActivity === true;
     }
 
     return searchMatch && typeMatch;
@@ -261,7 +337,7 @@ export default function ActivityLogs() {
       <div className="page-header">
         <div>
           <h1>Activity Logs</h1>
-          <p>Monitor user activity across AR experiments, modules, and quizzes.</p>
+          <p>Monitor student, teacher, and administrator activity across SciLab AR.</p>
         </div>
       </div>
 
@@ -294,6 +370,7 @@ export default function ActivityLogs() {
               <option value="courses">Courses</option>
               <option value="added_quizzes">Added Quizzes</option>
               <option value="student_quizzes">Answered Quizzes</option>
+              <option value="admin">Admin Activity</option>
             </select>
           </div>
         </div>

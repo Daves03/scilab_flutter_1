@@ -9,7 +9,7 @@ export default function Legal() {
       <div className="page-header">
         <div>
           <h1>Legal</h1>
-          <p>Manage Terms & Conditions and Privacy Policy.</p>
+          <p>Terms &amp; Conditions and Privacy Policy.</p>
         </div>
       </div>
 
@@ -55,7 +55,7 @@ export default function Legal() {
         {/* Content Area */}
         <div style={{ flex: 1, padding: '32px', overflowY: 'auto', maxHeight: '700px' }}>
           {activeTab === 'terms' ? (
-            <div style={{ color: 'var(--text-color)', lineHeight: '1.6' }}>
+            <div style={{ color: 'var(--text-color)', lineHeight: '1.6', textAlign: 'justify', textJustify: 'inter-word' }}>
               <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '24px', color: 'var(--text-color)' }}>Terms and Conditions</h2>
               <p style={{ marginBottom: '24px' }}>Welcome to SciLab AR! By using this application, you agree to the following terms and conditions. Please read them carefully before proceeding.</p>
               
@@ -95,13 +95,13 @@ export default function Legal() {
               </ul>
               
               <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginTop: '32px', marginBottom: '12px', color: 'var(--text-color)' }}>7. Acceptance of Terms</h3>
-              <p style={{ marginBottom: '32px' }}>By clicking "Accept" or continuing to use SciLab AR, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions.</p>
+              <p style={{ marginBottom: '32px' }}>By continuing to use SciLab AR, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions.</p>
               
               <hr style={{ borderColor: 'var(--border-light)', margin: '32px 0' }} />
               <p style={{ textAlign: 'center', fontSize: '14px', fontWeight: 'bold', color: 'var(--text-secondary)' }}>Copyright © 2026 SciLab AR. All Rights Reserved. Cavite State University - Bacoor City Campus</p>
             </div>
           ) : (
-            <div style={{ color: 'var(--text-color)', lineHeight: '1.6' }}>
+            <div style={{ color: 'var(--text-color)', lineHeight: '1.6', textAlign: 'justify', textJustify: 'inter-word' }}>
               <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '24px', color: 'var(--text-color)' }}>Privacy Policy</h2>
               
               <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginTop: '32px', marginBottom: '12px', color: 'var(--text-color)' }}>Data Privacy and Storage</h3>

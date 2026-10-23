@@ -137,6 +137,17 @@ p { color: var(--text-secondary); line-height: 1.5; }
   background: rgba(255, 71, 87, 0.2);
 }
 
+.btn-archive {
+  background: color-mix(in srgb, var(--accent-orange) 10%, transparent);
+  color: var(--accent-orange);
+  border: 1px solid color-mix(in srgb, var(--accent-orange) 35%, transparent);
+}
+
+.btn-archive:hover {
+  background: color-mix(in srgb, var(--accent-orange) 20%, transparent);
+  border-color: color-mix(in srgb, var(--accent-orange) 55%, transparent);
+}
+
 .btn-success {
   background: rgba(0, 255, 136, 0.1);
   color: var(--accent-green);
@@ -189,6 +200,208 @@ p { color: var(--text-secondary); line-height: 1.5; }
 
 .animate-fade-in {
   animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Authentication background — mirrors the Flutter app's floating particles. */
+.auth-page-shell {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, #0a2033 0%, #15152f 48%, #0a1628 100%);
+}
+
+.auth-moving-background {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.auth-moving-background::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 212, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.75), transparent 90%);
+}
+
+.auth-aurora {
+  position: absolute;
+  width: min(46vw, 720px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.12;
+  animation: authAuroraDrift 16s ease-in-out infinite alternate;
+}
+
+.auth-aurora-cyan {
+  left: -12%;
+  top: -20%;
+  background: #00d4ff;
+}
+
+.auth-aurora-purple {
+  right: -10%;
+  bottom: -28%;
+  background: #7c5cbf;
+  animation-delay: -8s;
+  animation-direction: alternate-reverse;
+}
+
+.auth-particle {
+  position: absolute;
+  left: var(--particle-left);
+  top: var(--particle-top);
+  width: var(--particle-size);
+  height: var(--particle-size);
+  border-radius: 50%;
+  opacity: 0.46;
+  animation: authParticleFloat var(--particle-duration) ease-in-out var(--particle-delay) infinite alternate;
+  will-change: transform, opacity;
+}
+
+.auth-particle-cyan {
+  background: #00d4ff;
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.75);
+}
+
+.auth-particle-green {
+  background: #00ff88;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.65);
+}
+
+.auth-particle-purple {
+  background: #7c5cbf;
+  box-shadow: 0 0 12px rgba(124, 92, 191, 0.7);
+}
+
+.auth-login-card {
+  position: relative;
+  z-index: 1;
+  background: rgba(16, 31, 58, 0.82);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.36),
+    0 0 42px rgba(0, 212, 255, 0.055);
+}
+
+.auth-theme-toggle {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 14px;
+  border: 1px solid rgba(0, 212, 255, 0.35);
+  border-radius: 999px;
+  background: rgba(10, 22, 40, 0.66);
+  color: #f8fafc;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.auth-theme-toggle:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-cyan);
+  background: rgba(15, 35, 62, 0.88);
+}
+
+.auth-theme-toggle:focus-visible {
+  outline: 3px solid rgba(0, 212, 255, 0.3);
+  outline-offset: 3px;
+}
+
+[data-theme="light"] .auth-page-shell {
+  background: linear-gradient(135deg, #e8f9fd 0%, #f3e8fd 48%, #f5f7fa 100%);
+}
+
+[data-theme="light"] .auth-moving-background::after {
+  background-image:
+    linear-gradient(rgba(21, 101, 192, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(21, 101, 192, 0.045) 1px, transparent 1px);
+}
+
+[data-theme="light"] .auth-aurora {
+  opacity: 0.09;
+}
+
+[data-theme="light"] .auth-login-card {
+  background: rgba(255, 255, 255, 0.84);
+  border-color: rgba(21, 101, 192, 0.15);
+  box-shadow:
+    0 24px 70px rgba(15, 23, 42, 0.14),
+    0 0 42px rgba(21, 101, 192, 0.06);
+}
+
+[data-theme="light"] .auth-login-card:hover {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(21, 101, 192, 0.24);
+}
+
+[data-theme="light"] .auth-theme-toggle {
+  background: rgba(255, 255, 255, 0.78);
+  color: #0f172a;
+  border-color: rgba(21, 101, 192, 0.3);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+}
+
+[data-theme="light"] .auth-theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: #1565c0;
+}
+
+@media (max-width: 600px) {
+  .auth-theme-toggle {
+    top: 16px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .auth-theme-toggle span {
+    display: none;
+  }
+}
+
+@keyframes authParticleFloat {
+  0% {
+    transform: translate3d(0, 12px, 0) scale(0.8);
+    opacity: 0.22;
+  }
+  50% {
+    opacity: 0.62;
+  }
+  100% {
+    transform: translate3d(var(--particle-drift), -18px, 0) scale(1.15);
+    opacity: 0.38;
+  }
+}
+
+@keyframes authAuroraDrift {
+  from { transform: translate3d(-3%, -2%, 0) scale(0.92); }
+  to { transform: translate3d(9%, 7%, 0) scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-particle,
+  .auth-aurora {
+    animation: none;
+  }
 }
 
 /* Custom Scrollbar */

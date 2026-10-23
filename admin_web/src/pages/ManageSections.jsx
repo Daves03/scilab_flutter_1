@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { collection, query, where, onSnapshot, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Layers, Plus, Trash2, RefreshCcw, AlertTriangle, ArrowLeft } from 'lucide-react';
+import { logAdminActivity } from '../services/adminActivityService';
+import { Layers, Plus, Trash2, Archive, RefreshCcw, AlertTriangle, ArrowLeft } from 'lucide-react';
 
 export default function ManageSections() {
   const [activeTab, setActiveTab] = useState('active');
@@ -79,6 +80,11 @@ export default function ManageSections() {
         grade: newSectionGrade,
         isTrashed: false
       });
+      await logAdminActivity({
+        type: 'section_added',
+        title: `${newSectionGrade} - Section ${newSectionName.trim()}`,
+        details: { sectionName: newSectionName.trim(), grade: newSectionGrade },
+      });
       setNewSectionName('');
       setShowAddModal(false);
     } catch (e) {
@@ -95,10 +101,15 @@ export default function ManageSections() {
         isTrashed: true,
         deletedAt: new Date().toISOString()
       });
+      await logAdminActivity({
+        type: 'section_archived',
+        title: `${deleteConfirm.grade || 'Grade not set'} - Section ${deleteConfirm.name}`,
+        details: { sectionId: deleteConfirm.id, sectionName: deleteConfirm.name, grade: deleteConfirm.grade || '' },
+      });
       setDeleteConfirm(null);
     } catch (e) {
       console.error(e);
-      alert('Error moving to trash: ' + e.message);
+      alert('Error archiving section: ' + e.message);
     }
   };
 
@@ -108,6 +119,11 @@ export default function ManageSections() {
       await updateDoc(doc(db, 'sections', recoverConfirm.id), {
         isTrashed: false,
         deletedAt: null
+      });
+      await logAdminActivity({
+        type: 'section_recovered',
+        title: `${recoverConfirm.grade || 'Grade not set'} - Section ${recoverConfirm.name}`,
+        details: { sectionId: recoverConfirm.id, sectionName: recoverConfirm.name, grade: recoverConfirm.grade || '' },
       });
       setRecoverConfirm(null);
     } catch (e) {
@@ -120,6 +136,11 @@ export default function ManageSections() {
     if (!permanentDeleteConfirm) return;
     try {
       await deleteDoc(doc(db, 'sections', permanentDeleteConfirm.id));
+      await logAdminActivity({
+        type: 'section_permanently_deleted',
+        title: `${permanentDeleteConfirm.grade || 'Grade not set'} - Section ${permanentDeleteConfirm.name}`,
+        details: { sectionId: permanentDeleteConfirm.id, sectionName: permanentDeleteConfirm.name, grade: permanentDeleteConfirm.grade || '' },
+      });
       setPermanentDeleteConfirm(null);
     } catch (e) {
       console.error(e);
@@ -202,7 +223,7 @@ export default function ManageSections() {
               onClick={() => setActiveTab('trash')}
               style={{ flex: 1, textAlign: 'center', padding: '12px 4px', fontSize: '0.85rem' }}
             >
-              <span style={{ color: 'var(--accent-red)' }}>Trash ({trashedSections.length})</span>
+              <span style={{ color: 'var(--accent-orange)' }}>Archive ({trashedSections.length})</span>
             </button>
           </div>
           
@@ -230,7 +251,7 @@ export default function ManageSections() {
 
         {filteredList.length === 0 ? (
           <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-            {activeTab === 'active' ? 'No sections found.' : 'Trash is empty.'}
+            {activeTab === 'active' ? 'No sections found.' : 'Archive is empty.'}
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
@@ -272,15 +293,15 @@ export default function ManageSections() {
                 
                 {activeTab === 'active' ? (
                   <button 
-                    className="btn btn-danger" 
+                    className="btn btn-archive" 
                     style={{ padding: '8px' }}
                     onClick={(e) => {
                       e.stopPropagation();
                       setDeleteConfirm(section);
                     }}
-                    title="Move to Trash"
+                    title="Archive Section"
                   >
-                    <Trash2 size={16} />
+                    <Archive size={16} />
                   </button>
                 ) : (
                   <div style={{ display: 'flex', gap: '8px' }}>
@@ -363,17 +384,17 @@ export default function ManageSections() {
           zIndex: 100
         }}>
           <div className="glass-panel animate-fade-in" style={{ width: '100%', maxWidth: '420px', padding: '32px', textAlign: 'center' }}>
-            <div style={{ background: 'rgba(255, 71, 87, 0.1)', padding: '16px', borderRadius: '50%', display: 'inline-block', marginBottom: '16px' }}>
-              <AlertTriangle size={32} color="var(--accent-red)" />
+            <div style={{ background: 'color-mix(in srgb, var(--accent-orange) 12%, transparent)', padding: '16px', borderRadius: '50%', display: 'inline-block', marginBottom: '16px' }}>
+              <Archive size={32} color="var(--accent-orange)" />
             </div>
-            <h2 style={{ marginBottom: '12px' }}>Move to Trash?</h2>
+            <h2 style={{ marginBottom: '12px' }}>Archive Section?</h2>
             <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: 1.5 }}>
-              Are you sure you want to delete the section <strong>"{deleteConfirm.name}"</strong>? 
-              Users assigned to this section won't be deleted, but they will lose this section tag. You can recover it from the trash later.
+              Are you sure you want to archive the section <strong>"{deleteConfirm.name}"</strong>? 
+              Users assigned to this section won't be deleted, but they will lose this section tag. You can recover it from the archive later.
             </p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
               <button className="btn btn-secondary" onClick={() => setDeleteConfirm(null)}>Cancel</button>
-              <button className="btn btn-danger" onClick={handleConfirmDelete}>Yes, move to trash</button>
+              <button className="btn btn-archive" onClick={handleConfirmDelete}>Yes, archive</button>
             </div>
           </div>
         </div>
