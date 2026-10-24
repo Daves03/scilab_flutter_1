@@ -3,8 +3,10 @@ import 'dart:ui' show PlatformDispatcher;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ThemeProvider extends ChangeNotifier {
-  static const _key = 'theme_mode';
+class ThemeProvider extends ChangeNotifier with WidgetsBindingObserver {
+  // Use a new key so installs that previously saved dark mode start from the
+  // system setting instead of being permanently forced back to dark mode.
+  static const _key = 'theme_mode_v2';
   ThemeMode _themeMode = ThemeMode.system;
 
   ThemeMode get themeMode => _themeMode;
@@ -16,7 +18,21 @@ class ThemeProvider extends ChangeNotifier {
   };
 
   ThemeProvider() {
+    WidgetsBinding.instance.addObserver(this);
     _loadTheme();
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    if (_themeMode == ThemeMode.system) {
+      notifyListeners();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   Future<void> _loadTheme() async {
@@ -28,9 +44,6 @@ class ThemeProvider extends ChangeNotifier {
         'light' => ThemeMode.light,
         _ => ThemeMode.system,
       };
-    } else if (savedMode is bool) {
-      // Backward compatibility with the previous boolean preference format.
-      _themeMode = savedMode ? ThemeMode.dark : ThemeMode.light;
     } else {
       _themeMode = ThemeMode.system;
     }
