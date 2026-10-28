@@ -86,12 +86,14 @@ class ArLabRecord {
   final String experimentName;
   final int attempts;
   final double rubricScore; // out of 100
+  final Map<String, int> rubricScores;
   final String lastAttemptDate;
 
   const ArLabRecord({
     required this.experimentName,
     required this.attempts,
     required this.rubricScore,
+    required this.rubricScores,
     required this.lastAttemptDate,
   });
 }
@@ -263,7 +265,8 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
             return ArLabRecord(
               experimentName: arExpMap[expId] ?? 'Unknown Experiment',
               attempts: 1,
-              rubricScore: act.completed ? 100.0 : 0.0,
+              rubricScore: act.rubricScore ?? (act.completed ? 100.0 : 0.0),
+              rubricScores: act.rubricScores,
               lastAttemptDate: _formatDate(act.completedAt ?? act.launchedAt),
             );
           }).toList();
@@ -1556,6 +1559,110 @@ class _ArLabRecordRow extends StatelessWidget {
               valueColor: AlwaysStoppedAnimation<Color>(color),
               minHeight: 5,
             ),
+          ),
+          if (record.rubricScores.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Theme(
+              data: theme.copyWith(dividerColor: Colors.transparent),
+              child: ExpansionTile(
+                tilePadding: EdgeInsets.zero,
+                childrenPadding: const EdgeInsets.only(bottom: 4),
+                dense: true,
+                title: const Text(
+                  'Rubric Breakdown',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
+                ),
+                children: [
+                  _TeacherRubricBreakdown(
+                    scores: record.rubricScores,
+                    textColor: subTextColor,
+                    borderColor: borderColor,
+                    isDark: isDark,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _TeacherRubricBreakdown extends StatelessWidget {
+  final Map<String, int> scores;
+  final Color textColor;
+  final Color borderColor;
+  final bool isDark;
+
+  const _TeacherRubricBreakdown({
+    required this.scores,
+    required this.textColor,
+    required this.borderColor,
+    required this.isDark,
+  });
+
+  static const _criteria = [
+    ('ppe', 'PPE Selection', 15),
+    ('procedureAndSequence', 'Procedure & Sequence', 35),
+    ('equipmentHandling', 'Equipment Handling', 20),
+    ('experimentalResult', 'Experimental Result', 20),
+    ('scientificUnderstanding', 'Scientific Understanding', 10),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF0A1628) : Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: borderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ..._criteria.map((criterion) {
+            final (key, label, maximum) = criterion;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      label,
+                      style: TextStyle(color: textColor, fontSize: 10),
+                    ),
+                  ),
+                  Text(
+                    '${scores[key] ?? 0}/$maximum',
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+          const Divider(height: 10),
+          Row(
+            children: [
+              const Expanded(
+                child: Text(
+                  'Total',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
+                ),
+              ),
+              Text(
+                '${scores['total'] ?? 0}/100',
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
           ),
         ],
       ),

@@ -32,8 +32,9 @@ class CourseModule {
     }
     const kb = 1024;
     const mb = kb * 1024;
-    if (fileSizeBytes >= mb)
+    if (fileSizeBytes >= mb) {
       return '${(fileSizeBytes / mb).toStringAsFixed(1)} MB';
+    }
     return '${(fileSizeBytes / kb).ceil()} KB';
   }
 
@@ -127,6 +128,17 @@ enum CourseQuestionType {
     CourseQuestionType.trueFalse => 'True or False',
     CourseQuestionType.identification => 'Identification',
     CourseQuestionType.enumeration => 'Enumeration',
+  };
+
+  String get direction => switch (this) {
+    CourseQuestionType.multipleChoice =>
+      'Read each question carefully and select the best answer from the choices provided.',
+    CourseQuestionType.trueFalse =>
+      'Read each statement carefully. Select True if the statement is correct and False if it is incorrect.',
+    CourseQuestionType.identification =>
+      'Identify the term or concept being described and enter the most accurate answer.',
+    CourseQuestionType.enumeration =>
+      'List all the items requested. Enter each item in a separate answer field.',
   };
 
   static CourseQuestionType fromStorageValue(Object? value) {
@@ -225,7 +237,7 @@ class CourseQuiz {
       questions: ((data['questions'] as List<dynamic>?) ?? const [])
           .whereType<Map<dynamic, dynamic>>()
           .map(
-            (q) => CourseQuestion.fromMap(Map<String, dynamic>.from(q as Map)),
+            (q) => CourseQuestion.fromMap(Map<String, dynamic>.from(q)),
           )
           .toList(),
       createdAt: ts is Timestamp ? ts.toDate() : null,
@@ -310,11 +322,11 @@ class Course {
           : const [],
       modules: ((data['modules'] as List<dynamic>?) ?? const [])
           .whereType<Map<dynamic, dynamic>>()
-          .map((m) => CourseModule.fromMap(Map<String, dynamic>.from(m as Map)))
+          .map((m) => CourseModule.fromMap(Map<String, dynamic>.from(m)))
           .toList(),
       quizzes: ((data['quizzes'] as List<dynamic>?) ?? const [])
           .whereType<Map<dynamic, dynamic>>()
-          .map((q) => CourseQuiz.fromMap(Map<String, dynamic>.from(q as Map)))
+          .map((q) => CourseQuiz.fromMap(Map<String, dynamic>.from(q)))
           .toList(),
       createdAt: ts is Timestamp ? ts.toDate() : null,
     );

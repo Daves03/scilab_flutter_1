@@ -1,8 +1,19 @@
 import '../../../core/app_export.dart';
 import '../../../models/course_model.dart';
 import '../../../services/course_service.dart';
+import '../../../services/ai_quiz_generator_service.dart';
+import '../../../services/office_document_text_extractor.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-import '../teacher_courses_screen.dart';
+
+enum _QuizCreationMethod { manual, ai }
+
+class _AiQuizOptions {
+  final CourseModule module;
+  final Map<CourseQuestionType, int> questionCounts;
+
+  const _AiQuizOptions({required this.module, required this.questionCounts});
+}
 
 class CourseQuizManagerWidget extends StatefulWidget {
   final Course course;
@@ -23,6 +34,23 @@ class _CourseQuizManagerWidgetState extends State<CourseQuizManagerWidget> {
   CourseQuiz? _expandedQuiz;
 
   Future<void> _addQuiz() async {
+    final method = await showDialog<_QuizCreationMethod>(
+      context: context,
+      builder: (context) => _QuizCreationMethodDialog(
+        hasModules: widget.course.modules.any(
+          (module) =>
+              module.url.isNotEmpty &&
+              const {'pdf', 'doc', 'ppt'}.contains(module.fileType),
+        ),
+      ),
+    );
+    if (!mounted || method == null) return;
+
+    if (method == _QuizCreationMethod.ai) {
+      await _generateAiQuiz();
+      return;
+    }
+
     final selectedTypes = await showDialog<Set<CourseQuestionType>>(
       context: context,
       barrierDismissible: false,
@@ -38,7 +66,7 @@ class _CourseQuizManagerWidgetState extends State<CourseQuizManagerWidget> {
         questionTypes: selectedTypes,
         onSave: (CourseQuiz quiz) {
           setState(() {
-            widget.course.quizzes.add(quiz);
+            widget.course.quizzes.insert(0, quiz);
             _expandedQuiz = quiz;
           });
           widget.onUpdated();
@@ -46,6 +74,133 @@ class _CourseQuizManagerWidgetState extends State<CourseQuizManagerWidget> {
         },
       ),
     );
+  }
+
+  Future<void> _generateAiQuiz() async {
+    final supportedModules = widget.course.modules
+        .where(
+          (module) =>
+              module.url.isNotEmpty &&
+              const {'pdf', 'doc', 'ppt'}.contains(module.fileType),
+        )
+        .toList();
+    if (supportedModules.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Upload a PDF, Word, or PowerPoint module before using the AI quiz generator.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final options = await showDialog<_AiQuizOptions>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => _AiQuizGeneratorDialog(modules: supportedModules),
+    );
+    if (!mounted || options == null) return;
+
+    final courseService = context.read<CourseService>();
+    BuildContext? loadingDialogContext;
+    void closeLoadingDialog() {
+      final dialogContext = loadingDialogContext;
+      loadingDialogContext = null;
+      if (dialogContext != null && dialogContext.mounted) {
+        Navigator.of(dialogContext).pop();
+      }
+    }
+
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        loadingDialogContext = dialogContext;
+        return const Dialog(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 18),
+                Flexible(child: Text('AI is reading the module...')),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    final aiService = AiQuizGeneratorService();
+    var insertedQuizzes = <CourseQuiz>[];
+    try {
+      final response = await http
+          .get(Uri.parse(options.module.url))
+          .timeout(const Duration(minutes: 2));
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw Exception('Module download failed (${response.statusCode}).');
+      }
+
+      String? extractedText;
+      if (options.module.fileType == 'doc' ||
+          options.module.fileType == 'ppt') {
+        extractedText = OfficeDocumentTextExtractor.extract(
+          bytes: response.bodyBytes,
+          fileName: options.module.title,
+        ).text;
+      }
+      final quizzes = await aiService.generateQuizzesFromDocument(
+        response.bodyBytes,
+        options.module.title,
+        numQuizzes: 1,
+        numQuestions: options.questionCounts.values.fold(0, (a, b) => a + b),
+        mimeType: options.module.fileType == 'pdf'
+            ? 'application/pdf'
+            : 'text/plain',
+        extractedDocumentText: extractedText,
+        sourceFileName: options.module.title,
+        questionTypes: options.questionCounts.keys.toSet(),
+        questionTypeCounts: options.questionCounts,
+      );
+      if (quizzes == null || quizzes.isEmpty) {
+        throw Exception(
+          aiService.lastErrorMessage ?? 'AI did not return a combined quiz.',
+        );
+      }
+      if (!mounted) return;
+
+      widget.course.quizzes.insertAll(0, quizzes);
+      insertedQuizzes = quizzes;
+      await courseService.updateCourse(widget.course);
+      closeLoadingDialog();
+      if (!mounted) return;
+      setState(() => _expandedQuiz = quizzes.first);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${quizzes.length} AI quiz${quizzes.length == 1 ? '' : 'zes'} created from ${options.module.title}.',
+          ),
+        ),
+      );
+      widget.onUpdated();
+    } catch (error) {
+      closeLoadingDialog();
+      if (insertedQuizzes.isNotEmpty) {
+        final insertedIds = insertedQuizzes.map((quiz) => quiz.id).toSet();
+        widget.course.quizzes.removeWhere(
+          (quiz) => insertedIds.contains(quiz.id),
+        );
+      }
+      if (!mounted) return;
+      final message = error.toString().replaceFirst('Exception: ', '');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not generate the quiz: $message')),
+      );
+    } finally {
+      closeLoadingDialog();
+    }
   }
 
   void _editQuiz(CourseQuiz quiz) {
@@ -594,150 +749,6 @@ class _QuestionTile extends StatelessWidget {
 
 // ── Shared dialog & field components ─────────────────────────────────────────
 
-class _GlassDialog extends StatelessWidget {
-  final String title;
-  final Color accentColor;
-  final Widget content;
-  final VoidCallback onSave;
-  final VoidCallback onCancel;
-  final bool scrollable;
-
-  const _GlassDialog({
-    required this.title,
-    required this.accentColor,
-    required this.content,
-    required this.onSave,
-    required this.onCancel,
-    this.scrollable = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 480),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0F1E35),
-          borderRadius: BorderRadius.circular(20.0),
-          border: Border.all(color: accentColor.withAlpha(60), width: 1),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Title bar
-            Container(
-              padding: const EdgeInsets.fromLTRB(20, 16, 12, 16),
-              decoration: BoxDecoration(
-                color: accentColor.withAlpha(15),
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(20),
-                ),
-                border: Border(
-                  bottom: BorderSide(
-                    color: accentColor.withAlpha(40),
-                    width: 1,
-                  ),
-                ),
-              ),
-              child: Row(
-                children: [
-                  CustomIconWidget(
-                    iconName: 'edit_note',
-                    color: accentColor,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: onCancel,
-                    child: const CustomIconWidget(
-                      iconName: 'close',
-                      color: Color(0xFF8BA3C0),
-                      size: 20,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Content
-            scrollable
-                ? ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height * 0.55,
-                    ),
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(20),
-                      child: content,
-                    ),
-                  )
-                : Padding(padding: const EdgeInsets.all(20), child: content),
-            // Actions
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: onCancel,
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(
-                          color: Color(0xFF3A5A7A),
-                          width: 1,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      child: const Text(
-                        'Cancel',
-                        style: TextStyle(
-                          color: Color(0xFF8BA3C0),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: onSave,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: accentColor,
-                        foregroundColor: const Color(0xFF0A1628),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        elevation: 0,
-                      ),
-                      child: const Text(
-                        'Save',
-                        style: TextStyle(fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _GlassTextField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
@@ -857,7 +868,7 @@ class _ConfirmDeleteDialog extends StatelessWidget {
           boxShadow: isLight
               ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withAlpha(13),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -1049,6 +1060,346 @@ class _AddButton extends StatelessWidget {
 }
 
 // ── Unified Google Forms-Style Quiz Editor ───────────────────────────────────
+
+class _QuizCreationMethodDialog extends StatelessWidget {
+  final bool hasModules;
+
+  const _QuizCreationMethodDialog({required this.hasModules});
+
+  @override
+  Widget build(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final accent = isLight ? const Color(0xFF1565C0) : const Color(0xFF00D4FF);
+
+    Widget option({
+      required IconData icon,
+      required String title,
+      required String description,
+      required VoidCallback? onTap,
+    }) => InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isLight ? Colors.grey.shade50 : const Color(0xFF142240),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: onTap != null
+                ? accent.withAlpha(70)
+                : Colors.grey.withAlpha(50),
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: onTap != null ? accent : Colors.grey, size: 28),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: onTap != null
+                          ? (isLight ? Colors.black87 : Colors.white)
+                          : Colors.grey,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    description,
+                    style: TextStyle(
+                      color: isLight
+                          ? Colors.grey.shade600
+                          : const Color(0xFF8BA3C0),
+                      fontSize: 11.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: onTap != null ? accent : Colors.grey,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    return AlertDialog(
+      title: const Text('Create Quiz'),
+      content: SizedBox(
+        width: 430,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            option(
+              icon: Icons.edit_note_rounded,
+              title: 'Create Manually',
+              description: 'Write and configure each quiz question yourself.',
+              onTap: () => Navigator.pop(context, _QuizCreationMethod.manual),
+            ),
+            const SizedBox(height: 12),
+            option(
+              icon: Icons.auto_awesome_rounded,
+              title: 'AI Quiz Generator',
+              description: hasModules
+                  ? 'Choose an uploaded module and generate questions from it.'
+                  : 'Upload a module first to use the AI quiz generator.',
+              onTap: hasModules
+                  ? () => Navigator.pop(context, _QuizCreationMethod.ai)
+                  : null,
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+      ],
+    );
+  }
+}
+
+class _AiQuizGeneratorDialog extends StatefulWidget {
+  final List<CourseModule> modules;
+
+  const _AiQuizGeneratorDialog({required this.modules});
+
+  @override
+  State<_AiQuizGeneratorDialog> createState() => _AiQuizGeneratorDialogState();
+}
+
+class _AiQuizGeneratorDialogState extends State<_AiQuizGeneratorDialog> {
+  late CourseModule _module;
+  final Set<CourseQuestionType> _types = {CourseQuestionType.multipleChoice};
+  final Map<CourseQuestionType, int> _itemCounts = {
+    CourseQuestionType.multipleChoice: 5,
+  };
+
+  int get _totalItems => _itemCounts.values.fold(0, (a, b) => a + b);
+
+  @override
+  void initState() {
+    super.initState();
+    _module = widget.modules.first;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final accent = isLight ? const Color(0xFF1565C0) : const Color(0xFF00D4FF);
+    final foreground = isLight ? Colors.black87 : Colors.white;
+
+    return Dialog(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 500, maxHeight: 680),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 18, 12, 12),
+              child: Row(
+                children: [
+                  Icon(Icons.auto_awesome_rounded, color: accent),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'AI Quiz Generator',
+                      style: TextStyle(
+                        color: foreground,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            Flexible(
+              child: ListView(
+                padding: const EdgeInsets.all(20),
+                children: [
+                  Text(
+                    'Module',
+                    style: TextStyle(
+                      color: foreground,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 7),
+                  DropdownButtonFormField<CourseModule>(
+                    initialValue: _module,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.description_outlined),
+                    ),
+                    items: widget.modules
+                        .map(
+                          (module) => DropdownMenuItem(
+                            value: module,
+                            child: Text(
+                              module.title,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (module) {
+                      if (module != null) setState(() => _module = module);
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Question Types',
+                    style: TextStyle(
+                      color: foreground,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  ...CourseQuestionType.values.map(
+                    (type) => CheckboxListTile(
+                      value: _types.contains(type),
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
+                      activeColor: accent,
+                      title: Text(type.label),
+                      onChanged: !_types.contains(type) && _totalItems >= 20
+                          ? null
+                          : (selected) => setState(() {
+                              if (selected == true) {
+                                _types.add(type);
+                                _itemCounts[type] = 1;
+                              } else if (_types.length > 1) {
+                                _types.remove(type);
+                                _itemCounts.remove(type);
+                              }
+                            }),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Number of items for each type',
+                          style: TextStyle(
+                            color: foreground,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '$_totalItems/20 total',
+                        style: TextStyle(
+                          color: accent,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  ..._types.map(
+                    (type) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Row(
+                        children: [
+                          Expanded(child: Text(type.label)),
+                          IconButton.outlined(
+                            visualDensity: VisualDensity.compact,
+                            onPressed: _itemCounts[type] == 1
+                                ? null
+                                : () => setState(
+                                    () => _itemCounts[type] =
+                                        _itemCounts[type]! - 1,
+                                  ),
+                            icon: const Icon(Icons.remove_rounded, size: 18),
+                          ),
+                          SizedBox(
+                            width: 34,
+                            child: Text(
+                              '${_itemCounts[type]}',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          IconButton.outlined(
+                            visualDensity: VisualDensity.compact,
+                            onPressed: _totalItems >= 20
+                                ? null
+                                : () => setState(
+                                    () => _itemCounts[type] =
+                                        _itemCounts[type]! + 1,
+                                  ),
+                            icon: const Icon(Icons.add_rounded, size: 18),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 18),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancel'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 12,
+                        ),
+                      ),
+                      onPressed: () => Navigator.pop(
+                        context,
+                        _AiQuizOptions(
+                          module: _module,
+                          questionCounts: {
+                            for (final type in _types) type: _itemCounts[type]!,
+                          },
+                        ),
+                      ),
+                      icon: const Icon(Icons.auto_awesome_rounded, size: 18),
+                      label: const FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text('Generate', maxLines: 1, softWrap: false),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class _QuizTypeSelectionDialog extends StatefulWidget {
   const _QuizTypeSelectionDialog();

@@ -246,13 +246,16 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
               .collection('experiment_activity')
               .get();
           arAttempts = uArSnap.docs.length;
-          int completed = 0;
-          for (var d in uArSnap.docs) {
+          final grades = <double>[];
+          for (final d in uArSnap.docs) {
             final act = ExperimentActivity.fromMap(d.id, d.data());
-            if (act.completed) completed++;
+            if (act.completed) {
+              grades.add(act.rubricScore ?? 100.0);
+            }
           }
-          if (arAttempts > 0) {
-            avgArScore = (completed / arAttempts) * 100.0;
+          if (grades.isNotEmpty) {
+            avgArScore =
+                grades.reduce((total, grade) => total + grade) / grades.length;
           }
         } catch (e) {
           print('Error fetching AR records for ${u.id}: $e');
@@ -645,12 +648,17 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     List<QueryDocumentSnapshot<Map<String, dynamic>>> documents,
   ) {
     if (!mounted) return;
-    final completedCount = documents.where((document) {
-      return ExperimentActivity.fromMap(document.id, document.data()).completed;
-    }).length;
-    final score = documents.isEmpty
+    final grades = documents
+        .map(
+          (document) =>
+              ExperimentActivity.fromMap(document.id, document.data()),
+        )
+        .where((activity) => activity.completed)
+        .map((activity) => activity.rubricScore ?? 100.0)
+        .toList();
+    final score = grades.isEmpty
         ? 0.0
-        : (completedCount / documents.length) * 100;
+        : grades.reduce((total, grade) => total + grade) / grades.length;
 
     setState(() {
       _students = _students.map((student) {
@@ -1392,6 +1400,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
           return _ArProgressEntry(
             title: _arExperimentTitle(document.id),
             completed: activity.completed,
+            rubricScore: activity.completed
+                ? (activity.rubricScore ?? 100.0)
+                : null,
+            rubricScores: activity.rubricScores,
             activityAt: activity.completedAt ?? activity.launchedAt,
           );
         }).toList()..sort(
@@ -4084,11 +4096,15 @@ class _StatCard extends StatelessWidget {
 class _ArProgressEntry {
   final String title;
   final bool completed;
+  final double? rubricScore;
+  final Map<String, int> rubricScores;
   final DateTime? activityAt;
 
   const _ArProgressEntry({
     required this.title,
     required this.completed,
+    required this.rubricScore,
+    required this.rubricScores,
     required this.activityAt,
   });
 }
@@ -4340,11 +4356,14 @@ class _StudentArProgressDialog extends StatelessWidget {
     final secondaryText = isDark
         ? const Color(0xFF9BB0C9)
         : const Color(0xFF607086);
-    final completed = activities.where((activity) => activity.completed).length;
     final tries = activities.isEmpty ? student.arAttempts : activities.length;
-    final score = activities.isEmpty
+    final grades = activities
+        .map((activity) => activity.rubricScore)
+        .whereType<double>()
+        .toList();
+    final score = grades.isEmpty
         ? student.avgArScore
-        : completed / activities.length * 100;
+        : grades.reduce((total, grade) => total + grade) / grades.length;
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -4406,7 +4425,7 @@ class _StudentArProgressDialog extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
               child: _MetricExplanation(
                 text:
-                    'AR Score is the percentage of recorded AR labs completed. '
+                    'AR Score is the average of the student\'s rubric grades for completed AR labs. '
                     'AR Tries is the number of AR lab records for this student.',
                 isDark: isDark,
               ),
@@ -4431,9 +4450,16 @@ class _StudentArProgressDialog extends StatelessWidget {
                     separatorBuilder: (_, __) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
                       final activity = activities[index];
-                      final statusColor = activity.completed
+                      final grade = activity.rubricScore;
+                      final statusColor = grade == null
+                          ? const Color(0xFFFFC107)
+                          : grade >= 90
                           ? const Color(0xFF00E88F)
-                          : const Color(0xFFFFC107);
+                          : grade >= 75
+                          ? const Color(0xFF00D4FF)
+                          : grade >= 60
+                          ? const Color(0xFFFFB800)
+                          : const Color(0xFFFF4757);
                       return Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
@@ -4441,70 +4467,108 @@ class _StudentArProgressDialog extends StatelessWidget {
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(color: borderColor),
                         ),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: statusColor.withAlpha(24),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Icon(
-                                activity.completed
-                                    ? Icons.check_circle_outline
-                                    : Icons.play_circle_outline,
-                                color: statusColor,
-                                size: 21,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    activity.title,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
+                            Row(
+                              children: [
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: statusColor.withAlpha(24),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(
+                                    activity.completed
+                                        ? Icons.check_circle_outline
+                                        : Icons.play_circle_outline,
+                                    color: statusColor,
+                                    size: 21,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        activity.title,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: primaryText,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        _formatProgressDateTime(
+                                          activity.activityAt,
+                                        ),
+                                        style: TextStyle(
+                                          color: secondaryText,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: statusColor.withAlpha(24),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    activity.rubricScore != null
+                                        ? '${activity.rubricScore!.round()}%'
+                                        : 'Started',
                                     style: TextStyle(
-                                      color: primaryText,
-                                      fontSize: 14,
+                                      color: statusColor,
+                                      fontSize: 10,
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    _formatProgressDateTime(
-                                      activity.activityAt,
-                                    ),
+                                ),
+                              ],
+                            ),
+                            if (activity.rubricScores.isNotEmpty) ...[
+                              const SizedBox(height: 4),
+                              Theme(
+                                data: Theme.of(
+                                  context,
+                                ).copyWith(dividerColor: Colors.transparent),
+                                child: ExpansionTile(
+                                  tilePadding: EdgeInsets.zero,
+                                  childrenPadding: const EdgeInsets.only(
+                                    bottom: 4,
+                                  ),
+                                  dense: true,
+                                  title: const Text(
+                                    'Rubric Breakdown',
                                     style: TextStyle(
-                                      color: secondaryText,
                                       fontSize: 11,
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 5,
-                              ),
-                              decoration: BoxDecoration(
-                                color: statusColor.withAlpha(24),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                activity.completed ? 'Completed' : 'Started',
-                                style: TextStyle(
-                                  color: statusColor,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
+                                  children: [
+                                    _HomeRubricBreakdown(
+                                      scores: activity.rubricScores,
+                                      textColor: secondaryText,
+                                      borderColor: borderColor,
+                                      isDark: isDark,
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ),
+                            ],
                           ],
                         ),
                       );
@@ -4514,6 +4578,87 @@ class _StudentArProgressDialog extends StatelessWidget {
               ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _HomeRubricBreakdown extends StatelessWidget {
+  final Map<String, int> scores;
+  final Color textColor;
+  final Color borderColor;
+  final bool isDark;
+
+  const _HomeRubricBreakdown({
+    required this.scores,
+    required this.textColor,
+    required this.borderColor,
+    required this.isDark,
+  });
+
+  static const _criteria = [
+    ('ppe', 'PPE Selection', 15),
+    ('procedureAndSequence', 'Procedure & Sequence', 35),
+    ('equipmentHandling', 'Equipment Handling', 20),
+    ('experimentalResult', 'Experimental Result', 20),
+    ('scientificUnderstanding', 'Scientific Understanding', 10),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF101D32) : Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: borderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ..._criteria.map((criterion) {
+            final (key, label, maximum) = criterion;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      label,
+                      style: TextStyle(color: textColor, fontSize: 10),
+                    ),
+                  ),
+                  Text(
+                    '${scores[key] ?? 0}/$maximum',
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+          const Divider(height: 10),
+          Row(
+            children: [
+              const Expanded(
+                child: Text(
+                  'Total',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
+                ),
+              ),
+              Text(
+                '${scores['total'] ?? 0}/100',
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

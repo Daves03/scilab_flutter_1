@@ -32,6 +32,7 @@ class AiQuizGeneratorService {
     Set<CourseQuestionType> questionTypes = const {
       CourseQuestionType.multipleChoice,
     },
+    Map<CourseQuestionType, int>? questionTypeCounts,
   }) async {
     lastErrorMessage = null;
 
@@ -57,7 +58,17 @@ class AiQuizGeneratorService {
     final selectedTypes = questionTypes.isEmpty
         ? const {CourseQuestionType.multipleChoice}
         : Set<CourseQuestionType>.from(questionTypes);
+    final exactTypeCounts = <CourseQuestionType, int>{
+      for (final entry in (questionTypeCounts ?? const {}).entries)
+        if (selectedTypes.contains(entry.key) && entry.value > 0)
+          entry.key: entry.value,
+    };
     final typeNames = selectedTypes.map((type) => type.storageValue).join(', ');
+    final distributionRule = exactTypeCounts.isEmpty
+        ? 'Distribute the selected types as evenly as possible. When the question count permits, include every selected type in every quiz.'
+        : 'In each quiz, use exactly these question counts:\n'
+              '${exactTypeCounts.entries.map((entry) => '- ${entry.key.storageValue}: ${entry.value}').join('\n')}\n'
+              'Do not add, remove, or substitute question types.';
     final typeRules = selectedTypes
         .map((type) {
           return switch (type) {
@@ -78,7 +89,7 @@ class AiQuizGeneratorService {
 You are an expert chemistry teacher. Analyze the attached module and generate exactly $numQuizzes quiz(zes).
 Each quiz must have exactly $numQuestions questions based only on the module's content.
 Use only these selected question types: $typeNames.
-Distribute the selected types as evenly as possible. When the question count permits, include every selected type in every quiz.
+$distributionRule
 $typeRules
 
 Respond only with a valid JSON array. Do not wrap it in Markdown code blocks.
@@ -167,6 +178,25 @@ Each object in the array must match this structure exactly:
         late final List<CourseQuiz> quizzes;
         try {
           quizzes = _parseQuizzesJson(jsonString, moduleTitle, selectedTypes);
+          if (exactTypeCounts.isNotEmpty) {
+            if (quizzes.length != numQuizzes) {
+              throw FormatException(
+                'Expected $numQuizzes quiz(zes), but AI returned ${quizzes.length}.',
+              );
+            }
+            for (final quiz in quizzes) {
+              for (final entry in exactTypeCounts.entries) {
+                final actual = quiz.questions
+                    .where((question) => question.type == entry.key)
+                    .length;
+                if (actual != entry.value) {
+                  throw FormatException(
+                    'Expected ${entry.value} ${entry.key.label} item(s), but AI returned $actual.',
+                  );
+                }
+              }
+            }
+          }
         } catch (error) {
           final compactResponse = jsonString.replaceAll(RegExp(r'\s+'), ' ');
           final preview = compactResponse.length > 600
@@ -335,6 +365,9 @@ Each object in the array must match this structure exactly:
           explanation: rawQuestion['explanation'] as String? ?? '',
         );
       }).toList();
+      if (allowedTypes.length > 1) {
+        questions.sort((a, b) => a.type.index.compareTo(b.type.index));
+      }
 
       _log(
         'Parsed quiz "${quizData['title'] ?? defaultTitle}" with '
@@ -342,13 +375,10 @@ Each object in the array must match this structure exactly:
         '${questions.map((question) => question.type.storageValue).join(',')}',
       );
 
-      final generatedDirections = quizData['directions']?.toString().trim();
       return CourseQuiz(
         id: const Uuid().v4(),
         title: quizData['title'] as String? ?? 'Quiz: $defaultTitle',
-        directions: generatedDirections == null || generatedDirections.isEmpty
-            ? _defaultDirections(allowedTypes)
-            : generatedDirections,
+        directions: _defaultDirections(allowedTypes),
         questions: questions,
         createdAt: DateTime.now(),
       );
@@ -380,20 +410,17 @@ Each object in the array must match this structure exactly:
   }
 
   String _defaultDirections(Set<CourseQuestionType> types) {
-    if (types.length > 1) {
-      return 'Read each question carefully and follow the instructions for '
-          'each question type.';
+    final orderedTypes = CourseQuestionType.values
+        .where(types.contains)
+        .toList();
+    if (orderedTypes.length == 1) {
+      return orderedTypes.first.direction;
     }
-    return switch (types.first) {
-      CourseQuestionType.multipleChoice =>
-        'Choose the best answer for each question.',
-      CourseQuestionType.trueFalse =>
-        'Decide whether each statement is true or false.',
-      CourseQuestionType.identification =>
-        'Type the correct term or short answer for each question.',
-      CourseQuestionType.enumeration =>
-        'Provide every item requested by each question.',
-    };
+
+    return [
+      'This quiz contains multiple question types. Follow the appropriate direction for each item:',
+      ...orderedTypes.map((type) => '${type.label}: ${type.direction}'),
+    ].join('\n');
   }
 
   bool _isModelAvailabilityError(Object error) {

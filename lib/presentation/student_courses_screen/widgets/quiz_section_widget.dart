@@ -315,11 +315,10 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
       final requiredCount = question.type == CourseQuestionType.enumeration
           ? question.correctAnswers.length
           : 1;
-      return requiredCount > 0 &&
-          answers.length >= requiredCount &&
-          answers
-              .take(requiredCount)
-              .every((answer) => answer.trim().isNotEmpty);
+      final suppliedAnswers = question.type == CourseQuestionType.enumeration
+          ? _enumerationAnswerParts(answers)
+          : answers.where((answer) => answer.trim().isNotEmpty).toList();
+      return requiredCount > 0 && suppliedAnswers.length >= requiredCount;
     }).length;
   }
 
@@ -458,6 +457,11 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
 
   Widget _buildQuizView() {
     final quiz = _activeQuiz!;
+    final usesTypeDirections =
+        quiz.questions.map((question) => question.type).toSet().length > 1 &&
+        quiz.directions.startsWith(
+          'This quiz contains multiple question types.',
+        );
     return Column(
       children: [
         // Quiz header
@@ -533,7 +537,7 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
               ),
             ),
           ),
-        if (quiz.directions.trim().isNotEmpty)
+        if (quiz.directions.trim().isNotEmpty && !usesTypeDirections)
           _buildDirectionsPanel(quiz.directions),
         // Score result banner
         if (_quizSubmitted) _buildScoreBanner(quiz),
@@ -544,15 +548,28 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
             itemCount: quiz.questions.length,
             itemBuilder: (context, index) {
               final q = quiz.questions[index];
-              return _QuestionCard(
-                question: q,
-                questionNumber: index + 1,
-                selectedIndex: _selectedAnswers[q.id],
-                textAnswers: _textAnswers[q.id] ?? const <String>[],
-                isSubmitted: _quizSubmitted,
-                accentColor: _effectiveAccentColor,
-                onSelect: (i) => _selectAnswer(q.id, i),
-                onTextChanged: (i, value) => _updateTextAnswer(q.id, i, value),
+              final startsTypeGroup =
+                  index == 0 || quiz.questions[index - 1].type != q.type;
+              return Column(
+                children: [
+                  if (usesTypeDirections && startsTypeGroup)
+                    _buildDirectionsPanel(
+                      q.type.direction,
+                      title: '${q.type.label} Directions',
+                      margin: const EdgeInsets.only(bottom: 12),
+                    ),
+                  _QuestionCard(
+                    question: q,
+                    questionNumber: index + 1,
+                    selectedIndex: _selectedAnswers[q.id],
+                    textAnswers: _textAnswers[q.id] ?? const <String>[],
+                    isSubmitted: _quizSubmitted,
+                    accentColor: _effectiveAccentColor,
+                    onSelect: (i) => _selectAnswer(q.id, i),
+                    onTextChanged: (i, value) =>
+                        _updateTextAnswer(q.id, i, value),
+                  ),
+                ],
               );
             },
           ),
@@ -635,10 +652,14 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
     );
   }
 
-  Widget _buildDirectionsPanel(String directions) {
+  Widget _buildDirectionsPanel(
+    String directions, {
+    String title = 'Directions',
+    EdgeInsets margin = const EdgeInsets.fromLTRB(16, 12, 16, 0),
+  }) {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      margin: margin,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: _effectiveAccentColor.withAlpha(18),
@@ -649,7 +670,7 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Directions',
+            title,
             style: TextStyle(
               color: _effectiveAccentColor,
               fontSize: 12,
@@ -1319,7 +1340,23 @@ class _OptionTile extends StatelessWidget {
 }
 
 String _normalizeWrittenAnswer(String answer) {
-  return answer.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+  return answer
+      .trim()
+      .toLowerCase()
+      .replaceAll(RegExp(r"[’']s\b"), '')
+      .replaceAll(RegExp(r"[’']"), '')
+      .replaceAll(RegExp(r'[-–—_/]'), ' ')
+      .replaceAll(RegExp(r'''[,.;:!?"()[\]{}]'''), '')
+      .replaceAll(RegExp(r'\s+'), ' ')
+      .trim();
+}
+
+List<String> _enumerationAnswerParts(List<String> answers) {
+  return answers
+      .expand((answer) => answer.split(RegExp(r'[,;\n]+')))
+      .map((answer) => answer.trim())
+      .where((answer) => answer.isNotEmpty)
+      .toList();
 }
 
 bool _writtenAnswerIsCorrect(
@@ -1330,7 +1367,10 @@ bool _writtenAnswerIsCorrect(
       .map(_normalizeWrittenAnswer)
       .where((answer) => answer.isNotEmpty)
       .toList();
-  final actual = studentAnswers
+  final answerParts = question.type == CourseQuestionType.enumeration
+      ? _enumerationAnswerParts(studentAnswers)
+      : studentAnswers;
+  final actual = answerParts
       .map(_normalizeWrittenAnswer)
       .where((answer) => answer.isNotEmpty)
       .toList();
