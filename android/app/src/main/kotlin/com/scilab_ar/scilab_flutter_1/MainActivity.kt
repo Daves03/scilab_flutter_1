@@ -1,5 +1,5 @@
 package com.scilab_ar.scilab_flutter_1
 
-import io.flutter.embedding.android.FlutterActivity
+import com.learntoflutter.flutter_embed_unity_android.unity.FakeUnityPlayerActivity
 
-class MainActivity : FlutterActivity()
+class MainActivity : FakeUnityPlayerActivity()

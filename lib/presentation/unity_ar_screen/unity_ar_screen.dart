@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +17,7 @@ import '../../data/experiment_assessment_data.dart';
 import '../../data/periodic_table_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'widgets/flame_solution_dialog.dart';
+import 'widgets/collapsible_steps_panel.dart';
 import 'widgets/ppe_selection_dialog.dart';
 
 class UnityArScreen extends StatefulWidget {
@@ -29,6 +32,14 @@ class _UnityArScreenState extends State<UnityArScreen>
     with TickerProviderStateMixin {
   bool _isExperimentActive = false;
   bool _isLoading = false;
+  // Unity remains in memory when an AR route is closed. A later route must
+  // reuse its readiness rather than wait for the bootstrap scene to load again.
+  static bool _unityRuntimeReady = false;
+  final Completer<void> _unityReady = Completer<void>();
+  bool _sceneLoadRequested = false;
+  Timer? _startupTimeout;
+  Timer? _sceneReadyTimer;
+  String? _arStartupError;
   String? _activeExperimentId;
   final ActivityService _activityService = ActivityService();
   ActivitySyncStatus? _completionSyncStatus;
@@ -65,6 +76,12 @@ class _UnityArScreenState extends State<UnityArScreen>
   }
 
   void _onFlameSolutionSelected(FlameChemical chem) {
+    // A selection sent before scene_ready can reach the previous scene or be
+    // hidden again by FlameTestController.Start when the new scene initializes.
+    if (!mounted || !_isExperimentActive || _isLoading || !_isFlameTest) {
+      return;
+    }
+
     setState(() {
       _selectedFlameChemicalIndex = chem.index;
       _showFlameSolutionPicker = false;
@@ -73,6 +90,10 @@ class _UnityArScreenState extends State<UnityArScreen>
     // Send one canonical selection. Sending both the index and name to both
     // receivers made Unity hide/reset every bottle four times, which could
     // leave a model invisible while the embedded Unity view was resuming.
+    debugPrint(
+      'Flame selection: ${chem.elementName}, index=${chem.index}, '
+      'receiver=FlutterReceiver.SelectFlameChemical',
+    );
     sendToUnity(
       'FlutterReceiver',
       'SelectFlameChemical',
@@ -251,10 +272,41 @@ class _UnityArScreenState extends State<UnityArScreen>
   void dispose() {
     _isExperimentActive = false;
     _isWarningDialogShowing = false;
+    _cancelUnityStartup();
     _guideAnimationController.dispose();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
+  }
+
+  void _cancelUnityStartup() {
+    _startupTimeout?.cancel();
+    _sceneReadyTimer?.cancel();
+    if (!_unityReady.isCompleted) _unityReady.complete();
+  }
+
+  void _failUnityStartup(String message) {
+    if (!mounted || !_isExperimentActive || !_isLoading) return;
+    _cancelUnityStartup();
+    debugPrint('AR startup failed: $message');
+    setState(() => _arStartupError = message);
+  }
+
+  Future<void> _loadUnityExperiment(String sceneId) async {
+    // On a cold launch, FlutterReceiver does not exist until the bootstrap
+    // scene reports scene_ready. Sending LoadExperiment earlier loses it.
+    if (!_unityRuntimeReady) await _unityReady.future;
+    if (!mounted || !_isExperimentActive || _arStartupError != null) return;
+
+    // Let the native view attach/resume and drain bootstrap notifications
+    // before accepting a readiness notification for the requested experiment.
+    await WidgetsBinding.instance.endOfFrame;
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    if (!mounted || !_isExperimentActive || _arStartupError != null) return;
+
+    _sceneLoadRequested = true;
+    debugPrint('AR startup: loading Unity experiment $sceneId');
+    sendToUnity('FlutterReceiver', 'LoadExperiment', sceneId);
   }
 
   Future<void> _launchExperiment(String experimentId) async {
@@ -316,15 +368,18 @@ class _UnityArScreenState extends State<UnityArScreen>
     }
 
     if (status.isGranted) {
-      SystemChrome.setPreferredOrientations([
+      await SystemChrome.setPreferredOrientations([
         DeviceOrientation.landscapeLeft,
         DeviceOrientation.landscapeRight,
       ]);
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+      await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+      if (!mounted) return;
 
       setState(() {
         _isExperimentActive = true;
         _isLoading = true;
+        _arStartupError = null;
+        _sceneLoadRequested = false;
         _activeExperimentId = experimentId;
         _currentStepIndex = 0; // Reset steps on launch
         _hasCompleted = false;
@@ -346,12 +401,29 @@ class _UnityArScreenState extends State<UnityArScreen>
             (experimentId == '4' || experimentId == 'ar4');
       });
 
+      _startupTimeout = Timer(const Duration(seconds: 45), () {
+        _failUnityStartup(
+          'The AR scene could not start. Go back and open the experiment '
+          'again. If this continues, close and reopen the app.',
+        );
+      });
+
+      // Offline or slow Firestore must not prevent an AR scene from opening.
+      _currentSteps = dummyArExperiments
+          .firstWhere(
+            (experiment) =>
+                experiment.id.replaceAll(RegExp(r'[^0-9]'), '') == normalizedId,
+            orElse: () => dummyArExperiments.first,
+          )
+          .steps;
+
       // Fetch dynamic steps from Firestore
       try {
         final docSnapshot = await FirebaseFirestore.instance
             .collection('ar_experiments')
             .doc(experimentId)
-            .get();
+            .get()
+            .timeout(const Duration(seconds: 10));
         if (docSnapshot.exists) {
           final experimentModel = ArExperimentModel.fromMap(
             docSnapshot.id,
@@ -376,6 +448,7 @@ class _UnityArScreenState extends State<UnityArScreen>
       } catch (e) {
         debugPrint('Error fetching experiment steps: $e');
       }
+      if (!mounted || !_isExperimentActive || _arStartupError != null) return;
 
       // Ensure Flame Test always runs with the 3-step sequence
       if (_isFlameTest) {
@@ -413,10 +486,9 @@ class _UnityArScreenState extends State<UnityArScreen>
         ];
       }
 
-      // Tell Unity to load the experiment / scene
-      sendToUnity('FlutterReceiver', 'LoadExperiment', normalizedId);
+      await _loadUnityExperiment(normalizedId);
 
-      if (!mounted) return;
+      if (!mounted || !_isExperimentActive || _arStartupError != null) return;
       final uid = context.read<AuthService>().currentUser?.id;
       if (uid != null) {
         _activityService.logExperimentLaunch(uid, experimentId);
@@ -432,12 +504,14 @@ class _UnityArScreenState extends State<UnityArScreen>
           content: Text('Camera access is required to run AR experiments.'),
         ),
       );
+      Navigator.of(context).pop();
     }
   }
 
   void _closeUnityAndReturnToMenu() {
     if (!mounted) return;
     _isExperimentActive = false;
+    _cancelUnityStartup();
     if (_isWarningDialogShowing) {
       Navigator.of(context, rootNavigator: true).pop();
       _isWarningDialogShowing = false;
@@ -502,7 +576,9 @@ class _UnityArScreenState extends State<UnityArScreen>
     debugPrint('Received from Unity: "$trimmedMessage"');
 
     if (trimmedMessage == 'show_menu' || trimmedMessage == 'EXPERIMENT_EXIT') {
-      if (mounted) {
+      // A cold Unity launch can enter its menu before Flutter requests the
+      // experiment. That bootstrap notification is not a user exit.
+      if (mounted && _isExperimentActive && _sceneLoadRequested) {
         _closeUnityAndReturnToMenu();
       }
       return;
@@ -511,8 +587,21 @@ class _UnityArScreenState extends State<UnityArScreen>
     if (!mounted || !_isExperimentActive) return;
 
     if (trimmedMessage == 'scene_ready') {
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
+      _unityRuntimeReady = true;
+      if (!_unityReady.isCompleted) _unityReady.complete();
+      // Bootstrap readiness only unlocks LoadExperiment. It must not reveal
+      // controls or the flame picker before the experiment itself has loaded.
+      if (!_sceneLoadRequested || !_isLoading || _arStartupError != null) {
+        return;
+      }
+      final readyExperimentId = _activeExperimentId;
+      _sceneReadyTimer?.cancel();
+      _sceneReadyTimer = Timer(const Duration(milliseconds: 500), () {
+        if (mounted &&
+            _isExperimentActive &&
+            _arStartupError == null &&
+            _activeExperimentId == readyExperimentId) {
+          _startupTimeout?.cancel();
           setState(() {
             _isLoading = false;
             _showGuide =
@@ -524,6 +613,7 @@ class _UnityArScreenState extends State<UnityArScreen>
           _notifyUnityActiveStep(); // Send first step as soon as scene is ready
         }
       });
+      return;
     }
 
     if (trimmedMessage == 'DROP_BUTTON_READY:DropperDrop') {
@@ -1918,10 +2008,10 @@ class _UnityArScreenState extends State<UnityArScreen>
       child: Scaffold(
         body: Stack(
           children: [
-            Offstage(
-              offstage: !_isExperimentActive,
-              child: EmbedUnity(onMessageFromUnity: _handleMessageFromUnity),
-            ),
+            // Offstage still creates its child. Mount Unity only after camera
+            // permission and landscape setup have completed.
+            if (_isExperimentActive)
+              EmbedUnity(onMessageFromUnity: _handleMessageFromUnity),
 
             // --- UI OVERLAY FOR INSTRUCTIONS AND CONTROLS WHEN EXPERIMENT IS ACTIVE ---
             if (_isExperimentActive &&
@@ -1984,98 +2074,101 @@ class _UnityArScreenState extends State<UnityArScreen>
                     alignment: Alignment.topRight,
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: Container(
-                        constraints: const BoxConstraints(maxWidth: 280),
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color: const Color(
-                            0xFF0A1628,
-                          ).withValues(alpha: 0.85),
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(
+                      child: CollapsibleStepsPanel(
+                        child: Container(
+                          constraints: const BoxConstraints(maxWidth: 280),
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
                             color: const Color(
-                              0xFF00D4FF,
-                            ).withValues(alpha: 0.3),
-                            width: 1.5,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.4),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
+                              0xFF0A1628,
+                            ).withValues(alpha: 0.85),
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(
+                              color: const Color(
+                                0xFF00D4FF,
+                              ).withValues(alpha: 0.3),
+                              width: 1.5,
                             ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  _activeExplanation != null
-                                      ? "SCIENTIFIC ANALYSIS"
-                                      : "PROGRESS",
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w800,
-                                    color: _activeExplanation != null
-                                        ? const Color(0xFF00D4FF)
-                                        : const Color(0xFF8BA3C0),
-                                    letterSpacing: 1.2,
-                                  ),
-                                ),
-                                if (_activeExplanation == null)
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 2,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.4),
+                                blurRadius: 20,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    _activeExplanation != null
+                                        ? "SCIENTIFIC ANALYSIS"
+                                        : "PROGRESS",
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w800,
+                                      color: _activeExplanation != null
+                                          ? const Color(0xFF00D4FF)
+                                          : const Color(0xFF8BA3C0),
+                                      letterSpacing: 1.2,
                                     ),
-                                    decoration: BoxDecoration(
-                                      color: const Color(
-                                        0xFF00D4FF,
-                                      ).withValues(alpha: 0.1),
-                                      borderRadius: BorderRadius.circular(50),
-                                      border: Border.all(
+                                  ),
+                                  if (_activeExplanation == null)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
                                         color: const Color(
                                           0xFF00D4FF,
-                                        ).withValues(alpha: 0.4),
+                                        ).withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(50),
+                                        border: Border.all(
+                                          color: const Color(
+                                            0xFF00D4FF,
+                                          ).withValues(alpha: 0.4),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        "${_currentStepIndex + 1}/${_currentSteps.length}",
+                                        style: const TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF00D4FF),
+                                        ),
                                       ),
                                     ),
-                                    child: Text(
-                                      "${_currentStepIndex + 1}/${_currentSteps.length}",
-                                      style: const TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF00D4FF),
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              _activeExplanation != null
-                                  ? "Reaction Result"
-                                  : currentStepData.instructionTitle,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
+                                ],
                               ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              _activeExplanation ??
-                                  currentStepData.instructionDetail,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF8BA3C0),
-                                height: 1.4,
+                              const SizedBox(height: 12),
+                              Text(
+                                _activeExplanation != null
+                                    ? "Reaction Result"
+                                    : currentStepData.instructionTitle,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 6),
+                              Text(
+                                _activeExplanation ??
+                                    currentStepData.instructionDetail,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFF8BA3C0),
+                                  height: 1.4,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -2141,13 +2234,28 @@ class _UnityArScreenState extends State<UnityArScreen>
             if (_isLoading)
               Container(
                 color: theme.colorScheme.surface,
-                child: const Center(
+                child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CircularProgressIndicator(),
-                      SizedBox(height: 24),
-                      Text('Preparing Chemistry Lab...'),
+                      if (_arStartupError == null)
+                        const CircularProgressIndicator()
+                      else
+                        const Icon(Icons.error_outline, size: 40),
+                      const SizedBox(height: 24),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: Text(
+                          _arStartupError ?? 'Preparing Chemistry Lab...',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextButton.icon(
+                        onPressed: _closeUnityAndReturnToMenu,
+                        icon: const Icon(Icons.arrow_back),
+                        label: const Text('Back to experiments'),
+                      ),
                     ],
                   ),
                 ),
@@ -2156,7 +2264,10 @@ class _UnityArScreenState extends State<UnityArScreen>
             if (_showGuide && !_isPeriodicTable) _buildGuideOverlay(theme),
 
             // FULL-SCREEN FLAME SOLUTION PICKER OVERLAY (REPLACES UNITY CANVAS)
-            if (_isFlameTest && _showFlameSolutionPicker)
+            if (_isExperimentActive &&
+                !_isLoading &&
+                _isFlameTest &&
+                _showFlameSolutionPicker)
               Positioned.fill(
                 child: FlameSolutionPickerView(
                   selectedIndex: _selectedFlameChemicalIndex,
