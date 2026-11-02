@@ -49,17 +49,30 @@ export default function Layout() {
     <div className="app-container">
       {/* Mobile Header (Only visible on small screens) */}
       <div className="mobile-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="mobile-menu-btn"
+          aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+        >
+          {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+        </button>
+        <div className="mobile-header-brand" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <img src="/favicon.png" alt="Scilab Logo" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
           <h3 style={{ fontSize: '1.2rem', margin: 0, fontWeight: 700 }}>Scilab Admin</h3>
         </div>
-        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="mobile-menu-btn">
-          {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
       </div>
 
       <aside className={`sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '48px', padding: '0 8px' }}>
+        <button
+          type="button"
+          className="sidebar-close-btn"
+          onClick={closeMenu}
+          aria-label="Close navigation menu"
+          title="Close navigation menu"
+        >
+          <X size={24} />
+        </button>
+        <div className="sidebar-brand" style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '48px', padding: '0 8px' }}>
           <img src="/favicon.png" alt="Scilab Logo" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
           <div>
             <h3 style={{ fontSize: '1.2rem', margin: 0 }}>Scilab Admin</h3>

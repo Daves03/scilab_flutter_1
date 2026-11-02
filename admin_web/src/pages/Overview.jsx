@@ -142,7 +142,7 @@ export default function Overview() {
           <h1 className="overview-title">
             Dashboard Overview
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>Welcome back, Admin. Here is what's happening today in your LMS.</p>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>Welcome, Admin. Here is what's happening today in SciLab AR.</p>
         </div>
 
         {/* Date, Time & Calendar Widget */}
@@ -699,7 +699,7 @@ function StatCard({ title, value, icon, trend, alert, onClick, color, small }) {
         }
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: small ? '12px' : '20px' }}>
+      <div className={`stat-card-header ${alert ? 'has-alert' : ''}`} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: small ? '12px' : '20px' }}>
         <div className="icon-wrapper" style={{ 
           background: `linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02))`, 
           padding: small ? '10px' : '14px', 
@@ -710,8 +710,8 @@ function StatCard({ title, value, icon, trend, alert, onClick, color, small }) {
         </div>
         
         {alert && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(251, 191, 36, 0.1)', padding: '4px 10px', borderRadius: '20px', border: '1px solid rgba(251, 191, 36, 0.2)' }}>
-            <span style={{ fontSize: '0.75rem', color: color, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Action Needed</span>
+          <div className="stat-alert-badge" style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(251, 191, 36, 0.1)', padding: '4px 10px', borderRadius: '20px', border: '1px solid rgba(251, 191, 36, 0.2)' }}>
+            <span className="stat-alert-label" style={{ fontSize: '0.75rem', color: color, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Action Needed</span>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: color, boxShadow: `0 0 8px ${color}` }} className="animate-pulse"></span>
           </div>
         )}
