@@ -47,6 +47,7 @@ app.*.map.json
 
 # Unity large files
 android/unityLibrary*/build/
+android/unityLibrary*/src/main/assets/bin.zip
 android/unityLibrary*/src/main/assets/bin/Data/
 *.unity3d
 *.dbg.so
