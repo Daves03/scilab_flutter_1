@@ -233,6 +233,7 @@ function AiQuizModal({ course, quizzes, modules, onClose, onGenerated }) {
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
   const abortRef = useRef(null);
+  useEffect(() => () => abortRef.current?.abort(), []);
   const totalQuestions = Object.values(questionCounts).reduce((total, count) => total + Number(count || 0), 0);
 
   const toggleType = (type) => setQuestionCounts((current) => {
@@ -263,8 +264,8 @@ function AiQuizModal({ course, quizzes, modules, onClose, onGenerated }) {
     const controller = new AbortController();
     abortRef.current = controller;
     try {
-      setStatus('Gemini is reading the module and generating questions...');
-      const generated = await generateQuizFromModule({ module: selectedModule, questionCounts, signal: controller.signal });
+      const generated = await generateQuizFromModule({ module: selectedModule, questionCounts, signal: controller.signal, onProgress: setStatus });
+      controller.signal.throwIfAborted();
       setStatus('Saving the generated quiz...');
       const savedQuiz = { ...generated, id: `ai-quiz-${Date.now()}`, createdAt: Timestamp.now(), dueDate: null };
       await updateDoc(doc(db, 'courses', course.id), { quizzes: [savedQuiz, ...quizzes] });

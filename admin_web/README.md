@@ -1,16 +1,28 @@
-# React + Vite
+# SciLab admin web
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+From `admin_web`, run:
 
-Currently, two official plugins are available:
+```sh
+npm install
+npm run dev
+npm run build
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The production output is written to `dist`.
 
-## React Compiler
+## Gemini quiz generation
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Development and production builds load `GEMINI_API_KEY` and optional
+`GEMINI_MODEL` from the repository root's ignored `.gemini.local.json`, shared
+with the Flutter app. The build exposes these as `VITE_GEMINI_API_KEY` and
+`VITE_GEMINI_MODEL` for the web quiz generator.
 
-## Expanding the Oxlint configuration
+To override either value, set the corresponding `VITE_` environment variable
+when building, or copy `.env.example` to `.env.local` and supply your values.
+On build servers without `.gemini.local.json`, configure `VITE_GEMINI_API_KEY`
+in the build environment. `VITE_GEMINI_MODEL` is optional; when omitted, the
+portal discovers available models.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+Restart the development server or rebuild and redeploy `dist` after changing
+the configuration. These values are embedded in the browser bundle; restrict
+the API key to your hosting domains and the Generative Language API.
