@@ -10,6 +10,9 @@ class ExperimentQuestion {
   final int correctOption;
 }
 
+const int minimumExperimentQuestions = 5;
+const int maximumExperimentQuestions = 10;
+
 const Map<String, List<ExperimentQuestion>> experimentQuestions = {
   '1': [
     ExperimentQuestion(
@@ -22,6 +25,31 @@ const Map<String, List<ExperimentQuestion>> experimentQuestions = {
       options: ['Indicator', 'Catalyst', 'Acid', 'Product'],
       correctOption: 1,
     ),
+    ExperimentQuestion(
+      prompt: 'What gas is released when hydrogen peroxide decomposes?',
+      options: ['Oxygen', 'Chlorine', 'Nitrogen', 'Methane'],
+      correctOption: 0,
+    ),
+    ExperimentQuestion(
+      prompt: 'Why is the foam warm after the reaction?',
+      options: [
+        'The reaction releases heat',
+        'The yeast freezes',
+        'The soap absorbs light',
+        'Oxygen has no temperature',
+      ],
+      correctOption: 0,
+    ),
+    ExperimentQuestion(
+      prompt: 'What is the purpose of dish soap in elephant toothpaste?',
+      options: [
+        'It traps oxygen in bubbles',
+        'It stops decomposition',
+        'It produces hydrogen peroxide',
+        'It cools the catalyst',
+      ],
+      correctOption: 0,
+    ),
   ],
   '2': [
     ExperimentQuestion(
@@ -32,6 +60,31 @@ const Map<String, List<ExperimentQuestion>> experimentQuestions = {
     ExperimentQuestion(
       prompt: 'Which reagent produces the precipitate in this test?',
       options: ['Silver nitrate', 'Vinegar', 'Limewater', 'Indicator'],
+      correctOption: 0,
+    ),
+    ExperimentQuestion(
+      prompt: 'What is the white precipitate formed in the chloride test?',
+      options: [
+        'Silver chloride',
+        'Sodium chloride',
+        'Calcium carbonate',
+        'Copper sulfate',
+      ],
+      correctOption: 0,
+    ),
+    ExperimentQuestion(
+      prompt: 'Why should a clean dropper be used for silver nitrate?',
+      options: [
+        'To prevent contamination',
+        'To increase temperature',
+        'To change the solution color',
+        'To remove chloride ions',
+      ],
+      correctOption: 0,
+    ),
+    ExperimentQuestion(
+      prompt: 'The formation of a solid from two solutions is called what?',
+      options: ['Precipitation', 'Evaporation', 'Combustion', 'Melting'],
       correctOption: 0,
     ),
   ],
@@ -51,6 +104,31 @@ const Map<String, List<ExperimentQuestion>> experimentQuestions = {
       ],
       correctOption: 1,
     ),
+    ExperimentQuestion(
+      prompt: 'What substance causes limewater to appear milky?',
+      options: [
+        'Calcium carbonate',
+        'Sodium chloride',
+        'Copper metal',
+        'Hydrogen peroxide',
+      ],
+      correctOption: 0,
+    ),
+    ExperimentQuestion(
+      prompt: 'How should the test gas be introduced into limewater?',
+      options: [
+        'Bubble it through the solution',
+        'Freeze the solution',
+        'Pour out the limewater',
+        'Heat the container strongly',
+      ],
+      correctOption: 0,
+    ),
+    ExperimentQuestion(
+      prompt: 'A milky limewater result indicates which gas?',
+      options: ['Carbon dioxide', 'Oxygen', 'Hydrogen', 'Nitrogen'],
+      correctOption: 0,
+    ),
   ],
   '4': [
     ExperimentQuestion(
@@ -66,6 +144,36 @@ const Map<String, List<ExperimentQuestion>> experimentQuestions = {
     ExperimentQuestion(
       prompt: 'Which observation is used to identify the metal ion?',
       options: ['Flame color', 'Solution mass', 'Bubble size', 'Wire length'],
+      correctOption: 0,
+    ),
+    ExperimentQuestion(
+      prompt: 'Why should the test wire be cleaned between samples?',
+      options: [
+        'To prevent color contamination',
+        'To make the flame colder',
+        'To increase the wire mass',
+        'To produce oxygen',
+      ],
+      correctOption: 0,
+    ),
+    ExperimentQuestion(
+      prompt: 'What happens before excited electrons produce colored light?',
+      options: [
+        'They return to lower energy levels',
+        'They become protons',
+        'They leave the atom permanently',
+        'They stop moving completely',
+      ],
+      correctOption: 0,
+    ),
+    ExperimentQuestion(
+      prompt: 'Which flame-test result is most useful for identification?',
+      options: [
+        'A characteristic flame color',
+        'The container shape',
+        'The sample volume only',
+        'The room temperature',
+      ],
       correctOption: 0,
     ),
   ],
@@ -87,6 +195,31 @@ const Map<String, List<ExperimentQuestion>> experimentQuestions = {
         'The water freezes',
         'The beaker moves',
         'The salt disappears',
+      ],
+      correctOption: 0,
+    ),
+    ExperimentQuestion(
+      prompt: 'What particles carry charge through a salt solution?',
+      options: ['Ions', 'Neutral atoms only', 'Bubbles', 'Sugar crystals'],
+      correctOption: 0,
+    ),
+    ExperimentQuestion(
+      prompt: 'Why does solid salt conduct poorly compared with salt solution?',
+      options: [
+        'Its ions cannot move freely',
+        'It has no charged particles',
+        'It contains no atoms',
+        'It is always too cold',
+      ],
+      correctOption: 0,
+    ),
+    ExperimentQuestion(
+      prompt: 'What should be checked if the bulb does not light?',
+      options: [
+        'Circuit connections and electrode contact',
+        'The beaker color only',
+        'The table height',
+        'The label font',
       ],
       correctOption: 0,
     ),
@@ -112,6 +245,31 @@ const Map<String, List<ExperimentQuestion>> experimentQuestions = {
       ],
       correctOption: 1,
     ),
+    ExperimentQuestion(
+      prompt: 'What gas inflates the balloon in the reaction?',
+      options: ['Carbon dioxide', 'Oxygen', 'Hydrogen', 'Chlorine'],
+      correctOption: 0,
+    ),
+    ExperimentQuestion(
+      prompt: 'Why must the system remain closed during the experiment?',
+      options: [
+        'To prevent matter from escaping',
+        'To make matter disappear',
+        'To remove the gas mass',
+        'To increase gravity',
+      ],
+      correctOption: 0,
+    ),
+    ExperimentQuestion(
+      prompt: 'Which law is demonstrated by the unchanged total mass?',
+      options: [
+        'Law of conservation of mass',
+        "Ohm's law",
+        'Law of reflection',
+        "Boyle's law only",
+      ],
+      correctOption: 0,
+    ),
   ],
   '7': [
     ExperimentQuestion(
@@ -128,6 +286,26 @@ const Map<String, List<ExperimentQuestion>> experimentQuestions = {
       prompt: 'A neutral solution is closest to which pH?',
       options: ['0', '3', '7', '14'],
       correctOption: 2,
+    ),
+    ExperimentQuestion(
+      prompt: 'A solution with a pH below 7 is generally what?',
+      options: ['Acidic', 'Alkaline', 'Neutral', 'Metallic'],
+      correctOption: 0,
+    ),
+    ExperimentQuestion(
+      prompt: 'A solution with a pH above 7 is generally what?',
+      options: ['Alkaline', 'Acidic', 'Neutral', 'Radioactive'],
+      correctOption: 0,
+    ),
+    ExperimentQuestion(
+      prompt: 'Why is the indicator color compared with a color scale?',
+      options: [
+        'To estimate the pH',
+        'To measure mass',
+        'To identify voltage',
+        'To count atoms',
+      ],
+      correctOption: 0,
     ),
   ],
   '8': [
@@ -146,10 +324,37 @@ const Map<String, List<ExperimentQuestion>> experimentQuestions = {
       options: ['Chemical symbol', 'pH value', 'Voltage', 'Temperature'],
       correctOption: 0,
     ),
+    ExperimentQuestion(
+      prompt: 'Elements in the same vertical column belong to the same what?',
+      options: ['Group', 'Period only', 'Isotope', 'Compound'],
+      correctOption: 0,
+    ),
+    ExperimentQuestion(
+      prompt: 'What generally increases by one from one element to the next?',
+      options: [
+        'Atomic number',
+        'Number of compounds',
+        'Room temperature',
+        'pH value',
+      ],
+      correctOption: 0,
+    ),
+    ExperimentQuestion(
+      prompt: 'Which information is commonly shown in an element tile?',
+      options: [
+        'Atomic number and chemical symbol',
+        'Circuit voltage only',
+        'Solution pH only',
+        'Reaction time only',
+      ],
+      correctOption: 0,
+    ),
   ],
 };
 
 List<ExperimentQuestion> questionsForExperiment(String experimentId) {
   final id = experimentId.replaceAll(RegExp(r'[^0-9]'), '');
-  return experimentQuestions[id] ?? const [];
+  return (experimentQuestions[id] ?? const <ExperimentQuestion>[])
+      .take(maximumExperimentQuestions)
+      .toList(growable: false);
 }

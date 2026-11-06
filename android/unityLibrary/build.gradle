@@ -122,6 +122,7 @@ def buildIl2CppImpl(String workingDir, String configuration, String architecture
     commandLineArgs.add("--architecture=${architecture}")
     commandLineArgs.add("--outputpath=${workingDir}/src/main/jniLibs/${abi}/libil2cpp.so")
     commandLineArgs.add("--baselib-directory=${workingDir}/src/main/jniStaticLibs/${abi}")
+    commandLineArgs.add("--incremental-g-c-time-slice=3")
     commandLineArgs.add("--configuration=${configuration}")
     commandLineArgs.add("--dotnetprofile=unityaot-linux")
     commandLineArgs.add("--usymtool-path=${workingDir}/src/main/Il2CppOutputProject/usymtool.exe")

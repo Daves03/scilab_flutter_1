@@ -20,20 +20,24 @@ class _PpeSelectionDialogState extends State<PpeSelectionDialog> {
   final Set<String> _selected = {};
   Set<String> _missing = {};
   Set<String> _unnecessary = {};
+  Set<String>? _firstAttemptMissing;
+  Set<String>? _firstAttemptUnnecessary;
   int? _firstAttemptScore;
 
   void _submit() {
     final missing = widget.requiredPpe.difference(_selected);
     final unnecessaryItems = _selected.difference(widget.requiredPpe);
     final unnecessary = unnecessaryItems.length;
+    _firstAttemptMissing ??= Set<String>.unmodifiable(missing);
+    _firstAttemptUnnecessary ??= Set<String>.unmodifiable(unnecessaryItems);
     _firstAttemptScore ??= widget.requiredPpe.isEmpty
-        ? 15
+        ? 25
         : (((_selected.intersection(widget.requiredPpe).length /
                               widget.requiredPpe.length) *
-                          15)
+                          25)
                       .round() -
                   unnecessary)
-              .clamp(0, 15)
+              .clamp(0, 25)
               .toInt();
 
     if (missing.isNotEmpty || unnecessaryItems.isNotEmpty) {
@@ -49,6 +53,8 @@ class _PpeSelectionDialogState extends State<PpeSelectionDialog> {
         selected: Set.unmodifiable(_selected),
         required: Set.unmodifiable(widget.requiredPpe),
         score: _firstAttemptScore!,
+        firstAttemptMissing: _firstAttemptMissing ?? const <String>{},
+        firstAttemptUnnecessary: _firstAttemptUnnecessary ?? const <String>{},
       ),
     );
   }

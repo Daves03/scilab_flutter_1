@@ -78,6 +78,7 @@ extern void FlutterBridge_OnSceneLoaded_mFE181A8C708192970A52CA828B114EAA7A42146
 extern void FlutterBridge_ResetExperiment_mC8A4FC667F051E4C7735C6462C0A154CB7BA5466 (void);
 extern void FlutterBridge_SetActiveStep_m476C78EA2752C1EB078CEAB3950B5A76EF4DAC05 (void);
 extern void FlutterBridge_DispatchActiveStep_m925158300156AD92920F574F8B2DD510A9180B81 (void);
+extern void FlutterBridge_SetBurnerState_mF7FA28E02B5B03B3FE7D86A625861E4C257A9B9B (void);
 extern void FlutterBridge_SelectFlameChemical_mDDA8DE59631251F8E1CBC61394F29346B89874D5 (void);
 extern void FlutterBridge_OnWarningDismissed_m838E1D7F11001890E45331619567ECECB98CC6D1 (void);
 extern void FlutterBridge__ctor_m8C7C130B9FDDA38785839365E9EC76BFDF6CA44B (void);
@@ -172,14 +173,17 @@ extern void U3CPourSequenceU3Ed__10_MoveNext_mF3CB4D2F270CA9C2EE8D078746D225FDFB
 extern void U3CPourSequenceU3Ed__10_System_Collections_Generic_IEnumeratorU3CSystem_ObjectU3E_get_Current_mCF31F33F50D5B4599FDB27FD33B187F53FDB73E1 (void);
 extern void U3CPourSequenceU3Ed__10_System_Collections_IEnumerator_Reset_mFC4594DB91C05EC22E270F78814E1EB1B63FD555 (void);
 extern void U3CPourSequenceU3Ed__10_System_Collections_IEnumerator_get_Current_mC97BA6FAAD6599D478F72F72CE7836371B6604A9 (void);
-extern void ArrowControllerExp3_Update_mE5892FDAD660D48821FE4E85BE9CEB8F4E8B755B (void);
+extern void ArrowControllerExp3_Awake_m3AEFF742B312B468A005A8CE4E19A6A612022A8C (void);
+extern void ArrowControllerExp3_SetActiveStepStatus_m0B3E0C901BCADDF12F5E262B0A9E68A17E040028 (void);
 extern void ArrowControllerExp3_UpdateArrowVisibility_mCB5F772F6C11EB5E08A5FC5365239AD41583DEFD (void);
 extern void ArrowControllerExp3__ctor_m61153E2DF109C0EDD2768A74E345DCFA2BCD0904 (void);
+extern void BunsenBurnerSwitch_get_IsBurning_m758986B3B04CFAB47C62CC225BFBDF8B19FE1FA7 (void);
 extern void BunsenBurnerSwitch_Start_m9CFC9088106C4CC822EBC20A824C04D4D9762B4D (void);
 extern void BunsenBurnerSwitch_SetActiveStepStatus_m0AE73B8B48F4F6E8C90A31149DD6054557345B3A (void);
 extern void BunsenBurnerSwitch_Update_m3CC6C338974A49867328EEBDE6C552BD972F1AB6 (void);
 extern void BunsenBurnerSwitch_ShowButton_m0FF5C8CE47D2D98935548C4C31841CD48B9917DD (void);
 extern void BunsenBurnerSwitch_ToggleFire_m0779B2B0B181697DC42101B515400A9E2EE20BD2 (void);
+extern void BunsenBurnerSwitch_SetBurnerState_m3627680C987FF247EF399E2400A31E985AFEDCE1 (void);
 extern void BunsenBurnerSwitch_TurnOn_mD923F628693F37C0A25E800A6D9474762A3A3434 (void);
 extern void BunsenBurnerSwitch_TurnOff_mBC34FB09B6145B0AEFA269F9AE44869D22B5B965 (void);
 extern void BunsenBurnerSwitch__ctor_m74F105F5154411AA4CD5A3DB3EF7DF768D4670D7 (void);
@@ -257,7 +261,8 @@ extern void U3CPourAndActivateU3Ed__28_MoveNext_m970C410B5C7103464542A178E1A6FE4
 extern void U3CPourAndActivateU3Ed__28_System_Collections_Generic_IEnumeratorU3CSystem_ObjectU3E_get_Current_m261F258FCCC834C798BDB6340EDF929302A1DE29 (void);
 extern void U3CPourAndActivateU3Ed__28_System_Collections_IEnumerator_Reset_mBA7F19513D1D140E0396660EA6B79DA5DFDF4648 (void);
 extern void U3CPourAndActivateU3Ed__28_System_Collections_IEnumerator_get_Current_m2537CC583ABC4ADDE873D4F1CDF0E34248F968A1 (void);
-extern void ArrowController_Update_mB808269BD56B06975A3729674F769683BCCEDAB6 (void);
+extern void ArrowController_Awake_mFC50EE4268C356D6F64003E60732E8844B40D0E8 (void);
+extern void ArrowController_SetActiveStepStatus_m7597F800A65D78E2D0017A210529681633ABBD33 (void);
 extern void ArrowController_UpdateArrowVisibility_m20C3BB46242CF74ADF1B0768729DD5AE7820CED1 (void);
 extern void ArrowController__ctor_m5363B3666D1BBC8ACB329EE770C93ED8D030DD98 (void);
 extern void FlaskScaleTrigger_Awake_mC25D881DDE3F7385FFCB33C479886BC7BEC5B3A0 (void);
@@ -661,7 +666,7 @@ extern void SafeArea_Refresh_m2EB186CFFCAB2AB7E5B57A46A2A57D14493FD8EA (void);
 extern void SafeArea_GetSafeArea_m4B6B53C8ED0A4B2F5DBC404E2F208E6A71411815 (void);
 extern void SafeArea_ApplySafeArea_m19691250ABEE5AFFA7F793548BCCE402CCF38548 (void);
 extern void SafeArea__ctor_mC10940463499A1652DEC94CACFCB811ADA5CD6FF (void);
-static Il2CppMethodPointer s_methodPointers[670] = 
+static Il2CppMethodPointer s_methodPointers[675] = 
 {
 	NULL,
 	NULL,
@@ -745,6 +750,7 @@ static Il2CppMethodPointer s_methodPointers[670] =
 	FlutterBridge_ResetExperiment_mC8A4FC667F051E4C7735C6462C0A154CB7BA5466,
 	FlutterBridge_SetActiveStep_m476C78EA2752C1EB078CEAB3950B5A76EF4DAC05,
 	FlutterBridge_DispatchActiveStep_m925158300156AD92920F574F8B2DD510A9180B81,
+	FlutterBridge_SetBurnerState_mF7FA28E02B5B03B3FE7D86A625861E4C257A9B9B,
 	FlutterBridge_SelectFlameChemical_mDDA8DE59631251F8E1CBC61394F29346B89874D5,
 	FlutterBridge_OnWarningDismissed_m838E1D7F11001890E45331619567ECECB98CC6D1,
 	FlutterBridge__ctor_m8C7C130B9FDDA38785839365E9EC76BFDF6CA44B,
@@ -839,14 +845,17 @@ static Il2CppMethodPointer s_methodPointers[670] =
 	U3CPourSequenceU3Ed__10_System_Collections_Generic_IEnumeratorU3CSystem_ObjectU3E_get_Current_mCF31F33F50D5B4599FDB27FD33B187F53FDB73E1,
 	U3CPourSequenceU3Ed__10_System_Collections_IEnumerator_Reset_mFC4594DB91C05EC22E270F78814E1EB1B63FD555,
 	U3CPourSequenceU3Ed__10_System_Collections_IEnumerator_get_Current_mC97BA6FAAD6599D478F72F72CE7836371B6604A9,
-	ArrowControllerExp3_Update_mE5892FDAD660D48821FE4E85BE9CEB8F4E8B755B,
+	ArrowControllerExp3_Awake_m3AEFF742B312B468A005A8CE4E19A6A612022A8C,
+	ArrowControllerExp3_SetActiveStepStatus_m0B3E0C901BCADDF12F5E262B0A9E68A17E040028,
 	ArrowControllerExp3_UpdateArrowVisibility_mCB5F772F6C11EB5E08A5FC5365239AD41583DEFD,
 	ArrowControllerExp3__ctor_m61153E2DF109C0EDD2768A74E345DCFA2BCD0904,
+	BunsenBurnerSwitch_get_IsBurning_m758986B3B04CFAB47C62CC225BFBDF8B19FE1FA7,
 	BunsenBurnerSwitch_Start_m9CFC9088106C4CC822EBC20A824C04D4D9762B4D,
 	BunsenBurnerSwitch_SetActiveStepStatus_m0AE73B8B48F4F6E8C90A31149DD6054557345B3A,
 	BunsenBurnerSwitch_Update_m3CC6C338974A49867328EEBDE6C552BD972F1AB6,
 	BunsenBurnerSwitch_ShowButton_m0FF5C8CE47D2D98935548C4C31841CD48B9917DD,
 	BunsenBurnerSwitch_ToggleFire_m0779B2B0B181697DC42101B515400A9E2EE20BD2,
+	BunsenBurnerSwitch_SetBurnerState_m3627680C987FF247EF399E2400A31E985AFEDCE1,
 	BunsenBurnerSwitch_TurnOn_mD923F628693F37C0A25E800A6D9474762A3A3434,
 	BunsenBurnerSwitch_TurnOff_mBC34FB09B6145B0AEFA269F9AE44869D22B5B965,
 	BunsenBurnerSwitch__ctor_m74F105F5154411AA4CD5A3DB3EF7DF768D4670D7,
@@ -924,7 +933,8 @@ static Il2CppMethodPointer s_methodPointers[670] =
 	U3CPourAndActivateU3Ed__28_System_Collections_Generic_IEnumeratorU3CSystem_ObjectU3E_get_Current_m261F258FCCC834C798BDB6340EDF929302A1DE29,
 	U3CPourAndActivateU3Ed__28_System_Collections_IEnumerator_Reset_mBA7F19513D1D140E0396660EA6B79DA5DFDF4648,
 	U3CPourAndActivateU3Ed__28_System_Collections_IEnumerator_get_Current_m2537CC583ABC4ADDE873D4F1CDF0E34248F968A1,
-	ArrowController_Update_mB808269BD56B06975A3729674F769683BCCEDAB6,
+	ArrowController_Awake_mFC50EE4268C356D6F64003E60732E8844B40D0E8,
+	ArrowController_SetActiveStepStatus_m7597F800A65D78E2D0017A210529681633ABBD33,
 	ArrowController_UpdateArrowVisibility_m20C3BB46242CF74ADF1B0768729DD5AE7820CED1,
 	ArrowController__ctor_m5363B3666D1BBC8ACB329EE770C93ED8D030DD98,
 	FlaskScaleTrigger_Awake_mC25D881DDE3F7385FFCB33C479886BC7BEC5B3A0,
@@ -1337,9 +1347,9 @@ static Il2CppMethodPointer s_methodPointers[670] =
 extern void Goal__ctor_m4452076EE88E564D97BBDD12E7011CAF34E275A3_AdjustorThunk (void);
 static Il2CppTokenAdjustorThunkPair s_adjustorThunks[1] = 
 {
-	{ 0x06000257, Goal__ctor_m4452076EE88E564D97BBDD12E7011CAF34E275A3_AdjustorThunk },
+	{ 0x0600025C, Goal__ctor_m4452076EE88E564D97BBDD12E7011CAF34E275A3_AdjustorThunk },
 };
-static const int32_t s_InvokerIndices[670] = 
+static const int32_t s_InvokerIndices[675] = 
 {
 	-1,
 	-1,
@@ -1420,6 +1430,7 @@ static const int32_t s_InvokerIndices[670] =
 	5294,
 	4514,
 	3003,
+	4514,
 	4514,
 	4514,
 	4514,
@@ -1518,13 +1529,16 @@ static const int32_t s_InvokerIndices[670] =
 	5294,
 	5163,
 	5294,
+	4514,
 	4487,
 	5294,
+	5058,
 	5294,
 	4514,
 	5294,
 	5294,
 	5294,
+	4413,
 	5294,
 	5294,
 	5294,
@@ -1603,6 +1617,7 @@ static const int32_t s_InvokerIndices[670] =
 	5294,
 	5163,
 	5294,
+	4514,
 	4487,
 	5294,
 	5294,
@@ -2016,7 +2031,7 @@ static const Il2CppTokenRangePair s_rgctxIndices[3] =
 {
 	{ 0x02000002, { 0, 29 } },
 	{ 0x02000074, { 29, 11 } },
-	{ 0x0600027E, { 40, 2 } },
+	{ 0x06000283, { 40, 2 } },
 };
 extern const uint32_t g_rgctx_U3CU3Ef__AnonymousType0_4_t93FD0713D40011506D6B5581D9D5064D1A1A31B8;
 extern const uint32_t g_rgctx_U3CidU3Ej__TPar_tB4283D6614B0A1B9713411CF590AE6445EC76C76;
@@ -2109,7 +2124,7 @@ IL2CPP_EXTERN_C const Il2CppCodeGenModule g_AssemblyU2DCSharp_CodeGenModule;
 const Il2CppCodeGenModule g_AssemblyU2DCSharp_CodeGenModule = 
 {
 	"Assembly-CSharp.dll",
-	670,
+	675,
 	s_methodPointers,
 	1,
 	s_adjustorThunks,

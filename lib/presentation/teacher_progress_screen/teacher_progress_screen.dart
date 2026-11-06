@@ -1603,12 +1603,37 @@ class _TeacherRubricBreakdown extends StatelessWidget {
   });
 
   static const _criteria = [
-    ('ppe', 'PPE Selection', 15),
-    ('procedureAndSequence', 'Procedure & Sequence', 35),
-    ('equipmentHandling', 'Equipment Handling', 20),
-    ('experimentalResult', 'Experimental Result', 20),
-    ('scientificUnderstanding', 'Scientific Understanding', 10),
+    ('ppe', 'PPE and Safety', 25),
+    (
+      'procedureSequenceEquipment',
+      'Procedure, Sequence & Equipment Handling',
+      25,
+    ),
+    ('experimentalResult', 'Experimental Results', 25),
+    ('scientificUnderstanding', 'Scientific Understanding', 25),
   ];
+
+  int _criterionScore(String key) {
+    if (scores.containsKey('procedureSequenceEquipment')) {
+      return scores[key] ?? 0;
+    }
+
+    // Keep older 15/35/20/20/10 records readable after the rubric update.
+    return switch (key) {
+      'ppe' => (((scores['ppe'] ?? 0) / 15) * 25).round(),
+      'procedureSequenceEquipment' =>
+        ((((scores['procedureAndSequence'] ?? 0) +
+                        (scores['equipmentHandling'] ?? 0)) /
+                    55) *
+                25)
+            .round(),
+      'experimentalResult' =>
+        (((scores['experimentalResult'] ?? 0) / 20) * 25).round(),
+      'scientificUnderstanding' =>
+        (((scores['scientificUnderstanding'] ?? 0) / 10) * 25).round(),
+      _ => 0,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1636,7 +1661,7 @@ class _TeacherRubricBreakdown extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '${scores[key] ?? 0}/$maximum',
+                    '${_criterionScore(key)}/$maximum',
                     style: const TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,

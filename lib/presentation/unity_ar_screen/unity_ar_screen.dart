@@ -19,6 +19,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'widgets/flame_solution_dialog.dart';
 import 'widgets/collapsible_steps_panel.dart';
 import 'widgets/ppe_selection_dialog.dart';
+import 'widgets/experiment_result_rubric.dart';
 
 class UnityArScreen extends StatefulWidget {
   final String? experimentId;
@@ -32,6 +33,7 @@ class _UnityArScreenState extends State<UnityArScreen>
     with TickerProviderStateMixin {
   bool _isExperimentActive = false;
   bool _isLoading = false;
+  bool _isClosingAr = false;
   // Unity remains in memory when an AR route is closed. A later route must
   // reuse its readiness rather than wait for the bootstrap scene to load again.
   static bool _unityRuntimeReady = false;
@@ -47,7 +49,7 @@ class _UnityArScreenState extends State<UnityArScreen>
   ExperimentGrade? _experimentGrade;
   bool _showKnowledgeCheck = false;
   bool _isAwaitingKnowledgeCheck = false;
-  List<int?> _knowledgeAnswers = const [null, null];
+  List<int?> _knowledgeAnswers = const [];
   int _sequenceErrors = 0;
   int _equipmentErrors = 0;
 
@@ -68,6 +70,27 @@ class _UnityArScreenState extends State<UnityArScreen>
   // --- Flame Solution State ---
   int _selectedFlameChemicalIndex = -1;
   bool _showFlameSolutionPicker = false;
+  bool _isBurnerOn = false;
+
+  bool get _showBurnerToggle =>
+      _isFlameTest &&
+      !_hasCompleted &&
+      !_showFlameSolutionPicker &&
+      _currentSteps.isNotEmpty &&
+      _currentStepIndex < _currentSteps.length &&
+      _isTagMatching(
+        _currentSteps[_currentStepIndex].bottleTag,
+        'Flame-Switch',
+      );
+
+  void _toggleBurner() {
+    if (!_showBurnerToggle || !_isExperimentActive || _isLoading) return;
+    sendToUnity(
+      'FlutterReceiver',
+      'SetBurnerState',
+      _isBurnerOn ? 'off' : 'on',
+    );
+  }
 
   void _openFlameSolutionPicker() {
     setState(() {
@@ -387,7 +410,10 @@ class _UnityArScreenState extends State<UnityArScreen>
         _experimentGrade = null;
         _showKnowledgeCheck = false;
         _isAwaitingKnowledgeCheck = false;
-        _knowledgeAnswers = const [null, null];
+        _knowledgeAnswers = List<int?>.filled(
+          questionsForExperiment(experimentId).length,
+          null,
+        );
         _sequenceErrors = 0;
         _equipmentErrors = 0;
         _showCompletionPopup = false;
@@ -397,6 +423,7 @@ class _UnityArScreenState extends State<UnityArScreen>
         _completedStepIndices.clear();
         _completedSubTagsForCurrentStep.clear();
         _selectedFlameChemicalIndex = -1;
+        _isBurnerOn = false;
         _showFlameSolutionPicker =
             (experimentId == '4' || experimentId == 'ar4');
       });
@@ -508,17 +535,29 @@ class _UnityArScreenState extends State<UnityArScreen>
     }
   }
 
-  void _closeUnityAndReturnToMenu() {
-    if (!mounted) return;
-    _isExperimentActive = false;
+  Future<void> _closeUnityAndReturnToMenu() async {
+    if (!mounted || _isClosingAr) return;
+
+    setState(() {
+      _isClosingAr = true;
+      _isExperimentActive = false;
+    });
     _cancelUnityStartup();
     if (_isWarningDialogShowing) {
       Navigator.of(context, rootNavigator: true).pop();
       _isWarningDialogShowing = false;
     }
     ScaffoldMessenger.of(context).clearSnackBars();
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
+    // Give the platform view one frame to detach and pause Unity before the
+    // route and its landscape surface are removed. This also prevents a fast
+    // second back/exit event from popping the screen behind the AR route.
+    await WidgetsBinding.instance.endOfFrame;
+    await Future.wait<void>([
+      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]),
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge),
+    ]);
+
     if (mounted) {
       Navigator.of(context).pop();
     }
@@ -585,6 +624,13 @@ class _UnityArScreenState extends State<UnityArScreen>
     }
 
     if (!mounted || !_isExperimentActive) return;
+
+    if (trimmedMessage.startsWith('BURNER_STATE:')) {
+      if (_isFlameTest) {
+        setState(() => _isBurnerOn = trimmedMessage == 'BURNER_STATE:on');
+      }
+      return;
+    }
 
     if (trimmedMessage == 'scene_ready') {
       _unityRuntimeReady = true;
@@ -844,7 +890,10 @@ class _UnityArScreenState extends State<UnityArScreen>
     if (_hasCompleted) return;
     setState(() {
       _hasCompleted = true;
-      _knowledgeAnswers = const [null, null];
+      _knowledgeAnswers = List<int?>.filled(
+        questionsForExperiment(_activeExperimentId ?? '').length,
+        null,
+      );
       _isAwaitingKnowledgeCheck = true;
     });
   }
@@ -922,7 +971,11 @@ class _UnityArScreenState extends State<UnityArScreen>
         .take(questions.length)
         .any((answer) => answer == null)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Answer both questions to continue.')),
+        SnackBar(
+          content: Text(
+            'Answer all ${questions.length} questions to continue.',
+          ),
+        ),
       );
       return;
     }
@@ -935,11 +988,15 @@ class _UnityArScreenState extends State<UnityArScreen>
     }
 
     final grade = ExperimentGrade(
-      ppeScore: _ppeSelectionResult?.score ?? 15,
-      procedureScore: (35 - (_sequenceErrors * 5)).clamp(0, 35),
-      equipmentScore: (20 - (_equipmentErrors * 2)).clamp(0, 20),
-      resultScore: 20,
-      understandingScore: (correctAnswers * 5).clamp(0, 10),
+      ppeScore: _ppeSelectionResult?.score ?? 25,
+      procedureSequenceEquipmentScore:
+          (25 - (_sequenceErrors * 5) - (_equipmentErrors * 2)).clamp(0, 25),
+      resultScore: 25,
+      understandingScore: questions.isEmpty
+          ? 0
+          : ((correctAnswers / questions.length) * 25).round().clamp(0, 25),
+      correctUnderstandingAnswers: correctAnswers,
+      totalUnderstandingQuestions: questions.length,
       sequenceErrors: _sequenceErrors,
       equipmentErrors: _equipmentErrors,
     );
@@ -1003,11 +1060,11 @@ class _UnityArScreenState extends State<UnityArScreen>
             ),
             child: Column(
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.quiz_rounded, color: Color(0xFF00D4FF)),
-                    SizedBox(width: 10),
-                    Expanded(
+                    const Icon(Icons.quiz_rounded, color: Color(0xFF00D4FF)),
+                    const SizedBox(width: 10),
+                    const Expanded(
                       child: Text(
                         'Experiment Check',
                         style: TextStyle(
@@ -1018,8 +1075,8 @@ class _UnityArScreenState extends State<UnityArScreen>
                       ),
                     ),
                     Text(
-                      '10 points',
-                      style: TextStyle(
+                      '25 points • ${questions.length} questions',
+                      style: const TextStyle(
                         color: Color(0xFF00D4FF),
                         fontWeight: FontWeight.bold,
                       ),
@@ -1120,12 +1177,12 @@ class _UnityArScreenState extends State<UnityArScreen>
         child: Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              maxWidth: 420,
+              maxWidth: 900,
               maxHeight: MediaQuery.sizeOf(context).height - 24,
             ),
             child: Container(
-              margin: const EdgeInsets.all(24),
-              padding: const EdgeInsets.fromLTRB(24, 24, 24, 18),
+              margin: const EdgeInsets.all(12),
+              padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
               decoration: BoxDecoration(
                 color: const Color(0xFF0A1628),
                 borderRadius: BorderRadius.circular(20),
@@ -1181,31 +1238,13 @@ class _UnityArScreenState extends State<UnityArScreen>
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(height: 10),
-                            _buildGradeRow(
-                              'PPE and safety',
-                              _experimentGrade!.ppeScore,
-                              15,
-                            ),
-                            _buildGradeRow(
-                              'Procedure and sequence',
-                              _experimentGrade!.procedureScore,
-                              35,
-                            ),
-                            _buildGradeRow(
-                              'Equipment handling',
-                              _experimentGrade!.equipmentScore,
-                              20,
-                            ),
-                            _buildGradeRow(
-                              'Experimental result',
-                              _experimentGrade!.resultScore,
-                              20,
-                            ),
-                            _buildGradeRow(
-                              'Scientific understanding',
-                              _experimentGrade!.understandingScore,
-                              10,
+                            const SizedBox(height: 16),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: ExperimentResultRubric(
+                                grade: _experimentGrade!,
+                                ppeResult: _ppeSelectionResult,
+                              ),
                             ),
                           ],
                           const SizedBox(height: 10),
@@ -1250,13 +1289,7 @@ class _UnityArScreenState extends State<UnityArScreen>
                         ),
                       ),
                       icon: const Icon(Icons.check_circle_outline_rounded),
-                      onPressed: () {
-                        if (mounted) {
-                          setState(() {
-                            _showCompletionPopup = false;
-                          });
-                        }
-                      },
+                      onPressed: _closeUnityAndReturnToMenu,
                       label: const Text(
                         'Finish',
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -1268,30 +1301,6 @@ class _UnityArScreenState extends State<UnityArScreen>
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildGradeRow(String label, int score, int maximum) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              label,
-              style: const TextStyle(color: Color(0xFF8BA3C0), fontSize: 12),
-            ),
-          ),
-          Text(
-            '$score/$maximum',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -1430,6 +1439,7 @@ class _UnityArScreenState extends State<UnityArScreen>
       _sequenceErrors = 0;
       _equipmentErrors = 0;
       _selectedFlameChemicalIndex = -1;
+      _isBurnerOn = false;
       _silverNitrateDropCount = 0;
       _isDropButtonCoolingDown = false;
       _isSilverNitrateDropReady = false;
@@ -1998,12 +2008,12 @@ class _UnityArScreenState extends State<UnityArScreen>
     );
 
     return PopScope(
-      canPop: false,
+      canPop: _isClosingAr,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) {
           return;
         }
-        _closeUnityAndReturnToMenu();
+        unawaited(_closeUnityAndReturnToMenu());
       },
       child: Scaffold(
         body: Stack(
@@ -2176,6 +2186,38 @@ class _UnityArScreenState extends State<UnityArScreen>
                 ),
 
               // Silver nitrate uses Flutter UI while Unity runs the drop VFX.
+              if (_showBurnerToggle && !_showGuide)
+                SafeArea(
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: FilledButton.icon(
+                        onPressed: _toggleBurner,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: _isBurnerOn
+                              ? Colors.deepOrange
+                              : const Color(0xFF00D4FF),
+                          foregroundColor: _isBurnerOn
+                              ? Colors.white
+                              : const Color(0xFF0A1628),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 16,
+                          ),
+                        ),
+                        icon: Icon(
+                          _isBurnerOn
+                              ? Icons.local_fire_department
+                              : Icons.power_settings_new,
+                        ),
+                        label: Text(
+                          _isBurnerOn ? 'TURN BURNER OFF' : 'TURN BURNER ON',
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               if (_showSilverNitrateDropButton && !_showGuide)
                 SafeArea(
                   child: Align(

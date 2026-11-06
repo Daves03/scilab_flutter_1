@@ -1,26 +1,27 @@
 class ExperimentGrade {
   const ExperimentGrade({
     required this.ppeScore,
-    required this.procedureScore,
-    required this.equipmentScore,
+    required this.procedureSequenceEquipmentScore,
     required this.resultScore,
     required this.understandingScore,
+    required this.correctUnderstandingAnswers,
+    required this.totalUnderstandingQuestions,
     required this.sequenceErrors,
     required this.equipmentErrors,
   });
 
   final int ppeScore;
-  final int procedureScore;
-  final int equipmentScore;
+  final int procedureSequenceEquipmentScore;
   final int resultScore;
   final int understandingScore;
+  final int correctUnderstandingAnswers;
+  final int totalUnderstandingQuestions;
   final int sequenceErrors;
   final int equipmentErrors;
 
   int get totalScore =>
       ppeScore +
-      procedureScore +
-      equipmentScore +
+      procedureSequenceEquipmentScore +
       resultScore +
       understandingScore;
 
@@ -33,10 +34,11 @@ class ExperimentGrade {
 
   Map<String, dynamic> toMap() => {
     'ppe': ppeScore,
-    'procedureAndSequence': procedureScore,
-    'equipmentHandling': equipmentScore,
+    'procedureSequenceEquipment': procedureSequenceEquipmentScore,
     'experimentalResult': resultScore,
     'scientificUnderstanding': understandingScore,
+    'correctUnderstandingAnswers': correctUnderstandingAnswers,
+    'totalUnderstandingQuestions': totalUnderstandingQuestions,
     'total': totalScore,
     'performanceLevel': performanceLevel,
     'sequenceErrors': sequenceErrors,

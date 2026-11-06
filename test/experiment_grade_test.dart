@@ -5,11 +5,12 @@ import 'package:scilab_flutter_1/models/experiment_grade.dart';
 void main() {
   test('rubric categories total 100 for a perfect experiment', () {
     const grade = ExperimentGrade(
-      ppeScore: 15,
-      procedureScore: 35,
-      equipmentScore: 20,
-      resultScore: 20,
-      understandingScore: 10,
+      ppeScore: 25,
+      procedureSequenceEquipmentScore: 25,
+      resultScore: 25,
+      understandingScore: 25,
+      correctUnderstandingAnswers: 5,
+      totalUnderstandingQuestions: 5,
       sequenceErrors: 0,
       equipmentErrors: 0,
     );
@@ -21,23 +22,31 @@ void main() {
 
   test('performance levels use the approved score boundaries', () {
     ExperimentGrade gradeWithTotal(int understandingScore) => ExperimentGrade(
-      ppeScore: 15,
-      procedureScore: 35,
-      equipmentScore: 20,
-      resultScore: 20,
+      ppeScore: 25,
+      procedureSequenceEquipmentScore: 25,
+      resultScore: 25,
       understandingScore: understandingScore,
+      correctUnderstandingAnswers: switch (understandingScore) {
+        15 => 3,
+        5 => 1,
+        _ => 0,
+      },
+      totalUnderstandingQuestions: 5,
       sequenceErrors: 0,
       equipmentErrors: 0,
     );
 
-    expect(gradeWithTotal(0).performanceLevel, 'Excellent');
+    expect(gradeWithTotal(15).performanceLevel, 'Excellent');
+    expect(gradeWithTotal(5).performanceLevel, 'Proficient');
+    expect(gradeWithTotal(0).performanceLevel, 'Developing');
 
     const developing = ExperimentGrade(
-      ppeScore: 10,
-      procedureScore: 25,
-      equipmentScore: 15,
-      resultScore: 15,
-      understandingScore: 5,
+      ppeScore: 17,
+      procedureSequenceEquipmentScore: 15,
+      resultScore: 25,
+      understandingScore: 13,
+      correctUnderstandingAnswers: 5,
+      totalUnderstandingQuestions: 10,
       sequenceErrors: 2,
       equipmentErrors: 1,
     );
@@ -45,10 +54,16 @@ void main() {
     expect(developing.performanceLevel, 'Developing');
   });
 
-  test('every AR activity has two automatically graded questions', () {
+  test('every AR activity has between 5 and 10 graded questions', () {
     for (var experiment = 1; experiment <= 8; experiment++) {
       final questions = questionsForExperiment('ar$experiment');
-      expect(questions, hasLength(2));
+      expect(
+        questions.length,
+        inInclusiveRange(
+          minimumExperimentQuestions,
+          maximumExperimentQuestions,
+        ),
+      );
       for (final question in questions) {
         expect(question.options, hasLength(4));
         expect(question.correctOption, inInclusiveRange(0, 3));

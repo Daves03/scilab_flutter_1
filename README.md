@@ -1,5 +1,9 @@
 # scilab_flutter_1
 
+## Documentation
+
+- [AR Experiment Grading Rubric and Deduction Guide](docs/AR_EXPERIMENT_GRADING_RUBRIC.md)
+
 A new Flutter project.
 
 ## Getting Started

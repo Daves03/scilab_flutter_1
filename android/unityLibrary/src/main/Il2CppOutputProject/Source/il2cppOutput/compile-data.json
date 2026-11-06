@@ -48,7 +48,7 @@
     "Settings": {
       "OutputFileExtension": "",
       "DebuggerPort": 0,
-      "IncrementalGCTimeSlice": 0,
+      "IncrementalGCTimeSlice": 3,
       "RelativeDataPath": "Data",
       "DontLinkCrt": false,
       "TargetBitcode": false,
