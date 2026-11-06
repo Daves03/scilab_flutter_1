@@ -1,8 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { collection, query, onSnapshot, doc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { logAdminActivity } from '../services/adminActivityService';
 import { Edit, Save, X, RefreshCw, Layers } from 'lucide-react';
+import { teacherGradeLabels } from '../services/teacherPortalUtils';
+
+const GRADE_EXPERIMENT_IDS = {
+  'Grade 9': ['ar3', 'ar2', 'ar5'],
+  'Grade 10': ['ar7', 'ar1', 'ar6'],
+};
+const ENRICHMENT_EXPERIMENT_IDS = ['ar4', 'ar8'];
 
 const DUMMY_EXPERIMENTS = [
     {
@@ -256,8 +263,9 @@ const DUMMY_EXPERIMENTS = [
     },
   ];
 
-export default function ARLabManager() {
+export default function ARLabManager({ teacherProfile = null }) {
   const [experiments, setExperiments] = useState([]);
+  const [sectionCatalog, setSectionCatalog] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingExp, setEditingExp] = useState(null);
   const [textEditorModal, setTextEditorModal] = useState(null);
@@ -279,6 +287,25 @@ export default function ARLabManager() {
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!teacherProfile) return undefined;
+    return onSnapshot(collection(db, 'sections'), (snapshot) => {
+      setSectionCatalog(snapshot.docs.map((item) => ({ id: item.id, ...item.data() })));
+    });
+  }, [teacherProfile]);
+
+  const handledGrades = useMemo(() => teacherProfile
+    ? teacherGradeLabels(teacherProfile.sections || [], sectionCatalog)
+    : [], [sectionCatalog, teacherProfile]);
+  const visibleExperiments = useMemo(() => {
+    if (!teacherProfile) return experiments;
+    const allowedIds = new Set([
+      ...handledGrades.flatMap((grade) => GRADE_EXPERIMENT_IDS[grade] || []),
+      ...(handledGrades.length ? ENRICHMENT_EXPERIMENT_IDS : []),
+    ]);
+    return experiments.filter((experiment) => allowedIds.has(String(experiment.id || experiment._docId).toLowerCase()));
+  }, [experiments, handledGrades, teacherProfile]);
 
   const handleSeedData = async () => {
     setSeeding(true);
@@ -317,16 +344,18 @@ export default function ARLabManager() {
         requiredMaterials: editingExp.requiredMaterials,
         steps: editingExp.steps || [],
       });
-      await logAdminActivity({
-        type: 'ar_content_updated',
-        title: editingExp.title || editingExp.topic || editingExp._docId,
-        details: { experimentId: editingExp._docId, category: editingExp.category || '' },
-      });
+      if (!teacherProfile) {
+        await logAdminActivity({
+          type: 'ar_content_updated',
+          title: editingExp.title || editingExp.topic || editingExp._docId,
+          details: { experimentId: editingExp._docId, category: editingExp.category || '' },
+        });
+      }
       setEditingExp(null);
       setShowSaveConfirm(false);
     } catch (error) {
       console.error(error);
-      alert('Error updating experiment: ' + error.message);
+      alert('Error updating experiment: ' + error.message + (teacherProfile ? '\nConfirm that Firestore allows teachers to update AR experiments.' : ''));
     }
   };
 
@@ -370,10 +399,13 @@ export default function ARLabManager() {
       <div className="animate-fade-in" style={{ paddingBottom: '60px' }}>
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <h1>AR Lab Content</h1>
-          <p>Manage background information, safety notes, and materials for AR experiments.</p>
+          {teacherProfile && <span className="teacher-eyebrow"><Layers size={16} /> Teacher Lab Content</span>}
+          <h1>{teacherProfile ? 'My AR Lab Content' : 'AR Lab Content'}</h1>
+          <p>{teacherProfile
+            ? `Edit only the ${handledGrades.join(' and ') || 'assigned grade'} experiments available to your handled students.`
+            : 'Manage background information, safety notes, and materials for AR experiments.'}</p>
         </div>
-        {experiments.length === 0 && (
+        {!teacherProfile && experiments.length === 0 && (
           <button 
             className="btn btn-primary" 
             onClick={handleSeedData}
@@ -386,17 +418,19 @@ export default function ARLabManager() {
       </div>
 
       <div className="glass-panel" style={{ padding: '24px' }}>
-        {experiments.length === 0 ? (
+        {visibleExperiments.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
             <Layers size={48} style={{ margin: '0 auto 16px', opacity: 0.5 }} />
             <h3>No AR Experiments Found</h3>
             <p style={{ maxWidth: '400px', margin: '0 auto' }}>
-              The database is currently empty. Click the <strong>Initialize Database</strong> button above to populate it with the default experiments.
+              {teacherProfile
+                ? 'No AR experiments are assigned to your handled grade levels.'
+                : <>The database is currently empty. Click the <strong>Initialize Database</strong> button above to populate it with the default experiments.</>}
             </p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {experiments.map(exp => (
+            {visibleExperiments.map(exp => (
               <div className="flex-mobile-col" key={exp._docId} style={{ 
                 background: 'rgba(255,255,255,0.03)', 
                 border: '1px solid var(--border-light)',

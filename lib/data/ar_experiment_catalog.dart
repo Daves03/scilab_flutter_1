@@ -28,7 +28,9 @@ bool canRoleAccessExperiment(UserRole? role, String experimentId) {
     UserRole.grade9 =>
       track == ArExperimentTrack.grade9 ||
           track == ArExperimentTrack.enrichment,
-    UserRole.grade10 => track != ArExperimentTrack.unassigned,
+    UserRole.grade10 =>
+      track == ArExperimentTrack.grade10 ||
+          track == ArExperimentTrack.enrichment,
     UserRole.teacher || UserRole.admin => true,
     null => false,
   };
@@ -62,13 +64,11 @@ List<ArExperimentGroup> experimentGroupsForRole(
 
   final groups = <ArExperimentGroup>[];
   final showsAll = role == UserRole.teacher || role == UserRole.admin;
-  if (role == UserRole.grade9 || role == UserRole.grade10 || showsAll) {
+  if (role == UserRole.grade9 || showsAll) {
     groups.add(
       ArExperimentGroup(
         title: 'Grade 9 Experiments',
-        subtitle: role == UserRole.grade10
-            ? 'Foundation experiments from Grade 9'
-            : showsAll
+        subtitle: showsAll
             ? 'Grade 9 curriculum experiments'
             : 'Experiments for your grade level',
         experiments: ordered(grade9ExperimentIds),

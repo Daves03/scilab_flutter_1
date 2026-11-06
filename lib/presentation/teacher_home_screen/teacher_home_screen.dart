@@ -1014,13 +1014,26 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                                       ),
                                       child: _StudentProgressCard(
                                         student: filteredStudents[index],
-                                        onQuizTap: () =>
+                                        onQuizAverageTap: () =>
                                             _showStudentQuizProgress(
                                               filteredStudents[index],
+                                              averageOnly: true,
                                             ),
-                                        onArTap: () => _showStudentArProgress(
-                                          filteredStudents[index],
-                                        ),
+                                        onQuizzesTap: () =>
+                                            _showStudentQuizProgress(
+                                              filteredStudents[index],
+                                              averageOnly: false,
+                                            ),
+                                        onArScoreTap: () =>
+                                            _showStudentArProgress(
+                                              filteredStudents[index],
+                                              scoreOnly: true,
+                                            ),
+                                        onArTriesTap: () =>
+                                            _showStudentArProgress(
+                                              filteredStudents[index],
+                                              scoreOnly: false,
+                                            ),
                                         showBadge:
                                             !_isSearching &&
                                             _currentTab ==
@@ -1376,7 +1389,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     return '${diff.inDays} days ago';
   }
 
-  void _showStudentQuizProgress(_StudentSummary student) {
+  void _showStudentQuizProgress(
+    _StudentSummary student, {
+    required bool averageOnly,
+  }) {
     final attempts = _latestAttemptsForStudent(_allAttempts, student.id)
       ..sort(
         (a, b) => (b.submittedAt ?? DateTime(2000)).compareTo(
@@ -1385,12 +1401,18 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
       );
     showDialog<void>(
       context: context,
-      builder: (_) =>
-          _StudentQuizProgressDialog(student: student, attempts: attempts),
+      builder: (_) => _StudentQuizProgressDialog(
+        student: student,
+        attempts: attempts,
+        averageOnly: averageOnly,
+      ),
     );
   }
 
-  void _showStudentArProgress(_StudentSummary student) {
+  void _showStudentArProgress(
+    _StudentSummary student, {
+    required bool scoreOnly,
+  }) {
     final activities =
         (_arAttemptsByStudent[student.id] ?? const []).map((document) {
           final activity = ExperimentActivity.fromMap(
@@ -1403,7 +1425,6 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
             rubricScore: activity.completed
                 ? (activity.rubricScore ?? 100.0)
                 : null,
-            rubricScores: activity.rubricScores,
             activityAt: activity.completedAt ?? activity.launchedAt,
           );
         }).toList()..sort(
@@ -1413,8 +1434,11 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
         );
     showDialog<void>(
       context: context,
-      builder: (_) =>
-          _StudentArProgressDialog(student: student, activities: activities),
+      builder: (_) => _StudentArProgressDialog(
+        student: student,
+        activities: activities,
+        scoreOnly: scoreOnly,
+      ),
     );
   }
 
@@ -4097,14 +4121,12 @@ class _ArProgressEntry {
   final String title;
   final bool completed;
   final double? rubricScore;
-  final Map<String, int> rubricScores;
   final DateTime? activityAt;
 
   const _ArProgressEntry({
     required this.title,
     required this.completed,
     required this.rubricScore,
-    required this.rubricScores,
     required this.activityAt,
   });
 }
@@ -4145,10 +4167,12 @@ Color _progressResultColor(double score) {
 class _StudentQuizProgressDialog extends StatelessWidget {
   final _StudentSummary student;
   final List<QuizAttempt> attempts;
+  final bool averageOnly;
 
   const _StudentQuizProgressDialog({
     required this.student,
     required this.attempts,
+    required this.averageOnly,
   });
 
   @override
@@ -4200,7 +4224,9 @@ class _StudentQuizProgressDialog extends StatelessWidget {
             _StudentMetricDialogHeader(
               icon: Icons.quiz_outlined,
               color: const Color(0xFF00D4FF),
-              title: '${student.name}\'s Quiz Progress',
+              title: averageOnly
+                  ? '${student.name}\'s Quiz Average'
+                  : '${student.name}\'s Quiz Results',
               subtitle: '${student.grade} \u2022 Section ${student.section}',
               onClose: () => Navigator.of(context).pop(),
             ),
@@ -4211,19 +4237,16 @@ class _StudentQuizProgressDialog extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _MetricSummaryBox(
-                      label: 'Quiz Average',
-                      value: '${(average * 100).round()}%',
-                      icon: Icons.analytics_outlined,
-                      color: const Color(0xFF00D4FF),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _MetricSummaryBox(
-                      label: 'Quizzes',
-                      value: '${attempts.length}',
-                      icon: Icons.assignment_turned_in_outlined,
-                      color: const Color(0xFF7C3AED),
+                      label: averageOnly ? 'Quiz Average' : 'Completed Quizzes',
+                      value: averageOnly
+                          ? '${(average * 100).round()}%'
+                          : '${attempts.length}',
+                      icon: averageOnly
+                          ? Icons.analytics_outlined
+                          : Icons.assignment_turned_in_outlined,
+                      color: averageOnly
+                          ? const Color(0xFF00D4FF)
+                          : const Color(0xFF7C3AED),
                     ),
                   ),
                 ],
@@ -4232,13 +4255,15 @@ class _StudentQuizProgressDialog extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
               child: _MetricExplanation(
-                text:
-                    'Quiz Average uses the latest score for each completed quiz. '
-                    'Quizzes is the number of distinct quizzes completed.',
+                text: averageOnly
+                    ? 'Quiz Average uses the latest score for each completed quiz.'
+                    : 'Each result shows the quiz score and its submission date and time.',
                 isDark: isDark,
               ),
             ),
-            if (attempts.isEmpty)
+            if (averageOnly)
+              const SizedBox(height: 8)
+            else if (attempts.isEmpty)
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 20, 24, 30),
                 child: _EmptyMetricState(
@@ -4250,7 +4275,6 @@ class _StudentQuizProgressDialog extends StatelessWidget {
             else
               Flexible(
                 child: Scrollbar(
-                  thumbVisibility: attempts.length > 4,
                   child: ListView.separated(
                     shrinkWrap: true,
                     padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
@@ -4336,10 +4360,12 @@ class _StudentQuizProgressDialog extends StatelessWidget {
 class _StudentArProgressDialog extends StatelessWidget {
   final _StudentSummary student;
   final List<_ArProgressEntry> activities;
+  final bool scoreOnly;
 
   const _StudentArProgressDialog({
     required this.student,
     required this.activities,
+    required this.scoreOnly,
   });
 
   @override
@@ -4364,6 +4390,9 @@ class _StudentArProgressDialog extends StatelessWidget {
     final score = grades.isEmpty
         ? student.avgArScore
         : grades.reduce((total, grade) => total + grade) / grades.length;
+    final visibleActivities = scoreOnly
+        ? activities.where((activity) => activity.rubricScore != null).toList()
+        : activities;
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -4392,7 +4421,9 @@ class _StudentArProgressDialog extends StatelessWidget {
             _StudentMetricDialogHeader(
               icon: Icons.science_outlined,
               color: const Color(0xFF8B5CF6),
-              title: '${student.name}\'s AR Progress',
+              title: scoreOnly
+                  ? '${student.name}\'s AR Scores'
+                  : '${student.name}\'s AR Lab Tries',
               subtitle: '${student.grade} \u2022 Section ${student.section}',
               onClose: () => Navigator.of(context).pop(),
             ),
@@ -4403,19 +4434,14 @@ class _StudentArProgressDialog extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _MetricSummaryBox(
-                      label: 'AR Score',
-                      value: '${score.round()}%',
-                      icon: Icons.science_outlined,
-                      color: const Color(0xFF8B5CF6),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _MetricSummaryBox(
-                      label: 'AR Tries',
-                      value: '$tries',
-                      icon: Icons.view_in_ar_outlined,
-                      color: const Color(0xFF00D4FF),
+                      label: scoreOnly ? 'AR Score' : 'AR Tries',
+                      value: scoreOnly ? '${score.round()}%' : '$tries',
+                      icon: scoreOnly
+                          ? Icons.science_outlined
+                          : Icons.view_in_ar_outlined,
+                      color: scoreOnly
+                          ? const Color(0xFF8B5CF6)
+                          : const Color(0xFF00D4FF),
                     ),
                   ),
                 ],
@@ -4424,32 +4450,33 @@ class _StudentArProgressDialog extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
               child: _MetricExplanation(
-                text:
-                    'AR Score is the average of the student\'s rubric grades for completed AR labs. '
-                    'AR Tries is the number of AR lab records for this student.',
+                text: scoreOnly
+                    ? 'Only completed AR Lab scores with their date and time are shown.'
+                    : 'Each AR Lab try is shown with its status, date, and time.',
                 isDark: isDark,
               ),
             ),
-            if (activities.isEmpty)
+            if (visibleActivities.isEmpty)
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 20, 24, 30),
                 child: _EmptyMetricState(
                   icon: Icons.view_in_ar_outlined,
-                  message: 'No AR lab activity yet.',
+                  message: scoreOnly
+                      ? 'No completed AR scores yet.'
+                      : 'No AR lab tries yet.',
                   color: secondaryText,
                 ),
               )
             else
               Flexible(
                 child: Scrollbar(
-                  thumbVisibility: activities.length > 4,
                   child: ListView.separated(
                     shrinkWrap: true,
                     padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
-                    itemCount: activities.length,
+                    itemCount: visibleActivities.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
-                      final activity = activities[index];
+                      final activity = visibleActivities[index];
                       final grade = activity.rubricScore;
                       final statusColor = grade == null
                           ? const Color(0xFFFFC107)
@@ -4527,8 +4554,10 @@ class _StudentArProgressDialog extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Text(
-                                    activity.rubricScore != null
+                                    scoreOnly
                                         ? '${activity.rubricScore!.round()}%'
+                                        : activity.completed
+                                        ? 'Completed'
                                         : 'Started',
                                     style: TextStyle(
                                       color: statusColor,
@@ -4539,36 +4568,6 @@ class _StudentArProgressDialog extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            if (activity.rubricScores.isNotEmpty) ...[
-                              const SizedBox(height: 4),
-                              Theme(
-                                data: Theme.of(
-                                  context,
-                                ).copyWith(dividerColor: Colors.transparent),
-                                child: ExpansionTile(
-                                  tilePadding: EdgeInsets.zero,
-                                  childrenPadding: const EdgeInsets.only(
-                                    bottom: 4,
-                                  ),
-                                  dense: true,
-                                  title: const Text(
-                                    'Rubric Breakdown',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  children: [
-                                    _HomeRubricBreakdown(
-                                      scores: activity.rubricScores,
-                                      textColor: secondaryText,
-                                      borderColor: borderColor,
-                                      isDark: isDark,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
                           ],
                         ),
                       );
@@ -4885,14 +4884,18 @@ class _EmptyMetricState extends StatelessWidget {
 class _StudentProgressCard extends StatelessWidget {
   final _StudentSummary student;
   final bool showBadge;
-  final VoidCallback? onQuizTap;
-  final VoidCallback? onArTap;
+  final VoidCallback? onQuizAverageTap;
+  final VoidCallback? onQuizzesTap;
+  final VoidCallback? onArScoreTap;
+  final VoidCallback? onArTriesTap;
 
   const _StudentProgressCard({
     required this.student,
     this.showBadge = true,
-    this.onQuizTap,
-    this.onArTap,
+    this.onQuizAverageTap,
+    this.onQuizzesTap,
+    this.onArScoreTap,
+    this.onArTriesTap,
   });
 
   @override
@@ -5074,7 +5077,7 @@ class _StudentProgressCard extends StatelessWidget {
                 icon: 'quiz',
                 label: 'Quiz Avg',
                 value: '${(student.avgQuizScore * 100).toStringAsFixed(0)}%',
-                onTap: onQuizTap,
+                onTap: onQuizAverageTap,
                 color: Theme.of(context).brightness == Brightness.dark
                     ? const Color(0xFF00D4FF)
                     : const Color(0xFF1565C0),
@@ -5084,7 +5087,7 @@ class _StudentProgressCard extends StatelessWidget {
                 icon: 'science',
                 label: 'AR Score',
                 value: '${student.avgArScore.toStringAsFixed(0)}%',
-                onTap: onArTap,
+                onTap: onArScoreTap,
                 color: const Color(0xFF7C3AED),
               ),
               const SizedBox(width: 8),
@@ -5092,7 +5095,7 @@ class _StudentProgressCard extends StatelessWidget {
                 icon: 'assignment_turned_in',
                 label: 'Quizzes',
                 value: '${student.quizzesTaken}',
-                onTap: onQuizTap,
+                onTap: onQuizzesTap,
                 color: const Color(0xFF8BA3C0),
               ),
               const SizedBox(width: 8),
@@ -5100,7 +5103,7 @@ class _StudentProgressCard extends StatelessWidget {
                 icon: 'biotech',
                 label: 'AR Tries',
                 value: '${student.arAttempts}',
-                onTap: onArTap,
+                onTap: onArTriesTap,
                 color: const Color(0xFF8BA3C0),
               ),
             ],

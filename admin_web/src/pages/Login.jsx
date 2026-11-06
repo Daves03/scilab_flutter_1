@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { reload, sendEmailVerification, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { auth } from '../firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase';
 import { ADMIN_EMAIL, clearPendingAdminDeviceVerification, hasPendingAdminDeviceVerification, isTrustedAdminDevice, sendAdminDeviceVerification, watchAdminDeviceApproval } from '../services/adminDeviceVerification';
 import { logAdminActivity } from '../services/adminActivityService';
 import { Loader2, Eye, EyeOff, MailCheck, RefreshCw, ShieldCheck } from 'lucide-react';
@@ -20,9 +21,9 @@ const getSignInErrorMessage = (error) => {
     case 'auth/network-request-failed':
       return 'Network error. Check your internet connection and try again.';
     case 'auth/user-disabled':
-      return 'This administrator account has been disabled.';
+      return 'This account has been disabled.';
     case 'auth/operation-not-allowed':
-      return 'Admin email and password login is not enabled in Firebase Authentication.';
+      return 'Email and password login is not enabled in Firebase Authentication.';
     default:
       return 'Could not sign in. Please check your credentials and try again.';
   }
@@ -77,13 +78,22 @@ export default function Login() {
     let passwordAuthenticated = false;
     
     try {
-      if (email.trim().toLowerCase() !== ADMIN_EMAIL) {
-        throw new Error('Incorrect email or password. Please try again.');
+      const normalizedEmail = email.trim().toLowerCase();
+      const credential = await signInWithEmailAndPassword(auth, normalizedEmail, password);
+      passwordAuthenticated = true;
+      const profileSnapshot = await getDoc(doc(db, 'users', credential.user.uid));
+      const profile = profileSnapshot.exists() ? profileSnapshot.data() : null;
+      const isAdminAccount = normalizedEmail === ADMIN_EMAIL || profile?.role === 'admin';
+      const isApprovedTeacher = profile?.role === 'teacher' && profile?.status === 'approved';
+
+      if (!isAdminAccount && !isApprovedTeacher) {
+        if (profile?.role === 'teacher' && profile?.status !== 'approved') {
+          throw new Error('Your teacher account must be approved before you can use the web portal.');
+        }
+        throw new Error('This web portal is available only to approved teachers and administrators.');
       }
 
-      const credential = await signInWithEmailAndPassword(auth, ADMIN_EMAIL, password);
-      passwordAuthenticated = true;
-      if (!isTrustedAdminDevice(credential.user)) {
+      if (isAdminAccount && !isTrustedAdminDevice(credential.user)) {
         if (!credential.user.emailVerified) {
           await sendEmailVerification(credential.user);
           setAccountVerificationSent(true);
@@ -94,9 +104,10 @@ export default function Login() {
       }
       setLoading(false);
     } catch (err) {
-      console.error('Admin sign-in failed:', err);
+      console.error('Portal sign-in failed:', err);
       const isWrongAdminEmail = err.message === 'Incorrect email or password. Please try again.';
-      setError(isWrongAdminEmail
+      const isRoleError = err.message?.includes('approved before') || err.message?.includes('available only');
+      setError(isWrongAdminEmail || isRoleError
         ? err.message
         : passwordAuthenticated
           ? getVerificationErrorMessage(err)
@@ -202,8 +213,8 @@ export default function Login() {
           }}>
             <img src={scilabLogo} alt="Scilab Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
-          <h2 style={{ marginBottom: '8px' }}>Admin Portal</h2>
-          <p style={{ textAlign: 'center', fontSize: '0.9rem' }}>Sign in with your administrator account to continue.</p>
+          <h2 style={{ marginBottom: '8px' }}>SciLab AR Web Portal</h2>
+          <p style={{ textAlign: 'center', fontSize: '0.9rem' }}>Sign in with your account.</p>
         </div>
 
         {error && (
@@ -273,7 +284,7 @@ export default function Login() {
             />
           </div>
           
-          <div className="input-group" style={{ marginBottom: '32px', position: 'relative' }}>
+          <div className="input-group auth-password-group" style={{ marginBottom: '32px' }}>
             <label className="input-label">Password</label>
             <input 
               type={showPassword ? "text" : "password"} 
@@ -282,22 +293,16 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
               required 
               placeholder="password"
-              style={{ paddingRight: '40px' }}
+              autoComplete="current-password"
+              style={{ paddingRight: '52px' }}
             />
             <button
               type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              style={{
-                position: 'absolute',
-                right: '12px',
-                top: '38px',
-                background: 'none',
-                border: 'none',
-                color: 'var(--text-secondary)',
-                cursor: 'pointer',
-                padding: 0,
-                display: 'flex'
-              }}
+              className="auth-password-toggle"
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => setShowPassword((visible) => !visible)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              title={showPassword ? 'Hide password' : 'Show password'}
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
@@ -309,7 +314,7 @@ export default function Login() {
             style={{ width: '100%', padding: '14px' }}
             disabled={loading}
           >
-            {loading ? <Loader2 className="animate-spin" size={20} /> : <><ShieldCheck size={18} /> Login</>}
+            {loading ? <Loader2 className="animate-spin" size={20} /> : <><ShieldCheck size={18} /> Sign In</>}
           </button>
         </form>
         )}

@@ -213,6 +213,16 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
       final allAttempts = attemptsSnap.docs
           .map((d) => QuizAttempt.fromMap(d.id, d.data()))
           .toList();
+      // Keep every quiz-result view consistent: newest submission first and
+      // attempts without a timestamp at the bottom.
+      allAttempts.sort((a, b) {
+        final aDate = a.submittedAt;
+        final bDate = b.submittedAt;
+        if (aDate == null && bDate == null) return 0;
+        if (aDate == null) return 1;
+        if (bDate == null) return -1;
+        return bDate.compareTo(aDate);
+      });
 
       // 2.5 Fetch all courses to check for missed quizzes
       final coursesSnap = await db.collection('courses').get();
@@ -259,9 +269,25 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
               .doc(u.id)
               .collection('experiment_activity')
               .get();
-          uArRecords = uArSnap.docs.map((d) {
-            final expId = d.id;
-            final act = ExperimentActivity.fromMap(expId, d.data());
+          final activities = uArSnap.docs
+              .map(
+                (document) => MapEntry(
+                  document.id,
+                  ExperimentActivity.fromMap(document.id, document.data()),
+                ),
+              )
+              .toList();
+          activities.sort((a, b) {
+            final aDate = a.value.completedAt ?? a.value.launchedAt;
+            final bDate = b.value.completedAt ?? b.value.launchedAt;
+            if (aDate == null && bDate == null) return 0;
+            if (aDate == null) return 1;
+            if (bDate == null) return -1;
+            return bDate.compareTo(aDate);
+          });
+          uArRecords = activities.map((entry) {
+            final expId = entry.key;
+            final act = entry.value;
             return ArLabRecord(
               experimentName: arExpMap[expId] ?? 'Unknown Experiment',
               attempts: 1,

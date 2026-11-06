@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { auth } from '../firebase';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { auth, db } from '../firebase';
+import UserAvatar from './UserAvatar';
+import { teacherGradeLabels } from '../services/teacherPortalUtils';
 import { 
+  BadgeCheck,
   LayoutDashboard, 
   Users, 
   Layers, 
@@ -14,19 +19,31 @@ import {
   Moon,
   Activity,
   Shield,
-  QrCode
+  QrCode,
+  GraduationCap,
+  Mail,
+  UserRound,
 } from 'lucide-react';
 
-export default function Layout() {
+export default function Layout({ role = 'admin', profile }) {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('admin-theme') || 'dark');
   const [showSignOutModal, setShowSignOutModal] = useState(false);
+  const [showTeacherProfile, setShowTeacherProfile] = useState(false);
+  const [sectionCatalog, setSectionCatalog] = useState([]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('admin-theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    if (role !== 'teacher') return undefined;
+    return onSnapshot(collection(db, 'sections'), (snapshot) => {
+      setSectionCatalog(snapshot.docs.map((item) => ({ id: item.id, ...item.data() })));
+    });
+  }, [role]);
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
@@ -45,6 +62,10 @@ export default function Layout() {
     setIsMobileMenuOpen(false);
   };
 
+  const isTeacher = role === 'teacher';
+  const portalName = isTeacher ? 'SciLab Teacher' : 'Scilab Admin';
+  const teachingGrades = teacherGradeLabels(profile?.sections || [], sectionCatalog);
+
   return (
     <div className="app-container">
       {/* Mobile Header (Only visible on small screens) */}
@@ -58,7 +79,7 @@ export default function Layout() {
         </button>
         <div className="mobile-header-brand" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <img src="/favicon.png" alt="Scilab Logo" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
-          <h3 style={{ fontSize: '1.2rem', margin: 0, fontWeight: 700 }}>Scilab Admin</h3>
+          <h3 style={{ fontSize: '1.2rem', margin: 0, fontWeight: 700 }}>{portalName}</h3>
         </div>
       </div>
 
@@ -75,8 +96,8 @@ export default function Layout() {
         <div className="sidebar-brand" style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '48px', padding: '0 8px' }}>
           <img src="/favicon.png" alt="Scilab Logo" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
           <div>
-            <h3 style={{ fontSize: '1.2rem', margin: 0 }}>Scilab Admin</h3>
-            <span style={{ fontSize: '0.75rem', color: 'var(--accent-green)', fontWeight: 600 }}>PORTAL ACTIVE</span>
+            <h3 style={{ fontSize: '1.2rem', margin: 0 }}>{portalName}</h3>
+            <span style={{ fontSize: '0.75rem', color: 'var(--accent-green)', fontWeight: 600 }}>{isTeacher ? 'TEACHER VIEW' : 'PORTAL ACTIVE'}</span>
           </div>
         </div>
 
@@ -90,7 +111,23 @@ export default function Layout() {
             <LayoutDashboard size={20} />
             Overview
           </NavLink>
-          
+          {isTeacher ? (
+            <>
+              <NavLink to="/students" onClick={closeMenu} className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+                <Users size={20} /> Manage Students
+              </NavLink>
+              <NavLink to="/my-courses" onClick={closeMenu} className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+                <BookOpen size={20} /> Manage Courses
+              </NavLink>
+              <NavLink to="/ar-labs" onClick={closeMenu} className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+                <Box size={20} /> AR Lab Content
+              </NavLink>
+              <NavLink to="/student-progress" onClick={closeMenu} className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+                <Activity size={20} /> Student Progress
+              </NavLink>
+            </>
+          ) : (
+          <>
           <NavLink 
             to="/users" 
             onClick={closeMenu}
@@ -153,6 +190,8 @@ export default function Layout() {
             <Shield size={20} />
             Legal
           </NavLink>
+          </>
+          )}
           
           <div 
             onClick={toggleTheme}
@@ -166,6 +205,13 @@ export default function Layout() {
             </div>
           </div>
         </nav>
+
+        {isTeacher && (
+          <button type="button" className="teacher-sidebar-profile" onClick={() => { setShowTeacherProfile(true); closeMenu(); }} aria-label="Open teacher profile">
+            <UserAvatar user={profile || { name: 'Teacher' }} />
+            <div><strong>{profile?.name || 'Teacher'}</strong><span>{profile?.email || ''}</span></div>
+          </button>
+        )}
 
         <div style={{ marginTop: 'auto', paddingTop: '24px', borderTop: '1px solid var(--border-light)' }}>
           <button 
@@ -190,6 +236,27 @@ export default function Layout() {
       <main className="main-content">
         <Outlet />
       </main>
+
+      {showTeacherProfile && createPortal(
+        <div className="teacher-modal-backdrop teacher-status-backdrop" onMouseDown={(event) => event.target === event.currentTarget && setShowTeacherProfile(false)}>
+          <div className="glass-panel teacher-profile-modal">
+            <button type="button" className="teacher-icon-btn teacher-profile-close" onClick={() => setShowTeacherProfile(false)} aria-label="Close teacher profile"><X size={20} /></button>
+            <div className="teacher-profile-identity">
+              <div className="teacher-profile-avatar"><UserAvatar user={profile || { name: 'Teacher' }} large /></div>
+              <h2>{profile?.name || 'Teacher'}</h2>
+              <span className="teacher-verified-badge"><BadgeCheck size={16} /> Verified Teacher</span>
+            </div>
+            <div className="teacher-profile-divider" />
+            <div className="teacher-profile-details">
+              <ProfileDetail icon={UserRound} label="Full Name" value={profile?.name || 'Teacher'} />
+              <ProfileDetail icon={Mail} label="Email Address" value={profile?.email || 'Not available'} />
+              <ProfileDetail icon={GraduationCap} label="Grade Level Teaching" value={teachingGrades.length ? teachingGrades.join(', ') : 'Not assigned'} />
+              <div className="teacher-profile-detail"><span><Users size={19} /></span><div><small>Sections Teaching</small><div className="teacher-profile-sections">{(profile?.sections || []).length ? profile.sections.map((section) => <b key={section}>{section}</b>) : <strong>Not assigned</strong>}</div></div></div>
+            </div>
+          </div>
+        </div>,
+        document.body,
+      )}
 
       {/* Sign Out Confirmation Modal */}
       {showSignOutModal && (
@@ -239,4 +306,8 @@ export default function Layout() {
       )}
     </div>
   );
+}
+
+function ProfileDetail({ icon: Icon, label, value }) {
+  return <div className="teacher-profile-detail"><span><Icon size={19} /></span><div><small>{label}</small><strong>{value}</strong></div></div>;
 }
