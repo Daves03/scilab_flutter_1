@@ -446,6 +446,16 @@ p { color: var(--text-secondary); line-height: 1.5; }
   }
 }
 
+@keyframes spinnerRotate {
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spinnerRotate 1s linear infinite;
+  transform-origin: center;
+  flex-shrink: 0;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

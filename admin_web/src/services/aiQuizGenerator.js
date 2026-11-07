@@ -86,13 +86,36 @@ const toBase64 = (arrayBuffer) => {
   return btoa(binary);
 };
 
-const listAvailableModels = async (apiKey) => {
-  const response = await fetch(`${API_ROOT}/models?key=${encodeURIComponent(apiKey)}`);
-  if (!response.ok) return [];
-  const data = await response.json();
+// Keep the deadline active while reading the response body, too.
+const readWithTimeout = async (url, options, read, timeoutMs, stage) => {
+  const controller = new AbortController();
+  const parentSignal = options.signal;
+  const cancel = () => controller.abort(parentSignal.reason);
+  parentSignal?.throwIfAborted();
+  parentSignal?.addEventListener('abort', cancel, { once: true });
+  const timer = setTimeout(() => controller.abort(new DOMException(
+    `${stage} timed out. Check your connection and try again.`, 'TimeoutError',
+  )), timeoutMs);
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    return await read(response);
+  } finally {
+    clearTimeout(timer);
+    parentSignal?.removeEventListener('abort', cancel);
+  }
+};
+
+const listAvailableModels = async (apiKey, signal) => {
+  const data = await readWithTimeout(`${API_ROOT}/models?key=${encodeURIComponent(apiKey)}`, { signal }, async (response) => {
+    const body = await response.json();
+    if (!response.ok) throw new Error(body.error?.message || `Could not load Gemini models (${response.status}).`);
+    return body;
+  }, 15000, 'Checking available Gemini models');
   return (data.models || [])
     .filter((model) => (model.supportedGenerationMethods || []).includes('generateContent'))
     .map((model) => String(model.name || '').replace(/^models\//, ''))
+    .filter((name) => /^gemini-/.test(name) && /flash|pro/.test(name)
+      && !/image|tts|audio|transcrib|robotics|computer-use|customtools/.test(name))
     .sort((left, right) => Number(right.includes('flash')) - Number(left.includes('flash')));
 };
 
@@ -119,13 +142,16 @@ const normalizeQuestionType = (value) => {
   return '';
 };
 
-export async function generateQuizFromModule({ module, questionCounts, signal }) {
+export async function generateQuizFromModule({ module, questionCounts, signal, onProgress = () => {} }) {
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY?.trim();
   if (!apiKey) throw new Error('Gemini is not configured for the web portal. Add VITE_GEMINI_API_KEY when building the admin web.');
 
-  const response = await fetch(module.url, { signal });
-  if (!response.ok) throw new Error(`Could not download the module (${response.status}).`);
-  const arrayBuffer = await response.arrayBuffer();
+  onProgress('Downloading the selected module...');
+  const arrayBuffer = await readWithTimeout(module.url, { signal }, async (response) => {
+    if (!response.ok) throw new Error(`Could not download the module (${response.status}).`);
+    return response.arrayBuffer();
+  }, 30000, 'Downloading the module');
+  onProgress('Reading the module content...');
   const selectedCounts = Object.entries(questionCounts).filter(([, count]) => Number(count) > 0);
   const totalQuestions = selectedCounts.reduce((total, [, count]) => total + Number(count), 0);
   if (!totalQuestions) throw new Error('Select at least one quiz type and question count.');
@@ -143,22 +169,39 @@ Respond only with a valid JSON array containing one object with this structure:
     : [{ text: `${prompt}\n\n--- BEGIN MODULE CONTENT ---\n${extractOfficeText(arrayBuffer, module.title || `module.${module.fileType}`)}\n--- END MODULE CONTENT ---` }];
 
   const configuredModel = import.meta.env.VITE_GEMINI_MODEL?.trim();
-  const discoveredModels = await listAvailableModels(apiKey);
-  const candidates = [...new Set([configuredModel, ...discoveredModels].filter(Boolean))].slice(0, 5);
+  onProgress('Checking available Gemini models...');
+  let discoveredModels = [];
+  try {
+    discoveredModels = await listAvailableModels(apiKey, signal);
+  } catch (error) {
+    if (signal?.aborted || !configuredModel) throw error;
+  }
+  const preferredFallbacks = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-2.5-flash-lite']
+    .filter((model) => discoveredModels.includes(model));
+  const candidates = [...new Set([configuredModel, ...preferredFallbacks, ...discoveredModels].filter(Boolean))].slice(0, 2);
   if (!candidates.length) throw new Error('No Gemini model supporting quiz generation is available for this API key.');
 
   let lastError;
-  for (const model of candidates) {
+  for (const [attempt, model] of candidates.entries()) {
     try {
-      const generation = await fetch(`${API_ROOT}/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`, {
+      signal?.throwIfAborted();
+      onProgress(attempt === 0
+        ? `Gemini is generating ${totalQuestions} questions...`
+        : `The first attempt did not finish. Trying an alternative model for ${totalQuestions} questions...`);
+      const generationConfig = { responseMimeType: 'application/json', temperature: 0.25 };
+      if (/^gemini-[34][.-]/.test(model)) generationConfig.thinkingConfig = { thinkingLevel: 'low' };
+      const data = await readWithTimeout(`${API_ROOT}/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ role: 'user', parts }], generationConfig: { responseMimeType: 'application/json', temperature: 0.25 } }),
+        body: JSON.stringify({ contents: [{ role: 'user', parts }], generationConfig }),
         signal,
-      });
-      const data = await generation.json();
-      if (!generation.ok) throw new Error(data.error?.message || `Gemini request failed (${generation.status}).`);
-      const text = data.candidates?.[0]?.content?.parts?.map((part) => part.text || '').join('') || '';
+      }, async (generation) => {
+        const body = await generation.json();
+        if (!generation.ok) throw new Error(body.error?.message || `Gemini request failed (${generation.status}).`);
+        return body;
+      }, attempt === 0 && candidates.length > 1 ? 45000 : 90000, 'Generating the quiz');
+      onProgress('Checking the generated questions...');
+      const text = data.candidates?.[0]?.content?.parts?.filter((part) => !part.thought).map((part) => part.text || '').join('') || '';
       const quizzes = parseJsonResponse(text);
       const generated = quizzes[0];
       if (!Array.isArray(generated.questions) || generated.questions.length !== totalQuestions) throw new Error(`AI returned ${generated.questions?.length || 0} questions instead of ${totalQuestions}.`);
@@ -198,8 +241,11 @@ Respond only with a valid JSON array containing one object with this structure:
       };
     } catch (error) {
       lastError = error;
-      if (error.name === 'AbortError') throw error;
+      if (signal?.aborted || error.name === 'AbortError') throw error;
     }
+  }
+  if (lastError?.name === 'TimeoutError') {
+    throw new Error('Gemini did not finish generating the quiz in time. Try fewer questions or a smaller module.');
   }
   throw lastError || new Error('AI quiz generation failed. Please try again.');
 }
