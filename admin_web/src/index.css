@@ -989,6 +989,10 @@ p { color: var(--text-secondary); line-height: 1.5; }
 .teacher-quiz-row:hover,.teacher-quiz-row:focus-visible { background:rgba(0,212,255,.055); outline:1px solid rgba(0,212,255,.22); }
 .teacher-row-chevron { color:var(--text-secondary); transition:transform .18s ease,color .18s ease; }
 .teacher-quiz-row:hover .teacher-row-chevron { color:var(--accent-cyan); transform:translateX(3px); }
+.teacher-content-row .teacher-quiz-approval-status { display:inline-flex; align-items:center; width:max-content; margin-top:7px; padding:4px 9px; border:1px solid currentColor; border-radius:999px; font-size:.68rem; font-weight:800; line-height:1; }
+.teacher-content-row .teacher-quiz-approval-status.pending { color:var(--accent-orange); background:color-mix(in srgb,var(--accent-orange) 9%,transparent); }
+.teacher-content-row .teacher-quiz-approval-status.approved { color:var(--accent-green); background:color-mix(in srgb,var(--accent-green) 8%,transparent); }
+.teacher-content-row .teacher-quiz-approval-status.rejected { color:var(--accent-red); background:color-mix(in srgb,var(--accent-red) 8%,transparent); }
 .teacher-content-modal { max-height:calc(100dvh - 32px); overflow-y:auto; background:var(--bg-main); box-shadow:0 28px 80px rgba(0,0,0,.55); }
 .teacher-content-modal.wide { width:min(850px,calc(100vw - 32px)); }
 [data-theme="light"] .teacher-content-modal { background:#fff; box-shadow:0 28px 80px rgba(15,23,42,.25); }
@@ -997,6 +1001,8 @@ p { color: var(--text-secondary); line-height: 1.5; }
 .teacher-textarea.compact { min-height:72px; }
 .teacher-quiz-builder-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:8px 0 14px; }
 .teacher-question-list { display:flex; flex-direction:column; gap:16px; }
+.teacher-add-question-bottom { width:100%; justify-content:center; margin-top:14px; padding:12px 16px; border-style:dashed; color:var(--accent-cyan); }
+.teacher-add-question-bottom:hover { border-color:var(--accent-cyan); background:rgba(0,212,255,.08); }
 .teacher-question-editor { padding:18px; border:1px solid var(--border-light); border-radius:15px; background:rgba(0,0,0,.09); }
 .teacher-question-header { display:grid; grid-template-columns:1fr minmax(190px,230px) 38px; align-items:center; gap:10px; margin-bottom:16px; }
 .teacher-question-header select { transform:none; padding:9px 12px; }

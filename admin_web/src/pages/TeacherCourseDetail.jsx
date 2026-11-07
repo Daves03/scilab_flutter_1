@@ -66,6 +66,7 @@ export default function TeacherCourseDetail({ user, profile }) {
   const [previewModule, setPreviewModule] = useState(null);
   const [viewQuiz, setViewQuiz] = useState(null);
   const [editQuiz, setEditQuiz] = useState(null);
+  const [createdQuizNotice, setCreatedQuizNotice] = useState(null);
 
   useEffect(() => onSnapshot(doc(db, 'courses', courseId), (snapshot) => {
     setCourse(snapshot.exists() ? { id: snapshot.id, ...snapshot.data() } : null);
@@ -136,30 +137,63 @@ export default function TeacherCourseDetail({ user, profile }) {
         )}
       </section>
 
-      {showQuizForm && <QuizModal course={course} quizzes={quizzes} questionTypes={manualQuestionTypes} onClose={() => setShowQuizForm(false)} />}
+      {showQuizForm && <QuizModal course={course} quizzes={quizzes} questionTypes={manualQuestionTypes} onClose={() => setShowQuizForm(false)} onCreated={(quiz) => { setShowQuizForm(false); setCreatedQuizNotice(quiz); }} />}
       {showQuizChoice && <QuizCreationChoiceModal hasModules={modules.some((module) => module.url && ['pdf', 'doc', 'ppt'].includes(module.fileType))} onClose={() => setShowQuizChoice(false)} onManual={() => { setShowQuizChoice(false); setShowQuizTypeSelection(true); }} onAi={() => { setShowQuizChoice(false); setShowAiQuizForm(true); }} />}
       {showQuizTypeSelection && <QuizTypeSelectionModal initialTypes={manualQuestionTypes} onClose={() => setShowQuizTypeSelection(false)} onConfirm={(types) => { setManualQuestionTypes(types); setShowQuizTypeSelection(false); setShowQuizForm(true); }} />}
-      {showAiQuizForm && <AiQuizModal course={course} quizzes={quizzes} modules={modules} onClose={() => setShowAiQuizForm(false)} onGenerated={(quiz) => { setShowAiQuizForm(false); setViewQuiz(quiz); }} />}
+      {showAiQuizForm && <AiQuizModal course={course} quizzes={quizzes} modules={modules} onClose={() => setShowAiQuizForm(false)} onGenerated={(quiz) => { setShowAiQuizForm(false); setCreatedQuizNotice(quiz); }} />}
       {editQuiz && <QuizModal course={course} quizzes={quizzes} quiz={editQuiz} onClose={() => setEditQuiz(null)} />}
       {viewQuiz && <QuizPreviewModal quiz={viewQuiz} onClose={() => setViewQuiz(null)} onEdit={() => { setViewQuiz(null); setEditQuiz(viewQuiz); }} />}
       {showModuleForm && <ModuleModal course={course} modules={modules} user={user} profile={profile} onClose={() => setShowModuleForm(false)} />}
       {editModule && <ModuleModal course={course} modules={modules} user={user} profile={profile} module={editModule} onClose={() => setEditModule(null)} />}
       {previewModule && <ModulePreviewModal module={previewModule} onClose={() => setPreviewModule(null)} />}
+      {createdQuizNotice && <QuizSubmittedModal quiz={createdQuizNotice} onClose={() => setCreatedQuizNotice(null)} />}
     </div>
   );
 }
 
 function QuizRow({ quiz, onOpen, onEdit, onDelete }) {
+  const approvalStatus = quiz.approvalStatus || 'approved';
+  const statusLabel = approvalStatus === 'pending' ? 'Pending admin approval' : approvalStatus === 'rejected' ? 'Rejected' : 'Approved';
   return (
     <article className="teacher-content-row teacher-quiz-row" role="button" tabIndex={0} onClick={onOpen} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') onOpen(); }}>
       <div className="teacher-content-icon quiz"><HelpCircle size={19} /></div>
-      <div><strong>{quiz.title || 'Untitled Quiz'}</strong><span>{(quiz.questions || []).length} questions · Created {formatDateTime(quiz.createdAt)}</span>{quiz.dueDate && <small><CalendarClock size={14} /> Due {formatDateTime(quiz.dueDate)}</small>}</div>
+      <div>
+        <strong>{quiz.title || 'Untitled Quiz'}</strong>
+        <span>{(quiz.questions || []).length} questions · Created {formatDateTime(quiz.createdAt)}</span>
+        <span className={`teacher-quiz-approval-status ${approvalStatus}`}>{statusLabel}</span>
+        {quiz.dueDate && <small><CalendarClock size={14} /> Due {formatDateTime(quiz.dueDate)}</small>}
+      </div>
       <div className="teacher-action-row">
         <button className="teacher-icon-btn edit" onClick={(event) => { event.stopPropagation(); onEdit(); }} title="Edit quiz"><Edit3 size={17} /></button>
         <button className="teacher-icon-btn danger" onClick={(event) => { event.stopPropagation(); onDelete(); }} title="Delete quiz"><Trash2 size={17} /></button>
         <ChevronRight className="teacher-row-chevron" size={19} />
       </div>
     </article>
+  );
+}
+
+function QuizSubmittedModal({ quiz, onClose }) {
+  return createPortal(
+    <div className="teacher-modal-backdrop teacher-status-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <div className="glass-panel teacher-status-modal" role="dialog" aria-modal="true" aria-labelledby="quiz-created-title">
+        <button type="button" className="teacher-icon-btn teacher-status-close" onClick={onClose} aria-label="Close confirmation"><X size={19} /></button>
+        <div className="teacher-status-icon"><CheckCircle2 size={34} /></div>
+        <h2 id="quiz-created-title">Quiz created successfully</h2>
+        <p>An administrator will review and approve it before your students can see the quiz.</p>
+        <div className="teacher-status-student">
+          <div className="teacher-content-icon quiz"><HelpCircle size={20} /></div>
+          <div>
+            <strong>{quiz.title || 'Untitled Quiz'}</strong>
+            <span>{(quiz.questions || []).length} questions</span>
+            <small>Pending admin approval</small>
+          </div>
+        </div>
+        <div className="teacher-status-actions" style={{ gridTemplateColumns: '1fr' }}>
+          <button type="button" className="btn btn-success" onClick={onClose}>Done</button>
+        </div>
+      </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -266,7 +300,7 @@ function AiQuizModal({ course, quizzes, modules, onClose, onGenerated }) {
       setStatus('Gemini is reading the module and generating questions...');
       const generated = await generateQuizFromModule({ module: selectedModule, questionCounts, signal: controller.signal });
       setStatus('Saving the generated quiz...');
-      const savedQuiz = { ...generated, id: `ai-quiz-${Date.now()}`, createdAt: Timestamp.now(), dueDate: null };
+      const savedQuiz = { ...generated, id: `ai-quiz-${Date.now()}`, createdAt: Timestamp.now(), dueDate: null, approvalStatus: 'pending' };
       await updateDoc(doc(db, 'courses', course.id), { quizzes: [savedQuiz, ...quizzes] });
       onGenerated(savedQuiz);
     } catch (generationError) {
@@ -371,7 +405,7 @@ function ModulePreviewModal({ module, onClose }) {
   </PortalModal>;
 }
 
-function QuizModal({ course, quizzes, onClose, quiz = null, questionTypes = QUESTION_TYPES.map((type) => type.value) }) {
+function QuizModal({ course, quizzes, onClose, onCreated, quiz = null, questionTypes = QUESTION_TYPES.map((type) => type.value) }) {
   const [title, setTitle] = useState(quiz?.title || '');
   const [directions, setDirections] = useState(quiz?.directions || '');
   const [dueDate, setDueDate] = useState(toDateTimeLocal(quiz?.dueDate));
@@ -412,6 +446,7 @@ function QuizModal({ course, quizzes, onClose, quiz = null, questionTypes = QUES
         directions: directions.trim(),
         dueDate: dueDate ? Timestamp.fromDate(new Date(dueDate)) : null,
         createdAt: quiz?.createdAt || Timestamp.now(),
+        approvalStatus: quiz ? (quiz.approvalStatus || 'approved') : 'pending',
         questions: questions.map((question) => ({
           ...question,
           question: question.question.trim(),
@@ -424,7 +459,9 @@ function QuizModal({ course, quizzes, onClose, quiz = null, questionTypes = QUES
         ? quizzes.map((item) => item.id === quiz.id ? savedQuiz : item)
         : [...quizzes, savedQuiz];
       await updateDoc(doc(db, 'courses', course.id), { quizzes: updatedQuizzes });
-      onClose();
+      if (quiz) onClose();
+      else if (onCreated) onCreated(savedQuiz);
+      else onClose();
     } catch (saveError) {
       setError(`Could not create quiz: ${saveError.message}`);
     } finally { setSaving(false); }
@@ -435,8 +472,9 @@ function QuizModal({ course, quizzes, onClose, quiz = null, questionTypes = QUES
       {error && <div className="teacher-form-error">{error}</div>}
       <div className="teacher-form-grid"><Field label="Quiz Title"><input className="input-field" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="e.g. Atomic Structure Quiz" /></Field><Field label="Due Date (Optional)"><input className="input-field" type="datetime-local" value={dueDate} onChange={(event) => setDueDate(event.target.value)} /></Field></div>
       <Field label="Directions"><textarea className="input-field teacher-textarea" value={directions} onChange={(event) => setDirections(event.target.value)} placeholder="Enter directions students should read before answering." /></Field>
-      <div className="teacher-quiz-builder-heading"><h3>Questions</h3><button type="button" className="btn btn-secondary" onClick={() => setQuestions((items) => [...items, newQuestion(questionTypes[0] || 'multipleChoice')])}><Plus size={16} /> Add Question</button></div>
+      <div className="teacher-quiz-builder-heading"><h3>Questions</h3></div>
       <div className="teacher-question-list">{questions.map((question, index) => <QuestionEditor key={question.id} question={question} index={index} allowedTypes={questionTypes} update={(changes) => updateQuestion(index, changes)} changeType={(type) => changeType(index, type)} remove={() => removeQuestion(index)} canRemove={questions.length > 1} />)}</div>
+      <button type="button" className="btn btn-secondary teacher-add-question-bottom" onClick={() => setQuestions((items) => [...items, newQuestion(questionTypes[0] || 'multipleChoice')])}><Plus size={17} /> Add Another Question</button>
       <ModalActions onClose={onClose} saving={saving} saveText={quiz ? 'Save Changes' : 'Save Quiz'} />
     </form>
   </PortalModal>;

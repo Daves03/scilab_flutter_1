@@ -141,12 +141,13 @@ export default function ManageUsers() {
     if (!recoverConfirm) return;
     try {
       await updateDoc(doc(db, 'users', recoverConfirm.id), {
-        status: recoverConfirm.previousStatus || 'approved'
+        status: 'pending',
+        previousStatus: 'rejected',
       });
       await logAdminActivity({
         type: 'user_recovered',
         title: recoverConfirm.name || recoverConfirm.email || 'User',
-        details: { userId: recoverConfirm.id, email: recoverConfirm.email || '', restoredStatus: recoverConfirm.previousStatus || 'approved' },
+        details: { userId: recoverConfirm.id, email: recoverConfirm.email || '', restoredStatus: 'pending' },
       });
       setRecoverConfirm(null);
     } catch (e) {
@@ -532,7 +533,7 @@ export default function ManageUsers() {
             <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: 1.5 }}>
               Are you sure you want to recover <strong>"{recoverConfirm.name}"</strong>? 
               <br /><br />
-              They will be moved back to the <strong>{recoverConfirm.previousStatus === 'pending' ? 'Pending' : 'Active'}</strong> list.
+              They will be moved back to <strong>Pending Approvals</strong> and must be approved again before their account becomes active.
             </p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
               <button className="btn btn-secondary" onClick={() => setRecoverConfirm(null)}>Cancel</button>

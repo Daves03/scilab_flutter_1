@@ -4276,6 +4276,7 @@ class _StudentQuizProgressDialog extends StatelessWidget {
               Flexible(
                 child: Scrollbar(
                   child: ListView.separated(
+                    primary: true,
                     shrinkWrap: true,
                     padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
                     itemCount: attempts.length,
@@ -4471,6 +4472,7 @@ class _StudentArProgressDialog extends StatelessWidget {
               Flexible(
                 child: Scrollbar(
                   child: ListView.separated(
+                    primary: true,
                     shrinkWrap: true,
                     padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
                     itemCount: visibleActivities.length,

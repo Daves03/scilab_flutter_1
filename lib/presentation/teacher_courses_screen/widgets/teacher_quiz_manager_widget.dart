@@ -64,13 +64,30 @@ class _CourseQuizManagerWidgetState extends State<CourseQuizManagerWidget> {
       builder: (ctx) => _UnifiedQuizEditorDialog(
         course: widget.course,
         questionTypes: selectedTypes,
-        onSave: (CourseQuiz quiz) {
+        onSave: (CourseQuiz quiz) async {
           setState(() {
             widget.course.quizzes.insert(0, quiz);
             _expandedQuiz = quiz;
           });
-          widget.onUpdated();
-          context.read<CourseService>().updateCourse(widget.course);
+          try {
+            await context.read<CourseService>().updateCourse(widget.course);
+            if (!mounted) return;
+            widget.onUpdated();
+            await _showQuizSubmittedForApprovalDialog();
+          } catch (_) {
+            if (!mounted) return;
+            setState(() {
+              widget.course.quizzes.removeWhere((item) => item.id == quiz.id);
+              if (_expandedQuiz?.id == quiz.id) _expandedQuiz = null;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Could not save the quiz. Please check your connection and try again.',
+                ),
+              ),
+            );
+          }
         },
       ),
     );
@@ -177,14 +194,8 @@ class _CourseQuizManagerWidgetState extends State<CourseQuizManagerWidget> {
       closeLoadingDialog();
       if (!mounted) return;
       setState(() => _expandedQuiz = quizzes.first);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            '${quizzes.length} AI quiz${quizzes.length == 1 ? '' : 'zes'} created from ${options.module.title}.',
-          ),
-        ),
-      );
       widget.onUpdated();
+      await _showQuizSubmittedForApprovalDialog(count: quizzes.length);
     } catch (error) {
       closeLoadingDialog();
       if (insertedQuizzes.isNotEmpty) {
@@ -201,6 +212,94 @@ class _CourseQuizManagerWidgetState extends State<CourseQuizManagerWidget> {
     } finally {
       closeLoadingDialog();
     }
+  }
+
+  Future<void> _showQuizSubmittedForApprovalDialog({int count = 1}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accent = isDark
+        ? const Color(0xFF00E88F)
+        : const Color(0xFF008A54);
+    return showDialog<void>(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 420),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF142240) : Colors.white,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: accent.withAlpha(80)),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x55000000),
+                blurRadius: 24,
+                offset: Offset(0, 12),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 62,
+                height: 62,
+                decoration: BoxDecoration(
+                  color: accent.withAlpha(24),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: accent.withAlpha(90)),
+                ),
+                child: Icon(Icons.check_rounded, color: accent, size: 34),
+              ),
+              const SizedBox(height: 18),
+              Text(
+                count == 1
+                    ? 'Quiz created successfully'
+                    : '$count quizzes created successfully',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: isDark ? Colors.white : const Color(0xFF12213A),
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'An administrator will review and approve ${count == 1 ? 'it' : 'them'} before your students can see ${count == 1 ? 'the quiz' : 'the quizzes'}.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: isDark
+                      ? const Color(0xFFA8BAD0)
+                      : const Color(0xFF607086),
+                  fontSize: 13,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 22),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: accent,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'Done',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _editQuiz(CourseQuiz quiz) {
@@ -267,7 +366,15 @@ class _CourseQuizManagerWidgetState extends State<CourseQuizManagerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final quizzes = widget.course.quizzes;
+    final quizzes = [...widget.course.quizzes]
+      ..sort((first, second) {
+        final firstTime = first.createdAt?.millisecondsSinceEpoch ?? 0;
+        final secondTime = second.createdAt?.millisecondsSinceEpoch ?? 0;
+        final dateComparison = secondTime.compareTo(firstTime);
+        return dateComparison != 0
+            ? dateComparison
+            : second.id.compareTo(first.id);
+      });
     final isLight = Theme.of(context).brightness == Brightness.light;
     final accentColor =
         (isLight && widget.course.accentColor == const Color(0xFF00D4FF))
@@ -343,6 +450,16 @@ class _QuizCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final statusColor = switch (quiz.approvalStatus) {
+      QuizApprovalStatus.pending => const Color(0xFFFFB800),
+      QuizApprovalStatus.approved => const Color(0xFF00E88F),
+      QuizApprovalStatus.rejected => const Color(0xFFFF4757),
+    };
+    final statusLabel = switch (quiz.approvalStatus) {
+      QuizApprovalStatus.pending => 'Pending admin approval',
+      QuizApprovalStatus.approved => 'Approved',
+      QuizApprovalStatus.rejected => 'Rejected',
+    };
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -412,6 +529,55 @@ class _QuizCard extends StatelessWidget {
                                 : Colors.grey.shade600,
                           ),
                         ),
+                        const SizedBox(height: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 7,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: statusColor.withAlpha(20),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: statusColor.withAlpha(90)),
+                          ),
+                          child: Text(
+                            statusLabel,
+                            style: TextStyle(
+                              color: statusColor,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        if (quiz.createdAt != null) ...[
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              CustomIconWidget(
+                                iconName: 'calendar_today',
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? const Color(0xFF8BA3C0)
+                                    : Colors.grey.shade600,
+                                size: 10,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Created: ${quiz.createdDateLabel}',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? const Color(0xFF8BA3C0)
+                                      : Colors.grey.shade600,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                         if (quiz.dueDate != null) ...[
                           const SizedBox(height: 2),
                           Row(
@@ -1831,6 +1997,8 @@ class _UnifiedQuizEditorDialogState extends State<_UnifiedQuizEditorDialog> {
       questions: validQuestions,
       createdAt: widget.existingQuiz?.createdAt ?? DateTime.now(),
       dueDate: _selectedDueDate,
+      approvalStatus:
+          widget.existingQuiz?.approvalStatus ?? QuizApprovalStatus.pending,
     );
 
     widget.onSave(quiz);

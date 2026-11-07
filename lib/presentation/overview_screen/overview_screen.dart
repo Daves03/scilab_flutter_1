@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:provider/provider.dart';
@@ -44,9 +45,11 @@ class _OverviewScreenState extends State<OverviewScreen>
   late AnimationController _floatController;
   late AnimationController _pulseController;
   late PageController _featurePageController;
+  Timer? _featurePageTimer;
   int _currentFeaturePage = 0;
 
   late PageController _arPreviewController;
+  Timer? _arPreviewTimer;
   int _currentArPreviewPage = 0;
 
   final List<String> _arPreviewImages = const [
@@ -153,6 +156,15 @@ class _OverviewScreenState extends State<OverviewScreen>
         setState(() => _currentFeaturePage = page);
       }
     });
+    _featurePageTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (!mounted || !_featurePageController.hasClients) return;
+      final nextPage = (_currentFeaturePage + 1) % _features.length;
+      _featurePageController.animateToPage(
+        nextPage,
+        duration: const Duration(milliseconds: 450),
+        curve: Curves.easeInOutCubic,
+      );
+    });
 
     _arPreviewController = PageController();
     _arPreviewController.addListener(() {
@@ -161,6 +173,16 @@ class _OverviewScreenState extends State<OverviewScreen>
         setState(() => _currentArPreviewPage = page);
       }
     });
+    _arPreviewTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+      if (!mounted || !_arPreviewController.hasClients) return;
+      final nextPage =
+          (_currentArPreviewPage + 1) % _arPreviewImages.length;
+      _arPreviewController.animateToPage(
+        nextPage,
+        duration: const Duration(milliseconds: 450),
+        curve: Curves.easeInOutCubic,
+      );
+    });
   }
 
   @override
@@ -168,7 +190,9 @@ class _OverviewScreenState extends State<OverviewScreen>
     _heroController.dispose();
     _floatController.dispose();
     _pulseController.dispose();
+    _featurePageTimer?.cancel();
     _featurePageController.dispose();
+    _arPreviewTimer?.cancel();
     _arPreviewController.dispose();
     super.dispose();
   }
@@ -553,11 +577,31 @@ class _OverviewScreenState extends State<OverviewScreen>
 
   Widget _buildStatsRow() {
     final accent = _landingAccent(context);
-    final stats = [
-      {'label': 'Courses', 'icon': 'menu_book'},
-      {'label': 'AR Experiments', 'icon': 'view_in_ar'},
-      {'label': 'Students', 'icon': 'people'},
-      {'label': 'Profile', 'icon': 'person'},
+    final stats = <Map<String, String>>[
+      {
+        'label': 'Courses',
+        'icon': 'menu_book',
+        'description':
+            'View your assigned chemistry courses, learning modules, quizzes, and course progress.',
+      },
+      {
+        'label': 'AR Experiments',
+        'icon': 'view_in_ar',
+        'description':
+            'Explore interactive chemistry experiments and guided augmented-reality laboratory activities.',
+      },
+      {
+        'label': 'Students',
+        'icon': 'people',
+        'description':
+            'Join your approved class and stay connected with the teachers and students in your section.',
+      },
+      {
+        'label': 'Profile',
+        'icon': 'person',
+        'description':
+            'View and manage your SciLab AR account, school information, section, and profile picture.',
+      },
     ];
 
     return AnimatedBuilder(
@@ -579,38 +623,141 @@ class _OverviewScreenState extends State<OverviewScreen>
           separatorBuilder: (_, __) => const SizedBox(width: 12),
           itemBuilder: (context, i) {
             final s = stats[i];
-            return Container(
-              width: 90,
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-              decoration: BoxDecoration(
-                color: _landingSurface(context),
-                borderRadius: BorderRadius.circular(16.0),
-                border: Border.all(color: accent.withAlpha(31), width: 1),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CustomIconWidget(
-                    iconName: s['icon']!,
-                    color: accent,
-                    size: 20,
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    s['label']!,
-                    style: GoogleFonts.manrope(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      color: _landingMutedText(context),
+            return Semantics(
+              button: true,
+              label: 'Preview ${s['label']}',
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => _showShortcutPreview(s),
+                  borderRadius: BorderRadius.circular(16),
+                  child: Ink(
+                    width: 90,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 8,
                     ),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                    decoration: BoxDecoration(
+                      color: _landingSurface(context),
+                      borderRadius: BorderRadius.circular(16.0),
+                      border: Border.all(
+                        color: accent.withAlpha(31),
+                        width: 1,
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CustomIconWidget(
+                          iconName: s['icon']!,
+                          color: accent,
+                          size: 20,
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          s['label']!,
+                          style: GoogleFonts.manrope(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: _landingMutedText(context),
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
-                ],
+                ),
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+
+  void _showShortcutPreview(Map<String, String> shortcut) {
+    final accent = _landingAccent(context);
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: _landingSurface(dialogContext),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 58,
+              height: 58,
+              decoration: BoxDecoration(
+                color: accent.withAlpha(31),
+                shape: BoxShape.circle,
+                border: Border.all(color: accent.withAlpha(89)),
+              ),
+              child: Center(
+                child: CustomIconWidget(
+                  iconName: shortcut['icon']!,
+                  color: accent,
+                  size: 28,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              shortcut['label']!,
+              style: GoogleFonts.manrope(
+                fontSize: 21,
+                fontWeight: FontWeight.w800,
+                color: _landingPrimaryText(dialogContext),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              shortcut['description']!,
+              style: GoogleFonts.manrope(
+                fontSize: 13,
+                height: 1.5,
+                color: _landingMutedText(dialogContext),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 22),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                  context.go(AppRoutes.signUpLoginScreen);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: accent,
+                  foregroundColor: AppTheme.primaryNavy,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text('Sign In to Open'),
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                context.go('${AppRoutes.signUpLoginScreen}?isLogin=false');
+              },
+              child: Text(
+                'Create Account',
+                style: GoogleFonts.manrope(
+                  color: accent,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

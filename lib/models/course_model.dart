@@ -195,6 +195,21 @@ class CourseQuestion {
   };
 }
 
+enum QuizApprovalStatus { pending, approved, rejected }
+
+extension QuizApprovalStatusX on QuizApprovalStatus {
+  String get storageValue => name;
+
+  static QuizApprovalStatus fromStorage(Object? value) {
+    return switch (value?.toString().trim().toLowerCase()) {
+      'pending' => QuizApprovalStatus.pending,
+      'rejected' => QuizApprovalStatus.rejected,
+      // Quizzes created before approval workflow existed stay visible.
+      _ => QuizApprovalStatus.approved,
+    };
+  }
+}
+
 class CourseQuiz {
   final String id;
   final String title;
@@ -202,6 +217,7 @@ class CourseQuiz {
   final List<CourseQuestion> questions;
   final DateTime? createdAt;
   final DateTime? dueDate;
+  final QuizApprovalStatus approvalStatus;
 
   CourseQuiz({
     required this.id,
@@ -210,13 +226,29 @@ class CourseQuiz {
     required this.questions,
     this.createdAt,
     this.dueDate,
+    this.approvalStatus = QuizApprovalStatus.pending,
   });
 
   int get totalQuestions => questions.length;
+  bool get isApproved => approvalStatus == QuizApprovalStatus.approved;
 
   String get dueDateLabel {
     if (dueDate == null) return '';
     final d = dueDate!;
+    int hour = d.hour;
+    final ampm = hour >= 12 ? 'PM' : 'AM';
+    if (hour == 0) hour = 12;
+    if (hour > 12) hour -= 12;
+    final min = d.minute.toString().padLeft(2, '0');
+    final month = d.month.toString().padLeft(2, '0');
+    final day = d.day.toString().padLeft(2, '0');
+    final year = d.year.toString().substring(2);
+    return '$month/$day/$year at $hour:$min $ampm';
+  }
+
+  String get createdDateLabel {
+    if (createdAt == null) return '';
+    final d = createdAt!;
     int hour = d.hour;
     final ampm = hour >= 12 ? 'PM' : 'AM';
     if (hour == 0) hour = 12;
@@ -244,6 +276,9 @@ class CourseQuiz {
       dueDate: data['dueDate'] is Timestamp
           ? (data['dueDate'] as Timestamp).toDate()
           : null,
+      approvalStatus: QuizApprovalStatusX.fromStorage(
+        data['approvalStatus'],
+      ),
     );
   }
 
@@ -254,6 +289,7 @@ class CourseQuiz {
     'questions': questions.map((q) => q.toMap()).toList(),
     'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
     'dueDate': dueDate != null ? Timestamp.fromDate(dueDate!) : null,
+    'approvalStatus': approvalStatus.storageValue,
   };
 }
 
@@ -346,7 +382,11 @@ class Course {
     'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
   };
 
-  Course copyWith({String? teacherName, List<CourseModule>? modules}) {
+  Course copyWith({
+    String? teacherName,
+    List<CourseModule>? modules,
+    List<CourseQuiz>? quizzes,
+  }) {
     final updated = Course(
       id: id,
       title: title,
@@ -358,7 +398,7 @@ class Course {
       iconName: iconName,
       sections: sections,
       modules: modules ?? this.modules,
-      quizzes: quizzes,
+      quizzes: quizzes ?? this.quizzes,
       createdAt: createdAt,
     );
     updated.progress = progress;

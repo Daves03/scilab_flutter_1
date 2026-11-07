@@ -44,6 +44,7 @@ class TermsScreen extends StatelessWidget {
                   radius: const Radius.circular(4),
                   thickness: 4,
                   child: SingleChildScrollView(
+                    primary: true,
                     padding: const EdgeInsets.only(right: 12.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

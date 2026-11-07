@@ -61,7 +61,9 @@ class CourseService {
     controller = StreamController<List<Course>>(
       onListen: () {
         coursesSubscription = coursesStream.listen((courses) {
-          latestCourses = courses;
+          latestCourses = courses
+              .map(_courseWithApprovedQuizzesOnly)
+              .toList(growable: false);
           hasCourses = true;
           emitProgress();
         }, onError: controller.addError);
@@ -214,6 +216,14 @@ class CourseService {
     return course.copyWith(teacherName: resolvedName, modules: resolvedModules);
   }
 
+  Course _courseWithApprovedQuizzesOnly(Course course) {
+    return course.copyWith(
+      quizzes: course.quizzes
+          .where((quiz) => quiz.isApproved)
+          .toList(growable: false),
+    );
+  }
+
   Future<List<Course>> _resolveCurrentTeacherNames(List<Course> courses) async {
     final teacherIds = courses
         .map((course) => course.teacherUid)
@@ -274,7 +284,9 @@ class CourseService {
           (course) => CourseAssignment.courseMatchesStudent(course, student),
         )
         .toList();
-    final resolvedCourses = await _resolveCurrentTeacherNames(courses);
+    final resolvedCourses = (await _resolveCurrentTeacherNames(courses))
+        .map(_courseWithApprovedQuizzesOnly)
+        .toList(growable: false);
     final attempts = await fetchAttemptsForStudent(student.id);
     return _applyStudentProgress(resolvedCourses, attempts);
   }
