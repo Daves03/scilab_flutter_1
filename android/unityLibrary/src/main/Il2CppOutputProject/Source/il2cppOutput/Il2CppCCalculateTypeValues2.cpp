@@ -4497,7 +4497,7 @@ struct EventKeyValue_t2E93F8100AC01C48CA40BCEB5102B5BBAB19E04F  : public Runtime
 struct U3CU3Ec_t04E77827D54CC7D69F04FDFC5A84C3F7392F9A76  : public RuntimeObject
 {
 };
-struct U3CStartFullReactionSequenceU3Ed__45_t904C351ED8CC13F262FB62CF0C46DC4353F69E2B  : public RuntimeObject
+struct U3CStartFullReactionSequenceU3Ed__47_t9CF154B255660D57780F6B7BD38C3D71CBC50637  : public RuntimeObject
 {
 	int32_t ___U3CU3E1__state;
 	RuntimeObject* ___U3CU3E2__current;
@@ -41195,7 +41195,7 @@ const Il2CppTypeDefinitionSizes g_typeDefinitionSize12624 = { sizeof(SceneSwitch
 IL2CPP_EXTERN_C_CONST Il2CppTypeDefinitionSizes g_typeDefinitionSize12625;
 const Il2CppTypeDefinitionSizes g_typeDefinitionSize12625 = { sizeof(StepInstructionManager_t0D168C22CBAF852DE6B1A247BB12C96FE38A73BE), -1, 0, 0 };
 IL2CPP_EXTERN_C_CONST Il2CppTypeDefinitionSizes g_typeDefinitionSize12626;
-const Il2CppTypeDefinitionSizes g_typeDefinitionSize12626 = { sizeof(U3CStartFullReactionSequenceU3Ed__45_t904C351ED8CC13F262FB62CF0C46DC4353F69E2B), -1, 0, 0 };
+const Il2CppTypeDefinitionSizes g_typeDefinitionSize12626 = { sizeof(U3CStartFullReactionSequenceU3Ed__47_t9CF154B255660D57780F6B7BD38C3D71CBC50637), -1, 0, 0 };
 IL2CPP_EXTERN_C_CONST Il2CppTypeDefinitionSizes g_typeDefinitionSize12627;
 const Il2CppTypeDefinitionSizes g_typeDefinitionSize12627 = { sizeof(StraightSidePour_t32F199841A7C4B293FDCDA8ADFD5E57C358B007C), -1, 0, 0 };
 IL2CPP_EXTERN_C_CONST Il2CppTypeDefinitionSizes g_typeDefinitionSize12628;

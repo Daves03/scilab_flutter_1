@@ -431,14 +431,16 @@ extern void StraightSidePour_OnTriggerEnter_m34E0848259FCFAE8F6344CE03ABAF8720FF
 extern void StraightSidePour_AnimEvent_StartPour_m452D70EBCF51CB31F71215868F3359A448825921 (void);
 extern void StraightSidePour_AnimEvent_StopPour_mFB0E1A908D7B147D0F46A9D32F32C58E9D9882EC (void);
 extern void StraightSidePour_AnimEvent_ResetControls_m50A2BBEE80F04F682B40A5D72E1A0016141456B7 (void);
+extern void StraightSidePour_HideFoam_m2A5E91B988A19DD1E0A21AC8E0D09D984248DB34 (void);
+extern void StraightSidePour_StartFoam_m3C7A592FE785C21E388A564DAFDDB29F15F68337 (void);
 extern void StraightSidePour_StartFullReactionSequence_m29540D87B8083B087755C3B2FBA8BFC0C63D92A6 (void);
 extern void StraightSidePour__ctor_m2D2DDD221DCCBE4FA8F2F8881D8F4FD63B09D246 (void);
-extern void U3CStartFullReactionSequenceU3Ed__45__ctor_m5128B22EC4DDAB3A88F340D906D52BB3AD9969AC (void);
-extern void U3CStartFullReactionSequenceU3Ed__45_System_IDisposable_Dispose_mEFE72C6DB50F25CE1C530434D90969E34A04947B (void);
-extern void U3CStartFullReactionSequenceU3Ed__45_MoveNext_m58D725760E360ECFC027CF114BDBD3B589C15674 (void);
-extern void U3CStartFullReactionSequenceU3Ed__45_System_Collections_Generic_IEnumeratorU3CSystem_ObjectU3E_get_Current_m54CAB832F99B7B2A68995E7402F4A60B0EEEE193 (void);
-extern void U3CStartFullReactionSequenceU3Ed__45_System_Collections_IEnumerator_Reset_m339EB32BA4BBA6FC834E41DFD57874537E1F58CE (void);
-extern void U3CStartFullReactionSequenceU3Ed__45_System_Collections_IEnumerator_get_Current_mB16CDD5BAD63AA3F8409D3C754FFA9853EDAFE0B (void);
+extern void U3CStartFullReactionSequenceU3Ed__47__ctor_m631EE218C64B0C31E19929C40417732666A7C0D0 (void);
+extern void U3CStartFullReactionSequenceU3Ed__47_System_IDisposable_Dispose_m6BD644EF41C295AD27AE0096F61C3D3728458059 (void);
+extern void U3CStartFullReactionSequenceU3Ed__47_MoveNext_mD1C9BAFF6FE56F5635DF2C6E016B87D41CF8064D (void);
+extern void U3CStartFullReactionSequenceU3Ed__47_System_Collections_Generic_IEnumeratorU3CSystem_ObjectU3E_get_Current_m2047E4F8823BE7C68F39D99CCD30FEDBBF4E3E1D (void);
+extern void U3CStartFullReactionSequenceU3Ed__47_System_Collections_IEnumerator_Reset_m190A0470BE6798572FDFC98C8AE63209E971FAAE (void);
+extern void U3CStartFullReactionSequenceU3Ed__47_System_Collections_IEnumerator_get_Current_mE84E74794F68CEF4A3F9A7DC1CD940A73948EF05 (void);
 extern void TapSelector_OnEnable_mD498E97E3D4DFD3617BB89041A9F72015D25D6D2 (void);
 extern void TapSelector_OnDisable_mA08C8914E3156A4A97E8A385F8358B8B1DE7C2FD (void);
 extern void TapSelector_Start_mFFDE2B793DE68D96403983DD422BD63F5BBECC95 (void);
@@ -730,7 +732,7 @@ extern void SafeArea_Refresh_m2EB186CFFCAB2AB7E5B57A46A2A57D14493FD8EA (void);
 extern void SafeArea_GetSafeArea_m4B6B53C8ED0A4B2F5DBC404E2F208E6A71411815 (void);
 extern void SafeArea_ApplySafeArea_m19691250ABEE5AFFA7F793548BCCE402CCF38548 (void);
 extern void SafeArea__ctor_mC10940463499A1652DEC94CACFCB811ADA5CD6FF (void);
-static Il2CppMethodPointer s_methodPointers[740] = 
+static Il2CppMethodPointer s_methodPointers[742] = 
 {
 	NULL,
 	NULL,
@@ -1168,14 +1170,16 @@ static Il2CppMethodPointer s_methodPointers[740] =
 	StraightSidePour_AnimEvent_StartPour_m452D70EBCF51CB31F71215868F3359A448825921,
 	StraightSidePour_AnimEvent_StopPour_mFB0E1A908D7B147D0F46A9D32F32C58E9D9882EC,
 	StraightSidePour_AnimEvent_ResetControls_m50A2BBEE80F04F682B40A5D72E1A0016141456B7,
+	StraightSidePour_HideFoam_m2A5E91B988A19DD1E0A21AC8E0D09D984248DB34,
+	StraightSidePour_StartFoam_m3C7A592FE785C21E388A564DAFDDB29F15F68337,
 	StraightSidePour_StartFullReactionSequence_m29540D87B8083B087755C3B2FBA8BFC0C63D92A6,
 	StraightSidePour__ctor_m2D2DDD221DCCBE4FA8F2F8881D8F4FD63B09D246,
-	U3CStartFullReactionSequenceU3Ed__45__ctor_m5128B22EC4DDAB3A88F340D906D52BB3AD9969AC,
-	U3CStartFullReactionSequenceU3Ed__45_System_IDisposable_Dispose_mEFE72C6DB50F25CE1C530434D90969E34A04947B,
-	U3CStartFullReactionSequenceU3Ed__45_MoveNext_m58D725760E360ECFC027CF114BDBD3B589C15674,
-	U3CStartFullReactionSequenceU3Ed__45_System_Collections_Generic_IEnumeratorU3CSystem_ObjectU3E_get_Current_m54CAB832F99B7B2A68995E7402F4A60B0EEEE193,
-	U3CStartFullReactionSequenceU3Ed__45_System_Collections_IEnumerator_Reset_m339EB32BA4BBA6FC834E41DFD57874537E1F58CE,
-	U3CStartFullReactionSequenceU3Ed__45_System_Collections_IEnumerator_get_Current_mB16CDD5BAD63AA3F8409D3C754FFA9853EDAFE0B,
+	U3CStartFullReactionSequenceU3Ed__47__ctor_m631EE218C64B0C31E19929C40417732666A7C0D0,
+	U3CStartFullReactionSequenceU3Ed__47_System_IDisposable_Dispose_m6BD644EF41C295AD27AE0096F61C3D3728458059,
+	U3CStartFullReactionSequenceU3Ed__47_MoveNext_mD1C9BAFF6FE56F5635DF2C6E016B87D41CF8064D,
+	U3CStartFullReactionSequenceU3Ed__47_System_Collections_Generic_IEnumeratorU3CSystem_ObjectU3E_get_Current_m2047E4F8823BE7C68F39D99CCD30FEDBBF4E3E1D,
+	U3CStartFullReactionSequenceU3Ed__47_System_Collections_IEnumerator_Reset_m190A0470BE6798572FDFC98C8AE63209E971FAAE,
+	U3CStartFullReactionSequenceU3Ed__47_System_Collections_IEnumerator_get_Current_mE84E74794F68CEF4A3F9A7DC1CD940A73948EF05,
 	TapSelector_OnEnable_mD498E97E3D4DFD3617BB89041A9F72015D25D6D2,
 	TapSelector_OnDisable_mA08C8914E3156A4A97E8A385F8358B8B1DE7C2FD,
 	TapSelector_Start_mFFDE2B793DE68D96403983DD422BD63F5BBECC95,
@@ -1476,9 +1480,9 @@ static Il2CppMethodPointer s_methodPointers[740] =
 extern void Goal__ctor_m4452076EE88E564D97BBDD12E7011CAF34E275A3_AdjustorThunk (void);
 static Il2CppTokenAdjustorThunkPair s_adjustorThunks[1] = 
 {
-	{ 0x0600029D, Goal__ctor_m4452076EE88E564D97BBDD12E7011CAF34E275A3_AdjustorThunk },
+	{ 0x0600029F, Goal__ctor_m4452076EE88E564D97BBDD12E7011CAF34E275A3_AdjustorThunk },
 };
-static const int32_t s_InvokerIndices[740] = 
+static const int32_t s_InvokerIndices[742] = 
 {
 	-1,
 	-1,
@@ -1916,6 +1920,8 @@ static const int32_t s_InvokerIndices[740] =
 	5294,
 	5294,
 	5294,
+	11145,
+	11145,
 	5163,
 	5294,
 	4487,
@@ -2225,7 +2231,7 @@ static const Il2CppTokenRangePair s_rgctxIndices[3] =
 {
 	{ 0x02000002, { 0, 29 } },
 	{ 0x02000078, { 29, 11 } },
-	{ 0x060002C4, { 40, 2 } },
+	{ 0x060002C6, { 40, 2 } },
 };
 extern const uint32_t g_rgctx_U3CU3Ef__AnonymousType0_4_t93FD0713D40011506D6B5581D9D5064D1A1A31B8;
 extern const uint32_t g_rgctx_U3CidU3Ej__TPar_tB4283D6614B0A1B9713411CF590AE6445EC76C76;
@@ -2318,7 +2324,7 @@ IL2CPP_EXTERN_C const Il2CppCodeGenModule g_AssemblyU2DCSharp_CodeGenModule;
 const Il2CppCodeGenModule g_AssemblyU2DCSharp_CodeGenModule = 
 {
 	"Assembly-CSharp.dll",
-	740,
+	742,
 	s_methodPointers,
 	1,
 	s_adjustorThunks,
