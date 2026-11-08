@@ -1,0 +1,284 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- Helper Functions ---
+    function isSuperAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'scilabar@gmail.com';
+    }
+
+    function getUserRole() {
+      return get(
+        /databases/$(database)/documents/users/$(request.auth.uid)
+      ).data.role;
+    }
+
+    function isAdmin() {
+      return isSuperAdmin() || getUserRole() == 'admin';
+    }
+
+    function isTeacherOrAdmin() {
+      return isSuperAdmin()
+        || getUserRole() == 'admin'
+        || getUserRole() == 'teacher';
+    }
+
+    // Checks whether a teacher can edit a specific AR experiment.
+    function canTeacherEditArExperiment(experimentId) {
+      let user = get(
+        /databases/$(database)/documents/users/$(request.auth.uid)
+      ).data;
+
+      let teachesGrade9 =
+        user.sections is list
+        && user.sections.hasAny(['A', 'B', 'C']);
+
+      let teachesGrade10 =
+        user.sections is list
+        && user.sections.hasAny(['X', 'Y', 'Z']);
+
+      let gradeAllowed =
+        (
+          teachesGrade9
+          && experimentId in ['ar2', 'ar3', 'ar5']
+        )
+        || (
+          teachesGrade10
+          && experimentId in ['ar1', 'ar6', 'ar7']
+        )
+        || (
+          (teachesGrade9 || teachesGrade10)
+          && experimentId in ['ar4', 'ar8']
+        );
+
+      return user.role == 'teacher'
+        && gradeAllowed
+        && request.resource.data.diff(resource.data)
+          .affectedKeys()
+          .hasOnly([
+            'title',
+            'topic',
+            'category',
+            'backgroundInfo',
+            'safetyNote',
+            'relatedConcepts',
+            'requiredMaterials',
+            'steps'
+          ]);
+    }
+
+    // 1. Users Collection
+    match /users/{userId} {
+      // Required by live profile/name sync and teacher roster/count queries.
+      allow read: if request.auth != null;
+
+      // Users create and maintain their own profile. Teachers retain the
+      // approval workflow, while administrators retain account management.
+      allow create: if request.auth != null
+        && request.auth.uid == userId;
+
+      allow update: if request.auth != null
+        && (
+          request.auth.uid == userId
+          || isAdmin()
+          || (
+            getUserRole() == 'teacher'
+            && resource.data.role in ['grade9', 'grade10']
+            && request.resource.data.diff(resource.data)
+              .affectedKeys()
+              .hasOnly(['status'])
+            && request.resource.data.status in ['approved', 'rejected']
+          )
+        );
+
+      allow delete: if request.auth != null
+        && isAdmin();
+    }
+
+    // 1.5. User AR Experiment Activity
+    match /users/{userId}/experiment_activity/{experimentId} {
+      allow read: if request.auth != null;
+
+      allow write: if request.auth != null
+        && request.auth.uid == userId;
+    }
+
+    // 2. Courses Collection
+    match /courses/{courseId} {
+      allow read: if request.auth != null;
+
+      allow write: if request.auth != null
+        && isTeacherOrAdmin();
+    }
+
+    // 3. Quiz Attempts Collection
+    match /quiz_attempts/{attemptId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // 4. Module Attachments Collection
+    match /module_attachments/{attachmentId} {
+      allow read: if request.auth != null;
+
+      allow write: if request.auth != null
+        && isTeacherOrAdmin();
+    }
+
+    // 5. Quizzes Collection
+    match /quizzes/{quizId} {
+      allow read: if request.auth != null;
+
+      allow write: if request.auth != null
+        && isTeacherOrAdmin();
+    }
+
+    // 6. Student Activity Logs
+    match /activity/{userId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // 7. Sections Collection
+    match /sections/{sectionId} {
+      allow read: if true;
+
+      allow write: if request.auth != null
+        && isAdmin();
+    }
+
+    // 8. AR Experiments Collection
+    match /ar_experiments/{experimentId} {
+      allow read: if request.auth != null;
+
+      // Only administrators can add or delete AR experiments.
+      allow create, delete: if request.auth != null
+        && isAdmin();
+
+      // Administrators can update every experiment. Teachers can update only
+      // experiments for their handled grade.
+      allow update: if request.auth != null
+        && (
+          isAdmin()
+          || canTeacherEditArExperiment(experimentId)
+        );
+    }
+
+    // 9. AR Locks Collection
+    match /ar_locks/{sectionId} {
+      allow read: if request.auth != null;
+
+      allow write: if request.auth != null
+        && isTeacherOrAdmin();
+    }
+
+    // 10. Class Announcements
+    match /class_announcements/{announcementId} {
+      allow create: if request.auth != null
+        && isTeacherOrAdmin()
+        && request.resource.data.teacherId == request.auth.uid
+        && request.resource.data.message is string
+        && request.resource.data.message.size() > 0
+        && request.resource.data.message.size() <= 500
+        && request.resource.data.targets is list
+        && request.resource.data.targetStudentIds is list
+        && request.resource.data.targetStudentIds.size() > 0;
+
+      allow read: if request.auth != null
+        && (
+          isAdmin()
+          || resource.data.teacherId == request.auth.uid
+          || request.auth.uid in resource.data.targetStudentIds
+        );
+
+      allow update, delete: if request.auth != null
+        && (
+          isAdmin()
+          || resource.data.teacherId == request.auth.uid
+        );
+
+      match /reactions/{studentId} {
+        function announcementData() {
+          return get(
+            /databases/$(database)/documents/class_announcements/$(announcementId)
+          ).data;
+        }
+
+        allow read: if request.auth != null
+          && (
+            isAdmin()
+            || announcementData().teacherId == request.auth.uid
+            || request.auth.uid
+              in announcementData().targetStudentIds
+          );
+
+        allow create, update: if request.auth != null
+          && request.auth.uid == studentId
+          && request.auth.uid
+            in announcementData().targetStudentIds
+          && request.resource.data.studentId == request.auth.uid
+          && request.resource.data.type in ['like', 'love'];
+
+        allow delete: if request.auth != null
+          && request.auth.uid == studentId
+          && request.auth.uid
+            in announcementData().targetStudentIds;
+      }
+    }
+
+    // 11. Archived Teacher Uploads
+    match /teacher_upload_archives/{archiveId} {
+      allow read, create, update, delete: if request.auth != null
+        && isAdmin();
+    }
+
+    // 12. Admin Activity Logs
+    match /admin_activity_logs/{logId} {
+      allow read: if request.auth != null
+        && isAdmin();
+
+      allow create: if request.auth != null
+        && isAdmin()
+        && request.resource.data.adminUid == request.auth.uid;
+
+      allow update, delete: if false;
+    }
+
+    // 13. Admin Device Approval Requests
+    match /admin_device_requests/{requestId} {
+      allow read: if request.auth != null
+        && isAdmin();
+
+      allow create: if request.auth != null
+        && isAdmin()
+        && request.resource.data.requesterUid == request.auth.uid
+        && request.resource.data.requesterEmail
+          == 'scilabar@gmail.com'
+        && request.resource.data.status == 'pending';
+
+      allow update: if request.auth != null
+        && isAdmin()
+        && resource.data.requesterUid == request.auth.uid
+        && resource.data.status == 'pending'
+        && request.resource.data.requesterUid
+          == resource.data.requesterUid
+        && request.resource.data.requesterEmail
+          == resource.data.requesterEmail
+        && request.resource.data.diff(resource.data)
+          .affectedKeys()
+          .hasOnly([
+            'status',
+            'approvedAt',
+            'approvedByUid'
+          ])
+        && request.resource.data.status == 'approved'
+        && request.resource.data.approvedByUid
+          == request.auth.uid;
+
+      allow delete: if request.auth != null
+        && isAdmin()
+        && resource.data.requesterUid == request.auth.uid
+        && resource.data.status == 'pending';
+    }
+  }
+}

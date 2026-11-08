@@ -646,7 +646,24 @@ class AuthService extends ChangeNotifier {
 
     // array-contains-any limits to 10 elements
     final chunked = sections.take(10).toList();
-    try {
+
+    // After a web hot restart Firebase Auth can still be restoring its
+    // persisted session while course widgets begin loading. Wait briefly for
+    // that session so Firestore does not receive an unauthenticated count
+    // request and report a misleading permission-denied error.
+    var authenticatedUser = _auth.currentUser;
+    if (authenticatedUser == null) {
+      try {
+        authenticatedUser = await _auth
+            .authStateChanges()
+            .firstWhere((user) => user != null)
+            .timeout(const Duration(seconds: 5));
+      } on TimeoutException {
+        return 0;
+      }
+    }
+
+    Future<int> runCount() async {
       final snapshot = await _db
           .collection('users')
           .where('sections', arrayContainsAny: chunked)
@@ -655,6 +672,24 @@ class AuthService extends ChangeNotifier {
           .count()
           .get();
       return snapshot.count ?? 0;
+    }
+
+    try {
+      return await runCount();
+    } on FirebaseException catch (error) {
+      if (error.code == 'permission-denied' && authenticatedUser != null) {
+        try {
+          // Refresh a stale web token once, then repeat the same authorized
+          // query. A genuine rules denial still falls through to the log below.
+          await authenticatedUser.getIdToken(true);
+          return await runCount();
+        } catch (retryError) {
+          debugPrint('Error counting students after auth refresh: $retryError');
+          return 0;
+        }
+      }
+      debugPrint('Error counting students: $error');
+      return 0;
     } catch (e) {
       debugPrint('Error counting students: $e');
       return 0;

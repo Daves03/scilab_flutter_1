@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { Shield, FileText } from 'lucide-react';
+import { useState } from 'react';
 
 export default function Legal() {
   const [activeTab, setActiveTab] = useState('terms');
@@ -22,12 +21,16 @@ export default function Legal() {
               padding: '16px 24px', 
               border: 'none', 
               background: 'transparent',
-              color: activeTab === 'terms' ? 'var(--primary-color)' : 'var(--text-secondary)',
-              fontWeight: activeTab === 'terms' ? '600' : 'normal', 
+              color: activeTab === 'terms' ? 'var(--text-primary)' : 'var(--text-secondary)',
+              fontWeight: activeTab === 'terms' ? '800' : '500',
               cursor: 'pointer',
-              borderBottom: activeTab === 'terms' ? '2px solid var(--primary-color)' : '2px solid transparent',
+              borderBottom: activeTab === 'terms' ? '3px solid #ffffff' : '3px solid transparent',
+              boxShadow: activeTab === 'terms' ? '0 3px 8px rgba(255,255,255,0.28)' : 'none',
+              backgroundColor: activeTab === 'terms' ? 'rgba(255,255,255,0.045)' : 'transparent',
               transition: 'all 0.2s',
               marginRight: '8px',
+              marginBottom: '-1px',
+              flex: 1,
               fontSize: '15px'
             }}
           >
@@ -40,11 +43,15 @@ export default function Legal() {
               padding: '16px 24px', 
               border: 'none', 
               background: 'transparent',
-              color: activeTab === 'privacy' ? 'var(--primary-color)' : 'var(--text-secondary)',
-              fontWeight: activeTab === 'privacy' ? '600' : 'normal', 
+              color: activeTab === 'privacy' ? 'var(--text-primary)' : 'var(--text-secondary)',
+              fontWeight: activeTab === 'privacy' ? '800' : '500',
               cursor: 'pointer',
-              borderBottom: activeTab === 'privacy' ? '2px solid var(--primary-color)' : '2px solid transparent',
+              borderBottom: activeTab === 'privacy' ? '3px solid #ffffff' : '3px solid transparent',
+              boxShadow: activeTab === 'privacy' ? '0 3px 8px rgba(255,255,255,0.28)' : 'none',
+              backgroundColor: activeTab === 'privacy' ? 'rgba(255,255,255,0.045)' : 'transparent',
               transition: 'all 0.2s',
+              marginBottom: '-1px',
+              flex: 1,
               fontSize: '15px'
             }}
           >

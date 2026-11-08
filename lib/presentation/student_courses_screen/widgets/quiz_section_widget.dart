@@ -354,7 +354,15 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
   // ── Quiz list ──────────────────────────────────────────────────────────────
 
   Widget _buildQuizList() {
-    final quizzes = List<CourseQuiz>.from(widget.course.quizzes);
+    final quizzes = List<CourseQuiz>.from(widget.course.quizzes)
+      ..sort((first, second) {
+        final firstTime = first.createdAt?.millisecondsSinceEpoch ?? 0;
+        final secondTime = second.createdAt?.millisecondsSinceEpoch ?? 0;
+        final dateComparison = secondTime.compareTo(firstTime);
+        return dateComparison != 0
+            ? dateComparison
+            : second.id.compareTo(first.id);
+      });
     final requestedQuizId = widget.initialQuizId;
     if (requestedQuizId != null) {
       final requestedIndex = quizzes.indexWhere(
@@ -796,6 +804,10 @@ class _QuizCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasDueDate = quiz.dueDate != null;
+    final dueHighlightColor = isMissed
+        ? const Color(0xFFFF4757)
+        : const Color(0xFFFFB800);
     final Color statusColor = isDone
         ? (percentage! >= 0.8
               ? const Color(0xFF00FF88)
@@ -813,8 +825,12 @@ class _QuizCard extends StatelessWidget {
             : Colors.white,
         borderRadius: BorderRadius.circular(18.0),
         border: Border.all(
-          color: isHighlighted ? accentColor : statusColor.withAlpha(40),
-          width: isHighlighted ? 2 : 1,
+          color: isHighlighted
+              ? accentColor
+              : hasDueDate && !isDone
+              ? dueHighlightColor.withAlpha(150)
+              : statusColor.withAlpha(40),
+          width: isHighlighted || (hasDueDate && !isDone) ? 1.5 : 1,
         ),
         boxShadow: isHighlighted
             ? [
@@ -865,15 +881,99 @@ class _QuizCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      '${quiz.totalQuestions} questions${quiz.dueDate != null ? (isMissed ? ' • Missed: ${quiz.dueDateLabel}' : ' • Due: ${quiz.dueDateLabel}') : ' • No Due Date'}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? const Color(0xFF8BA3C0)
-                            : Colors.grey.shade600,
-                      ),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 5,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          '${quiz.totalQuestions} questions',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF8BA3C0)
+                                : Colors.grey.shade600,
+                          ),
+                        ),
+                        if (hasDueDate)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 7,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: dueHighlightColor.withAlpha(24),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: dueHighlightColor.withAlpha(120),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CustomIconWidget(
+                                  iconName: isMissed
+                                      ? 'event_busy'
+                                      : 'event',
+                                  color: dueHighlightColor,
+                                  size: 12,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${isMissed ? 'Missed' : 'Due'}: ${quiz.dueDateLabel}',
+                                  style: TextStyle(
+                                    color: dueHighlightColor,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        else
+                          Text(
+                            '• No due date',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? const Color(0xFF6F89A8)
+                                  : Colors.grey.shade500,
+                            ),
+                          ),
+                      ],
                     ),
+                    if (quiz.createdAt != null) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          CustomIconWidget(
+                            iconName: 'schedule',
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF00D4FF)
+                                : const Color(0xFF1565C0),
+                            size: 13,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              'Created: ${quiz.createdDateLabel}',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? const Color(0xFF8BA3C0)
+                                    : Colors.grey.shade600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -914,38 +1014,9 @@ class _QuizCard extends StatelessWidget {
           ],
           if (quiz.directions.trim().isNotEmpty) ...[
             const SizedBox(height: 12),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: accentColor.withAlpha(15),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: accentColor.withAlpha(45)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Directions',
-                    style: TextStyle(
-                      color: accentColor,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    quiz.directions,
-                    style: TextStyle(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0xFFB7C9DD)
-                          : Colors.grey.shade700,
-                      fontSize: 12,
-                      height: 1.4,
-                    ),
-                  ),
-                ],
-              ),
+            _QuizDirections(
+              directions: quiz.directions,
+              accentColor: accentColor,
             ),
           ],
           const SizedBox(height: 12),
@@ -1003,6 +1074,116 @@ class _QuizCard extends StatelessWidget {
 }
 
 // ── Question card ─────────────────────────────────────────────────────────────
+
+class _QuizDirections extends StatefulWidget {
+  final String directions;
+  final Color accentColor;
+
+  const _QuizDirections({
+    required this.directions,
+    required this.accentColor,
+  });
+
+  @override
+  State<_QuizDirections> createState() => _QuizDirectionsState();
+}
+
+class _QuizDirectionsState extends State<_QuizDirections> {
+  bool _isExpanded = false;
+
+  bool get _canExpand {
+    final text = widget.directions.trim();
+    return text.length > 110 || '\n'.allMatches(text).length >= 2;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bodyColor = isDark
+        ? const Color(0xFFB7C9DD)
+        : Colors.grey.shade700;
+
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOut,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+        decoration: BoxDecoration(
+          color: widget.accentColor.withAlpha(13),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: widget.accentColor.withAlpha(45)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CustomIconWidget(
+                  iconName: 'menu_book',
+                  color: widget.accentColor,
+                  size: 15,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    'Quiz directions',
+                    style: TextStyle(
+                      color: widget.accentColor,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                if (_canExpand)
+                  InkWell(
+                    onTap: () => setState(() => _isExpanded = !_isExpanded),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 2,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _isExpanded ? 'Show less' : 'Show more',
+                            style: TextStyle(
+                              color: widget.accentColor,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(width: 2),
+                          CustomIconWidget(
+                            iconName: _isExpanded
+                                ? 'keyboard_arrow_up'
+                                : 'keyboard_arrow_down',
+                            color: widget.accentColor,
+                            size: 15,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 5),
+            Text(
+              widget.directions.trim(),
+              maxLines: _isExpanded ? null : 2,
+              overflow: _isExpanded
+                  ? TextOverflow.visible
+                  : TextOverflow.ellipsis,
+              style: TextStyle(color: bodyColor, fontSize: 12, height: 1.35),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class _QuestionCard extends StatelessWidget {
   final CourseQuestion question;

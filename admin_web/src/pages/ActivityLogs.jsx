@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { collection, collectionGroup, getDocs, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Activity, Clock, Box, BookOpen, Search, PlusCircle, FilePlus, HelpCircle, CheckCircle, ChevronLeft, ChevronRight, ShieldCheck, Archive, RotateCcw, UserCheck, UserX, Pencil, Trash2 } from 'lucide-react';
+import { Activity, Clock, Box, BookOpen, Search, PlusCircle, FilePlus, HelpCircle, CheckCircle, ChevronLeft, ChevronRight, ShieldCheck, Archive, RotateCcw, UserCheck, UserX, Pencil, Trash2, XCircle } from 'lucide-react';
 
 export default function ActivityLogs() {
   const [logs, setLogs] = useState([]);
@@ -256,6 +256,12 @@ export default function ActivityLogs() {
         return { text: 'Added Quiz', color: '#8b5cf6', icon: <HelpCircle size={16} /> };
       case 'quiz_submitted':
         return { text: 'Answered Quiz', color: '#10b981', icon: <CheckCircle size={16} /> };
+      case 'quiz_approved':
+        return { text: 'Approved Quiz', color: '#34d399', icon: <CheckCircle size={16} /> };
+      case 'quiz_rejected':
+        return { text: 'Rejected Quiz', color: '#fb7185', icon: <XCircle size={16} /> };
+      case 'quiz_recovered':
+        return { text: 'Recovered Quiz', color: '#22d3ee', icon: <RotateCcw size={16} /> };
       case 'section_added':
         return { text: 'Added Section', color: '#22d3ee', icon: <PlusCircle size={16} /> };
       case 'section_archived':
@@ -321,6 +327,8 @@ export default function ActivityLogs() {
       typeMatch = log.type === 'quiz_added';
     } else if (filterType === 'student_quizzes') {
       typeMatch = log.type === 'quiz_submitted';
+    } else if (filterType === 'quiz_reviews') {
+      typeMatch = ['quiz_approved', 'quiz_rejected', 'quiz_recovered'].includes(log.type);
     } else if (filterType === 'admin') {
       typeMatch = log.isAdminActivity === true;
     }
@@ -370,6 +378,7 @@ export default function ActivityLogs() {
               <option value="courses">Courses</option>
               <option value="added_quizzes">Added Quizzes</option>
               <option value="student_quizzes">Answered Quizzes</option>
+              <option value="quiz_reviews">Quiz Approvals</option>
               <option value="admin">Admin Activity</option>
             </select>
           </div>
