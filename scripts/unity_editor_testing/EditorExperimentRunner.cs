@@ -16,6 +16,7 @@ public sealed class EditorExperimentRunner : MonoBehaviour
     private bool initializeScene;
     private string warning;
     private string status;
+    private string customStepOrder = "";
     private bool collapsed;
     private Rect panel = new Rect(12, 12, 360, 310);
 
@@ -82,10 +83,14 @@ public sealed class EditorExperimentRunner : MonoBehaviour
             warning = null;
             TapSelector.IsModalOpen = false;
             string[] tags = EditorExperimentSteps.ForScene(SceneManager.GetActiveScene().name);
-            steps = tags == null ? null : new EditorExperimentSteps(tags);
+            customStepOrder = EditorPrefs.GetString("Scilab.EditorStepPlan." + SceneManager.GetActiveScene().name, "");
+            if (!string.IsNullOrWhiteSpace(customStepOrder))
+                tags = customStepOrder.Split(new[] { '|' }, System.StringSplitOptions.RemoveEmptyEntries);
+            steps = tags == null || tags.Length == 0 ? null : new EditorExperimentSteps(tags);
             if (steps != null)
             {
                 status = "Perform the highlighted action; animations advance the guide automatically.";
+                DynamicExperimentGuide.SetPlan(steps.Tags);
                 Bridge().SetActiveStep(steps.ActiveTag);
             }
         }
@@ -96,7 +101,8 @@ public sealed class EditorExperimentRunner : MonoBehaviour
             if (message.StartsWith("STEP_COMPLETED:", System.StringComparison.Ordinal))
             {
                 string item = message.Substring("STEP_COMPLETED:".Length).Trim();
-                if (steps.Complete(item)) Bridge().SetActiveStep(steps.ActiveTag);
+                steps.Complete(item);
+                Bridge().SetActiveStep(steps.ActiveTag);
                 status = "Animation completed: " + item;
             }
             else if (message.StartsWith("WARNING:", System.StringComparison.Ordinal))
@@ -112,8 +118,12 @@ public sealed class EditorExperimentRunner : MonoBehaviour
             else if (message.StartsWith("EXPLANATION:", System.StringComparison.Ordinal))
             {
                 status = message.Substring("EXPLANATION:".Length);
-                if (SceneManager.GetActiveScene().name == "Exp7" && steps.Complete("Litmus"))
+                if (SceneManager.GetActiveScene().name == "Exp7")
+                {
+                    steps.Finish();
                     Bridge().SetActiveStep(steps.ActiveTag);
+                }
+
             }
         }
     }
@@ -151,7 +161,7 @@ public sealed class EditorExperimentRunner : MonoBehaviour
     {
         if (steps == null) return;
         panel.width = Mathf.Min(360, Screen.width - 24);
-        panel.height = collapsed ? 58 : (warning != null ? 395 : 320);
+        panel.height = collapsed ? 58 : (warning != null ? 475 : 400);
         panel = GUI.Window(GetInstanceID(), panel, DrawPanel, "SciLab - Editor Testing");
     }
 
@@ -163,13 +173,13 @@ public sealed class EditorExperimentRunner : MonoBehaviour
             " - Step " + (steps.Index + 1) + "/" + steps.Tags.Length + ": " + steps.ActiveTag));
         GUILayout.Label(steps.Finished ? "Experiment complete. Restart for a fresh run." : Instruction(steps.ActiveTag), EditorStyles.wordWrappedLabel);
         GUILayout.Label(status, EditorStyles.wordWrappedLabel);
-        if (SceneManager.GetActiveScene().name == "Exp4" && !steps.Finished && steps.ActiveTag == "Flame-Switch")
+        if (SceneManager.GetActiveScene().name == "Exp4" && !steps.Finished && DynamicExperimentGuide.Matches(steps.ActiveTag, "Flame-Switch"))
         {
             BunsenBurnerSwitch burner = FindFirstObjectByType<BunsenBurnerSwitch>();
             if (burner != null && GUILayout.Button(burner.IsBurning ? "Turn burner OFF" : "Turn burner ON"))
                 Bridge().SetBurnerState(burner.IsBurning ? "off" : "on");
         }
-        if (SceneManager.GetActiveScene().name == "Exp4" && !steps.Finished && steps.Index == 0)
+        if (SceneManager.GetActiveScene().name == "Exp4" && !steps.Finished && DynamicExperimentGuide.Matches(steps.ActiveTag, "Chemical-Bottle"))
         {
             string[] chemicals = { "Sodium", "Copper", "Potassium", "Strontium", "Barium", "Calcium" };
             GUILayout.BeginHorizontal();
@@ -179,6 +189,14 @@ public sealed class EditorExperimentRunner : MonoBehaviour
                 if (GUILayout.Button(chemicals[i])) Bridge().SelectFlameChemical(i.ToString());
             }
             GUILayout.EndHorizontal();
+        }
+        GUILayout.Label("Editor step tags (separate steps with |):");
+        customStepOrder = GUILayout.TextField(customStepOrder);
+        if (GUILayout.Button("Apply order and restart"))
+        {
+            EditorPrefs.SetString("Scilab.EditorStepPlan." + SceneManager.GetActiveScene().name, customStepOrder);
+            UnityEditor.SceneManagement.EditorSceneManager.LoadSceneInPlayMode(
+                SceneManager.GetActiveScene().path, new LoadSceneParameters(LoadSceneMode.Single));
         }
         if (warning != null)
         {

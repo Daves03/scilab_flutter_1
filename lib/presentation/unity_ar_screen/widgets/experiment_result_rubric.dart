@@ -57,7 +57,7 @@ class ExperimentResultRubric extends StatelessWidget {
                   _RubricCell('Assessment details', isHeader: true),
                   _RubricCell('25–18', isHeader: true),
                   _RubricCell('17–10', isHeader: true),
-                  _RubricCell('9–1', isHeader: true),
+                  _RubricCell('9–2', isHeader: true),
                 ],
               ),
               for (final row in _rows())
@@ -79,7 +79,7 @@ class ExperimentResultRubric extends StatelessWidget {
                     ),
                     _RubricCell(
                       row.lowDescription,
-                      isEarnedBand: row.score <= 9,
+                      isEarnedBand: row.score >= 2 && row.score <= 9,
                     ),
                   ],
                 ),
@@ -189,7 +189,7 @@ class ExperimentResultRubric extends StatelessWidget {
   List<String> _ppeLabels(Set<String> ids) => ids
       .map(
         (id) =>
-            ppeOptions
+            (ppeResult?.options ?? ppeOptions)
                 .where((option) => option.id == id)
                 .map((option) => option.label)
                 .firstOrNull ??

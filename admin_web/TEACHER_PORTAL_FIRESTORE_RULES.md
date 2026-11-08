@@ -4,6 +4,13 @@ The teacher web portal uses the same Firebase collections as the Flutter app.
 Most existing rules already support it, but the `ar_experiments` rule must allow
 approved teachers to update AR content.
 
+The editor also saves per-experiment `ppeAssessment` and `assessmentQuestions`
+fields on these documents. The same update permission covers PPE choices,
+correct selections, and the 5–10-question end-of-experiment quiz. No additional
+collection is used. The web editor validates settings before save, and Flutter
+validates them when loading. Existing documents without these fields keep the
+built-in assessments.
+
 Replace the existing AR Experiments block with:
 
 ```firestore

@@ -7,10 +7,21 @@ public sealed class EditorExperimentSteps
 {
     public readonly string[] Tags;
     private readonly HashSet<int> completed = new HashSet<int>();
-    private readonly HashSet<string> rods = new HashSet<string>();
+    private readonly Dictionary<int, HashSet<string>> actions = new Dictionary<int, HashSet<string>>();
     public int Index { get; private set; }
     public bool Finished { get; private set; }
-    public string ActiveTag { get { return Finished ? "COMPLETED" : Tags[Index]; } }
+    public string ActiveTag
+    {
+        get
+        {
+            if (Finished) return "COMPLETED";
+            if (!actions.TryGetValue(Index, out HashSet<string> done)) return Tags[Index];
+            var pending = new List<string>();
+            foreach (string action in Tags[Index].Split(','))
+                if (!done.Contains(DynamicExperimentGuide.Canonical(action))) pending.Add(action);
+            return string.Join(",", pending);
+        }
+    }
 
     public EditorExperimentSteps(string[] tags) { Tags = tags; }
 
@@ -29,33 +40,33 @@ public sealed class EditorExperimentSteps
         }
     }
 
-    private static string Normalize(string value)
-    {
-        return (value ?? "").Replace("-", "").Replace("_", "").Replace(" ", "").Trim().ToLowerInvariant();
-    }
+    public void Finish() { Finished = true; }
 
     public bool Complete(string item)
     {
         if (Finished || string.IsNullOrWhiteSpace(item)) return false;
-        string normalized = Normalize(item);
-        int found = -1;
-        for (int i = 0; i < Tags.Length; i++)
-            foreach (string alias in Tags[i].Split(','))
-                if (Normalize(alias) == normalized) found = i;
-        if (found < 0 || completed.Contains(found)) return false;
-        // Rods are two separate actions; RedWire/ElectrodeA are aliases.
-        if (Tags[found] == "Rod1,Rod2")
+        for (int offset = 0; offset < Tags.Length; offset++)
         {
-            rods.Add(normalized);
-            if (!rods.Contains("rod1") || !rods.Contains("rod2")) return false;
+            int found = (Index + offset) % Tags.Length;
+            if (completed.Contains(found) || !DynamicExperimentGuide.Matches(Tags[found], item)) continue;
+            if (!actions.TryGetValue(found, out HashSet<string> done))
+            {
+                done = new HashSet<string>();
+                actions[found] = done;
+            }
+            foreach (string action in Tags[found].Split(','))
+                if (DynamicExperimentGuide.Matches(action, item)) done.Add(DynamicExperimentGuide.Canonical(action));
+            bool allDone = true;
+            foreach (string action in Tags[found].Split(','))
+                if (!done.Contains(DynamicExperimentGuide.Canonical(action))) allDone = false;
+            if (!allDone) return false;
+            completed.Add(found);
+            for (int i = 0; i < Tags.Length; i++)
+                if (!completed.Contains(i)) { Index = i; return true; }
+            Finished = true;
+            return true;
         }
-        // The final activator must follow all preparatory actions.
-        if (found == Tags.Length - 1 && completed.Count != Tags.Length - 1) return false;
-        completed.Add(found);
-        for (int i = 0; i < Tags.Length; i++)
-            if (!completed.Contains(i)) { Index = i; return true; }
-        Finished = true;
-        return true;
+        return false;
     }
 }
 #endif

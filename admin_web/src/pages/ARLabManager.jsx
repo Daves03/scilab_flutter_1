@@ -4,6 +4,8 @@ import { db } from '../firebase';
 import { logAdminActivity } from '../services/adminActivityService';
 import { Edit, Save, X, RefreshCw, Layers } from 'lucide-react';
 import { teacherGradeLabels } from '../services/teacherPortalUtils';
+import ExperimentAssessmentEditor from '../components/ExperimentAssessmentEditor';
+import { prepareExperimentAssessment, validateExperimentAssessment, assessmentFieldsForSave } from '../services/experimentAssessments';
 
 const GRADE_EXPERIMENT_IDS = {
   'Grade 9': ['ar3', 'ar2', 'ar5'],
@@ -271,6 +273,7 @@ export default function ARLabManager({ teacherProfile = null }) {
   const [textEditorModal, setTextEditorModal] = useState(null);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [seeding, setSeeding] = useState(false);
+  const [assessmentError, setAssessmentError] = useState('');
 
   useEffect(() => {
     const q = query(collection(db, 'ar_experiments'));
@@ -280,7 +283,7 @@ export default function ARLabManager({ teacherProfile = null }) {
         expData.push({ _docId: doc.id, ...doc.data() });
       });
       // Sort by ID to keep them in order
-      expData.sort((a, b) => a.id.localeCompare(b.id));
+      expData.sort((a, b) => String(a.id || a._docId).localeCompare(String(b.id || b._docId)));
       setExperiments(expData);
       setLoading(false);
     });
@@ -328,12 +331,16 @@ export default function ARLabManager({ teacherProfile = null }) {
 
   const handleSaveClick = (e) => {
     e.preventDefault();
+    const error = validateExperimentAssessment(editingExp);
+    setAssessmentError(error);
+    if (error) return;
     setShowSaveConfirm(true);
   };
 
   const confirmSave = async () => {
     if (!editingExp) return;
     try {
+      const assessmentFields = assessmentFieldsForSave(editingExp);
       await updateDoc(doc(db, 'ar_experiments', editingExp._docId), {
         title: editingExp.title,
         topic: editingExp.topic,
@@ -343,6 +350,7 @@ export default function ARLabManager({ teacherProfile = null }) {
         relatedConcepts: editingExp.relatedConcepts,
         requiredMaterials: editingExp.requiredMaterials,
         steps: editingExp.steps || [],
+        ...assessmentFields,
       });
       if (!teacherProfile) {
         await logAdminActivity({
@@ -448,7 +456,7 @@ export default function ARLabManager({ teacherProfile = null }) {
                     <span>Topic: {exp.topic}</span>
                   </div>
                 </div>
-                <button className="btn btn-secondary mobile-w-full" style={{ color: 'var(--accent-green)' }} onClick={() => setEditingExp({...exp})}>
+                <button className="btn btn-secondary mobile-w-full" style={{ color: 'var(--accent-green)' }} onClick={() => { setAssessmentError(''); setEditingExp(prepareExperimentAssessment(exp)); }}>
                   <Edit size={16} /> Edit Content
                 </button>
               </div>
@@ -600,9 +608,13 @@ export default function ARLabManager({ teacherProfile = null }) {
                     + Add Step
                   </button>
                 </label>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Tags must match an existing model action. Each model keeps its destination. Separate grouped actions with commas.</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {(editingExp.steps || []).map((step, index) => (
                     <div key={`step-${index}`} style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'flex-start', background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                      <div style={{ flex: '1 1 100%', display: 'flex', gap: '12px', alignItems: 'center' }}>
+                        <strong>Step {index + 1}</strong>
+                      </div>
                       <div style={{ flex: '1 1 100px' }}>
                         <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: '500' }}>Bottle Tag</div>
                         <input className="input-field" style={{ margin: 0, cursor: 'pointer' }} value={step.bottleTag} readOnly onClick={() => setTextEditorModal({ title: 'Edit Bottle Tag', value: step.bottleTag, onSave: (val) => handleStepChange(index, 'bottleTag', val) })} placeholder="e.g. Surf" required />
@@ -629,6 +641,9 @@ export default function ARLabManager({ teacherProfile = null }) {
                   )}
                 </div>
               </div>
+
+              <ExperimentAssessmentEditor experiment={editingExp} onChange={(patch) => { setAssessmentError(''); setEditingExp((current) => ({ ...current, ...patch })); }} />
+              {assessmentError && <p role="alert" style={{ color: '#ff7070' }}>{assessmentError}</p>}
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px', borderTop: '1px solid var(--border-light)', paddingTop: '24px' }}>
                 <button type="button" className="btn btn-secondary" onClick={() => setEditingExp(null)}>

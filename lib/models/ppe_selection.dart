@@ -88,6 +88,7 @@ class PpeSelectionResult {
     required this.score,
     this.firstAttemptMissing = const <String>{},
     this.firstAttemptUnnecessary = const <String>{},
+    this.options = ppeOptions,
   });
 
   final Set<String> selected;
@@ -95,4 +96,5 @@ class PpeSelectionResult {
   final int score;
   final Set<String> firstAttemptMissing;
   final Set<String> firstAttemptUnnecessary;
+  final List<PpeOption> options;
 }

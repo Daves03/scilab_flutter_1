@@ -1,0 +1,506 @@
+{
+  "ppeOptions": [
+    {
+      "id": "goggles",
+      "label": "Safety goggles",
+      "reason": "Protects the eyes from chemical splashes, droplets, and debris."
+    },
+    {
+      "id": "gloves",
+      "label": "Nitrile gloves",
+      "reason": "Reduces skin contact with irritating or corrosive chemicals."
+    },
+    {
+      "id": "lab_coat",
+      "label": "Lab coat / apron",
+      "reason": "Protects skin and clothing from spills and splashes."
+    },
+    {
+      "id": "closed_shoes",
+      "label": "Closed-toe shoes",
+      "reason": "Protects the feet from spills, broken glass, and dropped tools."
+    },
+    {
+      "id": "face_shield",
+      "label": "Face shield",
+      "reason": "Adds full-face protection during high-risk splash procedures."
+    },
+    {
+      "id": "heat_gloves",
+      "label": "Heat-resistant gloves",
+      "reason": "Protects the hands when handling hot equipment or containers."
+    },
+    {
+      "id": "respirator",
+      "label": "Face mask / respirator",
+      "reason": "Helps protect against specific airborne hazards when required."
+    },
+    {
+      "id": "hair_restraint",
+      "label": "Hair restraint",
+      "reason": "Keeps long hair away from flames, chemicals, and equipment."
+    }
+  ],
+  "requiredPpeByExperiment": {
+    "1": [
+      "goggles",
+      "gloves",
+      "lab_coat",
+      "closed_shoes"
+    ],
+    "2": [
+      "goggles",
+      "gloves",
+      "lab_coat",
+      "closed_shoes"
+    ],
+    "3": [
+      "goggles",
+      "gloves",
+      "lab_coat",
+      "closed_shoes"
+    ],
+    "4": [
+      "goggles",
+      "lab_coat",
+      "closed_shoes",
+      "hair_restraint"
+    ],
+    "5": [
+      "goggles",
+      "lab_coat",
+      "closed_shoes"
+    ],
+    "6": [
+      "goggles",
+      "gloves",
+      "lab_coat",
+      "closed_shoes"
+    ],
+    "7": [
+      "goggles",
+      "gloves",
+      "lab_coat",
+      "closed_shoes"
+    ],
+    "8": []
+  },
+  "questionsByExperiment": {
+    "1": [
+      {
+        "prompt": "What gas causes the foam in elephant toothpaste?",
+        "options": [
+          "Carbon dioxide",
+          "Oxygen",
+          "Hydrogen",
+          "Nitrogen"
+        ],
+        "correctOption": 1
+      },
+      {
+        "prompt": "What role does yeast play in the reaction?",
+        "options": [
+          "Indicator",
+          "Catalyst",
+          "Acid",
+          "Product"
+        ],
+        "correctOption": 1
+      },
+      {
+        "prompt": "What gas is released when hydrogen peroxide decomposes?",
+        "options": [
+          "Oxygen",
+          "Chlorine",
+          "Nitrogen",
+          "Methane"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "Why is the foam warm after the reaction?",
+        "options": [
+          "The reaction releases heat",
+          "The yeast freezes",
+          "The soap absorbs light",
+          "Oxygen has no temperature"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "What is the purpose of dish soap in elephant toothpaste?",
+        "options": [
+          "It traps oxygen in bubbles",
+          "It stops decomposition",
+          "It produces hydrogen peroxide",
+          "It cools the catalyst"
+        ],
+        "correctOption": 0
+      }
+    ],
+    "2": [
+      {
+        "prompt": "What observation indicates chloride ions are present?",
+        "options": [
+          "Blue flame",
+          "White precipitate",
+          "Bubbles",
+          "Clear solution"
+        ],
+        "correctOption": 1
+      },
+      {
+        "prompt": "Which reagent produces the precipitate in this test?",
+        "options": [
+          "Silver nitrate",
+          "Vinegar",
+          "Limewater",
+          "Indicator"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "What is the white precipitate formed in the chloride test?",
+        "options": [
+          "Silver chloride",
+          "Sodium chloride",
+          "Calcium carbonate",
+          "Copper sulfate"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "Why should a clean dropper be used for silver nitrate?",
+        "options": [
+          "To prevent contamination",
+          "To increase temperature",
+          "To change the solution color",
+          "To remove chloride ions"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "The formation of a solid from two solutions is called what?",
+        "options": [
+          "Precipitation",
+          "Evaporation",
+          "Combustion",
+          "Melting"
+        ],
+        "correctOption": 0
+      }
+    ],
+    "3": [
+      {
+        "prompt": "What happens to limewater when carbon dioxide is present?",
+        "options": [
+          "It turns milky",
+          "It turns blue",
+          "It freezes",
+          "It glows"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "What type of test is the limewater test?",
+        "options": [
+          "Quantitative mass test",
+          "Qualitative gas test",
+          "Flame test",
+          "Electrical test"
+        ],
+        "correctOption": 1
+      },
+      {
+        "prompt": "What substance causes limewater to appear milky?",
+        "options": [
+          "Calcium carbonate",
+          "Sodium chloride",
+          "Copper metal",
+          "Hydrogen peroxide"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "How should the test gas be introduced into limewater?",
+        "options": [
+          "Bubble it through the solution",
+          "Freeze the solution",
+          "Pour out the limewater",
+          "Heat the container strongly"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "A milky limewater result indicates which gas?",
+        "options": [
+          "Carbon dioxide",
+          "Oxygen",
+          "Hydrogen",
+          "Nitrogen"
+        ],
+        "correctOption": 0
+      }
+    ],
+    "4": [
+      {
+        "prompt": "Why do metal ions produce characteristic flame colors?",
+        "options": [
+          "Electrons emit specific light",
+          "The wire melts",
+          "Oxygen becomes colored",
+          "The salt boils"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "Which observation is used to identify the metal ion?",
+        "options": [
+          "Flame color",
+          "Solution mass",
+          "Bubble size",
+          "Wire length"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "Why should the test wire be cleaned between samples?",
+        "options": [
+          "To prevent color contamination",
+          "To make the flame colder",
+          "To increase the wire mass",
+          "To produce oxygen"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "What happens before excited electrons produce colored light?",
+        "options": [
+          "They return to lower energy levels",
+          "They become protons",
+          "They leave the atom permanently",
+          "They stop moving completely"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "Which flame-test result is most useful for identification?",
+        "options": [
+          "A characteristic flame color",
+          "The container shape",
+          "The sample volume only",
+          "The room temperature"
+        ],
+        "correctOption": 0
+      }
+    ],
+    "5": [
+      {
+        "prompt": "Why does salt solution conduct electricity?",
+        "options": [
+          "It contains moving ions",
+          "It is transparent",
+          "It is cold",
+          "It contains sugar"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "What indicates that the circuit is conducting?",
+        "options": [
+          "The bulb lights",
+          "The water freezes",
+          "The beaker moves",
+          "The salt disappears"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "What particles carry charge through a salt solution?",
+        "options": [
+          "Ions",
+          "Neutral atoms only",
+          "Bubbles",
+          "Sugar crystals"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "Why does solid salt conduct poorly compared with salt solution?",
+        "options": [
+          "Its ions cannot move freely",
+          "It has no charged particles",
+          "It contains no atoms",
+          "It is always too cold"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "What should be checked if the bulb does not light?",
+        "options": [
+          "Circuit connections and electrode contact",
+          "The beaker color only",
+          "The table height",
+          "The label font"
+        ],
+        "correctOption": 0
+      }
+    ],
+    "6": [
+      {
+        "prompt": "What should happen to the total mass in the closed system?",
+        "options": [
+          "It increases",
+          "It decreases",
+          "It stays the same",
+          "It becomes zero"
+        ],
+        "correctOption": 2
+      },
+      {
+        "prompt": "Why does inflating the balloon not increase the total mass?",
+        "options": [
+          "Gas has no mass",
+          "The gas remains inside the closed system",
+          "The scale ignores gas",
+          "The balloon removes vinegar"
+        ],
+        "correctOption": 1
+      },
+      {
+        "prompt": "What gas inflates the balloon in the reaction?",
+        "options": [
+          "Carbon dioxide",
+          "Oxygen",
+          "Hydrogen",
+          "Chlorine"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "Why must the system remain closed during the experiment?",
+        "options": [
+          "To prevent matter from escaping",
+          "To make matter disappear",
+          "To remove the gas mass",
+          "To increase gravity"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "Which law is demonstrated by the unchanged total mass?",
+        "options": [
+          "Law of conservation of mass",
+          "Ohm's law",
+          "Law of reflection",
+          "Boyle's law only"
+        ],
+        "correctOption": 0
+      }
+    ],
+    "7": [
+      {
+        "prompt": "What does a pH indicator show?",
+        "options": [
+          "Acidity or alkalinity",
+          "Electrical current",
+          "Atomic mass",
+          "Gas pressure"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "A neutral solution is closest to which pH?",
+        "options": [
+          "0",
+          "3",
+          "7",
+          "14"
+        ],
+        "correctOption": 2
+      },
+      {
+        "prompt": "A solution with a pH below 7 is generally what?",
+        "options": [
+          "Acidic",
+          "Alkaline",
+          "Neutral",
+          "Metallic"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "A solution with a pH above 7 is generally what?",
+        "options": [
+          "Alkaline",
+          "Acidic",
+          "Neutral",
+          "Radioactive"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "Why is the indicator color compared with a color scale?",
+        "options": [
+          "To estimate the pH",
+          "To measure mass",
+          "To identify voltage",
+          "To count atoms"
+        ],
+        "correctOption": 0
+      }
+    ],
+    "8": [
+      {
+        "prompt": "What does an element’s atomic number represent?",
+        "options": [
+          "Number of protons",
+          "Atomic mass only",
+          "Number of compounds",
+          "Melting point"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "Which symbol identifies an element on the periodic table?",
+        "options": [
+          "Chemical symbol",
+          "pH value",
+          "Voltage",
+          "Temperature"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "Elements in the same vertical column belong to the same what?",
+        "options": [
+          "Group",
+          "Period only",
+          "Isotope",
+          "Compound"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "What generally increases by one from one element to the next?",
+        "options": [
+          "Atomic number",
+          "Number of compounds",
+          "Room temperature",
+          "pH value"
+        ],
+        "correctOption": 0
+      },
+      {
+        "prompt": "Which information is commonly shown in an element tile?",
+        "options": [
+          "Atomic number and chemical symbol",
+          "Circuit voltage only",
+          "Solution pH only",
+          "Reaction time only"
+        ],
+        "correctOption": 0
+      }
+    ]
+  }
+}

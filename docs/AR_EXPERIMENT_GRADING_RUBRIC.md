@@ -20,8 +20,13 @@ Each category uses the same performance ranges:
 |---:|---|---|
 | **25–18** | Proficient | The student performed the criterion correctly or with only minor errors. |
 | **17–10** | Developing | The student demonstrated partial competency but made several errors or needed guidance. |
-| **9–1** | Beginning | The student demonstrated limited competency and needs substantial assistance. |
+| **9–2** | Beginning | The student demonstrated limited competency and needs substantial assistance. |
 | **0** | No Evidence | The student did not demonstrate the criterion or produced no assessable result. |
+
+Teachers can configure each experiment's PPE choices, correct selections, and
+5–10 post-experiment quiz questions in the teacher web portal. The app uses the
+settings loaded before the PPE check for that entire run. See
+[Teacher-editable experiment assessments](TEACHER_EXPERIMENT_ASSESSMENTS.md).
 
 The **0-point level is recorded separately** because it represents no demonstrated evidence. In the student result table, it is displayed with the lowest performance range.
 
@@ -29,7 +34,7 @@ The **0-point level is recorded separately** because it represents no demonstrat
 
 ## 2. Complete Rubric
 
-| Category | Assessment details | 25–18 points: Proficient | 17–10 points: Developing | 9–1 points: Beginning |
+| Category | Assessment details | 25–18 points: Proficient | 17–10 points: Developing | 9–2 points: Beginning |
 |---|---|---|---|---|
 | **PPE AND SAFETY** | Assesses the student's first-attempt selection of required personal protective equipment. The system identifies missing required PPE and unnecessary PPE. | All or nearly all required PPE was selected. Safety choices were appropriate, with no error or only a minor error. | Some required PPE was missing or unnecessary PPE was selected. The student needed safety reminders before continuing. | Many required PPE items were missing or inappropriate items were selected, showing unsafe preparation and limited recognition of laboratory hazards. |
 | **PROCEDURE, SEQUENCE, AND EQUIPMENT HANDLING** | Assesses whether steps were performed in the correct order and whether the correct materials, apparatus, containers, and connections were used. | Steps were completed in the correct or nearly correct order. Equipment was selected, handled, and connected properly, with few or no detected errors. | Several sequence or equipment-handling errors occurred. The procedure was partly correct but required guidance or correction. | Frequent sequence and equipment errors occurred, showing limited ability to perform the procedure safely, accurately, and independently. |
@@ -135,7 +140,7 @@ The score is constrained to **0–25 points**. Deductions cannot produce a negat
 | 2 | 0 | `25 − 10` | 15 | 10 | Developing |
 | 1 | 4 | `25 − 5 − 8` | 12 | 13 | Developing |
 | 3 | 1 | `25 − 15 − 2` | 8 | 17 | Beginning |
-| 4 | 2 | `25 − 20 − 4` | 1 | 24 | Beginning |
+| 4 | 1 | `25 − 20 − 2` | 3 | 22 | Beginning |
 | 5 | 0 | `25 − 25` | 0 | 25 | No Evidence |
 
 ### 4.5 Student feedback
@@ -172,7 +177,7 @@ The expected outcome depends on the experiment and may include:
 |---:|---|---:|
 | **25–18** | Expected result produced clearly and accurately. Observations or measurements match the scientific objective. | 0–7 points |
 | **17–10** | Result partly produced. Some required observations or measurements are incomplete or inaccurate. | 8–15 points |
-| **9–1** | Result is weak, substantially incorrect, or unsuccessful. | 16–24 points |
+| **9–2** | Result is weak, substantially incorrect, or unsuccessful. | 16–23 points |
 | **0** | No valid or assessable result was produced. | 25 points |
 
 ### 5.3 Current automatic scoring behavior
@@ -303,7 +308,7 @@ After submitting all 5–10 post-experiment questions, the student sees:
 9. experimental result status; and
 10. the number of correct scientific-understanding answers.
 
-The student's earned range is highlighted in the rubric table. The table can be scrolled horizontally on smaller screens.
+The student's earned range is highlighted in the rubric table. Scores below 2 do not fall within the Beginning band. The table can be scrolled horizontally on smaller screens.
 
 ---
 

@@ -16,8 +16,8 @@ Both are wrapped in `UNITY_EDITOR` and compile to no code in exported players.
 The flame-test scene also has solution-selection buttons and a burner toggle in
 the panel. The Unity burner button can be removed; keep the burner controller
 and its flame VFX reference. Flutter supplies the burner toggle in exported apps.
-The pH
-scene completes on its existing litmus explanation message. Collapse the panel
+The pH scene reports the configured litmus step when its color finishes changing.
+Collapse the panel
 with **Hide guide** or drag its title bar if it obscures an object.
 
 **SciLab > Enable Editor Experiment Testing** toggles the runner for the next
@@ -28,8 +28,13 @@ The runner supplies Flutter's step-control role through `FlutterBridge` and
 listens to the integration package's existing `SendToFlutter - ` Editor log
 messages. It does not force animation playback or bypass triggers. All existing
 colliders, animation events, AR tracking, and model assignments still apply.
-The test sequences use the repository's Flutter guide tags; if remote Firestore
-guides change, update the Editor sequences to match.
+The test sequences default to the repository's Flutter guide tags. To test a
+different admin order, enter the tags in **Editor step tags**, separating steps
+with `|`, then click **Apply order and restart**. For example,
+`Yeast|Surf|Peroxide|Dye|Activator` tests yeast first. Commas group actions inside
+one step, such as `Rod1,Rod2`. Clear the field and apply to restore the defaults.
+The Editor does not connect to Firestore; the Flutter app loads the saved admin
+steps when opening the experiment.
 
 Unity Play Mode checks are useful for scene interactions. Device AR tracking and
 the Flutter interface still need a final exported-app check.

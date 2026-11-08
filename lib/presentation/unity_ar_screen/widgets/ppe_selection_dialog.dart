@@ -7,10 +7,12 @@ class PpeSelectionDialog extends StatefulWidget {
     super.key,
     required this.experimentTitle,
     required this.requiredPpe,
+    this.options = ppeOptions,
   });
 
   final String experimentTitle;
   final Set<String> requiredPpe;
+  final List<PpeOption> options;
 
   @override
   State<PpeSelectionDialog> createState() => _PpeSelectionDialogState();
@@ -55,6 +57,7 @@ class _PpeSelectionDialogState extends State<PpeSelectionDialog> {
         score: _firstAttemptScore!,
         firstAttemptMissing: _firstAttemptMissing ?? const <String>{},
         firstAttemptUnnecessary: _firstAttemptUnnecessary ?? const <String>{},
+        options: List.unmodifiable(widget.options),
       ),
     );
   }
@@ -108,7 +111,7 @@ class _PpeSelectionDialogState extends State<PpeSelectionDialog> {
                     'Select all safety equipment required before entering the AR laboratory.',
                     style: TextStyle(color: Color(0xFFB8C7DB), height: 1.35),
                   ),
-                  if (_missing.isNotEmpty) ...[
+                  if (_missing.isNotEmpty || _unnecessary.isNotEmpty) ...[
                     const SizedBox(height: 12),
                     Container(
                       width: double.infinity,
@@ -129,7 +132,7 @@ class _PpeSelectionDialogState extends State<PpeSelectionDialog> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          ...ppeOptions
+                          ...widget.options
                               .where((option) => _missing.contains(option.id))
                               .map(
                                 (option) => Padding(
@@ -143,8 +146,10 @@ class _PpeSelectionDialogState extends State<PpeSelectionDialog> {
                                   ),
                                 ),
                               ),
-                          ...ppeOptions
-                              .where((option) => false)
+                          ...widget.options
+                              .where(
+                                (option) => _unnecessary.contains(option.id),
+                              )
                               .map(
                                 (option) => Padding(
                                   padding: const EdgeInsets.only(bottom: 6),
@@ -173,7 +178,7 @@ class _PpeSelectionDialogState extends State<PpeSelectionDialog> {
                       return Wrap(
                         spacing: spacing,
                         runSpacing: 4,
-                        children: ppeOptions.map((option) {
+                        children: widget.options.map((option) {
                           final selected = _selected.contains(option.id);
                           final missing = _missing.contains(option.id);
                           final unnecessary = _unnecessary.contains(option.id);

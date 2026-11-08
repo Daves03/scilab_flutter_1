@@ -1,4 +1,7 @@
+import '../../models/experiment_assessment.dart';
+import '../../services/experiment_step_progress.dart';
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -13,7 +16,6 @@ import '../../models/experiment_grade.dart';
 import '../../models/ppe_selection.dart';
 import '../../data/dummy_ar_experiments.dart';
 import '../../data/ar_experiment_catalog.dart';
-import '../../data/experiment_assessment_data.dart';
 import '../../data/periodic_table_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'widgets/flame_solution_dialog.dart';
@@ -46,6 +48,10 @@ class _UnityArScreenState extends State<UnityArScreen>
   final ActivityService _activityService = ActivityService();
   ActivitySyncStatus? _completionSyncStatus;
   PpeSelectionResult? _ppeSelectionResult;
+  ExperimentAssessment _assessment = ExperimentAssessment.fromExperiment(
+    '1',
+    const {},
+  );
   ExperimentGrade? _experimentGrade;
   bool _showKnowledgeCheck = false;
   bool _isAwaitingKnowledgeCheck = false;
@@ -160,8 +166,7 @@ class _UnityArScreenState extends State<UnityArScreen>
   String? _activeExplanation;
   bool _hasCompleted = false;
   bool _showCompletionPopup = false;
-  final Set<int> _completedStepIndices = {};
-  final Set<String> _completedSubTagsForCurrentStep = {};
+  ExperimentStepProgress? _stepProgress;
   bool _isWarningDialogShowing = false;
   bool _isDropButtonCoolingDown = false;
   bool _isSilverNitrateDropReady = false;
@@ -201,70 +206,8 @@ class _UnityArScreenState extends State<UnityArScreen>
     }
   }
 
-  String _normalizeTag(String tag) {
-    return tag.toLowerCase().replaceAll(RegExp(r'[-_\s]'), '');
-  }
-
-  bool _isPureAlias(String tag) {
-    final norm = _normalizeTag(tag);
-    if (norm.contains('electrode') && norm.contains('redwire')) {
-      return true;
-    }
-    return false;
-  }
-
-  bool _isTagMatching(String tagA, String tagB) {
-    // 1. Check compound / comma-separated lists first (e.g. "Rod1,Rod2")
-    if (tagB.contains(',')) {
-      final list = tagB.split(',').map((t) => t.trim());
-      for (final item in list) {
-        if (_isTagMatching(tagA, item)) return true;
-      }
-      return false;
-    }
-
-    if (tagA.contains(',')) {
-      final list = tagA.split(',').map((t) => t.trim());
-      for (final item in list) {
-        if (_isTagMatching(item, tagB)) return true;
-      }
-      return false;
-    }
-
-    final normA = _normalizeTag(tagA);
-    final normB = _normalizeTag(tagB);
-    if (normA.isEmpty || normB.isEmpty) return false;
-
-    // Exact match
-    if (normA == normB) return true;
-
-    // Differentiate "2wayblackwire" from "blackwire"
-    final aIs2Way = normA.contains('2way') || normA.contains('twoway');
-    final bIs2Way = normB.contains('2way') || normB.contains('twoway');
-    if (aIs2Way != bIs2Way &&
-        (normA.contains('wire') || normB.contains('wire'))) {
-      return false; // One is 2-way and the other is not, NEVER match!
-    }
-
-    // Differentiate "rod1" from "rod2"
-    final aHasRod1 = normA.contains('rod1');
-    final bHasRod1 = normB.contains('rod1');
-    final aHasRod2 = normA.contains('rod2');
-    final bHasRod2 = normB.contains('rod2');
-    if ((aHasRod1 && bHasRod2) || (aHasRod2 && bHasRod1)) {
-      return false; // Rod1 and Rod2 are distinct!
-    }
-
-    // Known Aliases:
-    if ((normA.contains('electrode') || normA.contains('redwire')) &&
-        (normB.contains('electrode') || normB.contains('redwire'))) {
-      return true;
-    }
-
-    if (normA.contains(normB) || normB.contains(normA)) return true;
-
-    return false;
-  }
+  bool _isTagMatching(String tagA, String tagB) =>
+      experimentTagsMatch(tagA, tagB);
 
   @override
   void initState() {
@@ -349,6 +292,37 @@ class _UnityArScreenState extends State<UnityArScreen>
       return;
     }
 
+    final fallbackExperiment = dummyArExperiments.firstWhere(
+      (experiment) =>
+          experiment.id.replaceAll(RegExp(r'[^0-9]'), '') == normalizedId,
+      orElse: () => dummyArExperiments.first,
+    );
+    var launchExperiment = fallbackExperiment;
+    var assessmentData = <String, dynamic>{};
+    // Load PPE, questions and guide together. This snapshot stays fixed for
+    // the run so teacher edits cannot change an answer key halfway through.
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('ar_experiments')
+          .doc(experimentId)
+          .get()
+          .timeout(const Duration(seconds: 10));
+      if (snapshot.exists) {
+        assessmentData = snapshot.data()!;
+        launchExperiment = ArExperimentModel.fromMap(
+          snapshot.id,
+          assessmentData,
+        );
+      }
+    } catch (error) {
+      debugPrint('Using built-in experiment settings: $error');
+    }
+    if (!mounted) return;
+    _assessment = ExperimentAssessment.fromExperiment(
+      experimentId,
+      assessmentData,
+    );
+
     // PPE and the AR scene both use landscape. The PPE dialog uses a compact
     // two-column checklist so every choice remains visible at once.
     await SystemChrome.setPreferredOrientations([
@@ -358,19 +332,15 @@ class _UnityArScreenState extends State<UnityArScreen>
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     if (!mounted) return;
 
-    final requiredPpe = requiredPpeForExperiment(experimentId);
+    final requiredPpe = _assessment.requiredPpe;
     if (requiredPpe.isNotEmpty) {
-      final fallbackExperiment = dummyArExperiments.firstWhere(
-        (experiment) =>
-            experiment.id.replaceAll(RegExp(r'[^0-9]'), '') == normalizedId,
-        orElse: () => dummyArExperiments.first,
-      );
       final ppeResult = await showDialog<PpeSelectionResult>(
         context: context,
         barrierDismissible: false,
         builder: (_) => PpeSelectionDialog(
-          experimentTitle: fallbackExperiment.title,
+          experimentTitle: launchExperiment.title,
           requiredPpe: requiredPpe,
+          options: _assessment.ppeChoices,
         ),
       );
       if (!mounted) return;
@@ -411,7 +381,7 @@ class _UnityArScreenState extends State<UnityArScreen>
         _showKnowledgeCheck = false;
         _isAwaitingKnowledgeCheck = false;
         _knowledgeAnswers = List<int?>.filled(
-          questionsForExperiment(experimentId).length,
+          _assessment.questions.length,
           null,
         );
         _sequenceErrors = 0;
@@ -420,8 +390,7 @@ class _UnityArScreenState extends State<UnityArScreen>
         _silverNitrateDropCount = 0;
         _isDropButtonCoolingDown = false;
         _isSilverNitrateDropReady = false;
-        _completedStepIndices.clear();
-        _completedSubTagsForCurrentStep.clear();
+        _stepProgress = null;
         _selectedFlameChemicalIndex = -1;
         _isBurnerOn = false;
         _showFlameSolutionPicker =
@@ -435,83 +404,13 @@ class _UnityArScreenState extends State<UnityArScreen>
         );
       });
 
-      // Offline or slow Firestore must not prevent an AR scene from opening.
-      _currentSteps = dummyArExperiments
-          .firstWhere(
-            (experiment) =>
-                experiment.id.replaceAll(RegExp(r'[^0-9]'), '') == normalizedId,
-            orElse: () => dummyArExperiments.first,
-          )
-          .steps;
+      _currentSteps = launchExperiment.steps.isNotEmpty
+          ? launchExperiment.steps
+          : fallbackExperiment.steps;
 
-      // Fetch dynamic steps from Firestore
-      try {
-        final docSnapshot = await FirebaseFirestore.instance
-            .collection('ar_experiments')
-            .doc(experimentId)
-            .get()
-            .timeout(const Duration(seconds: 10));
-        if (docSnapshot.exists) {
-          final experimentModel = ArExperimentModel.fromMap(
-            docSnapshot.id,
-            docSnapshot.data()!,
-          );
-          if (mounted) {
-            setState(() {
-              _currentSteps = experimentModel.steps;
-            });
-          }
-        } else {
-          final dummyExp = dummyArExperiments.firstWhere(
-            (e) => e.id == experimentId,
-            orElse: () => dummyArExperiments.first,
-          );
-          if (mounted) {
-            setState(() {
-              _currentSteps = dummyExp.steps;
-            });
-          }
-        }
-      } catch (e) {
-        debugPrint('Error fetching experiment steps: $e');
-      }
-      if (!mounted || !_isExperimentActive || _arStartupError != null) return;
-
-      // Ensure Flame Test always runs with the 3-step sequence
-      if (_isFlameTest) {
-        _currentSteps = [
-          ExperimentStep(
-            bottleTag: 'Chemical-Bottle',
-            instructionTitle: 'STEP 1: SELECT & POUR SOLUTION',
-            instructionDetail:
-                'Choose a chemical solution from the Flame Solution menu, then pour a small amount onto the dish plate.',
-          ),
-          ExperimentStep(
-            bottleTag: 'Thread',
-            instructionTitle: 'STEP 2: COAT THE NICHROME WIRE',
-            instructionDetail:
-                'Pick up the nichrome wire and dip it into the solution on the dish plate to coat the wire with the metal ions.',
-          ),
-          ExperimentStep(
-            bottleTag: 'Flame-Switch',
-            instructionTitle: 'STEP 3: PERFORM THE FLAME TEST',
-            instructionDetail:
-                'Turn on the Bunsen burner flame, then place the coated nichrome wire over the burner to observe the flame color produced!',
-          ),
-        ];
-      } else if (_isPhExperiment) {
-        // Keep the pH guide aligned with the actual Unity interaction. The
-        // scene reports completion when the litmus result is produced, not as
-        // separate STEP_COMPLETED messages for each poured bottle.
-        _currentSteps = [
-          ExperimentStep(
-            bottleTag: 'Litmus',
-            instructionTitle: 'STEP 1: MIX AND TEST A SOLUTION',
-            instructionDetail:
-                'Mix any one test solution with water in the beaker, then dip the litmus paper into the mixture to observe its pH. You may add and compare other solutions if you want—the experiment is graded after your first valid litmus result.',
-          ),
-        ];
-      }
+      _stepProgress = ExperimentStepProgress(
+        _currentSteps.map((step) => step.bottleTag),
+      );
 
       await _loadUnityExperiment(normalizedId);
 
@@ -568,7 +467,17 @@ class _UnityArScreenState extends State<UnityArScreen>
     if (_currentSteps.isEmpty) {
       return;
     }
-    final activeTag = _currentSteps[_currentStepIndex].bottleTag;
+    sendToUnity(
+      'FlutterReceiver',
+      'SetStepPlan',
+      jsonEncode({
+        'tags': _currentSteps.map((step) => step.bottleTag).toList(),
+      }),
+    );
+    final activeTag = _hasCompleted
+        ? 'COMPLETED'
+        : _stepProgress?.pendingTag(_currentStepIndex) ??
+              _currentSteps[_currentStepIndex].bottleTag;
 
     // Send active step configuration to Unity's receiver
     sendToUnity('FlutterReceiver', 'SetActiveStep', activeTag);
@@ -713,12 +622,9 @@ class _UnityArScreenState extends State<UnityArScreen>
         _activeExplanation = explanation;
       });
 
-      // LitmusPaperController sends EXPLANATION only after a filled beaker has
-      // been tested and the paper finishes changing color. That is the pH
-      // scene's terminal action, so open the knowledge check and grade flow.
-      if (_isPhExperiment) {
-        _handleExperimentComplete();
-      }
+      // pH is exploratory: any valid litmus result completes the activity,
+      // regardless of how many optional solution steps the admin listed.
+      if (_isPhExperiment) _handleExperimentComplete();
       return;
     }
 
@@ -734,6 +640,7 @@ class _UnityArScreenState extends State<UnityArScreen>
 
     // --- CATCH STEP COMPLETION ---
     if (trimmedMessage.startsWith("STEP_COMPLETED")) {
+      if (_hasCompleted) return;
       String completedItem = "";
       if (trimmedMessage.contains(":")) {
         completedItem = trimmedMessage
@@ -743,142 +650,24 @@ class _UnityArScreenState extends State<UnityArScreen>
 
       if (_currentSteps.isEmpty) return;
 
-      // For pH indicator & Periodic table: keep strict sequential handling
-      if (_isPhExperiment || _isPeriodicTable) {
-        if (_currentStepIndex >= _currentSteps.length) return;
-        final currentStep = _currentSteps[_currentStepIndex];
-        final currentTag = currentStep.bottleTag;
-
-        if (completedItem.isNotEmpty &&
-            !_isTagMatching(completedItem, currentTag)) {
-          _sequenceErrors++;
-          debugPrint(
-            "⚠️ Ignoring out-of-order STEP_COMPLETED for '$completedItem' (current step expects '$currentTag')",
-          );
-          return;
-        }
-
-        if (_currentStepIndex < _currentSteps.length - 1) {
-          setState(() {
-            _currentStepIndex++;
-          });
-          _notifyUnityActiveStep();
-        } else {
-          _handleExperimentComplete();
-        }
-        return;
-      }
-
-      // --- ALL OTHER EXPERIMENTS: Flexible mixing of ingredients before activator/last bottle ---
-      final lastStepIndex = _currentSteps.length - 1;
-
-      // 1. Find which step matches this completed item
-      int matchedStepIndex = _currentSteps.indexWhere(
-        (s) => _isTagMatching(completedItem, s.bottleTag),
+      final progress = _stepProgress ??= ExperimentStepProgress(
+        _currentSteps.map((step) => step.bottleTag),
       );
-
-      if (matchedStepIndex == -1) {
+      final completion = progress.complete(completedItem);
+      if (completion == StepCompletion.unknown) {
         _equipmentErrors++;
         debugPrint(
-          "⚠️ Received STEP_COMPLETED for unmapped item: '$completedItem'",
+          'Ignoring completion for unconfigured model: $completedItem',
         );
         return;
       }
-
-      final matchedStep = _currentSteps[matchedStepIndex];
-
-      // 2. Handle multi-action step (e.g. "Rod1,Rod2")
-      final subTags = matchedStep.bottleTag
-          .split(',')
-          .map((t) => t.trim())
-          .toList();
-      if (subTags.length > 1 && !_isPureAlias(matchedStep.bottleTag)) {
-        final matchedSubTag = subTags.firstWhere(
-          (t) => _isTagMatching(completedItem, t),
-          orElse: () => completedItem,
-        );
-        _completedSubTagsForCurrentStep.add(_normalizeTag(matchedSubTag));
-
-        bool allSubTagsDone = subTags.every(
-          (t) => _completedSubTagsForCurrentStep.contains(_normalizeTag(t)),
-        );
-
-        if (!allSubTagsDone) {
-          debugPrint(
-            "⏳ Sub-step completed: $completedItem. Waiting for remaining items in step: ${matchedStep.bottleTag}",
-          );
-          if (mounted) {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  _normalizeTag(matchedSubTag) == 'rod1'
-                      ? "First copper rod placed! Now place the other copper rod into the beaker."
-                      : "Copper rod placed! Now place the remaining copper rod into the beaker.",
-                ),
-                backgroundColor: const Color(0xFF00D4FF),
-                duration: const Duration(seconds: 3),
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            );
-          }
-          return;
-        }
-      }
-
-      // Step requirements satisfied -> mark step completed!
-      _completedSubTagsForCurrentStep.clear();
-      _completedStepIndices.add(matchedStepIndex);
-
-      // Check if this was the last step / activator:
-      if (matchedStepIndex == lastStepIndex) {
-        // Verify all previous preparatory steps are completed!
-        final allPrepDone = Iterable.generate(
-          lastStepIndex,
-          (i) => i,
-        ).every((i) => _completedStepIndices.contains(i));
-
-        if (allPrepDone) {
-          debugPrint(
-            "🎉 All ingredients were mixed and final activator finished! Completing experiment.",
-          );
-          _handleExperimentComplete();
-        } else {
-          _sequenceErrors++;
-          debugPrint(
-            "⚠️ Activator finished but some prep ingredients were not mixed yet!",
-          );
-          _showEarlyActivatorWarning(completedItem);
-        }
-        return;
-      }
-
-      // Preparatory ingredient completed!
-      // Check if ALL preparatory steps are now completed:
-      final allPrepDone = Iterable.generate(
-        lastStepIndex,
-        (i) => i,
-      ).every((i) => _completedStepIndices.contains(i));
-
-      if (allPrepDone) {
-        // All prep ingredients mixed! Move directly to final activator!
-        setState(() {
-          _currentStepIndex = lastStepIndex;
-        });
-        _notifyUnityActiveStep();
+      if (completion == StepCompletion.duplicate) return;
+      setState(() {
+        _currentStepIndex = progress.nextIndex;
+      });
+      if (progress.finished) {
+        _handleExperimentComplete();
       } else {
-        // Move to the next uncompleted step:
-        int nextUncompleted = 0;
-        while (nextUncompleted < lastStepIndex &&
-            _completedStepIndices.contains(nextUncompleted)) {
-          nextUncompleted++;
-        }
-        setState(() {
-          _currentStepIndex = nextUncompleted;
-        });
         _notifyUnityActiveStep();
       }
       return;
@@ -890,12 +679,10 @@ class _UnityArScreenState extends State<UnityArScreen>
     if (_hasCompleted) return;
     setState(() {
       _hasCompleted = true;
-      _knowledgeAnswers = List<int?>.filled(
-        questionsForExperiment(_activeExperimentId ?? '').length,
-        null,
-      );
+      _knowledgeAnswers = List<int?>.filled(_assessment.questions.length, null);
       _isAwaitingKnowledgeCheck = true;
     });
+    _notifyUnityActiveStep();
   }
 
   void _openKnowledgeCheck() {
@@ -966,7 +753,7 @@ class _UnityArScreenState extends State<UnityArScreen>
   void _submitKnowledgeCheck() {
     final experimentId = _activeExperimentId;
     if (experimentId == null) return;
-    final questions = questionsForExperiment(experimentId);
+    final questions = _assessment.questions;
     if (_knowledgeAnswers
         .take(questions.length)
         .any((answer) => answer == null)) {
@@ -1041,7 +828,7 @@ class _UnityArScreenState extends State<UnityArScreen>
   }
 
   Widget _buildKnowledgeCheck() {
-    final questions = questionsForExperiment(_activeExperimentId ?? '');
+    final questions = _assessment.questions;
     return Positioned.fill(
       child: Material(
         color: Colors.black.withValues(alpha: 0.72),
@@ -1324,10 +1111,14 @@ class _UnityArScreenState extends State<UnityArScreen>
       title = "Dish Plate Is Empty";
       message =
           "There's no chemical solution on the dish plate yet! Pour a chemical solution first.";
-    } else if (ingredient == "PureBlood") {
-      title = "Stain Warning";
+    } else if (ingredient == "WireNotCoated") {
+      title = "Coat the Wire First";
       message =
-          "You dipped the litmus paper in pure blood! The red color is just a blood stain. Mix the blood with water first to read its true pH.";
+          "Dip the wire in the chemical solution before placing it in the flame.";
+    } else if (ingredient == "PureBlood") {
+      title = "Mix Blood with Water";
+      message =
+          "Mix the blood with water before testing. Undiluted blood is thick and will stain the litmus paper instead of showing a clear color change.";
     } else if (ingredient == "ToxicGas" || ingredient == "ChloramineGas") {
       title = "Critical Safety Violation";
       accentColor = const Color(0xFFFF4D4D);
@@ -1435,7 +1226,7 @@ class _UnityArScreenState extends State<UnityArScreen>
       _showKnowledgeCheck = false;
       _isAwaitingKnowledgeCheck = false;
       _experimentGrade = null;
-      _knowledgeAnswers = const [null, null];
+      _knowledgeAnswers = List<int?>.filled(_assessment.questions.length, null);
       _sequenceErrors = 0;
       _equipmentErrors = 0;
       _selectedFlameChemicalIndex = -1;
@@ -1443,8 +1234,9 @@ class _UnityArScreenState extends State<UnityArScreen>
       _silverNitrateDropCount = 0;
       _isDropButtonCoolingDown = false;
       _isSilverNitrateDropReady = false;
-      _completedSubTagsForCurrentStep.clear();
-      _completedStepIndices.clear();
+      _stepProgress = ExperimentStepProgress(
+        _currentSteps.map((step) => step.bottleTag),
+      );
       if (_isFlameTest) {
         _showFlameSolutionPicker = true;
       }

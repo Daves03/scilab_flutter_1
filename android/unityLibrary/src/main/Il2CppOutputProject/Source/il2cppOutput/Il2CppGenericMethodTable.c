@@ -8794,5 +8794,5 @@ const Il2CppGenericMethodFunctionsDefinitions g_Il2CppGenericMethodFunctions[878
 { 23179, 8783, 8374, -1},
 { 23180, 8784, 7971, -1},
 { 23185, 8785, 6682, -1},
-{ 37278, 0, -1, -1},
+{ 37281, 0, -1, -1},
 };
