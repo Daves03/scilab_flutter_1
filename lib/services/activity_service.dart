@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/activity_model.dart';
+import '../models/ar_progress_assessment.dart';
 
 enum ActivitySyncStatus { synced, pending, permissionDenied }
 
@@ -113,6 +114,7 @@ class ActivityService {
   }
 
   Future<ActivitySyncStatus> _upload(_PendingCompletion completion) async {
+    final graded = ArProgressAssessment.isGraded(completion.experimentId);
     if (FirebaseAuth.instance.currentUser?.uid != completion.uid) {
       return ActivitySyncStatus.pending;
     }
@@ -129,14 +131,16 @@ class ActivityService {
           .set({
             'experimentId': completion.experimentId,
             'completedAt': Timestamp.fromDate(completion.completedAt),
-            if (completion.ppeScore != null) 'ppeScore': completion.ppeScore,
-            if (completion.selectedPpe != null)
+            if (graded && completion.ppeScore != null)
+              'ppeScore': completion.ppeScore,
+            if (graded && completion.selectedPpe != null)
               'selectedPpe': completion.selectedPpe,
-            if (completion.requiredPpe != null)
+            if (graded && completion.requiredPpe != null)
               'requiredPpe': completion.requiredPpe,
-            if (completion.rubricScores != null)
+            if (graded && completion.rubricScores != null)
               'rubricScores': completion.rubricScores,
-            if (completion.rubricScores != null &&
+            if (graded &&
+                completion.rubricScores != null &&
                 completion.rubricScores!['total'] is num)
               'score': completion.rubricScores!['total'],
           }, SetOptions(merge: true))

@@ -1,3 +1,5 @@
+import 'ar_progress_assessment.dart';
+
 class ExperimentGrade {
   const ExperimentGrade({
     required this.ppeScore,
@@ -25,12 +27,8 @@ class ExperimentGrade {
       resultScore +
       understandingScore;
 
-  String get performanceLevel {
-    if (totalScore >= 90) return 'Excellent';
-    if (totalScore >= 80) return 'Proficient';
-    if (totalScore >= 70) return 'Developing';
-    return 'Needs support';
-  }
+  String get performanceLevel =>
+      ArProgressAssessment.performanceLevel(totalScore);
 
   Map<String, dynamic> toMap() => {
     'ppe': ppeScore,

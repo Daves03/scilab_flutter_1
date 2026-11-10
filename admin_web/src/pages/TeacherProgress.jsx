@@ -4,6 +4,7 @@ import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { Activity, BarChart3, BookOpenCheck, ChevronDown, FlaskConical, Info, Search, Trophy, Users, X } from 'lucide-react';
 import { db } from '../firebase';
 import UserAvatar from '../components/UserAvatar';
+import { AR_RUBRIC_CRITERIA, arRecordScore, arPerformanceLevel, normalizeArRubric, isGradedArRecord } from '../services/arProgressAssessment';
 import {
   average,
   courseMatchesStudent,
@@ -13,23 +14,6 @@ import {
   percentage,
   teacherHandlesStudent,
 } from '../services/teacherPortalUtils';
-
-function arRecordScore(record) {
-  const completed = record.completed === true || Boolean(record.completedAt);
-  const value = record.score ?? record.rubricScore ?? record.rubricScores?.total;
-  if (value != null && Number.isFinite(Number(value))) {
-    return Math.max(0, Math.min(100, Number(value)));
-  }
-  return completed ? 100 : 0;
-}
-
-const AR_RUBRIC_CRITERIA = [
-  ['ppe', 'PPE Selection', 15],
-  ['procedureAndSequence', 'Procedure & Sequence', 35],
-  ['equipmentHandling', 'Equipment Handling', 20],
-  ['experimentalResult', 'Experimental Result', 20],
-  ['scientificUnderstanding', 'Scientific Understanding', 10],
-];
 
 export default function TeacherProgress({ user, profile }) {
   const [students, setStudents] = useState([]);
@@ -89,8 +73,9 @@ export default function TeacherProgress({ user, profile }) {
       experimentTitle: record.experimentTitle || experiments.find((experiment) => experiment.id === (record.experimentId || record.id))?.title || 'Unknown Experiment',
     })).sort((a, b) => ((b.completedAt || b.launchedAt)?.seconds || 0) - ((a.completedAt || a.launchedAt)?.seconds || 0));
     const completedAr = studentAr.filter((record) => record.completed === true || record.completedAt);
-    const arAverage = average(completedAr.map(arRecordScore));
-    const overall = average([quizAverage, arAverage].filter((value, index) => index === 0 ? quizAttempts.length : completedAr.length));
+    const gradedAr = completedAr.filter(isGradedArRecord);
+    const arAverage = average(gradedAr.map(arRecordScore));
+    const overall = average([quizAverage, arAverage].filter((value, index) => index === 0 ? quizAttempts.length : gradedAr.length));
     return { ...student, quizAttempts, quizAverage, arRecords: studentAr, arAverage, arTries: studentAr.length, completedAr: completedAr.length, overall };
   }), [arRecords, experiments, handledStudents, latestAttempts]);
 
@@ -144,7 +129,7 @@ export default function TeacherProgress({ user, profile }) {
           {visible.length === 0 && <div className="teacher-empty-state teacher-grid-empty"><Users size={40} /><strong>No student progress found</strong><span>Approved students must match both the grade and section of one of your courses.</span></div>}
         </div>
       </section>
-      {details && <StudentProgressDetailsModal type={details.type} student={details.student} onClose={() => setDetails(null)} />}
+      {details && <StudentProgressDetailsModal type={details.type} student={summaries.find((student) => student.id === details.student.id) || details.student} onClose={() => setDetails(null)} />}
     </div>
   );
 }
@@ -174,24 +159,38 @@ function StudentProgressDetailsModal({ type, student, onClose }) {
           const quizRecord = type === 'quizzes';
           const tryRecord = type === 'arTries';
           const completed = record.completed === true || Boolean(record.completedAt);
+          const graded = quizRecord || isGradedArRecord(record);
           const score = quizRecord ? percentage(record.score, record.totalQuestions) : arRecordScore(record);
-          const scoreText = quizRecord ? `${record.score || 0}/${record.totalQuestions || 0}` : tryRecord ? (completed ? 'Completed' : 'Started') : score.toFixed(1);
+          const scoreText = quizRecord ? `${record.score || 0}/${record.totalQuestions || 0}` : !graded ? 'Not graded' : tryRecord ? (completed ? 'Completed' : 'Started') : `${score.toFixed(1)}/100`;
           const title = quizRecord ? (record.quizTitle || 'Quiz') : record.experimentTitle;
           const date = quizRecord ? record.submittedAt : (record.completedAt || record.launchedAt);
-          const rubricScores = !quizRecord && record.rubricScores && typeof record.rubricScores === 'object' ? record.rubricScores : null;
-          const hasRubric = rubricScores && Object.keys(rubricScores).length > 0;
+          const rubricScores = !quizRecord ? normalizeArRubric(record.rubricScores) : null;
+          const hasRubric = graded && rubricScores && Object.keys(rubricScores).length > 0;
           const rubricExpanded = Boolean(expandedRubrics[record.id]);
+          const scoreTone = quizRecord ? (score >= 75 ? 'good' : score > 0 ? 'mid' : 'low') : score >= 80 ? 'good' : score >= 70 ? 'mid' : 'low';
           return <article className="teacher-progress-record" key={record.id}>
             <div><strong>{title}</strong><span>{formatDateTime(date)}</span></div>
-            <strong className={tryRecord ? (completed ? 'score-good' : 'score-mid') : score >= 75 ? 'score-good' : score > 0 ? 'score-mid' : 'score-low'}>{scoreText}</strong>
-            {!tryRecord && <div className="teacher-progress-record-bar"><span className={score >= 75 ? 'good' : score > 0 ? 'mid' : 'low'} style={{ width: `${Math.min(100, score)}%` }} /></div>}
+            <strong className={!graded ? '' : tryRecord ? (completed ? 'score-good' : 'score-mid') : `score-${scoreTone}`}>{scoreText}</strong>
+            {graded && !quizRecord && !tryRecord && <span className={`teacher-ar-performance score-${scoreTone}`}>{arPerformanceLevel(score)}</span>}
+            {graded && !tryRecord && <div className="teacher-progress-record-bar"><span className={scoreTone} style={{ width: `${Math.min(100, score)}%` }} /></div>}
             {hasRubric && <div className="teacher-rubric-section">
               <button type="button" className={rubricExpanded ? 'expanded' : ''} onClick={() => setExpandedRubrics((current) => ({ ...current, [record.id]: !current[record.id] }))} aria-expanded={rubricExpanded}>
                 <span>Rubric Breakdown</span><ChevronDown size={17} />
               </button>
               {rubricExpanded && <div className="teacher-rubric-breakdown">
-                {AR_RUBRIC_CRITERIA.map(([key, label, maximum]) => <div key={key}><span>{label}</span><strong>{Number(rubricScores[key] || 0)}/{maximum}</strong></div>)}
-                <div className="total"><span>Total</span><strong>{Number(rubricScores.total ?? score).toFixed(0)}/100</strong></div>
+                <p>Each category is worth 25 points (100 points total).</p>
+                {AR_RUBRIC_CRITERIA.map(([key, label, maximum]) => <div key={key}><span>{label}</span><strong>{rubricScores[key] ?? '—'}/{maximum}</strong></div>)}
+                <div className="total"><span>Total</span><strong>{score.toFixed(0)}/100</strong></div>
+                <p>PPE: required items correctly selected on the first attempt ÷ required items × 25, rounded, minus 1 per unnecessary item (minimum 0).</p>
+                <p>Procedure: 25 points minus 5 per sequence error and 2 per equipment error (minimum 0).</p>
+                <p>Results: whether the expected scientific outcome was produced.</p>
+                <p>Understanding: correct answers ÷ total questions × 25, rounded.</p>
+                {rubricScores.legacyConverted === 1
+                  ? <p>Historical category scores converted to the current 25-point weights; this is not a new assessment.</p>
+                  : <>
+                    {('sequenceErrors' in rubricScores || 'equipmentErrors' in rubricScores) && <p>Recorded errors: {rubricScores.sequenceErrors ?? 0} sequence, {rubricScores.equipmentErrors ?? 0} equipment.</p>}
+                    {'totalUnderstandingQuestions' in rubricScores && <p>Understanding answers: {rubricScores.correctUnderstandingAnswers ?? 0}/{rubricScores.totalUnderstandingQuestions}.</p>}
+                  </>}
               </div>}
             </div>}
           </article>;

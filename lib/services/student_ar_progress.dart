@@ -1,4 +1,5 @@
 import '../models/activity_model.dart';
+import '../models/ar_progress_assessment.dart';
 
 class ArLabRecord {
   final String experimentName;
@@ -6,6 +7,7 @@ class ArLabRecord {
   final double rubricScore;
   final Map<String, int> rubricScores;
   final String lastAttemptDate;
+  final bool isGraded;
 
   const ArLabRecord({
     required this.experimentName,
@@ -13,6 +15,7 @@ class ArLabRecord {
     required this.rubricScore,
     required this.rubricScores,
     required this.lastAttemptDate,
+    this.isGraded = true,
   });
 }
 
@@ -34,8 +37,17 @@ List<ArLabRecord> buildStudentArRecords({
     return ArLabRecord(
       experimentName: experimentTitles[entry.key] ?? 'Unknown Experiment',
       attempts: 1,
-      rubricScore: activity.rubricScore ?? (activity.completed ? 100.0 : 0.0),
-      rubricScores: activity.rubricScores,
+      isGraded: activity.isGraded,
+      rubricScore: !activity.isGraded
+          ? 0
+          : ArProgressAssessment.score(
+              activity.rubricScores,
+              fallback:
+                  activity.rubricScore ?? (activity.completed ? 100.0 : 0.0),
+            )!,
+      rubricScores: !activity.isGraded
+          ? const {}
+          : ArProgressAssessment.normalize(activity.rubricScores),
       lastAttemptDate: formatDate(activity.completedAt ?? activity.launchedAt),
     );
   }).toList();

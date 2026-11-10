@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'ar_progress_assessment.dart';
 
 /// One row in `users/{uid}/experiment_activity/{experimentId}`.
 /// Doc id = experimentId, so relaunching the same experiment updates
@@ -19,6 +20,7 @@ class ExperimentActivity {
   });
 
   bool get completed => completedAt != null;
+  bool get isGraded => ArProgressAssessment.isGraded(experimentId);
 
   factory ExperimentActivity.fromMap(String id, Map<String, dynamic> data) {
     final launched = data['launchedAt'];
@@ -44,8 +46,15 @@ class ExperimentActivity {
       experimentId: id,
       launchedAt: launched is Timestamp ? launched.toDate() : null,
       completedAt: completed is Timestamp ? completed.toDate() : null,
-      rubricScore: rawScore?.toDouble().clamp(0, 100).toDouble(),
-      rubricScores: parsedRubricScores,
+      rubricScore: !ArProgressAssessment.isGraded(id)
+          ? null
+          : ArProgressAssessment.score(
+              parsedRubricScores,
+              fallback: rawScore?.toDouble(),
+            ),
+      rubricScores: !ArProgressAssessment.isGraded(id)
+          ? const {}
+          : ArProgressAssessment.normalize(parsedRubricScores),
     );
   }
 }

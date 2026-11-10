@@ -3,6 +3,26 @@ import 'package:scilab_flutter_1/models/activity_model.dart';
 import 'package:scilab_flutter_1/services/student_ar_progress.dart';
 
 void main() {
+  test(
+    'periodic table activity is retained without a rubric or graded result',
+    () {
+      final result = buildStudentArRecords(
+        activities: {
+          'ar8': ExperimentActivity(
+            experimentId: 'ar8',
+            completedAt: DateTime(2026, 11, 10),
+            rubricScore: 100,
+            rubricScores: {'total': 100},
+          ),
+        },
+        experimentTitles: {'ar8': 'Interactive Periodic Table'},
+        formatDate: (_) => 'Today',
+      ).single;
+      expect(result.experimentName, 'Interactive Periodic Table');
+      expect(result.isGraded, isFalse);
+      expect(result.rubricScores, isEmpty);
+    },
+  );
   final now = DateTime(2026, 11, 10);
   List<ArLabRecord> records(Map<String, ExperimentActivity> activities) =>
       buildStudentArRecords(

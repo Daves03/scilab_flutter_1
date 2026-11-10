@@ -9,6 +9,8 @@ import '../../services/ar_service.dart';
 import '../../models/ar_experiment_model.dart';
 import '../../data/dummy_ar_experiments.dart';
 import '../../models/activity_model.dart';
+import '../../models/ar_progress_assessment.dart';
+import '../../widgets/ar_progress_rubric.dart';
 import '../../services/student_quiz_progress.dart';
 import '../../services/student_ar_progress.dart';
 
@@ -490,12 +492,15 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
     return const Color(0xFFFF4757);
   }
 
-  String _scoreLabel(double score) {
-    if (score >= 90) return 'Excellent';
-    if (score >= 75) return 'Good';
-    if (score >= 60) return 'Satisfactory';
-    return 'Needs Improvement';
+  Color _arScoreColor(double score) {
+    if (score >= 90) return const Color(0xFF00FF88);
+    if (score >= 80) return const Color(0xFF00D4FF);
+    if (score >= 70) return const Color(0xFFFFB800);
+    return const Color(0xFFFF4757);
   }
+
+  String _scoreLabel(double score) =>
+      ArProgressAssessment.performanceLevel(score);
 
   @override
   Widget build(BuildContext context) {
@@ -841,7 +846,7 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
                           cardColor: cardColor,
                           borderColor: borderColor,
                           subTextColor: subTextColor,
-                          scoreColor: _scoreColor,
+                          scoreColor: _arScoreColor,
                           scoreLabel: _scoreLabel,
                           isDark: isDark,
                           theme: theme,
@@ -1579,6 +1584,14 @@ class _ArLabRecordRow extends StatelessWidget {
     final color = scoreColor(record.rubricScore);
     final label = scoreLabel(record.rubricScore);
 
+    if (!record.isGraded) {
+      return ListTile(
+        title: Text(record.experimentName),
+        subtitle: Text(record.lastAttemptDate),
+        trailing: const Text('Not graded'),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: Column(
@@ -1637,7 +1650,7 @@ class _ArLabRecordRow extends StatelessWidget {
                   border: Border.all(color: color.withAlpha(100)),
                 ),
                 child: Text(
-                  record.rubricScore.toStringAsFixed(1),
+                  '${record.rubricScore.toStringAsFixed(1)}/100',
                   style: TextStyle(
                     color: color,
                     fontSize: 13,
@@ -1721,123 +1734,10 @@ class _ArLabRecordRow extends StatelessWidget {
                   'Rubric Breakdown',
                   style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
                 ),
-                children: [
-                  _TeacherRubricBreakdown(
-                    scores: record.rubricScores,
-                    textColor: subTextColor,
-                    borderColor: borderColor,
-                    isDark: isDark,
-                  ),
-                ],
+                children: [ArProgressRubric(scores: record.rubricScores)],
               ),
             ),
           ],
-        ],
-      ),
-    );
-  }
-}
-
-class _TeacherRubricBreakdown extends StatelessWidget {
-  final Map<String, int> scores;
-  final Color textColor;
-  final Color borderColor;
-  final bool isDark;
-
-  const _TeacherRubricBreakdown({
-    required this.scores,
-    required this.textColor,
-    required this.borderColor,
-    required this.isDark,
-  });
-
-  static const _criteria = [
-    ('ppe', 'PPE and Safety', 25),
-    (
-      'procedureSequenceEquipment',
-      'Procedure, Sequence & Equipment Handling',
-      25,
-    ),
-    ('experimentalResult', 'Experimental Results', 25),
-    ('scientificUnderstanding', 'Scientific Understanding', 25),
-  ];
-
-  int _criterionScore(String key) {
-    if (scores.containsKey('procedureSequenceEquipment')) {
-      return scores[key] ?? 0;
-    }
-
-    // Keep older 15/35/20/20/10 records readable after the rubric update.
-    return switch (key) {
-      'ppe' => (((scores['ppe'] ?? 0) / 15) * 25).round(),
-      'procedureSequenceEquipment' =>
-        ((((scores['procedureAndSequence'] ?? 0) +
-                        (scores['equipmentHandling'] ?? 0)) /
-                    55) *
-                25)
-            .round(),
-      'experimentalResult' =>
-        (((scores['experimentalResult'] ?? 0) / 20) * 25).round(),
-      'scientificUnderstanding' =>
-        (((scores['scientificUnderstanding'] ?? 0) / 10) * 25).round(),
-      _ => 0,
-    };
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0A1628) : Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: borderColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ..._criteria.map((criterion) {
-            final (key, label, maximum) = criterion;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      label,
-                      style: TextStyle(color: textColor, fontSize: 10),
-                    ),
-                  ),
-                  Text(
-                    '${_criterionScore(key)}/$maximum',
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }),
-          const Divider(height: 10),
-          Row(
-            children: [
-              const Expanded(
-                child: Text(
-                  'Total',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
-                ),
-              ),
-              Text(
-                '${scores['total'] ?? 0}/100',
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );

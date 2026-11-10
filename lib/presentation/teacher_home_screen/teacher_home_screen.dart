@@ -278,7 +278,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
           final grades = <double>[];
           for (final d in uArSnap.docs) {
             final act = ExperimentActivity.fromMap(d.id, d.data());
-            if (act.completed) {
+            if (act.completed && act.isGraded) {
               grades.add(act.rubricScore ?? 100.0);
             }
           }
@@ -691,7 +691,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
           (document) =>
               ExperimentActivity.fromMap(document.id, document.data()),
         )
-        .where((activity) => activity.completed)
+        .where((activity) => activity.completed && activity.isGraded)
         .map((activity) => activity.rubricScore ?? 100.0)
         .toList();
     final score = grades.isEmpty
@@ -1460,7 +1460,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
           return _ArProgressEntry(
             title: _arExperimentTitle(document.id),
             completed: activity.completed,
-            rubricScore: activity.completed
+            rubricScore: activity.completed && activity.isGraded
                 ? (activity.rubricScore ?? 100.0)
                 : null,
             activityAt: activity.completedAt ?? activity.launchedAt,

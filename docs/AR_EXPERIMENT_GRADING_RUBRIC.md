@@ -4,6 +4,8 @@
 
 SciLab automatically grades each completed AR experiment out of **100 points**. The grade measures laboratory safety, performance of the procedure, production of the expected result, and scientific understanding.
 
+The **Interactive Periodic Table (`ar8`) is an ungraded exploration activity**. It has no PPE assessment, graded knowledge check, rubric, or performance level. Its usage can appear in activity records, but it does not contribute to AR score averages. Historical scores for this activity are ignored.
+
 The final grade contains four equally weighted categories:
 
 | Category | Maximum points |

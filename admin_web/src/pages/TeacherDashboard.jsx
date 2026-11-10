@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase';
 import TeacherDateTimeCalendar from '../components/TeacherDateTimeCalendar';
 import UserAvatar from '../components/UserAvatar';
+import { isGradedArRecord, arRecordScore } from '../services/arProgressAssessment';
 import {
   average,
   courseMatchesStudent,
@@ -98,8 +99,8 @@ export default function TeacherDashboard({ user, profile }) {
       scoreText: `${Number(attempt.score || 0)}/${Number(attempt.totalQuestions || 0)}`,
       result: percentage(attempt.score, attempt.totalQuestions),
     }));
-    const arResults = arRecords.filter((record) => handledStudentIds.has(record.studentId) && record.completedAt).map((record) => {
-      const score = Number(record.score ?? record.rubricScore ?? record.rubricScores?.total ?? 100);
+    const arResults = arRecords.filter((record) => handledStudentIds.has(record.studentId) && record.completedAt && isGradedArRecord(record)).map((record) => {
+      const score = arRecordScore(record);
       return {
         id: `ar-${record.studentId}-${record.id}`,
         studentId: record.studentId,

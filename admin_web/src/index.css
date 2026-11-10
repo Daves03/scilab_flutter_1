@@ -1293,6 +1293,8 @@ p { color: var(--text-secondary); line-height: 1.5; }
 .teacher-progress-record-bar span.mid { background:var(--accent-orange); }
 .teacher-progress-record-bar span.low { background:var(--accent-red); }
 .teacher-rubric-section { grid-column:1/-1; }
+.teacher-ar-performance { grid-column:1/-1; font-size:.74rem; font-weight:700; }
+.teacher-rubric-breakdown > p { margin:0; color:var(--text-secondary); font-size:.72rem; line-height:1.5; overflow-wrap:anywhere; }
 .teacher-rubric-section > button { width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:8px 2px 3px; border:0; background:transparent; color:var(--text-primary); font:inherit; font-size:.74rem; font-weight:800; cursor:pointer; }
 .teacher-rubric-section > button svg { color:var(--text-secondary); transition:transform .18s ease,color .18s ease; }
 .teacher-rubric-section > button:hover svg,.teacher-rubric-section > button.expanded svg { color:var(--accent-cyan); }

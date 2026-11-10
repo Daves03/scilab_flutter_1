@@ -1,10 +1,14 @@
 import { MAX_EXPERIMENT_QUESTIONS, MIN_EXPERIMENT_QUESTIONS } from '../services/experimentAssessments';
+import { isGradedArRecord } from '../services/arProgressAssessment';
 
 const groupStyle = { border: '1px solid var(--border-light)', padding: '20px', borderRadius: '12px', minWidth: 0 };
 const cardStyle = { border: '1px solid var(--border-light)', padding: '16px', borderRadius: '8px', display: 'grid', gap: '12px', minWidth: 0 };
 const hintStyle = { color: 'var(--text-secondary)', fontSize: '0.85rem' };
 
 export default function ExperimentAssessmentEditor({ experiment, onChange }) {
+  if (!isGradedArRecord(experiment)) {
+    return <p style={hintStyle}>The interactive periodic table is an exploration activity. It has no graded PPE check, knowledge check, or rubric score.</p>;
+  }
   const ppe = experiment.ppeAssessment;
   const questions = experiment.assessmentQuestions;
   const setPpeOption = (index, patch) => onChange({ ppeAssessment: {

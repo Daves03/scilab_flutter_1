@@ -333,7 +333,7 @@ class _UnityArScreenState extends State<UnityArScreen>
     if (!mounted) return;
 
     final requiredPpe = _assessment.requiredPpe;
-    if (requiredPpe.isNotEmpty) {
+    if (normalizedId != '8' && requiredPpe.isNotEmpty) {
       final ppeResult = await showDialog<PpeSelectionResult>(
         context: context,
         barrierDismissible: false,
@@ -675,6 +675,7 @@ class _UnityArScreenState extends State<UnityArScreen>
   }
 
   void _handleExperimentComplete() {
+    if (_isPeriodicTable) return;
     if (!mounted) return;
     if (_hasCompleted) return;
     setState(() {
@@ -686,6 +687,7 @@ class _UnityArScreenState extends State<UnityArScreen>
   }
 
   void _openKnowledgeCheck() {
+    if (_isPeriodicTable) return;
     if (!mounted || !_isAwaitingKnowledgeCheck) return;
     setState(() {
       _isAwaitingKnowledgeCheck = false;
@@ -751,6 +753,7 @@ class _UnityArScreenState extends State<UnityArScreen>
   }
 
   void _submitKnowledgeCheck() {
+    if (_isPeriodicTable) return;
     final experimentId = _activeExperimentId;
     if (experimentId == null) return;
     final questions = _assessment.questions;
@@ -797,6 +800,7 @@ class _UnityArScreenState extends State<UnityArScreen>
   }
 
   void _saveExperimentGrade(ExperimentGrade grade) {
+    if (_isPeriodicTable) return;
     try {
       final uid = context.read<AuthService>().currentUser?.id;
       if (uid == null || _activeExperimentId == null) return;

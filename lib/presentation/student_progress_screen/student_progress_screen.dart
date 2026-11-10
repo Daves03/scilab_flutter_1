@@ -4,6 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import '../../core/app_export.dart';
 import '../../models/course_model.dart';
+import '../../models/activity_model.dart';
+import '../../models/ar_progress_assessment.dart';
+import '../../widgets/ar_progress_rubric.dart';
 import '../../services/auth_service.dart';
 import '../../services/course_service.dart';
 import '../../models/user_model.dart';
@@ -35,8 +38,17 @@ class _ArExperimentResult {
   final String title;
   final String date;
   final double score;
+  final Map<String, int> rubricScores;
+  final bool isGraded;
   final DateTime timestamp;
-  const _ArExperimentResult(this.title, this.date, this.score, this.timestamp);
+  const _ArExperimentResult(
+    this.title,
+    this.date,
+    this.score,
+    this.timestamp,
+    this.rubricScores,
+    this.isGraded,
+  );
 }
 
 class StudentProgressScreen extends StatefulWidget {
@@ -228,12 +240,14 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
   ) {
     final experiments = <_ArExperimentResult>[];
     var totalScore = 0.0;
+    var gradedCount = 0;
     for (final document in documents) {
       final data = document.data();
       final completedAt = data['completedAt'];
       if (completedAt is! Timestamp) continue;
       final timestamp = completedAt.toDate();
-      final score = _arScore(data);
+      final activity = ExperimentActivity.fromMap(document.id, data);
+      final score = activity.rubricScore ?? 0;
       final experimentId = (data['experimentId'] as String?)?.trim();
       final storedTitle = (data['experimentTitle'] as String?)?.trim();
       experiments.add(
@@ -248,33 +262,24 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
           _formatDate(timestamp),
           score,
           timestamp,
+          activity.rubricScores,
+          activity.isGraded,
         ),
       );
-      totalScore += score;
+      if (activity.isGraded) {
+        totalScore += score;
+        gradedCount++;
+      }
     }
     experiments.sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
     setState(() {
       _arExperiments = experiments;
       _arPage = 0;
-      _avgAr = experiments.isEmpty
+      _avgAr = gradedCount == 0
           ? '0.0'
-          : (totalScore / experiments.length).toStringAsFixed(1);
+          : (totalScore / gradedCount).toStringAsFixed(1);
     });
-  }
-
-  double _arScore(Map<String, dynamic> data) {
-    final legacyScore = data['score'];
-    if (legacyScore is num) {
-      return legacyScore.toDouble().clamp(0, 100).toDouble();
-    }
-
-    final rubric = data['rubricScores'];
-    if (rubric is Map) {
-      final total = rubric['total'];
-      if (total is num) return total.toDouble().clamp(0, 100).toDouble();
-    }
-    return 0;
   }
 
   String _arExperimentTitle(String experimentId) {
@@ -546,9 +551,7 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
           child: _buildPaginationControls(
             currentPage: _arPage,
             totalItems: _arExperiments.length,
-            onPrevious: _arPage > 0
-                ? () => setState(() => _arPage--)
-                : null,
+            onPrevious: _arPage > 0 ? () => setState(() => _arPage--) : null,
             onNext: (start + _pageSize) < _arExperiments.length
                 ? () => setState(() => _arPage++)
                 : null,
@@ -617,11 +620,11 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
             border: Border.all(
               color: isDark
                   ? (enabled
-                      ? const Color(0x3300D4FF)
-                      : const Color(0xFF1E3A5F).withOpacity(0.3))
+                        ? const Color(0x3300D4FF)
+                        : const Color(0xFF1E3A5F).withOpacity(0.3))
                   : (enabled
-                      ? const Color(0xFF1565C0).withOpacity(0.3)
-                      : Colors.grey.shade300),
+                        ? const Color(0xFF1565C0).withOpacity(0.3)
+                        : Colors.grey.shade300),
             ),
           ),
           child: Center(
@@ -630,11 +633,9 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
               size: 20,
               color: isDark
                   ? (enabled
-                      ? const Color(0xFF00D4FF)
-                      : const Color(0xFF8BA3C0).withOpacity(0.3))
-                  : (enabled
-                      ? const Color(0xFF1565C0)
-                      : Colors.grey.shade400),
+                        ? const Color(0xFF00D4FF)
+                        : const Color(0xFF8BA3C0).withOpacity(0.3))
+                  : (enabled ? const Color(0xFF1565C0) : Colors.grey.shade400),
             ),
           ),
         ),
@@ -992,10 +993,14 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
 
   Widget _buildArExperimentCard(_ArExperimentResult result) {
     Color scoreColor;
-    if (result.score >= 80) {
+    if (!result.isGraded) {
+      scoreColor = Theme.of(context).colorScheme.onSurfaceVariant;
+    } else if (result.score >= 90) {
       scoreColor = const Color(0xFF00D4FF);
-    } else if (result.score >= 60) {
+    } else if (result.score >= 80) {
       scoreColor = const Color(0xFF7C3AED);
+    } else if (result.score >= 70) {
+      scoreColor = const Color(0xFFFFB800);
     } else {
       scoreColor = const Color(0xFFFF4757);
     }
@@ -1014,59 +1019,81 @@ class _StudentProgressScreenState extends State<StudentProgressScreen>
               : Colors.grey.shade300,
         ),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: scoreColor.withAlpha(20),
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: CustomIconWidget(
-                iconName: 'view_in_ar',
-                color: scoreColor,
-                size: 20,
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: scoreColor.withAlpha(20),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: CustomIconWidget(
+                    iconName: 'view_in_ar',
+                    color: scoreColor,
+                    size: 20,
+                  ),
+                ),
               ),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  result.title,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black87,
-                  ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      result.title,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      result.date,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF8BA3C0)
+                            : Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  result.date,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? const Color(0xFF8BA3C0)
-                        : Colors.grey.shade600,
-                  ),
+              ),
+              Text(
+                result.isGraded
+                    ? '${result.score.toStringAsFixed(1)}/100'
+                    : 'Not graded',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: scoreColor,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          Text(
-            '${result.score.toStringAsFixed(1)}',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: scoreColor,
+          const SizedBox(height: 8),
+          if (result.isGraded)
+            Text(
+              ArProgressAssessment.performanceLevel(result.score),
+              style: TextStyle(color: scoreColor, fontWeight: FontWeight.w700),
             ),
-          ),
+          if (result.isGraded && result.rubricScores.isNotEmpty)
+            ExpansionTile(
+              tilePadding: EdgeInsets.zero,
+              title: const Text(
+                'Rubric Breakdown',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+              ),
+              children: [ArProgressRubric(scores: result.rubricScores)],
+            ),
         ],
       ),
     );
