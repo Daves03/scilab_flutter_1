@@ -31,7 +31,10 @@ export default function TeacherSections({ profile }) {
   }, []);
 
   const sections = useMemo(() => teacherSectionSummaries(profile?.sections || [], catalog, users), [profile?.sections, catalog, users]);
-  const visible = sections.filter((section) => (grade === 'all' || section.grade === grade)
+  const grades = [...new Set(sections.map((section) => section.grade).filter((label) => label !== 'Grade not set'))]
+    .sort((first, second) => first.localeCompare(second, undefined, { numeric: true }));
+  const selectedGrade = grades.includes(grade) ? grade : 'all';
+  const visible = sections.filter((section) => (selectedGrade === 'all' || section.grade === selectedGrade)
     && `${section.name} ${section.grade}`.toLowerCase().includes(search.trim().toLowerCase()));
   const loading = !usersLoaded || !sectionsLoaded;
   const activeSection = sections.find((section) => section.key === selectedKey);
@@ -51,7 +54,12 @@ export default function TeacherSections({ profile }) {
         {activeSection ? <>
           <button type="button" className="btn btn-secondary" style={{ marginBottom: '24px' }} onClick={() => setSelectedKey(null)}><ArrowLeft size={18} /> Back to Sections</button>
           {!error && <>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>Total students: <strong>{activeSection.total}</strong> · Active: {activeSection.approved} · Pending: {activeSection.pending} · Rejected: {activeSection.rejected}</p>
+            <div className="teacher-section-status-summary">
+              <span>Total students: <strong>{activeSection.total}</strong></span>
+              <span className="teacher-student-status approved">Active: {activeSection.approved}</span>
+              <span className="teacher-student-status pending">Pending: {activeSection.pending}</span>
+              <span className="teacher-student-status rejected">Rejected: {activeSection.rejected}</span>
+            </div>
             <div className="teacher-responsive-table">
               <table className="data-table">
                 <thead><tr><th>Name</th><th>Student Number</th><th>Email</th><th>Status</th></tr></thead>
@@ -59,7 +67,7 @@ export default function TeacherSections({ profile }) {
                   <td><strong>{student.name || 'No Name'}</strong></td>
                   <td>{student.studentNumber ? `#${student.studentNumber}` : '-'}</td>
                   <td>{student.email || '-'}</td>
-                  <td>{student.status === 'approved' ? 'Active' : student.status === 'pending' ? 'Pending' : student.status === 'rejected' ? 'Rejected' : 'Not set'}</td>
+                  <td><span className={`teacher-student-status ${['approved', 'pending', 'rejected'].includes(student.status) ? student.status : 'unknown'}`}>{student.status === 'approved' ? 'Active' : student.status === 'pending' ? 'Pending' : student.status === 'rejected' ? 'Rejected' : 'Not set'}</span></td>
                 </tr>)}</tbody>
               </table>
             </div>
@@ -71,10 +79,9 @@ export default function TeacherSections({ profile }) {
             <span className="tab active" style={{ display: 'block', textAlign: 'center', color: 'var(--accent-green)' }}>Assigned Sections ({loading || error ? '…' : visible.length})</span>
           </div>
           <label className="teacher-search"><Search size={18} /><input aria-label="Search sections" placeholder="Search sections..." value={search} onChange={(event) => setSearch(event.target.value)} /></label>
-          <select className="input-field mobile-w-full" style={{ width: '180px', maxWidth: '100%', margin: 0 }} aria-label="Filter by grade level" value={grade} onChange={(event) => setGrade(event.target.value)}>
+          <select className="input-field mobile-w-full" style={{ width: '180px', maxWidth: '100%', margin: 0 }} aria-label="Filter by grade level" value={selectedGrade} onChange={(event) => setGrade(event.target.value)}>
             <option value="all">All Grade Levels</option>
-            <option value="Grade 9">Grade 9</option>
-            <option value="Grade 10">Grade 10</option>
+            {grades.map((label) => <option key={label} value={label}>{label}</option>)}
           </select>
         </div>
         {error ? null : loading ? <div className="teacher-empty-state" role="status">Loading sections and student counts...</div> : <>

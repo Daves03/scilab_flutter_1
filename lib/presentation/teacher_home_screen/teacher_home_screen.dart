@@ -72,6 +72,8 @@ class _StudentSummary {
 
 enum DashboardTab { allStudents, needsHelp, classAvg }
 
+enum _AnnouncementAction { edit, delete }
+
 class TeacherHomeScreen extends StatefulWidget {
   const TeacherHomeScreen({super.key});
 
@@ -108,6 +110,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   _announcementReactionStreams = {};
   bool _notificationStreamsStopped = false;
   int _teacherAnnouncementPage = 0;
+  final Set<String> _deletingAnnouncementIds = {};
 
   List<QueryDocumentSnapshot<Map<String, dynamic>>> _pendingUsers = [];
   final Map<int, List<QueryDocumentSnapshot<Map<String, dynamic>>>>
@@ -2509,6 +2512,70 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
     messageController.dispose();
   }
 
+  Future<void> _deleteAnnouncement(ClassAnnouncement announcement) async {
+    final teacher = _authService.currentUser;
+    if (teacher == null ||
+        teacher.id != announcement.teacherId ||
+        _deletingAnnouncementIds.contains(announcement.id)) {
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete announcement?'),
+        content: const Text(
+          'This announcement will be removed from your classes. This cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFFFF4757),
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted ||
+        confirmed != true ||
+        _deletingAnnouncementIds.contains(announcement.id)) {
+      return;
+    }
+    setState(() => _deletingAnnouncementIds.add(announcement.id));
+    try {
+      await _announcementService.deleteAnnouncement(
+        announcement: announcement,
+        teacher: teacher,
+      );
+      if (!mounted) return;
+      setState(() {
+        _teacherAnnouncementPage = 0;
+        _announcementReactionStreams.remove(announcement.id);
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Announcement deleted.')));
+    } catch (error) {
+      debugPrint('Announcement deletion failed: $error');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not delete the announcement. Please try again.'),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _deletingAnnouncementIds.remove(announcement.id));
+      }
+    }
+  }
+
   Future<void> _showAnnouncementEditor(ClassAnnouncement announcement) async {
     final teacher = _authService.currentUser;
     if (teacher == null || teacher.id != announcement.teacherId) {
@@ -3010,22 +3077,73 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
                                 ),
                               ),
                               const SizedBox(width: 5),
-                              IconButton(
-                                onPressed: () =>
-                                    _showAnnouncementEditor(announcement),
-                                tooltip: 'Edit announcement',
-                                icon: const Icon(Icons.edit_rounded),
-                                iconSize: 15,
-                                color: accent,
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints.tightFor(
-                                  width: 30,
-                                  height: 30,
+                              if (_authService.currentUser?.id ==
+                                  announcement.teacherId)
+                                PopupMenuButton<_AnnouncementAction>(
+                                  tooltip: 'Announcement options',
+                                  enabled: !_deletingAnnouncementIds.contains(
+                                    announcement.id,
+                                  ),
+                                  icon:
+                                      _deletingAnnouncementIds.contains(
+                                        announcement.id,
+                                      )
+                                      ? SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: accent,
+                                          ),
+                                        )
+                                      : Icon(
+                                          Icons.more_vert_rounded,
+                                          color: accent,
+                                          size: 20,
+                                        ),
+                                  onSelected: (action) {
+                                    if (action == _AnnouncementAction.edit) {
+                                      unawaited(
+                                        _showAnnouncementEditor(announcement),
+                                      );
+                                    } else {
+                                      unawaited(
+                                        _deleteAnnouncement(announcement),
+                                      );
+                                    }
+                                  },
+                                  itemBuilder: (_) => [
+                                    const PopupMenuItem(
+                                      value: _AnnouncementAction.edit,
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.edit_outlined, size: 18),
+                                          SizedBox(width: 10),
+                                          Text('Edit'),
+                                        ],
+                                      ),
+                                    ),
+                                    const PopupMenuItem(
+                                      value: _AnnouncementAction.delete,
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.delete_outline,
+                                            size: 18,
+                                            color: Color(0xFFFF4757),
+                                          ),
+                                          SizedBox(width: 10),
+                                          Text(
+                                            'Delete',
+                                            style: TextStyle(
+                                              color: Color(0xFFFF4757),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                style: IconButton.styleFrom(
-                                  backgroundColor: accent.withAlpha(18),
-                                ),
-                              ),
                             ],
                           ),
                           const SizedBox(height: 7),

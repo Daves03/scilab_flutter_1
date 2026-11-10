@@ -6,6 +6,7 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/course_model.dart';
+import 'ai_request_retry.dart';
 
 class AiQuizGeneratorService {
   static const String _apiKey = String.fromEnvironment('GEMINI_API_KEY');
@@ -160,9 +161,14 @@ Each object in the array must match this structure exactly:
             responseMimeType: 'application/json',
           ),
         );
-        final response = await model
-            .generateContent(content)
-            .timeout(const Duration(seconds: _requestTimeoutSeconds));
+        final response = await retryTemporaryAiRequest(
+          () => model
+              .generateContent(content)
+              .timeout(const Duration(seconds: _requestTimeoutSeconds)),
+          onRetry: (retry, delay) => _log(
+            'Model is busy. Retrying $modelName in ${delay.inSeconds}s ($retry/2).',
+          ),
+        );
         final jsonString = response.text;
         _log(
           'RESPONSE from $modelName after '
@@ -424,6 +430,7 @@ Each object in the array must match this structure exactly:
   }
 
   bool _isModelAvailabilityError(Object error) {
+    if (isTemporaryAiError(error) || error is TimeoutException) return true;
     final message = error.toString().toLowerCase();
     final mentionsModel =
         message.contains('model') || message.contains('generatecontent');
@@ -442,6 +449,10 @@ Each object in the array must match this structure exactly:
       lastErrorMessage =
           'AI quiz generation timed out after $_requestTimeoutSeconds seconds. '
           'Try fewer questions or a smaller document.';
+    } else if (isTemporaryAiError(error)) {
+      lastErrorMessage =
+          'The AI service is still busy after automatic recovery attempts. '
+          'Please try again in a moment.';
     } else if (_isModelAvailabilityError(error)) {
       lastErrorMessage =
           'The Gemini quiz model is temporarily unavailable. Please try again.';

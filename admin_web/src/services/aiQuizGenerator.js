@@ -1,4 +1,5 @@
 import { strFromU8, unzipSync } from 'fflate';
+import { isTemporaryAiError, retryTemporaryAiRequest } from './aiRequestRetry';
 
 const API_ROOT = 'https://generativelanguage.googleapis.com/v1beta';
 const MAX_OFFICE_BYTES = 50 * 1024 * 1024;
@@ -99,6 +100,9 @@ const readWithTimeout = async (url, options, read, timeoutMs, stage) => {
   try {
     const response = await fetch(url, { ...options, signal: controller.signal });
     return await read(response);
+  } catch (error) {
+    if (controller.signal.aborted) throw controller.signal.reason;
+    throw error;
   } finally {
     clearTimeout(timer);
     parentSignal?.removeEventListener('abort', cancel);
@@ -108,7 +112,11 @@ const readWithTimeout = async (url, options, read, timeoutMs, stage) => {
 const listAvailableModels = async (apiKey, signal) => {
   const data = await readWithTimeout(`${API_ROOT}/models?key=${encodeURIComponent(apiKey)}`, { signal }, async (response) => {
     const body = await response.json();
-    if (!response.ok) throw new Error(body.error?.message || `Could not load Gemini models (${response.status}).`);
+    if (!response.ok) {
+      const error = new Error(body.error?.message || `Could not load Gemini models (${response.status}).`);
+      error.status = response.status;
+      throw error;
+    }
     return body;
   }, 15000, 'Checking available Gemini models');
   return (data.models || [])
@@ -172,9 +180,16 @@ Respond only with a valid JSON array containing one object with this structure:
   onProgress('Checking available Gemini models...');
   let discoveredModels = [];
   try {
-    discoveredModels = await listAvailableModels(apiKey, signal);
+    discoveredModels = await retryTemporaryAiRequest(() => listAvailableModels(apiKey, signal), {
+      signal,
+      onRetry: () => onProgress('The AI service is busy. Retrying the available-model check...'),
+    });
   } catch (error) {
-    if (signal?.aborted || !configuredModel) throw error;
+    if (signal?.aborted) throw error;
+    if (!configuredModel) {
+      if (isTemporaryAiError(error)) throw new Error('The AI service is still busy after automatic retries. Please try again in a moment.');
+      throw error;
+    }
   }
   const preferredFallbacks = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-2.5-flash-lite']
     .filter((model) => discoveredModels.includes(model));
@@ -190,16 +205,25 @@ Respond only with a valid JSON array containing one object with this structure:
         : `The first attempt did not finish. Trying an alternative model for ${totalQuestions} questions...`);
       const generationConfig = { responseMimeType: 'application/json', temperature: 0.25 };
       if (/^gemini-[34][.-]/.test(model)) generationConfig.thinkingConfig = { thinkingLevel: 'low' };
-      const data = await readWithTimeout(`${API_ROOT}/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`, {
+      const data = await retryTemporaryAiRequest(() => readWithTimeout(`${API_ROOT}/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contents: [{ role: 'user', parts }], generationConfig }),
         signal,
       }, async (generation) => {
         const body = await generation.json();
-        if (!generation.ok) throw new Error(body.error?.message || `Gemini request failed (${generation.status}).`);
+        if (!generation.ok) {
+          const error = new Error(body.error?.message || `Gemini request failed (${generation.status}).`);
+          error.status = generation.status;
+          const retryAfter = generation.headers.get('Retry-After');
+          error.retryAfterMs = retryAfter ? (Number.isFinite(Number(retryAfter)) ? Number(retryAfter) * 1000 : Math.max(0, Date.parse(retryAfter) - Date.now())) : 0;
+          throw error;
+        }
         return body;
-      }, attempt === 0 && candidates.length > 1 ? 45000 : 90000, 'Generating the quiz');
+      }, attempt === 0 && candidates.length > 1 ? 45000 : 90000, 'Generating the quiz'), {
+        signal,
+        onRetry: (retry, delay) => onProgress(`The AI service is busy. Retrying in ${Math.ceil(delay / 1000)} seconds (${retry}/2)...`),
+      });
       onProgress('Checking the generated questions...');
       const text = data.candidates?.[0]?.content?.parts?.filter((part) => !part.thought).map((part) => part.text || '').join('') || '';
       const quizzes = parseJsonResponse(text);
@@ -242,10 +266,14 @@ Respond only with a valid JSON array containing one object with this structure:
     } catch (error) {
       lastError = error;
       if (signal?.aborted || error.name === 'AbortError') throw error;
+      if ([400, 401, 403, 429].includes(error.status)) throw error;
     }
   }
   if (lastError?.name === 'TimeoutError') {
     throw new Error('Gemini did not finish generating the quiz in time. Try fewer questions or a smaller module.');
+  }
+  if (isTemporaryAiError(lastError)) {
+    throw new Error('The AI service is still busy after automatic recovery attempts. Please try again in a moment.');
   }
   throw lastError || new Error('AI quiz generation failed. Please try again.');
 }

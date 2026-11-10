@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, query, where, onSnapshot, doc, deleteDoc, getDoc, writeBatch, runTransaction, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import { logAdminActivity } from '../services/adminActivityService';
+import { newestQuizFirst, teacherUploadGroups, formatUploadTime, uploadTimestampMillis } from '../services/quizOrdering';
 import { BookOpen, FileText, HelpCircle, Trash2, AlertTriangle, Search, Clock, Archive, RotateCcw, ArrowLeft, ShieldCheck, CheckCircle2, XCircle, Eye, X } from 'lucide-react';
 
 export default function TeacherUploads() {
@@ -39,18 +40,8 @@ export default function TeacherUploads() {
     return date.toLocaleString();
   };
 
-  const getCourseDate = (course) => {
-    if (course.createdAt) return formatDateTime(course.createdAt);
-    if (course.modules?.length && course.modules[0]?.uploadedAt) return formatDateTime(course.modules[0].uploadedAt);
-    if (course.quizzes?.length && course.quizzes[0]?.createdAt) return formatDateTime(course.quizzes[0].createdAt);
-    return null;
-  };
-
-  const getModuleDate = (module) =>
-    formatDateTime(module.uploadedAt || module.createdAt);
-
   const getQuizDate = (quiz) =>
-    formatDateTime(quiz.createdAt || quiz.uploadedAt);
+    formatUploadTime(uploadTimestampMillis(quiz));
 
   useEffect(() => {
     const q = query(collection(db, 'users'), where('role', '==', 'teacher'));
@@ -134,6 +125,7 @@ export default function TeacherUploads() {
   }).filter(t => (t.name || '').toLowerCase().includes(searchQuery.toLowerCase()));
   
   const activeTeacherCourses = courses.filter(c => (c.teacherUid || c.teacherName) === activeTeacherId);
+  const activeTeacherUploadGroups = teacherUploadGroups(activeTeacherCourses);
   const activeTeacherInfo = teachers.find(t => t.id === activeTeacherId) || {};
   const displayActiveTeacherName = activeTeacherInfo.name || 'Teacher';
   const pendingQuizzes = courses.flatMap(course => (course.quizzes || [])
@@ -156,7 +148,8 @@ export default function TeacherUploads() {
       grade: course.grade || 'Not set',
       sections: course.sections || [],
     })));
-  const visibleApprovalQuizzes = approvalFilter === 'rejected' ? rejectedQuizzes : pendingQuizzes;
+  const visibleApprovalQuizzes = [...(approvalFilter === 'rejected' ? rejectedQuizzes : pendingQuizzes)]
+    .sort((first, second) => newestQuizFirst(first.quiz, second.quiz));
 
   const updateQuizApproval = async (pendingQuiz, approvalStatus) => {
     try {
@@ -397,8 +390,8 @@ export default function TeacherUploads() {
 
   return (
     <>
-      <div className="animate-fade-in flex-mobile-col" style={{ display: 'flex', gap: '24px', height: 'calc(100vh - 100px)' }}>
-      <div className="mobile-w-full" style={{ flex: '0 0 350px', display: 'flex', flexDirection: 'column' }}>
+      <div className="animate-fade-in flex-mobile-col uploads-layout" style={{ display: 'flex', gap: '24px', height: 'calc(100vh - 100px)' }}>
+      <div className="mobile-w-full uploads-teacher-browser" style={{ flex: '0 0 350px', display: 'flex', flexDirection: 'column' }}>
         <div className="page-header" style={{ marginBottom: '24px' }}>
           <div>
             <h1>Teacher Uploads</h1>
@@ -602,7 +595,7 @@ export default function TeacherUploads() {
                 <p>Archived teacher uploads will appear here.</p>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(285px, 1fr))', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(285px, 100%), 1fr))', gap: '16px' }}>
                 {archivedUploads.map(archive => {
                   const itemTitle = archive.payload?.title || archive.courseTitle || 'Untitled upload';
                   const archivedDate = formatDateTime(archive.archivedAt) || 'Archiving...';
@@ -648,104 +641,48 @@ export default function TeacherUploads() {
               {displayActiveTeacherName}'s Uploads
             </h2>
             
-            {activeTeacherCourses.map((course, index) => (
-              <div key={course.id} style={{ marginBottom: '48px', paddingBottom: '48px', borderBottom: index !== activeTeacherCourses.length - 1 ? '2px dashed var(--text-secondary)' : 'none' }}>
-                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '16px', marginBottom: '24px', color: 'var(--text-secondary)' }}>
-                  <span className="badge" style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.1)', fontSize: '1.1rem', color: 'var(--accent-green)', padding: '6px 12px' }}>
-                    Course/Topic: {course.topic || course.title}
-                    <button
-                      onClick={() => handleDeleteCourse(course.id, course.title)}
-                      style={{ background: 'transparent', border: 'none', padding: 0, margin: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', color: 'var(--accent-orange)' }}
-                      title="Archive Course"
-                    >
-                      <Archive size={18} />
-                    </button>
-                  </span>
-                  <span className="badge" style={{ background: 'rgba(255,255,255,0.1)', fontSize: '0.9rem', padding: '6px 12px', color: 'var(--accent-purple)' }}>Subject: {course.subject}</span>
-                  <span className="badge" style={{ background: 'rgba(255,255,255,0.1)', fontSize: '0.9rem', padding: '6px 12px', color: 'var(--accent-cyan)' }}>Section: {course.sections?.join(', ')}</span>
-                  <span className="badge" style={{ background: 'rgba(255,255,255,0.1)', fontSize: '0.9rem', padding: '6px 12px', color: 'var(--accent-pending)' }}>Grade: {course.grade || 'Not set'}</span>
-                  {(() => {
-                    const createdDate = getCourseDate(course);
-                    return createdDate ? (
-                      <span className="badge" style={{ background: 'rgba(255,255,255,0.1)', fontSize: '0.9rem', padding: '6px 12px', color: 'var(--accent-orange)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                        <Clock size={14} />
-                        Created: {createdDate}
-                      </span>
-                    ) : null;
-                  })()}
+            {activeTeacherUploadGroups.map(({ course, modules, quizzes, createdTimestamp }, groupIndex) => (
+              <section key={course.id} style={{ marginBottom: '36px', paddingBottom: '32px', borderBottom: groupIndex !== activeTeacherUploadGroups.length - 1 ? '2px dashed var(--border-light)' : 'none' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+                  <span className="badge" style={{ background: 'var(--bg-card-hover)', color: 'var(--accent-green)', fontSize: '1rem', padding: '8px 12px' }}>Course/Topic: {course.topic || course.title || 'Untitled course'}</span>
+                  <span className="badge badge-role">{course.subject || 'No subject'}</span>
+                  <span className="badge">{course.grade || 'Grade not set'} &middot; Sections {(course.sections || []).join(', ') || 'not set'}</span>
+                  <button type="button" className="btn btn-archive" style={{ padding: '7px 10px', fontSize: '.8rem' }} onClick={() => handleDeleteCourse(course.id, course.title)}><Archive size={16} /> Archive Course</button>
                 </div>
-
-                <h3 style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <FileText size={20} color="var(--accent-cyan)" /> Modules ({course.modules?.length || 0})
-                </h3>
-                <div style={{ marginBottom: '32px' }}>
-                  {(!course.modules || course.modules.length === 0) ? (
-                    <p>No modules uploaded yet.</p>
-                  ) : (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px' }}>
-                      {course.modules.map((mod, index) => (
-                        <div key={index} style={{ background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
-                          <h4 style={{ color: 'var(--text-primary)', marginBottom: '8px', wordBreak: 'break-all' }}>{mod.title}</h4>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)', fontSize: '0.75rem', marginBottom: '12px' }}>
-                            <Clock size={13} color="var(--accent-orange)" />
-                            <span>Uploaded: {getModuleDate(mod) || 'Date not recorded'}</span>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{mod.fileType?.toUpperCase()}</span>
-                            <div style={{ display: 'flex', gap: '8px' }}>
-                              <a href={mod.url} target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '0.8rem' }}>View File</a>
-                              <button onClick={() => handleDeleteModule(course.id, index, mod.title)} className="btn btn-archive" style={{ padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Archive Module">
-                                <Archive size={16} />
-                              </button>
-                            </div>
-                          </div>
+                <p style={{ marginBottom: '20px', fontSize: '.8rem' }}>Course created: {formatUploadTime(createdTimestamp)}</p>
+                <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}><FileText size={20} color="var(--accent-cyan)" /> Modules ({modules.length})</h3>
+                {modules.length === 0 ? <p style={{ marginBottom: '24px' }}>No modules uploaded yet.</p> : (
+                  <div className="admin-upload-card-grid" style={{ marginBottom: '28px' }}>
+                    {modules.map(({ item: mod, index, timestamp }) => (
+                      <article key={mod.id || index} className="admin-upload-card">
+                        <h4>{mod.title || 'Untitled module'}</h4>
+                        <p className="admin-upload-card-date"><Clock size={13} /><span>Uploaded: {formatUploadTime(timestamp)}</span></p>
+                        <div className="admin-upload-card-actions"><span>{mod.fileType?.toUpperCase() || 'Module'}</span><div className="teacher-action-row">
+                          {mod.url && <a href={mod.url} target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ padding: '7px 10px', fontSize: '.8rem' }}>View File</a>}
+                          <button type="button" className="btn btn-archive" style={{ padding: '7px' }} onClick={() => handleDeleteModule(course.id, index, mod.title)} aria-label={`Archive ${mod.title || 'module'}`} title="Archive module"><Archive size={16} /></button>
+                        </div></div>
+                      </article>
+                    ))}
+                  </div>
+                )}
+                <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}><HelpCircle size={20} color="var(--accent-purple)" /> Approved Quizzes ({quizzes.length})</h3>
+                {quizzes.length === 0 ? <p>No approved quizzes yet.</p> : (
+                  <div className="admin-upload-card-grid">
+                    {quizzes.map(({ item: quiz, index, timestamp }) => (
+                      <article key={quiz.id || index} className="admin-upload-card">
+                        <h4>{quiz.title || 'Untitled quiz'}</h4>
+                        <p style={{ fontSize: '.8rem' }}>{quiz.questions?.length || 0} Questions{Number(quiz.timeLimitMinutes) > 0 ? ` / ${Number(quiz.timeLimitMinutes)} mins` : ''}</p>
+                        <span className="badge badge-approved" style={{ alignSelf: 'flex-start' }}>Approved</span>
+                        <p className="admin-upload-card-date"><Clock size={13} /><span>Created: {formatUploadTime(timestamp)}</span></p>
+                        <div className="teacher-action-row" style={{ marginTop: 'auto', flexWrap: 'wrap' }}>
+                          <button type="button" className="btn btn-secondary" style={{ padding: '7px 10px', fontSize: '.8rem' }} onClick={() => setPreviewQuiz({ quiz, courseId: course.id, courseTitle: course.topic || course.title, teacherName: displayActiveTeacherName, grade: course.grade, sections: course.sections || [] })}><Eye size={16} /> View Quiz</button>
+                          <button type="button" className="btn btn-archive" style={{ padding: '7px' }} onClick={() => handleDeleteQuiz(course.id, index, quiz.title)} aria-label={`Archive ${quiz.title || 'quiz'}`} title="Archive quiz"><Archive size={16} /></button>
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <h3 style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <HelpCircle size={20} color="var(--accent-purple)" /> Quizzes ({course.quizzes?.length || 0})
-                </h3>
-                <div>
-                  {(!course.quizzes || course.quizzes.length === 0) ? (
-                    <p>No quizzes created yet.</p>
-                  ) : (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px' }}>
-                      {course.quizzes.map((quiz, index) => (
-                        <div key={index} style={{ background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                            <h4 style={{ color: 'var(--text-primary)', wordBreak: 'break-all' }}>{quiz.title}</h4>
-                            <button onClick={() => handleDeleteQuiz(course.id, index, quiz.title)} className="btn btn-archive" style={{ padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '8px' }} title="Archive Quiz">
-                              <Archive size={16} />
-                            </button>
-                          </div>
-                          <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                            {quiz.questions?.length || 0} Questions
-                            {Number(quiz.timeLimitMinutes) > 0
-                              ? ` • ${Number(quiz.timeLimitMinutes)} mins`
-                              : ''}
-                          </span>
-                          <div style={{ marginTop: '9px' }}>
-                            <span className="badge" style={{
-                              textTransform: 'capitalize',
-                              color: quiz.approvalStatus === 'pending' ? 'var(--accent-orange)' : quiz.approvalStatus === 'rejected' ? 'var(--accent-red)' : 'var(--accent-green)',
-                              background: quiz.approvalStatus === 'pending' ? 'color-mix(in srgb, var(--accent-orange) 12%, transparent)' : quiz.approvalStatus === 'rejected' ? 'color-mix(in srgb, var(--accent-red) 12%, transparent)' : 'color-mix(in srgb, var(--accent-green) 12%, transparent)',
-                            }}>
-                              {quiz.approvalStatus || 'approved'}
-                            </span>
-                          </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)', fontSize: '0.75rem', marginTop: '10px' }}>
-                            <Clock size={13} color="var(--accent-orange)" />
-                            <span>Created: {getQuizDate(quiz) || 'Date not recorded'}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </section>
             ))}
           </div>
         ) : (

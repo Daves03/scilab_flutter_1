@@ -1,5 +1,6 @@
 import '../../../core/app_export.dart';
 import '../../../models/course_model.dart';
+import '../../../widgets/course_created_date.dart';
 import './modules_section_widget.dart';
 import './quiz_section_widget.dart';
 import './quiz_leave_confirmation_dialog.dart';
@@ -143,6 +144,8 @@ class _CourseDetailWidgetState extends State<CourseDetailWidget>
                     ),
                   ],
                 ),
+                const SizedBox(height: 12),
+                CourseCreatedDate(createdAt: course.createdAt),
                 const SizedBox(height: 12),
                 // Progress bar
                 Row(

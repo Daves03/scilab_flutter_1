@@ -83,6 +83,24 @@ class AnnouncementService {
     });
   }
 
+  Future<void> deleteAnnouncement({
+    required ClassAnnouncement announcement,
+    required AppUser teacher,
+  }) async {
+    if (teacher.id != announcement.teacherId) {
+      throw StateError('You can only delete your own announcements.');
+    }
+    final reference = _announcements.doc(announcement.id);
+    await _firestore.runTransaction((transaction) async {
+      final current = await transaction.get(reference);
+      if (!current.exists) return;
+      if (current.data()?['teacherId']?.toString() != teacher.id) {
+        throw StateError('You can only delete your own announcements.');
+      }
+      transaction.delete(reference);
+    });
+  }
+
   Stream<List<ClassAnnouncement>> announcementsForTeacher(String teacherId) {
     return _announcements
         .where('teacherId', isEqualTo: teacherId)

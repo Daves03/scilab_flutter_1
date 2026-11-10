@@ -1,5 +1,6 @@
 import '../../core/app_export.dart';
 import '../../core/course_assignment.dart';
+import '../../widgets/course_created_date.dart';
 import './widgets/course_detail_widget.dart';
 import 'package:provider/provider.dart';
 import '../../models/course_model.dart';
@@ -554,6 +555,8 @@ class _CourseListCard extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 10),
+            CourseCreatedDate(createdAt: course.createdAt),
             const SizedBox(height: 14),
             Wrap(
               spacing: 8,

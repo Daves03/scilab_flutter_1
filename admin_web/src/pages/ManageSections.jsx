@@ -293,7 +293,7 @@ export default function ManageSections() {
             {activeTab === 'active' ? 'No sections found.' : 'Archive is empty.'}
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(300px, 100%), 1fr))', gap: '16px' }}>
             {filteredList.map(section => (
               <div key={section.id} style={{ 
                 background: 'rgba(0,0,0,0.2)', 

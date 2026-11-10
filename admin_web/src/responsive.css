@@ -1,0 +1,82 @@
+/* Layouts adapt to the available content width, including laptop scaling. */
+.teacher-section-status-summary { display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; color:var(--text-secondary); }
+.teacher-student-status { display:inline-flex; align-items:center; gap:7px; padding:5px 10px; border:1px solid currentColor; border-radius:999px; font-size:.78rem; font-weight:700; white-space:nowrap; }
+.teacher-student-status::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; flex-shrink:0; }
+.teacher-student-status.approved { color:var(--accent-green); background:color-mix(in srgb,var(--accent-green) 9%,transparent); }
+.teacher-student-status.pending { color:var(--accent-orange); background:color-mix(in srgb,var(--accent-orange) 9%,transparent); }
+.teacher-student-status.rejected { color:var(--accent-red); background:color-mix(in srgb,var(--accent-red) 9%,transparent); }
+.teacher-student-status.unknown { color:var(--text-secondary); background:var(--bg-card); }
+[data-theme="light"] .teacher-student-status.approved { color:#087443; background:#ecfdf3; }
+[data-theme="light"] .teacher-student-status.pending { color:#92400e; background:#fffbeb; }
+[data-theme="light"] .teacher-student-status.rejected { color:#b42318; background:#fef3f2; }
+.admin-upload-card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr)); gap:16px; }
+.admin-upload-card { min-width:0; display:flex; flex-direction:column; gap:12px; padding:16px; border:1px solid var(--border-light); border-radius:12px; background:var(--bg-card); }
+.admin-upload-card h4 { overflow-wrap:anywhere; }
+.admin-upload-card-date { display:flex; align-items:flex-start; gap:6px; font-size:.75rem; }
+.admin-upload-card-date svg { color:var(--accent-orange); flex-shrink:0; margin-top:2px; }
+.admin-upload-card-actions { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-top:auto; }
+.admin-upload-card-actions > span { font-size:.75rem; color:var(--text-secondary); }
+.teacher-page { overflow-x:visible; }
+.teacher-course-grid,.teacher-progress-grid {
+  grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));
+}
+.teacher-dashboard-columns {
+  grid-template-columns:repeat(auto-fit,minmax(min(360px,100%),1fr));
+}
+.teacher-participation-row {
+  grid-template-columns:minmax(0,180px) minmax(0,1fr) 38px;
+}
+.uploads-layout > * { min-width:0; }
+.teacher-course-card h2,.teacher-course-meta,.teacher-course-counts { overflow-wrap:anywhere; }
+.teacher-course-counts { flex-wrap:wrap; }
+.teacher-overview-header-tools { flex-wrap:wrap; max-width:100%; }
+.teacher-overview-header-tools > * { min-width:0; max-width:100%; }
+.teacher-modal { max-height:calc(100dvh - 32px); }
+
+@media (max-width:1440px) {
+  :root { --sidebar-width:224px; }
+  .sidebar { padding:20px 14px; }
+  .main-content { padding:24px; }
+  .sidebar-brand { gap:9px !important; padding-left:4px !important; padding-right:4px !important; }
+  .sidebar-brand h3 { font-size:1.05rem !important; }
+  .nav-link { padding:11px 12px; gap:10px; font-size:.9rem; }
+  .stat-card-padding { padding:20px; }
+  .teacher-section-card,.teacher-participation-card,.teacher-table-panel { padding:20px; }
+  .flex-mobile-col { flex-wrap:wrap; }
+  .flex-mobile-col > * { min-width:0; max-width:100%; }
+  .teacher-overview-header-tools { flex-direction:row; }
+}
+
+@media (max-height:800px) {
+  .sidebar { padding-top:16px; padding-bottom:16px; }
+  .sidebar-brand { margin-bottom:20px !important; }
+  .nav-link { padding-top:9px; padding-bottom:9px; margin-bottom:4px; }
+}
+
+@media (min-width:1025px) and (max-width:1440px) {
+  .uploads-layout { gap:18px !important; }
+  .uploads-teacher-browser { flex-basis:260px !important; }
+}
+
+@media (max-width:1024px) {
+  .main-content { padding:24px 20px; }
+  .sidebar { max-width:calc(100vw - 36px); }
+  .sidebar-brand { padding-right:42px !important; }
+  .teacher-page-header { align-items:flex-start; }
+  .uploads-layout { height:auto !important; flex-direction:column; }
+  .uploads-teacher-browser { flex-basis:auto !important; width:100%; }
+  .uploads-teacher-browser > .glass-panel { max-height:360px; }
+  .flex-mobile-col { flex-direction:column !important; align-items:stretch !important; }
+  .mobile-w-full { width:100% !important; }
+  .grid-2-col { grid-template-columns:minmax(0,1fr) !important; }
+}
+
+@media (max-width:768px) {
+  .main-content { padding:20px 16px; }
+  .teacher-toolbar .teacher-tabs,.teacher-toolbar .teacher-search { flex:0 1 auto; }
+  .teacher-dashboard-columns,.teacher-course-grid,.teacher-progress-grid { grid-template-columns:minmax(0,1fr); }
+  .teacher-participation-row { grid-template-columns:minmax(0,1fr) 34px; }
+  .teacher-overview-header-tools { width:100%; }
+  .teacher-overview-header-tools > * { width:100%; }
+  .teacher-section-card,.teacher-table-panel { padding:16px; }
+}

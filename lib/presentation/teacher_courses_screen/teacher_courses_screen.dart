@@ -1,4 +1,5 @@
 import 'dart:math';
+import '../../core/teacher_course_options.dart';
 import '../../core/app_export.dart';
 import './widgets/teacher_course_detail_widget.dart';
 import 'package:provider/provider.dart';
@@ -1669,6 +1670,16 @@ class _CourseFormDialogState extends State<_CourseFormDialog> {
               .map((document) => document.data())
               .where((section) => section['isTrashed'] != true)
               .toList();
+          final grades = _availableGrades;
+          if (grades.length == 1) {
+            widget.gradeCtrl.text = grades.single;
+          } else if (!grades.contains(widget.gradeCtrl.text)) {
+            widget.gradeCtrl.clear();
+          }
+          final validSections = _availableSectionsForGrade;
+          widget.selectedSections.removeWhere(
+            (section) => !validSections.contains(section),
+          );
           _isLoadingSections = false;
         });
       }
@@ -1681,25 +1692,16 @@ class _CourseFormDialogState extends State<_CourseFormDialog> {
   }
 
   List<String> get _availableGrades {
-    final grades = <String>{};
-    for (var s in _allSections) {
-      if (_teacherSections.contains(s['name'])) {
-        if (s['grade'] != null) grades.add(s['grade']);
-      }
-    }
-    final sorted = grades.toList()..sort();
-    return sorted.isEmpty ? ['Grade 9', 'Grade 10'] : sorted;
+    return _courseOptions.grades;
   }
 
+  TeacherCourseOptions get _courseOptions => TeacherCourseOptions(
+    teacherSections: _teacherSections,
+    catalog: _allSections,
+  );
+
   List<String> get _availableSectionsForGrade {
-    final sections = <String>[];
-    for (var s in _allSections) {
-      if (s['grade'] == widget.gradeCtrl.text &&
-          _teacherSections.contains(s['name'])) {
-        sections.add(s['name'] as String);
-      }
-    }
-    return sections;
+    return _courseOptions.sectionsForGrade(widget.gradeCtrl.text);
   }
 
   Future<void> _saveCourse() async {
@@ -1806,17 +1808,20 @@ class _CourseFormDialogState extends State<_CourseFormDialog> {
                         child: Text(val),
                       );
                     }).toList(),
-                    onChanged: (val) {
-                      if (val != null) {
-                        setState(() {
-                          widget.gradeCtrl.text = val;
-                          // Clean up selected sections that don't belong to this grade
-                          widget.selectedSections.removeWhere(
-                            (s) => !_availableSectionsForGrade.contains(s),
-                          );
-                        });
-                      }
-                    },
+                    onChanged: _availableGrades.isEmpty
+                        ? null
+                        : (val) {
+                            if (val != null) {
+                              setState(() {
+                                widget.gradeCtrl.text = val;
+                                // Clean up selected sections that don't belong to this grade
+                                widget.selectedSections.removeWhere(
+                                  (s) =>
+                                      !_availableSectionsForGrade.contains(s),
+                                );
+                              });
+                            }
+                          },
                     style: TextStyle(
                       color: Theme.of(context).brightness == Brightness.dark
                           ? Colors.white
@@ -1829,7 +1834,9 @@ class _CourseFormDialogState extends State<_CourseFormDialog> {
                         : Colors.white,
                     decoration: InputDecoration(
                       labelText: 'Grade',
-                      hintText: 'Select Grade',
+                      hintText: _availableGrades.isEmpty
+                          ? 'No assigned grades available'
+                          : 'Select Grade',
                       labelStyle: TextStyle(
                         color: Theme.of(context).brightness == Brightness.dark
                             ? const Color(0xFF8BA3C0)
@@ -1887,6 +1894,30 @@ class _CourseFormDialogState extends State<_CourseFormDialog> {
                   ),
             if (!_isLoadingSections && widget.gradeCtrl.text.isNotEmpty) ...[
               const SizedBox(height: 14),
+              if (availableSections.isNotEmpty)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton.icon(
+                    onPressed: () => setState(() {
+                      if (remainingSections.isEmpty) {
+                        widget.selectedSections.clear();
+                      } else {
+                        widget.selectedSections
+                          ..clear()
+                          ..addAll(availableSections);
+                      }
+                    }),
+                    icon: Icon(
+                      remainingSections.isEmpty
+                          ? Icons.clear_all
+                          : Icons.done_all,
+                      size: 18,
+                    ),
+                    label: Text(
+                      remainingSections.isEmpty ? 'Clear All' : 'Select All',
+                    ),
+                  ),
+                ),
               DropdownButtonFormField<String>(
                 key: ValueKey(
                   'course-section-${widget.gradeCtrl.text}-${widget.selectedSections.join('|')}',
@@ -2023,7 +2054,9 @@ class _CourseFormDialogState extends State<_CourseFormDialog> {
               borderRadius: BorderRadius.circular(10.0),
             ),
           ),
-          onPressed: _isSaving ? null : _saveCourse,
+          onPressed: _isSaving || _isLoadingSections || _availableGrades.isEmpty
+              ? null
+              : _saveCourse,
           child: _isSaving
               ? const SizedBox(
                   width: 18,

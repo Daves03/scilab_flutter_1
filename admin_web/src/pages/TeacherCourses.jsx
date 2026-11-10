@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { addDoc, collection, deleteDoc, doc, onSnapshot, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
-import { BookOpen, CalendarClock, Edit3, FileText, Plus, Search, Trash2, X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { BookOpen, CalendarClock, Edit3, FileText, LayoutGrid, List, Plus, Search, Trash2, X } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { db } from '../firebase';
 import { formatDateTime, teacherGradeLabels } from '../services/teacherPortalUtils';
 
@@ -13,12 +13,28 @@ export default function TeacherCourses({ user, profile }) {
   const [courses, setCourses] = useState([]);
   const [sectionCatalog, setSectionCatalog] = useState([]);
   const [search, setSearch] = useState('');
+  const [view, setView] = useState('cards');
   const [form, setForm] = useState(EMPTY_FORM);
   const [editing, setEditing] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const teacherSections = useMemo(() => profile?.sections || [], [profile?.sections]);
+
+  useEffect(() => {
+    try {
+      setView(localStorage.getItem(`teacher-course-view:${user?.uid}`) === 'list' ? 'list' : 'cards');
+    } catch {
+      setView('cards');
+    }
+  }, [user?.uid]);
+
+  const changeView = (nextView) => {
+    setView(nextView);
+    try {
+      localStorage.setItem(`teacher-course-view:${user?.uid}`, nextView);
+    } catch { /* The view still works when browser storage is unavailable. */ }
+  };
 
   useEffect(() => {
     if (!user?.uid) return undefined;
@@ -125,8 +141,15 @@ export default function TeacherCourses({ user, profile }) {
         <button className="btn btn-primary" onClick={openCreate}><Plus size={18} /> New Course</button>
       </div>
 
-      <label className="teacher-search teacher-course-search"><Search size={18} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search your courses..." /></label>
+      <div className="teacher-course-browser-toolbar">
+        <label className="teacher-search"><Search size={18} /><input aria-label="Search your courses" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search your courses..." /></label>
+        <div className="teacher-course-view-switch" role="group" aria-label="Course view">
+          <button type="button" aria-pressed={view === 'cards'} className={view === 'cards' ? 'active' : ''} onClick={() => changeView('cards')}><LayoutGrid size={18} /> Cards</button>
+          <button type="button" aria-pressed={view === 'list'} className={view === 'list' ? 'active' : ''} onClick={() => changeView('list')}><List size={18} /> List</button>
+        </div>
+      </div>
 
+      {view === 'cards' ? (
       <div className="teacher-course-grid">
         {visibleCourses.map((course) => (
           <article
@@ -159,6 +182,28 @@ export default function TeacherCourses({ user, profile }) {
         ))}
         {visibleCourses.length === 0 && <div className="glass-panel teacher-empty-state teacher-grid-empty"><BookOpen size={40} /><strong>No courses found</strong><span>Create a course to make it available in the mobile app for your assigned students.</span></div>}
       </div>
+      ) : (
+        <section className="glass-panel teacher-course-list-panel" aria-label="Courses in list view">
+          <div className="teacher-responsive-table">
+            <table className="data-table teacher-course-list-table">
+              <thead><tr><th>Course / Topic</th><th>Subject</th><th>Grade & Sections</th><th>Created</th><th>Modules</th><th>Quizzes</th><th>Actions</th></tr></thead>
+              <tbody>{visibleCourses.map((course) => <tr key={course.id}>
+                <td><Link className="teacher-course-list-name" to={`/my-courses/${course.id}`}><span className="teacher-content-icon course"><BookOpen size={19} /></span><strong>{course.title || 'Untitled Course'}</strong></Link></td>
+                <td>{course.subject || 'No subject'}</td>
+                <td><div className="teacher-course-list-assignment"><strong>{course.grade || 'Grade not set'}</strong><span>Sections {(course.sections || course.assignedSections || []).join(', ') || 'not set'}</span></div></td>
+                <td>{formatDateTime(course.createdAt)}</td>
+                <td>{(course.modules || []).length}</td>
+                <td>{(course.quizzes || []).length}</td>
+                <td><div className="teacher-action-row">
+                  <button type="button" className="teacher-icon-btn edit" onClick={() => openEdit(course)} aria-label={`Edit ${course.title || 'course'}`} title="Edit course"><Edit3 size={17} /></button>
+                  <button type="button" className="teacher-icon-btn danger" onClick={() => removeCourse(course)} aria-label={`Delete ${course.title || 'course'}`} title="Delete course"><Trash2 size={17} /></button>
+                </div></td>
+              </tr>)}</tbody>
+            </table>
+          </div>
+          {visibleCourses.length === 0 && <div className="teacher-empty-state"><BookOpen size={40} /><strong>No courses found</strong><span>{search.trim() ? 'Try another search.' : 'Create a course to make it available to your assigned students.'}</span></div>}
+        </section>
+      )}
 
       {showForm && createPortal(
         <div className="teacher-modal-backdrop teacher-status-backdrop" onMouseDown={(event) => event.target === event.currentTarget && setShowForm(false)}>

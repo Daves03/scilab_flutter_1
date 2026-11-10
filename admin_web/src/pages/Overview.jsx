@@ -229,7 +229,7 @@ export default function Overview() {
       {/* Docked Calendar Card (when pinned) */}
       {showCalendar && isPinned && (
         <div className="calendar-docked-card animate-fade-in glass-panel">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '28px', alignItems: 'center' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', gap: '28px', alignItems: 'center' }}>
             <CalendarPanel 
               viewDate={viewDate}
               setViewDate={setViewDate}
@@ -328,7 +328,7 @@ export default function Overview() {
       )}
 
       {/* Unified 3-column grid for both top KPI and Platform Content rows */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '40px', alignItems: 'start' }}>
+      <div className="overview-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '24px', marginBottom: '40px', alignItems: 'start' }}>
 
         {/* ── Row 1: User Stats ── */}
         <StatCard 

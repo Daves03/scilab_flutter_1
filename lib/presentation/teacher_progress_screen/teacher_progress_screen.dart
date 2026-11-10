@@ -9,6 +9,7 @@ import '../../services/ar_service.dart';
 import '../../models/ar_experiment_model.dart';
 import '../../data/dummy_ar_experiments.dart';
 import '../../models/activity_model.dart';
+import '../../services/student_quiz_progress.dart';
 
 import '../../core/app_export.dart';
 import 'package:provider/provider.dart';
@@ -52,13 +53,15 @@ class StudentProgress {
     String? name,
     String? studentNumber,
     String? avatarUrl,
+    List<QuizResult>? quizResults,
+    List<MissedQuiz>? missedQuizzes,
   }) {
     return StudentProgress(
       id: id,
       name: name ?? this.name,
       section: section,
-      quizResults: quizResults,
-      missedQuizzes: missedQuizzes,
+      quizResults: quizResults ?? this.quizResults,
+      missedQuizzes: missedQuizzes ?? this.missedQuizzes,
       arLabRecords: arLabRecords,
       studentNumber: studentNumber ?? this.studentNumber,
       avatarUrl: avatarUrl ?? this.avatarUrl,
@@ -116,6 +119,15 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
   Map<String, AppUser> _liveStudentProfiles = {};
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
   _studentProfilesSubscription;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
+  _quizAttemptsSubscription;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _coursesSubscription;
+  List<QuizAttempt> _liveQuizAttempts = [];
+  List<Course> _liveCourses = [];
+  Map<String, AppUser> _loadedStudentProfiles = {};
+  bool _hasLiveQuizAttempts = false;
+  bool _hasLiveCourses = false;
+  final _progressUpdates = ValueNotifier<Map<String, StudentProgress>>({});
   bool _loading = true;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
@@ -125,12 +137,16 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _subscribeToStudentProfiles();
+    _subscribeToQuizProgress();
     _loadData();
   }
 
   @override
   void dispose() {
     _studentProfilesSubscription?.cancel();
+    _quizAttemptsSubscription?.cancel();
+    _coursesSubscription?.cancel();
+    _progressUpdates.dispose();
     _tabController.dispose();
     _searchController.dispose();
     super.dispose();
@@ -161,7 +177,94 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
                 })
                 .toList(growable: false);
           });
+          _notifyProgressUpdates();
         });
+  }
+
+  void _subscribeToQuizProgress() {
+    final db = FirebaseFirestore.instance;
+    _quizAttemptsSubscription = db
+        .collection('quiz_attempts')
+        .snapshots()
+        .listen(
+          (snapshot) {
+            if (!mounted) return;
+            _hasLiveQuizAttempts = true;
+            _liveQuizAttempts = snapshot.docs
+                .map(
+                  (document) =>
+                      QuizAttempt.fromMap(document.id, document.data()),
+                )
+                .toList();
+            _applyLiveQuizProgress();
+          },
+          onError: (Object error) =>
+              debugPrint('Quiz progress stream failed: $error'),
+        );
+    _coursesSubscription = db.collection('courses').snapshots().listen(
+      (snapshot) {
+        if (!mounted) return;
+        _hasLiveCourses = true;
+        _liveCourses = snapshot.docs
+            .map((document) => Course.fromMap(document.id, document.data()))
+            .toList();
+        _applyLiveQuizProgress();
+      },
+      onError: (Object error) =>
+          debugPrint('Course progress stream failed: $error'),
+    );
+  }
+
+  List<QuizResult> _quizResults(StudentQuizProgressData progress) => progress
+      .attempts
+      .map(
+        (attempt) => QuizResult(
+          quizTitle: attempt.quizTitle,
+          score: attempt.score,
+          total: attempt.totalQuestions,
+          date: _formatDate(attempt.submittedAt),
+        ),
+      )
+      .toList();
+
+  List<MissedQuiz> _missedQuizzes(StudentQuizProgressData progress) => progress
+      .missed
+      .map(
+        (item) => MissedQuiz(
+          quizTitle: item.quiz.title,
+          courseTitle: item.course.title,
+          dueDate: _formatDate(item.quiz.dueDate),
+        ),
+      )
+      .toList();
+
+  void _notifyProgressUpdates() {
+    _progressUpdates.value = {
+      for (final student in _allStudents) student.id: student,
+    };
+  }
+
+  void _applyLiveQuizProgress() {
+    if (!mounted || _loading) return;
+    setState(() {
+      _allStudents = _allStudents.map((student) {
+        final profile =
+            _liveStudentProfiles[student.id] ??
+            _loadedStudentProfiles[student.id];
+        if (profile == null) return student;
+        final progress = StudentQuizProgressData.build(
+          student: profile,
+          attempts: _liveQuizAttempts,
+          courses: _liveCourses,
+          now: DateTime.now(),
+        );
+        return student.copyWith(
+          quizResults: _quizResults(progress),
+          missedQuizzes: _missedQuizzes(progress),
+        );
+      }).toList();
+    });
+    _notifyProgressUpdates();
   }
 
   String _formatDate(DateTime? dt) {
@@ -207,28 +310,23 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
           .map((d) => AppUser.fromMap(d.id, d.data()))
           .where((u) => u.sections.any((sec) => _teacherSections.contains(sec)))
           .toList();
+      _loadedStudentProfiles = {
+        for (final student in users) student.id: student,
+      };
 
       // 2. Fetch all quiz attempts
       final attemptsSnap = await db.collection('quiz_attempts').get();
       final allAttempts = attemptsSnap.docs
           .map((d) => QuizAttempt.fromMap(d.id, d.data()))
           .toList();
-      // Keep every quiz-result view consistent: newest submission first and
-      // attempts without a timestamp at the bottom.
-      allAttempts.sort((a, b) {
-        final aDate = a.submittedAt;
-        final bDate = b.submittedAt;
-        if (aDate == null && bDate == null) return 0;
-        if (aDate == null) return 1;
-        if (bDate == null) return -1;
-        return bDate.compareTo(aDate);
-      });
+      if (!_hasLiveQuizAttempts) _liveQuizAttempts = allAttempts;
 
       // 2.5 Fetch all courses to check for missed quizzes
       final coursesSnap = await db.collection('courses').get();
       final allCourses = coursesSnap.docs
           .map((d) => Course.fromMap(d.id, d.data()))
           .toList();
+      if (!_hasLiveCourses) _liveCourses = allCourses;
 
       // 3. Fetch AR experiments to map IDs to titles (with fallback if permission denied)
       List<ArExperimentModel> arExps = [];
@@ -246,20 +344,13 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
       // 4. Build StudentProgress objects
       List<StudentProgress> dynamicStudents = [];
       for (var u in users) {
-        // get quiz results for u.id
-        final uAttempts = allAttempts
-            .where((a) => a.studentId == u.id)
-            .toList();
-        final quizResults = uAttempts
-            .map(
-              (a) => QuizResult(
-                quizTitle: a.quizTitle,
-                score: a.score,
-                total: a.totalQuestions,
-                date: _formatDate(a.submittedAt),
-              ),
-            )
-            .toList();
+        final quizProgress = StudentQuizProgressData.build(
+          student: u,
+          attempts: _liveQuizAttempts,
+          courses: _liveCourses,
+          now: DateTime.now(),
+        );
+        final quizResults = _quizResults(quizProgress);
 
         // get AR records for u.id
         List<ArLabRecord> uArRecords = [];
@@ -304,25 +395,7 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
 
         final section = u.sections.isNotEmpty ? u.sections.first : 'No Section';
 
-        List<MissedQuiz> uMissedQuizzes = [];
-        for (var course in allCourses) {
-          if (course.sections.contains(section)) {
-            for (var quiz in course.quizzes) {
-              final hasAttempted = uAttempts.any((a) => a.quizId == quiz.id);
-              if (!hasAttempted &&
-                  quiz.dueDate != null &&
-                  quiz.dueDate!.isBefore(DateTime.now())) {
-                uMissedQuizzes.add(
-                  MissedQuiz(
-                    quizTitle: quiz.title,
-                    courseTitle: course.title,
-                    dueDate: _formatDate(quiz.dueDate),
-                  ),
-                );
-              }
-            }
-          }
-        }
+        final uMissedQuizzes = _missedQuizzes(quizProgress);
 
         dynamicStudents.add(
           StudentProgress(
@@ -338,12 +411,15 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
         );
       }
 
+      if (!mounted) return;
       setState(() {
         _allStudents = dynamicStudents;
         _loading = false;
       });
+      _applyLiveQuizProgress();
     } catch (e) {
       print('Error loading dynamic progress: $e');
+      if (!mounted) return;
       setState(() {
         _loading = false;
       });
@@ -726,6 +802,7 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
                       children: [
                         _QuizResultsTab(
                           students: _filteredStudents,
+                          progressUpdates: _progressUpdates,
                           cardColor: cardColor,
                           borderColor: borderColor,
                           subTextColor: subTextColor,
@@ -757,6 +834,7 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
 
 class _QuizResultsTab extends StatelessWidget {
   final List<StudentProgress> students;
+  final ValueNotifier<Map<String, StudentProgress>> progressUpdates;
   final Color cardColor;
   final Color borderColor;
   final Color subTextColor;
@@ -766,6 +844,7 @@ class _QuizResultsTab extends StatelessWidget {
 
   const _QuizResultsTab({
     required this.students,
+    required this.progressUpdates,
     required this.cardColor,
     required this.borderColor,
     required this.subTextColor,
@@ -978,96 +1057,105 @@ class _QuizResultsTab extends StatelessWidget {
 
   void _showQuizDialog(BuildContext context, StudentProgress student) {
     if (student.quizResults.isEmpty && student.missedQuizzes.isEmpty) return;
+    final scrollController = ScrollController();
     showDialog(
       context: context,
-      builder: (context) {
-        final scrollController = ScrollController();
-        final allItems = [...student.quizResults, ...student.missedQuizzes];
-        final hasScrollableResults = allItems.length > 6;
+      builder: (context) =>
+          ValueListenableBuilder<Map<String, StudentProgress>>(
+            valueListenable: progressUpdates,
+            builder: (context, currentStudents, _) {
+              final latestStudent = currentStudents[student.id] ?? student;
+              final allItems = [
+                ...latestStudent.quizResults,
+                ...latestStudent.missedQuizzes,
+              ];
+              final hasScrollableResults = allItems.length > 6;
 
-        return Dialog(
-          backgroundColor: cardColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: BorderSide(color: borderColor),
-          ),
-          insetPadding: const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 48,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              return Dialog(
+                backgroundColor: cardColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(color: borderColor),
+                ),
+                insetPadding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 48,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Expanded(
-                      child: Text(
-                        '${student.name}\'s Quizzes',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                        overflow: TextOverflow.ellipsis,
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '${latestStudent.name}\'s Quizzes',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.close, color: subTextColor),
+                            onPressed: () => Navigator.pop(context),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
                       ),
                     ),
-                    IconButton(
-                      icon: Icon(Icons.close, color: subTextColor),
-                      onPressed: () => Navigator.pop(context),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
+                    Divider(height: 1, color: borderColor),
+                    Flexible(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxHeight: 540),
+                        child: RawScrollbar(
+                          controller: scrollController,
+                          thumbColor: (isDark ? Colors.white : Colors.black)
+                              .withAlpha(150),
+                          radius: const Radius.circular(4),
+                          thickness: 4,
+                          thumbVisibility: hasScrollableResults,
+                          child: ListView.separated(
+                            controller: scrollController,
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.all(16),
+                            itemCount: allItems.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(height: 12),
+                            itemBuilder: (context, index) {
+                              final item = allItems[index];
+                              if (item is QuizResult) {
+                                return _QuizResultRow(
+                                  quiz: item,
+                                  subTextColor: subTextColor,
+                                  scoreColor: scoreColor,
+                                  isDark: isDark,
+                                  theme: theme,
+                                  borderColor: borderColor,
+                                );
+                              } else if (item is MissedQuiz) {
+                                return _MissedQuizRow(
+                                  quiz: item,
+                                  subTextColor: subTextColor,
+                                  isDark: isDark,
+                                  theme: theme,
+                                );
+                              }
+                              return const SizedBox();
+                            },
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
-              ),
-              Divider(height: 1, color: borderColor),
-              Flexible(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 540),
-                  child: RawScrollbar(
-                    controller: scrollController,
-                    thumbColor: (isDark ? Colors.white : Colors.black)
-                        .withAlpha(150),
-                    radius: const Radius.circular(4),
-                    thickness: 4,
-                    thumbVisibility: hasScrollableResults,
-                    child: ListView.separated(
-                      controller: scrollController,
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.all(16),
-                      itemCount: allItems.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        final item = allItems[index];
-                        if (item is QuizResult) {
-                          return _QuizResultRow(
-                            quiz: item,
-                            subTextColor: subTextColor,
-                            scoreColor: scoreColor,
-                            isDark: isDark,
-                            theme: theme,
-                            borderColor: borderColor,
-                          );
-                        } else if (item is MissedQuiz) {
-                          return _MissedQuizRow(
-                            quiz: item,
-                            subTextColor: subTextColor,
-                            isDark: isDark,
-                            theme: theme,
-                          );
-                        }
-                        return const SizedBox();
-                      },
-                    ),
-                  ),
-                ),
-              ),
-            ],
+              );
+            },
           ),
-        );
-      },
-    );
+    ).whenComplete(scrollController.dispose);
   }
 }
 
