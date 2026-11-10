@@ -135,6 +135,7 @@ class CourseService {
             ),
           )
           .toList(growable: false);
+      resolved.sort(Course.newestFirst);
       controller.add(resolved);
     }
 
@@ -241,12 +242,14 @@ class CourseService {
         }
       }),
     );
-    return courses
+    final resolved = courses
         .map(
           (course) =>
               _courseWithCurrentTeacherName(course, names[course.teacherUid]),
         )
         .toList(growable: false);
+    resolved.sort(Course.newestFirst);
+    return resolved;
   }
 
   /// One-shot fetch, used where a screen loads once into a mutable
@@ -284,15 +287,18 @@ class CourseService {
           (course) => CourseAssignment.courseMatchesStudent(course, student),
         )
         .toList();
-    final resolvedCourses = (await _resolveCurrentTeacherNames(courses))
-        .map(_courseWithApprovedQuizzesOnly)
-        .toList(growable: false);
+    final resolvedCourses = (await _resolveCurrentTeacherNames(
+      courses,
+    )).map(_courseWithApprovedQuizzesOnly).toList(growable: false);
     final attempts = await fetchAttemptsForStudent(student.id);
     return _applyStudentProgress(resolvedCourses, attempts);
   }
 
   Future<String> createCourse(Course course) async {
-    final ref = await _db.collection(_coursesCollection).add(course.toMap());
+    final ref = await _db.collection(_coursesCollection).add({
+      ...course.toMap(),
+      'createdAt': Timestamp.fromDate(course.createdAt ?? DateTime.now()),
+    });
     return ref.id;
   }
 
@@ -300,7 +306,10 @@ class CourseService {
   /// can keep using that id locally right away instead of waiting on a
   /// round trip to learn the auto-generated one.
   Future<void> createCourseWithId(String id, Course course) {
-    return _db.collection(_coursesCollection).doc(id).set(course.toMap());
+    return _db.collection(_coursesCollection).doc(id).set({
+      ...course.toMap(),
+      'createdAt': Timestamp.fromDate(course.createdAt ?? DateTime.now()),
+    });
   }
 
   Future<void> deleteCourse(String courseId) async {

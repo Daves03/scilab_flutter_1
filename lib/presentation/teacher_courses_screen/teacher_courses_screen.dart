@@ -472,7 +472,7 @@ class _CoursesScreenState extends State<TeacherCoursesScreen>
               sections: selectedSections,
               modules: course.modules,
               quizzes: course.quizzes,
-              createdAt: course.createdAt ?? DateTime.now(),
+              createdAt: course.createdAt,
             );
             await context.read<CourseService>().updateCourse(updatedCourse);
             if (ctx.mounted) Navigator.of(ctx).pop();
@@ -609,11 +609,7 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
             final teacherCourses = await context
                 .read<CourseService>()
                 .fetchCoursesForTeacher(user.id);
-            teacherCourses.sort(
-              (a, b) => (b.createdAt ?? DateTime.now()).compareTo(
-                a.createdAt ?? DateTime.now(),
-              ),
-            );
+            teacherCourses.sort(Course.newestFirst);
             final lastIcon = teacherCourses.isNotEmpty
                 ? teacherCourses.first.iconName
                 : null;
@@ -677,7 +673,7 @@ class _CoursesCrudPanelState extends State<_CoursesCrudPanel> {
               sections: selectedSections,
               modules: course.modules,
               quizzes: course.quizzes,
-              createdAt: course.createdAt ?? DateTime.now(),
+              createdAt: course.createdAt,
             );
             await context.read<CourseService>().updateCourse(updatedCourse);
             if (ctx.mounted) Navigator.of(ctx).pop();
@@ -1364,6 +1360,8 @@ class _PanelCourseRow extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
+                const SizedBox(height: 4),
+                _CourseCreatedDate(createdAt: course.createdAt),
               ],
             ),
           ),
@@ -1503,6 +1501,8 @@ class _CourseCard extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      const SizedBox(height: 6),
+                      _CourseCreatedDate(createdAt: course.createdAt),
                     ],
                   ),
                 ),
@@ -1550,6 +1550,31 @@ class _CourseCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _CourseCreatedDate extends StatelessWidget {
+  final DateTime? createdAt;
+
+  const _CourseCreatedDate({required this.createdAt});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF8BA3C0)
+        : Colors.grey.shade600;
+    final label = createdAt == null
+        ? 'Creation date unavailable'
+        : 'Created ${MaterialLocalizations.of(context).formatMediumDate(createdAt!.toLocal())}';
+    return Row(
+      children: [
+        Icon(Icons.calendar_today_outlined, size: 12, color: color),
+        const SizedBox(width: 5),
+        Flexible(
+          child: Text(label, style: TextStyle(fontSize: 11, color: color)),
+        ),
+      ],
     );
   }
 }

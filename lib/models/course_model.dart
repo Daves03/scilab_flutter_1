@@ -268,17 +268,13 @@ class CourseQuiz {
       directions: data['directions']?.toString() ?? '',
       questions: ((data['questions'] as List<dynamic>?) ?? const [])
           .whereType<Map<dynamic, dynamic>>()
-          .map(
-            (q) => CourseQuestion.fromMap(Map<String, dynamic>.from(q)),
-          )
+          .map((q) => CourseQuestion.fromMap(Map<String, dynamic>.from(q)))
           .toList(),
       createdAt: ts is Timestamp ? ts.toDate() : null,
       dueDate: data['dueDate'] is Timestamp
           ? (data['dueDate'] as Timestamp).toDate()
           : null,
-      approvalStatus: QuizApprovalStatusX.fromStorage(
-        data['approvalStatus'],
-      ),
+      approvalStatus: QuizApprovalStatusX.fromStorage(data['approvalStatus']),
     );
   }
 
@@ -298,6 +294,16 @@ class CourseQuiz {
 /// subcollections — course content is small enough that a single
 /// read/write per course is simpler than N+1 subcollection queries.
 class Course {
+  /// New courses lead the list; legacy records without dates remain visible.
+  static int newestFirst(Course first, Course second) {
+    final firstDate = first.createdAt;
+    final secondDate = second.createdAt;
+    if (firstDate == null && secondDate != null) return 1;
+    if (firstDate != null && secondDate == null) return -1;
+    final byDate = firstDate == null ? 0 : secondDate!.compareTo(firstDate);
+    return byDate != 0 ? byDate : first.id.compareTo(second.id);
+  }
+
   final String id;
   final String title;
   final String subject;
