@@ -62,6 +62,15 @@ export default function Layout({ role = 'admin', profile }) {
     setIsMobileMenuOpen(false);
   };
 
+  useEffect(() => {
+    if (!isMobileMenuOpen) return undefined;
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') setIsMobileMenuOpen(false);
+    };
+    document.addEventListener('keydown', closeOnEscape);
+    return () => document.removeEventListener('keydown', closeOnEscape);
+  }, [isMobileMenuOpen]);
+
   const isTeacher = role === 'teacher';
   const portalName = isTeacher ? 'SciLab Teacher' : 'Scilab Admin';
   const teachingGrades = teacherGradeLabels(profile?.sections || [], sectionCatalog);
@@ -74,6 +83,8 @@ export default function Layout({ role = 'admin', profile }) {
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="mobile-menu-btn"
           aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-expanded={isMobileMenuOpen}
+          aria-controls="portal-navigation"
         >
           {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
@@ -101,7 +112,7 @@ export default function Layout({ role = 'admin', profile }) {
           </div>
         </div>
 
-        <nav style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <nav id="portal-navigation" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
           <NavLink 
             to="/" 
             end
@@ -198,7 +209,7 @@ export default function Layout({ role = 'admin', profile }) {
           
           <div 
             onClick={toggleTheme}
-            className="nav-link" 
+            className="nav-link sidebar-theme-switch"
             style={{ width: '100%', cursor: 'pointer', marginTop: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}
           >
             {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />} 

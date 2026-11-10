@@ -395,7 +395,7 @@ export default function ActivityLogs() {
         ) : (
           <>
             <div style={{ overflowX: 'auto' }}>
-              <table className="data-table">
+              <table className="data-table responsive-records-table">
                 <thead>
                   <tr>
                     <th>User</th>
@@ -410,26 +410,26 @@ export default function ActivityLogs() {
                     const actionInfo = getActionInfo(log.type);
                     return (
                       <tr key={log.id}>
-                        <td>
+                        <td data-label="User">
                           <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
                             {log.userName}
                           </div>
                         </td>
-                        <td>
+                        <td data-label="Role">
                           <span className="badge badge-role">
                             {log.userRole}
                           </span>
                         </td>
-                        <td>
+                        <td data-label="Action">
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: actionInfo.color }}>
                             {actionInfo.icon}
                             <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>{actionInfo.text}</span>
                           </div>
                         </td>
-                        <td style={{ color: 'var(--text-primary)' }}>
+                        <td data-label="Activity Details" style={{ color: 'var(--text-primary)' }}>
                           {log.title}
                         </td>
-                        <td style={{ textAlign: 'right', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                        <td data-label="Time" style={{ textAlign: 'right', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}>
                             <Clock size={14} />
                             {log.timestamp.toLocaleString()}

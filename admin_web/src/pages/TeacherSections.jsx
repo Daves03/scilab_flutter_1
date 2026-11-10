@@ -61,13 +61,13 @@ export default function TeacherSections({ profile }) {
               <span className="teacher-student-status rejected">Rejected: {activeSection.rejected}</span>
             </div>
             <div className="teacher-responsive-table">
-              <table className="data-table">
+              <table className="data-table responsive-records-table">
                 <thead><tr><th>Name</th><th>Student Number</th><th>Email</th><th>Status</th></tr></thead>
                 <tbody>{activeSection.students.map((student) => <tr key={student.id}>
-                  <td><strong>{student.name || 'No Name'}</strong></td>
-                  <td>{student.studentNumber ? `#${student.studentNumber}` : '-'}</td>
-                  <td>{student.email || '-'}</td>
-                  <td><span className={`teacher-student-status ${['approved', 'pending', 'rejected'].includes(student.status) ? student.status : 'unknown'}`}>{student.status === 'approved' ? 'Active' : student.status === 'pending' ? 'Pending' : student.status === 'rejected' ? 'Rejected' : 'Not set'}</span></td>
+                  <td data-label="Name"><strong>{student.name || 'No Name'}</strong></td>
+                  <td data-label="Student Number">{student.studentNumber ? `#${student.studentNumber}` : '-'}</td>
+                  <td data-label="Email">{student.email || '-'}</td>
+                  <td data-label="Status"><span className={`teacher-student-status ${['approved', 'pending', 'rejected'].includes(student.status) ? student.status : 'unknown'}`}>{student.status === 'approved' ? 'Active' : student.status === 'pending' ? 'Pending' : student.status === 'rejected' ? 'Rejected' : 'Not set'}</span></td>
                 </tr>)}</tbody>
               </table>
             </div>

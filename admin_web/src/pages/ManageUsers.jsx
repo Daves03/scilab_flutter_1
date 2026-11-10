@@ -322,7 +322,7 @@ export default function ManageUsers() {
           return (
             <>
               <div style={{ overflowX: 'auto' }}>
-                <table className="data-table">
+                <table className="data-table responsive-records-table">
                   <thead>
                     <tr>
                       <th>Name</th>
@@ -337,27 +337,27 @@ export default function ManageUsers() {
                   <tbody>
                     {paginatedUsers.map(user => (
                       <tr key={user.id} style={{ opacity: activeTab === 'rejected' ? 0.6 : 1 }}>
-                        <td>
+                        <td data-label="Name">
                           <div style={{ fontWeight: 600, color: 'var(--text-primary)', textDecoration: activeTab === 'rejected' ? 'line-through' : 'none' }}>
                             {user.name || 'No Name'}
                           </div>
                         </td>
-                        <td style={{ textDecoration: activeTab === 'rejected' ? 'line-through' : 'none', color: 'var(--text-secondary)' }}>
+                        <td data-label="Student Number" style={{ textDecoration: activeTab === 'rejected' ? 'line-through' : 'none', color: 'var(--text-secondary)' }}>
                           {user.studentNumber ? `#${user.studentNumber}` : '-'}
                         </td>
-                        <td style={{ textDecoration: activeTab === 'rejected' ? 'line-through' : 'none' }}>{user.email}</td>
-                        <td>
+                        <td data-label="Email" style={{ textDecoration: activeTab === 'rejected' ? 'line-through' : 'none' }}>{user.email}</td>
+                        <td data-label="Role">
                           <span className="badge badge-role">
                             {user.role === 'teacher' ? 'Teacher' : 'Student'}
                           </span>
                         </td>
-                        <td>
+                        <td data-label="Grade Level">
                           <span style={{ color: 'var(--text-secondary)' }}>
                             {userGrades(user).join(', ') || '-'}
                           </span>
                         </td>
-                        <td>{user.sections?.join(', ') || '-'}</td>
-                        <td style={{ textAlign: 'right' }}>
+                        <td data-label="Sections">{user.sections?.join(', ') || '-'}</td>
+                        <td data-label="Actions" style={{ textAlign: 'right' }}>
                           
                           {activeTab === 'pending' && (
                             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>

@@ -10,6 +10,7 @@ import '../../models/ar_experiment_model.dart';
 import '../../data/dummy_ar_experiments.dart';
 import '../../models/activity_model.dart';
 import '../../services/student_quiz_progress.dart';
+import '../../services/student_ar_progress.dart';
 
 import '../../core/app_export.dart';
 import 'package:provider/provider.dart';
@@ -55,6 +56,7 @@ class StudentProgress {
     String? avatarUrl,
     List<QuizResult>? quizResults,
     List<MissedQuiz>? missedQuizzes,
+    List<ArLabRecord>? arLabRecords,
   }) {
     return StudentProgress(
       id: id,
@@ -62,7 +64,7 @@ class StudentProgress {
       section: section,
       quizResults: quizResults ?? this.quizResults,
       missedQuizzes: missedQuizzes ?? this.missedQuizzes,
-      arLabRecords: arLabRecords,
+      arLabRecords: arLabRecords ?? this.arLabRecords,
       studentNumber: studentNumber ?? this.studentNumber,
       avatarUrl: avatarUrl ?? this.avatarUrl,
     );
@@ -83,22 +85,6 @@ class QuizResult {
   });
 
   double get percentage => total > 0 ? score / total : 0;
-}
-
-class ArLabRecord {
-  final String experimentName;
-  final int attempts;
-  final double rubricScore; // out of 100
-  final Map<String, int> rubricScores;
-  final String lastAttemptDate;
-
-  const ArLabRecord({
-    required this.experimentName,
-    required this.attempts,
-    required this.rubricScore,
-    required this.rubricScores,
-    required this.lastAttemptDate,
-  });
 }
 
 // ── Screen ────────────────────────────────────────────────────────────────────
@@ -128,6 +114,13 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
   bool _hasLiveQuizAttempts = false;
   bool _hasLiveCourses = false;
   final _progressUpdates = ValueNotifier<Map<String, StudentProgress>>({});
+  final Map<String, StreamSubscription<QuerySnapshot<Map<String, dynamic>>>>
+  _arProgressSubscriptions = {};
+  final Map<String, Map<String, ExperimentActivity>> _liveArActivities = {};
+  Map<String, String> _arExperimentTitles = {
+    for (final experiment in dummyArExperiments)
+      experiment.id: experiment.title,
+  };
   bool _loading = true;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
@@ -146,6 +139,10 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
     _studentProfilesSubscription?.cancel();
     _quizAttemptsSubscription?.cancel();
     _coursesSubscription?.cancel();
+    for (final subscription in _arProgressSubscriptions.values) {
+      unawaited(subscription.cancel());
+    }
+    _arProgressSubscriptions.clear();
     _progressUpdates.dispose();
     _tabController.dispose();
     _searchController.dispose();
@@ -244,6 +241,65 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
     };
   }
 
+  List<ArLabRecord> _arRecordsForStudent(String studentId) =>
+      buildStudentArRecords(
+        activities: _liveArActivities[studentId] ?? const {},
+        experimentTitles: _arExperimentTitles,
+        formatDate: _formatDate,
+      );
+
+  void _subscribeToArProgress(Iterable<String> studentIds) {
+    final desired = studentIds.toSet();
+    for (final id
+        in _arProgressSubscriptions.keys
+            .where((id) => !desired.contains(id))
+            .toList()) {
+      unawaited(_arProgressSubscriptions.remove(id)!.cancel());
+      _liveArActivities.remove(id);
+    }
+    for (final id in desired) {
+      if (_arProgressSubscriptions.containsKey(id)) continue;
+      _arProgressSubscriptions[id] = FirebaseFirestore.instance
+          .collection('users')
+          .doc(id)
+          .collection('experiment_activity')
+          .snapshots()
+          .listen(
+            (snapshot) {
+              if (!mounted || !_arProgressSubscriptions.containsKey(id)) return;
+              _liveArActivities[id] = {
+                for (final document in snapshot.docs)
+                  document.id: ExperimentActivity.fromMap(
+                    document.id,
+                    document.data(),
+                  ),
+              };
+              _applyLiveArProgress(id);
+            },
+            onError: (Object error) {
+              if (mounted) {
+                debugPrint('AR progress stream failed for $id: $error');
+              }
+            },
+          );
+    }
+  }
+
+  void _applyLiveArProgress(String studentId) {
+    if (!mounted || _loading) return;
+    final records = _arRecordsForStudent(studentId);
+    setState(() {
+      _allStudents = _allStudents
+          .map(
+            (student) => student.id == studentId
+                ? student.copyWith(arLabRecords: records)
+                : student,
+          )
+          .toList();
+    });
+    _notifyProgressUpdates();
+  }
+
   void _applyLiveQuizProgress() {
     if (!mounted || _loading) return;
     setState(() {
@@ -313,6 +369,7 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
       _loadedStudentProfiles = {
         for (final student in users) student.id: student,
       };
+      _subscribeToArProgress(users.map((student) => student.id));
 
       // 2. Fetch all quiz attempts
       final attemptsSnap = await db.collection('quiz_attempts').get();
@@ -339,7 +396,11 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
         print('Using fallback AR experiments due to error: $e');
         arExps = dummyArExperiments;
       }
-      final arExpMap = {for (var e in arExps) e.id: e.title};
+      _arExperimentTitles = {
+        for (final experiment in dummyArExperiments)
+          experiment.id: experiment.title,
+        for (final experiment in arExps) experiment.id: experiment.title,
+      };
 
       // 4. Build StudentProgress objects
       List<StudentProgress> dynamicStudents = [];
@@ -352,46 +413,7 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
         );
         final quizResults = _quizResults(quizProgress);
 
-        // get AR records for u.id
-        List<ArLabRecord> uArRecords = [];
-        try {
-          final uArSnap = await db
-              .collection('users')
-              .doc(u.id)
-              .collection('experiment_activity')
-              .get();
-          final activities = uArSnap.docs
-              .map(
-                (document) => MapEntry(
-                  document.id,
-                  ExperimentActivity.fromMap(document.id, document.data()),
-                ),
-              )
-              .toList();
-          activities.sort((a, b) {
-            final aDate = a.value.completedAt ?? a.value.launchedAt;
-            final bDate = b.value.completedAt ?? b.value.launchedAt;
-            if (aDate == null && bDate == null) return 0;
-            if (aDate == null) return 1;
-            if (bDate == null) return -1;
-            return bDate.compareTo(aDate);
-          });
-          uArRecords = activities.map((entry) {
-            final expId = entry.key;
-            final act = entry.value;
-            return ArLabRecord(
-              experimentName: arExpMap[expId] ?? 'Unknown Experiment',
-              attempts: 1,
-              rubricScore: act.rubricScore ?? (act.completed ? 100.0 : 0.0),
-              rubricScores: act.rubricScores,
-              lastAttemptDate: _formatDate(act.completedAt ?? act.launchedAt),
-            );
-          }).toList();
-        } catch (e) {
-          print(
-            'Permission denied or error fetching AR records for ${u.id}: $e',
-          );
-        }
+        final uArRecords = _arRecordsForStudent(u.id);
 
         final section = u.sections.isNotEmpty ? u.sections.first : 'No Section';
 
@@ -417,6 +439,9 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
         _loading = false;
       });
       _applyLiveQuizProgress();
+      for (final student in users) {
+        _applyLiveArProgress(student.id);
+      }
     } catch (e) {
       print('Error loading dynamic progress: $e');
       if (!mounted) return;
@@ -812,6 +837,7 @@ class _TeacherProgressScreenState extends State<TeacherProgressScreen>
                         ),
                         _ArLabTab(
                           students: _filteredStudents,
+                          progressUpdates: _progressUpdates,
                           cardColor: cardColor,
                           borderColor: borderColor,
                           subTextColor: subTextColor,
@@ -1248,6 +1274,7 @@ class _QuizResultRow extends StatelessWidget {
 
 class _ArLabTab extends StatelessWidget {
   final List<StudentProgress> students;
+  final ValueNotifier<Map<String, StudentProgress>> progressUpdates;
   final Color cardColor;
   final Color borderColor;
   final Color subTextColor;
@@ -1258,6 +1285,7 @@ class _ArLabTab extends StatelessWidget {
 
   const _ArLabTab({
     required this.students,
+    required this.progressUpdates,
     required this.cardColor,
     required this.borderColor,
     required this.subTextColor,
@@ -1438,85 +1466,92 @@ class _ArLabTab extends StatelessWidget {
 
   void _showArLabDialog(BuildContext context, StudentProgress student) {
     if (student.arLabRecords.isEmpty) return;
+    final scrollController = ScrollController();
     showDialog(
       context: context,
-      builder: (context) {
-        final scrollController = ScrollController();
-        final hasScrollableRecords = student.arLabRecords.length > 5;
+      builder: (context) =>
+          ValueListenableBuilder<Map<String, StudentProgress>>(
+            valueListenable: progressUpdates,
+            builder: (context, currentStudents, _) {
+              final latestStudent = currentStudents[student.id] ?? student;
+              final hasScrollableRecords =
+                  latestStudent.arLabRecords.length > 5;
 
-        return Dialog(
-          backgroundColor: cardColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: BorderSide(color: borderColor),
-          ),
-          insetPadding: const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 48,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              return Dialog(
+                backgroundColor: cardColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(color: borderColor),
+                ),
+                insetPadding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 48,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Expanded(
-                      child: Text(
-                        '${student.name}\'s Records',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                        overflow: TextOverflow.ellipsis,
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '${latestStudent.name}\'s Records',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.close, color: subTextColor),
+                            onPressed: () => Navigator.pop(context),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
                       ),
                     ),
-                    IconButton(
-                      icon: Icon(Icons.close, color: subTextColor),
-                      onPressed: () => Navigator.pop(context),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
+                    Divider(height: 1, color: borderColor),
+                    Flexible(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxHeight: 570),
+                        child: RawScrollbar(
+                          controller: scrollController,
+                          thumbColor: (isDark ? Colors.white : Colors.black)
+                              .withAlpha(150),
+                          radius: const Radius.circular(4),
+                          thickness: 4,
+                          thumbVisibility: hasScrollableRecords,
+                          child: ListView.separated(
+                            controller: scrollController,
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.all(16),
+                            itemCount: latestStudent.arLabRecords.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(height: 12),
+                            itemBuilder: (context, index) {
+                              return _ArLabRecordRow(
+                                record: latestStudent.arLabRecords[index],
+                                subTextColor: subTextColor,
+                                scoreColor: scoreColor,
+                                scoreLabel: scoreLabel,
+                                isDark: isDark,
+                                theme: theme,
+                                borderColor: borderColor,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
-              ),
-              Divider(height: 1, color: borderColor),
-              Flexible(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 570),
-                  child: RawScrollbar(
-                    controller: scrollController,
-                    thumbColor: (isDark ? Colors.white : Colors.black)
-                        .withAlpha(150),
-                    radius: const Radius.circular(4),
-                    thickness: 4,
-                    thumbVisibility: hasScrollableRecords,
-                    child: ListView.separated(
-                      controller: scrollController,
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.all(16),
-                      itemCount: student.arLabRecords.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        return _ArLabRecordRow(
-                          record: student.arLabRecords[index],
-                          subTextColor: subTextColor,
-                          scoreColor: scoreColor,
-                          scoreLabel: scoreLabel,
-                          isDark: isDark,
-                          theme: theme,
-                          borderColor: borderColor,
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ),
-            ],
+              );
+            },
           ),
-        );
-      },
-    );
+    ).whenComplete(scrollController.dispose);
   }
 }
 

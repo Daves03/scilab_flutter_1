@@ -228,7 +228,10 @@ class _TeacherArAndVideoLessonScreenState
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 24, 20, 100),
-            child: VideoLessonSectionWidget(),
+            child: VideoLessonSectionWidget(
+              experiments: groups.expand((group) => group.experiments).toList(),
+              teacherGrades: _teacherGrades,
+            ),
           ),
         ),
       ],

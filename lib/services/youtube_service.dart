@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class YoutubeVideo {
@@ -6,6 +7,7 @@ class YoutubeVideo {
   final String title;
   final String channelTitle;
   final String thumbnailUrl;
+  Uri get watchUrl => Uri.https('www.youtube.com', '/watch', {'v': id});
 
   YoutubeVideo({
     required this.id,
@@ -25,48 +27,55 @@ class YoutubeVideo {
 }
 
 class YoutubeService {
-  // TODO: Replace with your actual YouTube Data API v3 Key
-  static const String _apiKey = 'yt api here';
-  static const String _baseUrl = 'https://www.googleapis.com/youtube/v3/search';
+  static const String _configuredApiKey = String.fromEnvironment(
+    'YOUTUBE_API_KEY',
+  );
+  final String apiKey;
+  final http.Client? client;
 
-  Future<List<YoutubeVideo>> searchVideos(String query, {int maxResults = 3}) async {
-    // If API key is not set, return dummy data to prevent crashes
-    final normalizedKey = _apiKey.trim().toLowerCase();
+  YoutubeService({this.apiKey = _configuredApiKey, this.client});
+
+  Future<List<YoutubeVideo>> searchVideos(
+    String query, {
+    int maxResults = 3,
+  }) async {
+    // Never substitute unrelated videos when live YouTube search is unavailable.
+    final normalizedKey = apiKey.trim().toLowerCase();
     if (normalizedKey.isEmpty ||
         normalizedKey == 'your_youtube_api_key' ||
         normalizedKey == 'yt api here') {
-      return [
-        YoutubeVideo(
-          id: 'jNQXAC9IVRw', // "Me at the zoo" - First YouTube video
-          title: 'Chemistry Tutorial: $query',
-          channelTitle: 'Science Channel',
-          thumbnailUrl: 'https://img.youtube.com/vi/jNQXAC9IVRw/mqdefault.jpg',
-        ),
-        YoutubeVideo(
-          id: 'dQw4w9WgXcQ',
-          title: 'Advanced Concepts in $query',
-          channelTitle: 'EduChem',
-          thumbnailUrl: 'https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg',
-        ),
-      ];
+      return [];
     }
 
     try {
-      final url = Uri.parse(
-          '$_baseUrl?part=snippet&maxResults=$maxResults&q=$query&type=video&key=$_apiKey');
-      
-      final response = await http.get(url);
+      final url = Uri.https('www.googleapis.com', '/youtube/v3/search', {
+        'part': 'snippet',
+        'maxResults': maxResults.clamp(1, 50).toString(),
+        'q': query,
+        'type': 'video',
+        'order': 'relevance',
+        'safeSearch': 'strict',
+        'relevanceLanguage': 'en',
+        'key': apiKey,
+      });
+
+      final response = await (client?.get(url) ?? http.get(url)).timeout(
+        const Duration(seconds: 15),
+      );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final items = data['items'] as List;
-        return items.map((item) => YoutubeVideo.fromJson(item)).toList();
+        return items
+            .map((item) => YoutubeVideo.fromJson(item))
+            .where((video) => video.id.isNotEmpty)
+            .toList();
       } else {
-        print('YouTube API Error: ${response.statusCode}');
+        debugPrint('YouTube API Error: ${response.statusCode}');
         return [];
       }
     } catch (e) {
-      print('Exception fetching YouTube videos: $e');
+      debugPrint('YouTube search is temporarily unavailable.');
       return [];
     }
   }

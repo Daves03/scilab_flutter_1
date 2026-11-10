@@ -114,7 +114,7 @@ export default function TeacherStudents({ profile }) {
         )}
 
         <div className="teacher-responsive-table teacher-students-table-wrap">
-          <table className="data-table teacher-students-table">
+          <table className="data-table teacher-students-table responsive-records-table">
             <thead><tr><th>Student</th><th>Student Number</th><th>Grade & Section</th><th>Email</th><th>Actions</th></tr></thead>
             <tbody>
               {visible.map((student) => (

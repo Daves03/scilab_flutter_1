@@ -538,9 +538,9 @@ export default function TeacherUploads() {
                 <p>{approvalFilter === 'pending' ? 'New teacher-created quizzes will appear here for approval.' : 'Quizzes rejected by an administrator will appear here.'}</p>
               </div>
             ) : (
-              <div style={{ overflowX: 'auto', border: '1px solid var(--border-light)', borderRadius: '14px' }}>
-                <div style={{ minWidth: '1050px' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1.15fr 1.35fr 1.1fr 1.2fr 1.25fr 310px', gap: '18px', alignItems: 'center', padding: '15px 18px', borderBottom: '1px solid var(--border-light)', color: 'var(--text-secondary)', fontSize: '0.76rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+              <div className="admin-quiz-review-list" role="region" aria-label="Quiz approvals table" tabIndex={0} style={{ border: '1px solid var(--border-light)', borderRadius: '14px' }}>
+                <div>
+                  <div className="admin-quiz-review-heading" style={{ display: 'grid', gap: '18px', alignItems: 'center', padding: '15px 18px', borderBottom: '1px solid var(--border-light)', color: 'var(--text-secondary)', fontSize: '0.76rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
                     <span>Teacher</span>
                     <span>Title</span>
                     <span>Course</span>
@@ -551,17 +551,18 @@ export default function TeacherUploads() {
                   {visibleApprovalQuizzes.map(item => (
                     <div
                       key={`${item.courseId}-${item.quiz.id}`}
-                      style={{ display: 'grid', gridTemplateColumns: '1.15fr 1.35fr 1.1fr 1.2fr 1.25fr 310px', gap: '18px', alignItems: 'center', padding: '18px', borderBottom: '1px solid var(--border-light)', background: 'var(--bg-card)' }}
+                      className="admin-quiz-review-row"
+                      style={{ display: 'grid', gap: '18px', alignItems: 'center', padding: '18px', borderBottom: '1px solid var(--border-light)', background: 'var(--bg-card)' }}
                     >
-                      <strong style={{ color: 'var(--text-primary)', wordBreak: 'break-word' }}>{item.teacherName}</strong>
-                      <div style={{ minWidth: 0 }}>
+                      <strong data-label="Teacher" style={{ color: 'var(--text-primary)', wordBreak: 'break-word' }}>{item.teacherName}</strong>
+                      <div data-label="Title" style={{ minWidth: 0 }}>
                         <strong style={{ display: 'block', color: 'var(--text-primary)', wordBreak: 'break-word' }}>{item.quiz.title || 'Untitled quiz'}</strong>
                         <span style={{ display: 'block', marginTop: '4px', color: 'var(--text-secondary)', fontSize: '0.75rem' }}>{item.quiz.questions?.length || 0} Questions</span>
                       </div>
-                      <span style={{ color: 'var(--text-primary)', wordBreak: 'break-word' }}>{item.courseTitle}</span>
-                      <span style={{ color: 'var(--text-secondary)' }}>{item.grade}<br />Sections {item.sections.join(', ') || 'Not set'}</span>
-                      <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>{getQuizDate(item.quiz) || 'Date not recorded'}</span>
-                      <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
+                      <span data-label="Course" style={{ color: 'var(--text-primary)', wordBreak: 'break-word' }}>{item.courseTitle}</span>
+                      <span data-label="Class" style={{ color: 'var(--text-secondary)' }}>{item.grade}<br />Sections {item.sections.join(', ') || 'Not set'}</span>
+                      <span data-label="Created" style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>{getQuizDate(item.quiz) || 'Date not recorded'}</span>
+                      <div className="admin-quiz-review-actions" style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
                         <button className="btn btn-secondary" style={{ padding: '8px 11px', justifyContent: 'center' }} onClick={() => setPreviewQuiz(item)} title="View quiz"><Eye size={16} /> View</button>
                         {approvalFilter === 'pending' ? (
                           <>

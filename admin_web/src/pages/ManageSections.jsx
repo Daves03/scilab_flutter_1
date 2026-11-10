@@ -205,13 +205,13 @@ export default function ManageSections() {
               <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>No teachers are assigned to this section.</p>
             ) : (
               <div style={{ overflowX: 'auto', marginBottom: '32px' }}>
-                <table className="data-table">
+                <table className="data-table responsive-records-table">
                   <thead><tr><th>Name</th><th>Email</th><th>Account Status</th></tr></thead>
                   <tbody>{sectionTeachers.map(teacher => (
                     <tr key={teacher.id}>
-                      <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{teacher.name || 'No Name'}</td>
-                      <td>{teacher.email || '-'}</td>
-                      <td>{teacher.status === 'approved' ? 'Active' : teacher.status === 'pending' ? 'Pending Approval' : teacher.status === 'rejected' ? 'Rejected' : 'Not set'}</td>
+                      <td data-label="Name" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{teacher.name || 'No Name'}</td>
+                      <td data-label="Email">{teacher.email || '-'}</td>
+                      <td data-label="Status">{teacher.status === 'approved' ? 'Active' : teacher.status === 'pending' ? 'Pending Approval' : teacher.status === 'rejected' ? 'Rejected' : 'Not set'}</td>
                     </tr>
                   ))}</tbody>
                 </table>
@@ -224,7 +224,7 @@ export default function ManageSections() {
               </div>
             ) : (
               <div style={{ overflowX: 'auto' }}>
-                <table className="data-table">
+                <table className="data-table responsive-records-table">
                   <thead>
                     <tr>
                       <th>Name</th>
@@ -235,9 +235,9 @@ export default function ManageSections() {
                   <tbody>
                     {sectionUsers.map(user => (
                       <tr key={user.id}>
-                        <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{user.name || 'No Name'}</td>
-                        <td style={{ color: 'var(--text-secondary)' }}>{user.studentNumber ? `#${user.studentNumber}` : '-'}</td>
-                        <td>{user.email}</td>
+                        <td data-label="Name" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{user.name || 'No Name'}</td>
+                        <td data-label="Student Number" style={{ color: 'var(--text-secondary)' }}>{user.studentNumber ? `#${user.studentNumber}` : '-'}</td>
+                        <td data-label="Email">{user.email}</td>
                       </tr>
                     ))}
                   </tbody>

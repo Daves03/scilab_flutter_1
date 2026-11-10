@@ -185,16 +185,16 @@ export default function TeacherCourses({ user, profile }) {
       ) : (
         <section className="glass-panel teacher-course-list-panel" aria-label="Courses in list view">
           <div className="teacher-responsive-table">
-            <table className="data-table teacher-course-list-table">
+            <table className="data-table teacher-course-list-table responsive-records-table">
               <thead><tr><th>Course / Topic</th><th>Subject</th><th>Grade & Sections</th><th>Created</th><th>Modules</th><th>Quizzes</th><th>Actions</th></tr></thead>
               <tbody>{visibleCourses.map((course) => <tr key={course.id}>
-                <td><Link className="teacher-course-list-name" to={`/my-courses/${course.id}`}><span className="teacher-content-icon course"><BookOpen size={19} /></span><strong>{course.title || 'Untitled Course'}</strong></Link></td>
-                <td>{course.subject || 'No subject'}</td>
-                <td><div className="teacher-course-list-assignment"><strong>{course.grade || 'Grade not set'}</strong><span>Sections {(course.sections || course.assignedSections || []).join(', ') || 'not set'}</span></div></td>
-                <td>{formatDateTime(course.createdAt)}</td>
-                <td>{(course.modules || []).length}</td>
-                <td>{(course.quizzes || []).length}</td>
-                <td><div className="teacher-action-row">
+                <td data-label="Course / Topic"><Link className="teacher-course-list-name" to={`/my-courses/${course.id}`}><span className="teacher-content-icon course"><BookOpen size={19} /></span><strong>{course.title || 'Untitled Course'}</strong></Link></td>
+                <td data-label="Subject">{course.subject || 'No subject'}</td>
+                <td data-label="Grade & Sections"><div className="teacher-course-list-assignment"><strong>{course.grade || 'Grade not set'}</strong><span>Sections {(course.sections || course.assignedSections || []).join(', ') || 'not set'}</span></div></td>
+                <td data-label="Created">{formatDateTime(course.createdAt)}</td>
+                <td data-label="Modules">{(course.modules || []).length}</td>
+                <td data-label="Quizzes">{(course.quizzes || []).length}</td>
+                <td data-label="Actions"><div className="teacher-action-row">
                   <button type="button" className="teacher-icon-btn edit" onClick={() => openEdit(course)} aria-label={`Edit ${course.title || 'course'}`} title="Edit course"><Edit3 size={17} /></button>
                   <button type="button" className="teacher-icon-btn danger" onClick={() => removeCourse(course)} aria-label={`Delete ${course.title || 'course'}`} title="Delete course"><Trash2 size={17} /></button>
                 </div></td>

@@ -1,47 +1,77 @@
 import '../../../core/app_export.dart';
 import '../../../services/youtube_service.dart';
+import '../../../data/video_lesson_topics.dart';
+import '../../../models/ar_experiment_model.dart';
+import '../../../models/user_model.dart';
+import '../../../services/auth_service.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class _VideoLesson {
-  final String id;
+  final Uri url;
   final String title;
   final String subject;
-  final String duration;
   final String thumbnailUrl;
-  final bool isCompleted;
   final String semanticLabel;
 
   const _VideoLesson({
-    required this.id,
+    required this.url,
     required this.title,
     required this.subject,
-    required this.duration,
     required this.thumbnailUrl,
-    required this.isCompleted,
     required this.semanticLabel,
   });
 }
 
 class VideoLessonSectionWidget extends StatefulWidget {
-  const VideoLessonSectionWidget({super.key});
+  final List<ArExperimentModel> experiments;
+  final Set<String> teacherGrades;
+
+  const VideoLessonSectionWidget({
+    super.key,
+    this.experiments = const [],
+    this.teacherGrades = const {},
+  });
 
   @override
   State<VideoLessonSectionWidget> createState() =>
       _VideoLessonSectionWidgetState();
 }
 
-// TODO: Replace with [Riverpod/Bloc] for production
 class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
   List<_VideoLesson> _lessons = [];
   bool _isLoading = true;
+  List<VideoLessonTopic> _topics = [];
+  String? _topicKey;
+  int _requestVersion = 0;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateTopics(context.watch<AuthService>().currentUser?.role);
+  }
+
+  @override
+  void didUpdateWidget(covariant VideoLessonSectionWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _updateTopics(context.read<AuthService>().currentUser?.role);
+  }
+
+  void _updateTopics(UserRole? role) {
+    final topics = videoLessonTopics(
+      role: role,
+      experiments: widget.experiments,
+      teacherGrades: widget.teacherGrades,
+    );
+    final key = topics.map((topic) => topic.query).join('|');
+    if (_topicKey == key) return;
+    _topicKey = key;
+    _topics = topics;
     _fetchYoutubeVideos();
   }
 
   Future<void> _fetchYoutubeVideos() async {
+    final version = ++_requestVersion;
     if (mounted && !_isLoading) {
       setState(() {
         _isLoading = true;
@@ -49,26 +79,56 @@ class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
     }
     try {
       final youtubeService = YoutubeService();
-      final videos = await youtubeService.searchVideos('Chemistry video lessons', maxResults: 4);
-      
-      if (mounted) {
+      final topics = List<VideoLessonTopic>.from(_topics);
+      final matches = await Future.wait(
+        topics.map(
+          (topic) => youtubeService.searchVideos(topic.query, maxResults: 1),
+        ),
+      );
+      final usedIds = <String>{};
+      final lessons = <_VideoLesson>[];
+      for (var index = 0; index < topics.length; index++) {
+        final topic = topics[index];
+        final videos = matches[index]
+            .where((video) => !usedIds.contains(video.id))
+            .toList();
+        if (videos.isNotEmpty) {
+          final video = videos.first;
+          usedIds.add(video.id);
+          lessons.add(
+            _VideoLesson(
+              url: video.watchUrl,
+              title: video.title,
+              subject:
+                  '${topic.grade} · ${topic.topic} · ${video.channelTitle}',
+              thumbnailUrl: video.thumbnailUrl,
+              semanticLabel: video.title,
+            ),
+          );
+        } else {
+          lessons.add(
+            _VideoLesson(
+              url: topic.searchUrl,
+              title: topic.title,
+              subject: '${topic.grade} · ${topic.topic} · Explore on YouTube',
+              thumbnailUrl: '',
+              semanticLabel: 'YouTube lessons about ${topic.title}',
+            ),
+          );
+        }
+      }
+
+      if (mounted && version == _requestVersion) {
         setState(() {
-          _lessons = videos.map((v) => _VideoLesson(
-            id: v.id,
-            title: v.title,
-            subject: v.channelTitle,
-            duration: '10:00', // Placeholder
-            thumbnailUrl: v.thumbnailUrl,
-            isCompleted: false,
-            semanticLabel: v.title,
-          )).toList();
+          _lessons = lessons;
           _isLoading = false;
         });
       }
     } catch (e) {
-      print('Error fetching youtube videos: $e');
-      if (mounted) {
+      debugPrint('Error fetching YouTube videos: $e');
+      if (mounted && version == _requestVersion) {
         setState(() {
+          _lessons = [];
           _isLoading = false;
         });
       }
@@ -79,11 +139,11 @@ class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final accentColor =
-        isDark ? const Color(0xFF00D4FF) : const Color(0xFF1565C0);
+    final accentColor = isDark
+        ? const Color(0xFF00D4FF)
+        : const Color(0xFF1565C0);
     final titleColor = isDark ? Colors.white : const Color(0xFF0A1628);
-    final mutedColor =
-        isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700;
+    final mutedColor = isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade700;
 
     if (_isLoading) {
       return Center(
@@ -99,7 +159,7 @@ class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Text(
-            'No videos found.',
+            'No video topics are available for your grade yet.',
             style: TextStyle(color: mutedColor),
           ),
         ),
@@ -138,7 +198,10 @@ class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
                   ),
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: isDark
                           ? const Color(0xFF1E3A5F).withAlpha(77)
@@ -196,11 +259,7 @@ class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
                             ),
                           ],
                   ),
-                  child: Icon(
-                    Icons.refresh,
-                    color: accentColor,
-                    size: 20,
-                  ),
+                  child: Icon(Icons.refresh, color: accentColor, size: 20),
                 ),
               ),
             ],
@@ -214,19 +273,22 @@ class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
   Widget _buildLessonItem(_VideoLesson lesson) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardColor = isDark ? const Color(0xFF0F1E35) : Colors.white;
-    final borderColor =
-        isDark ? const Color(0xFF1E3A5F) : Colors.grey.shade300;
+    final borderColor = isDark ? const Color(0xFF1E3A5F) : Colors.grey.shade300;
     final titleColor = isDark ? Colors.white : const Color(0xFF0A1628);
-    final mutedColor =
-        isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade600;
+    final mutedColor = isDark ? const Color(0xFF8BA3C0) : Colors.grey.shade600;
 
     return GestureDetector(
       onTap: () async {
-        final url = Uri.parse('https://www.youtube.com/watch?v=${lesson.id}');
-        if (await canLaunchUrl(url)) {
-          await launchUrl(url);
-        } else {
-          print('Could not launch $url');
+        final opened = await launchUrl(
+          lesson.url,
+          mode: LaunchMode.externalApplication,
+        );
+        if (!opened && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Could not open YouTube. Please try again.'),
+            ),
+          );
         }
       },
       child: Container(
@@ -234,10 +296,7 @@ class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
         decoration: BoxDecoration(
           color: cardColor,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: borderColor,
-            width: 1,
-          ),
+          border: Border.all(color: borderColor, width: 1),
           boxShadow: isDark
               ? null
               : const [
@@ -254,13 +313,26 @@ class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: CustomImageWidget(
-                  imageUrl: lesson.thumbnailUrl,
-                  width: 80,
-                  height: 60,
-                  fit: BoxFit.cover,
-                  semanticLabel: lesson.semanticLabel,
-                ),
+                child: lesson.thumbnailUrl.isEmpty
+                    ? Container(
+                        width: 80,
+                        height: 60,
+                        color: isDark
+                            ? const Color(0xFF1E3A5F)
+                            : const Color(0xFFE8F2FF),
+                        child: const Icon(
+                          Icons.smart_display_rounded,
+                          color: Color(0xFFFF0000),
+                          size: 32,
+                        ),
+                      )
+                    : CustomImageWidget(
+                        imageUrl: lesson.thumbnailUrl,
+                        width: 80,
+                        height: 60,
+                        fit: BoxFit.cover,
+                        semanticLabel: lesson.semanticLabel,
+                      ),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -300,10 +372,7 @@ class _VideoLessonSectionWidgetState extends State<VideoLessonSectionWidget> {
                         Expanded(
                           child: Text(
                             lesson.subject,
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: mutedColor,
-                            ),
+                            style: TextStyle(fontSize: 11, color: mutedColor),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
