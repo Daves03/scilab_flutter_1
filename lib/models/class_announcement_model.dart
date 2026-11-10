@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../core/course_assignment.dart';
+import 'course_model.dart';
 import 'user_model.dart';
 
 class AnnouncementTarget {
@@ -8,6 +9,50 @@ class AnnouncementTarget {
   final List<String> sections;
 
   const AnnouncementTarget({required this.grade, required this.sections});
+
+  static List<AnnouncementTarget> forTeacher({
+    required AppUser teacher,
+    required Iterable<AppUser> students,
+    Iterable<Course> courses = const [],
+  }) {
+    final sectionsByGrade = <String, Set<String>>{};
+    for (final course in courses) {
+      final grade = course.grade.trim();
+      if (grade.isEmpty) continue;
+      sectionsByGrade
+          .putIfAbsent(grade, () => <String>{})
+          .addAll(
+            course.sections
+                .map((section) => section.trim())
+                .where((section) => section.isNotEmpty),
+          );
+    }
+    for (final student in students) {
+      if (!student.isStudent || student.status != VerificationStatus.approved) {
+        continue;
+      }
+      final grade = student.role!.label;
+      final matchingSections = CourseAssignment.matchingStudentSectionLabels(
+        studentGrade: grade,
+        studentSections: student.sections,
+        courseGrade: grade,
+        courseSections: teacher.sections,
+      );
+      if (matchingSections.isEmpty) continue;
+      sectionsByGrade
+          .putIfAbsent(grade, () => <String>{})
+          .addAll(matchingSections);
+    }
+    final targets =
+        sectionsByGrade.entries.where((entry) => entry.value.isNotEmpty).map((
+          entry,
+        ) {
+          final sections = entry.value.toList()
+            ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+          return AnnouncementTarget(grade: entry.key, sections: sections);
+        }).toList()..sort((a, b) => a.grade.compareTo(b.grade));
+    return targets;
+  }
 
   factory AnnouncementTarget.fromMap(Map<String, dynamic> data) {
     return AnnouncementTarget(

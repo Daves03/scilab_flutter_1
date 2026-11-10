@@ -13,6 +13,9 @@ export default function ManageSections() {
   
   const [activeSection, setActiveSection] = useState(null);
   const [sectionUsers, setSectionUsers] = useState([]);
+  const [sectionTeachers, setSectionTeachers] = useState([]);
+  const [sectionMembersLoading, setSectionMembersLoading] = useState(false);
+  const [sectionMembersError, setSectionMembersError] = useState('');
   
   const [showAddModal, setShowAddModal] = useState(false);
   const [newSectionName, setNewSectionName] = useState('');
@@ -53,19 +56,33 @@ export default function ManageSections() {
 
   useEffect(() => {
     if (!activeSection) return;
+    setSectionUsers([]);
+    setSectionTeachers([]);
+    setSectionMembersLoading(true);
+    setSectionMembersError('');
     const q = query(
       collection(db, 'users'),
       where('sections', 'array-contains', activeSection.name)
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const usersData = [];
+      const teachersData = [];
       snapshot.forEach(doc => {
         const data = doc.data();
+        if (data.role === 'teacher') {
+          teachersData.push({ id: doc.id, ...data });
+        }
         if (data.role !== 'admin' && data.role !== 'teacher' && data.status === 'approved') {
           usersData.push({ id: doc.id, ...data });
         }
       });
       setSectionUsers(usersData);
+      setSectionTeachers(teachersData.sort((a, b) => (a.name || '').localeCompare(b.name || '')));
+      setSectionMembersLoading(false);
+    }, (error) => {
+      console.error('Could not load section members:', error);
+      setSectionMembersError('Could not load the assigned teachers and students. Please reopen this section to try again.');
+      setSectionMembersLoading(false);
     });
     return () => unsubscribe();
   }, [activeSection]);
@@ -160,7 +177,7 @@ export default function ManageSections() {
       <div className="page-header">
         <div>
           <h1>{activeSection ? `Section: ${(activeSection.name || '').replace(/^\\d+-\\s*/, '')}` : 'Manage Sections'}</h1>
-          <p>{activeSection ? 'View students in this section.' : 'Create and remove school sections.'}</p>
+          <p>{activeSection ? `${activeSection.grade || 'Grade not set'} · View assigned teachers and students in this section.` : 'Create and remove school sections.'}</p>
         </div>
         {!activeSection && activeTab === 'active' && (
           <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
@@ -180,6 +197,27 @@ export default function ManageSections() {
               <ArrowLeft size={18} /> Back to Sections
             </button>
             
+            {sectionMembersError ? <div className="teacher-form-error" role="alert">{sectionMembersError}</div> : sectionMembersLoading ? (
+              <div role="status" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading assigned teachers and students...</div>
+            ) : <>
+            <h2 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>Assigned Teachers ({sectionTeachers.length})</h2>
+            {sectionTeachers.length === 0 ? (
+              <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>No teachers are assigned to this section.</p>
+            ) : (
+              <div style={{ overflowX: 'auto', marginBottom: '32px' }}>
+                <table className="data-table">
+                  <thead><tr><th>Name</th><th>Email</th><th>Account Status</th></tr></thead>
+                  <tbody>{sectionTeachers.map(teacher => (
+                    <tr key={teacher.id}>
+                      <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{teacher.name || 'No Name'}</td>
+                      <td>{teacher.email || '-'}</td>
+                      <td>{teacher.status === 'approved' ? 'Active' : teacher.status === 'pending' ? 'Pending Approval' : teacher.status === 'rejected' ? 'Rejected' : 'Not set'}</td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              </div>
+            )}
+            <h2 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>Active Students ({sectionUsers.length})</h2>
             {sectionUsers.length === 0 ? (
               <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
                 No students found in this section.
@@ -206,6 +244,7 @@ export default function ManageSections() {
                 </table>
               </div>
             )}
+            </>}
           </div>
         ) : (
           <>

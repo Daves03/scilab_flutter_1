@@ -1,8 +1,85 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:scilab_flutter_1/core/course_assignment.dart';
 import 'package:scilab_flutter_1/models/course_model.dart';
+import 'package:scilab_flutter_1/models/user_model.dart';
 
 void main() {
+  group('Teacher roster assignments', () {
+    final student = AppUser(
+      id: 'student',
+      name: 'Student',
+      email: 'student@example.com',
+      role: UserRole.grade9,
+      sections: ['A'],
+    );
+    final otherCourse = Course.fromMap('course', {
+      'grade': 'Grade 10',
+      'sections': ['X'],
+    });
+
+    test('includes assigned students before any course is created', () {
+      expect(
+        CourseAssignment.teacherMatchesStudent(
+          teacherSections: ['A'],
+          student: student,
+        ),
+        isTrue,
+      );
+    });
+    test(
+      'includes assigned students when existing courses cover another section',
+      () {
+        expect(
+          CourseAssignment.teacherMatchesStudent(
+            teacherSections: ['A', 'X'],
+            student: student,
+            courses: [otherCourse],
+          ),
+          isTrue,
+        );
+      },
+    );
+    test('normalizes legacy section names and respects embedded grades', () {
+      expect(
+        CourseAssignment.teacherMatchesStudent(
+          teacherSections: ['9-A'],
+          student: student,
+        ),
+        isTrue,
+      );
+      expect(
+        CourseAssignment.teacherMatchesStudent(
+          teacherSections: ['10-A'],
+          student: student,
+        ),
+        isFalse,
+      );
+    });
+    test('excludes students outside assigned sections and courses', () {
+      expect(
+        CourseAssignment.teacherMatchesStudent(
+          teacherSections: ['B'],
+          student: student,
+          courses: [otherCourse],
+        ),
+        isFalse,
+      );
+    });
+    test('retains students assigned through a matching course', () {
+      final course = Course.fromMap('matching', {
+        'grade': 'Grade 9',
+        'sections': ['A'],
+      });
+      expect(
+        CourseAssignment.teacherMatchesStudent(
+          teacherSections: [],
+          student: student,
+          courses: [course],
+        ),
+        isTrue,
+      );
+    });
+  });
   group('CourseAssignment.matches', () {
     test('matches the same grade and section', () {
       expect(

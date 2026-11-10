@@ -18,6 +18,7 @@ import ActivityLogs from './pages/ActivityLogs';
 import Legal from './pages/Legal';
 import TeacherDashboard from './pages/TeacherDashboard';
 import TeacherStudents from './pages/TeacherStudents';
+import TeacherSections from './pages/TeacherSections';
 import TeacherCourses from './pages/TeacherCourses';
 import TeacherProgress from './pages/TeacherProgress';
 import TeacherCourseDetail from './pages/TeacherCourseDetail';
@@ -107,7 +108,7 @@ function App() {
         >
           <Route index element={role === 'admin' ? <Overview /> : <TeacherDashboard user={user} profile={profile} />} />
           <Route path="users" element={role === 'admin' ? <ManageUsers /> : <Navigate to="/" replace />} />
-          <Route path="sections" element={role === 'admin' ? <ManageSections /> : <Navigate to="/" replace />} />
+          <Route path="sections" element={role === 'admin' ? <ManageSections /> : role === 'teacher' ? <TeacherSections profile={profile} /> : <Navigate to="/" replace />} />
           <Route path="uploads" element={role === 'admin' ? <TeacherUploads /> : <Navigate to="/" replace />} />
           <Route path="ar-labs" element={<ARLabManager teacherProfile={role === 'teacher' ? profile : null} />} />
           <Route path="ar-marker" element={role === 'admin' ? <ARMarker /> : <Navigate to="/" replace />} />

@@ -5,6 +5,7 @@ import { AlertTriangle, CheckCircle2, RefreshCcw, Search, UserCheck, UserX, User
 import { useSearchParams } from 'react-router-dom';
 import { db } from '../firebase';
 import { gradeLabelForRole, teacherHandlesStudent } from '../services/teacherPortalUtils';
+import { teacherSectionSummaries } from '../services/teacherSectionSummaries';
 
 const TABS = [
   { id: 'pending', label: 'Pending Approvals', icon: UserCheck },
@@ -19,6 +20,7 @@ export default function TeacherStudents({ profile }) {
   const requestedStatus = searchParams.get('status');
   const [activeTab, setActiveTab] = useState(TABS.some((tab) => tab.id === requestedStatus) ? requestedStatus : 'pending');
   const [search, setSearch] = useState('');
+  const [sectionFilter, setSectionFilter] = useState('all');
   const [busyId, setBusyId] = useState('');
   const [message, setMessage] = useState('');
   const [confirmation, setConfirmation] = useState(null);
@@ -48,15 +50,20 @@ export default function TeacherStudents({ profile }) {
 
   const handled = useMemo(() => students.filter((student) =>
     teacherHandlesStudent(teacherSections, student, sections)), [sections, students, teacherSections]);
+  const sectionOptions = useMemo(() => teacherSectionSummaries(teacherSections, sections, students), [teacherSections, sections, students]);
+  const selectedSection = sectionOptions.length > 1 ? sectionOptions.find((section) => section.key === sectionFilter) : null;
+  const filtered = useMemo(() => {
+    const selectedIds = selectedSection ? new Set(selectedSection.students.map((student) => student.id)) : null;
+    const queryText = search.trim().toLowerCase();
+    return handled.filter((student) => (!selectedIds || selectedIds.has(student.id))
+      && (!queryText || [student.name, student.email, student.studentNumber]
+        .some((value) => String(value || '').toLowerCase().includes(queryText))));
+  }, [handled, selectedSection, search]);
   const counts = useMemo(() => Object.fromEntries(TABS.map((tab) => [
     tab.id,
-    handled.filter((student) => student.status === tab.id).length,
-  ])), [handled]);
-  const visible = useMemo(() => handled.filter((student) => {
-    const queryText = search.trim().toLowerCase();
-    return student.status === activeTab && (!queryText || [student.name, student.email, student.studentNumber]
-      .some((value) => String(value || '').toLowerCase().includes(queryText)));
-  }), [activeTab, handled, search]);
+    filtered.filter((student) => student.status === tab.id).length,
+  ])), [filtered]);
+  const visible = useMemo(() => filtered.filter((student) => student.status === activeTab), [activeTab, filtered]);
 
   const changeStatus = async (student, status) => {
     setBusyId(student.id);
@@ -93,8 +100,18 @@ export default function TeacherStudents({ profile }) {
               </button>
             ))}
           </div>
-          <label className="teacher-search"><Search size={18} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search students..." /></label>
+          <label className="teacher-search"><Search size={18} /><input aria-label="Search students" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search students..." /></label>
         </div>
+
+        {sectionOptions.length > 1 && (
+          <label className="input-group" style={{ maxWidth: '320px', marginBottom: '20px' }}>
+            <span className="input-label">Section</span>
+            <select className="input-field" aria-label="Filter students by section" value={selectedSection?.key || 'all'} onChange={(event) => setSectionFilter(event.target.value)}>
+              <option value="all">All Assigned Sections</option>
+              {sectionOptions.map((section) => <option key={section.key} value={section.key}>{section.grade} · Section {section.name}</option>)}
+            </select>
+          </label>
+        )}
 
         <div className="teacher-responsive-table teacher-students-table-wrap">
           <table className="data-table teacher-students-table">
@@ -117,7 +134,7 @@ export default function TeacherStudents({ profile }) {
               ))}
             </tbody>
           </table>
-          {visible.length === 0 && <div className="teacher-empty-state"><Users size={34} /><strong>No {activeTab} students</strong><span>Students assigned to your handled sections will appear here.</span></div>}
+          {visible.length === 0 && <div className="teacher-empty-state"><Users size={34} /><strong>No {activeTab} students</strong><span>{selectedSection || search.trim() ? 'No students match your current section and search filters.' : 'Students assigned to your handled sections will appear here.'}</span></div>}
         </div>
       </section>
 

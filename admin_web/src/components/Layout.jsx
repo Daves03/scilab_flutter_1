@@ -116,6 +116,9 @@ export default function Layout({ role = 'admin', profile }) {
               <NavLink to="/students" onClick={closeMenu} className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
                 <Users size={20} /> Manage Students
               </NavLink>
+              <NavLink to="/sections" onClick={closeMenu} className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+                <Layers size={20} /> Manage Sections
+              </NavLink>
               <NavLink to="/my-courses" onClick={closeMenu} className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
                 <BookOpen size={20} /> Manage Courses
               </NavLink>

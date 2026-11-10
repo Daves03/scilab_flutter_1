@@ -115,6 +115,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   final Map<String, List<QueryDocumentSnapshot<Map<String, dynamic>>>>
   _arAttemptsByStudent = {};
   final Map<String, AppUser> _approvedStudentsById = {};
+  bool _approvedStudentsLoaded = false;
   List<QuizAttempt> _notificationQuizAttempts = [];
   List<Map<String, dynamic>> _notifications = [];
   int _quizSubscriptionGeneration = 0;
@@ -159,9 +160,33 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   void _applyLiveQuizAttempts(List<QuizAttempt> attempts) {
     if (!mounted) return;
 
+    final previousSummaries = {
+      for (final student in _students) student.id: student,
+    };
+    final profiles = _approvedStudentsLoaded
+        ? _approvedStudentsById.values.where(_studentMatchesAnyTeacherCourse)
+        : null;
+    final roster =
+        profiles?.map((profile) {
+          final previous = previousSummaries[profile.id];
+          return _StudentSummary(
+            id: profile.id,
+            name: profile.name,
+            grade: profile.role?.label ?? 'Grade not set',
+            section: _matchingSectionLabel(profile),
+            studentNumber: profile.studentNumber,
+            avatarUrl: profile.avatarUrl,
+            avgQuizScore: previous?.avgQuizScore ?? 0,
+            avgArScore: previous?.avgArScore ?? 0,
+            quizzesTaken: previous?.quizzesTaken ?? 0,
+            arAttempts: previous?.arAttempts ?? 0,
+          );
+        }).toList() ??
+        _students;
+
     setState(() {
       _allAttempts = attempts;
-      _students = _students.map((student) {
+      _students = roster.map((student) {
         final currentProfile = _approvedStudentsById[student.id];
         final studentAttempts = _latestAttemptsForStudent(attempts, student.id);
         return _StudentSummary(
@@ -207,9 +232,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
       final users = studentsSnap.docs
           .map((document) => AppUser.fromMap(document.id, document.data()))
           .where(
-            (student) => courses.any(
-              (course) =>
-                  CourseAssignment.courseMatchesStudent(course, student),
+            (student) => CourseAssignment.teacherMatchesStudent(
+              teacherSections: teacher.sections,
+              student: student,
+              courses: courses,
             ),
           )
           .toList();
@@ -298,6 +324,12 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
           }
           _loading = false;
         });
+        if (_approvedStudentsLoaded) {
+          _applyCurrentQuizAttempts();
+          for (final entry in _arAttemptsByStudent.entries) {
+            _applyLiveArActivities(entry.key, entry.value);
+          }
+        }
         _updateNotifs();
       }
     } catch (e) {
@@ -353,6 +385,9 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   void _handleAuthChanged() {
     if (_authService.currentUser == null) {
       _stopNotificationStreams();
+    } else if (_approvedStudentsLoaded) {
+      _applyCurrentQuizAttempts();
+      _refreshArActivitySubscriptions(FirebaseFirestore.instance);
     }
   }
 
@@ -389,15 +424,13 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   }
 
   bool _studentMatchesAnyTeacherCourse(AppUser student) {
-    if (_teacherCourses.isNotEmpty) {
-      return _teacherCourses.any(
-        (course) => CourseAssignment.courseMatchesStudent(course, student),
-      );
-    }
-    // Fallback: use teacher's own sections field when no courses are assigned yet
     final user = context.read<AuthService>().currentUser;
     if (user == null) return false;
-    return student.sections.any((s) => user.sections.contains(s));
+    return CourseAssignment.teacherMatchesStudent(
+      teacherSections: user.sections,
+      student: student,
+      courses: _teacherCourses,
+    );
   }
 
   Set<String> get _handledStudentIds => _approvedStudentsById.values
@@ -437,6 +470,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
             setState(() {
               _teacherCourses = courses;
             });
+            _applyCurrentQuizAttempts();
             _refreshQuizAttemptSubscriptions(db);
             _refreshArActivitySubscriptions(db);
             _updateNotifs();
@@ -476,6 +510,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
         .listen(
           (snapshot) {
             if (!mounted) return;
+            _approvedStudentsLoaded = true;
             _approvedStudentsById
               ..clear()
               ..addEntries(
@@ -1858,39 +1893,55 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen>
   }
 
   List<AnnouncementTarget> get _announcementTargets {
-    final sectionsByGrade = <String, Set<String>>{};
-    for (final course in _teacherCourses) {
-      final grade = course.grade.trim();
-      if (grade.isEmpty) continue;
-      final sections = sectionsByGrade.putIfAbsent(grade, () => <String>{});
-      sections.addAll(
-        course.sections
-            .map((section) => section.trim())
-            .where((section) => section.isNotEmpty),
-      );
-    }
-
-    final targets = sectionsByGrade.entries
-        .where((entry) => entry.value.isNotEmpty)
-        .map((entry) {
-          final sections = entry.value.toList()
-            ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
-          return AnnouncementTarget(grade: entry.key, sections: sections);
-        })
-        .toList();
-    targets.sort((a, b) => a.grade.compareTo(b.grade));
-    return targets;
+    final teacher = _authService.currentUser;
+    if (teacher == null) return const [];
+    return AnnouncementTarget.forTeacher(
+      teacher: teacher,
+      students: _approvedStudentsById.values,
+      courses: _teacherCourses,
+    );
   }
 
   Future<void> _showAnnouncementComposer() async {
     final teacher = _authService.currentUser;
-    final targets = _announcementTargets;
     if (teacher == null) return;
+    if (!_approvedStudentsLoaded) {
+      try {
+        final snapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('role', whereIn: [UserRole.grade9.id, UserRole.grade10.id])
+            .where('status', isEqualTo: VerificationStatus.approved.id)
+            .get();
+        if (!mounted) return;
+        _approvedStudentsById
+          ..clear()
+          ..addEntries(
+            snapshot.docs.map(
+              (document) => MapEntry(
+                document.id,
+                AppUser.fromMap(document.id, document.data()),
+              ),
+            ),
+          );
+        _approvedStudentsLoaded = true;
+        _applyCurrentQuizAttempts();
+        _refreshArActivitySubscriptions(FirebaseFirestore.instance);
+      } catch (error) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not load your students. Please try again.'),
+          ),
+        );
+        return;
+      }
+    }
+    final targets = _announcementTargets;
     if (targets.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            'Create a course with an assigned grade and section before posting an announcement.',
+            'No announcement audience is available. Assign sections and approve students in those sections first.',
           ),
         ),
       );

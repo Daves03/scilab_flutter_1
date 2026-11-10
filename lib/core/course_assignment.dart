@@ -9,6 +9,23 @@ import '../models/user_model.dart';
 class CourseAssignment {
   const CourseAssignment._();
 
+  /// A teacher's roster includes assigned-section students before courses exist.
+  /// Course assignments can also identify students handled by the teacher.
+  static bool teacherMatchesStudent({
+    required Iterable<String> teacherSections,
+    required AppUser student,
+    Iterable<Course> courses = const [],
+  }) {
+    if (!student.isStudent) return false;
+    return matches(
+          studentGrade: student.role?.label,
+          studentSections: student.sections,
+          courseGrade: student.role?.label,
+          courseSections: teacherSections,
+        ) ||
+        courses.any((course) => courseMatchesStudent(course, student));
+  }
+
   static bool courseMatchesStudent(Course course, AppUser student) {
     return matchingSectionsForStudent(course, student).isNotEmpty;
   }
@@ -133,9 +150,7 @@ class CourseAssignment {
     if (gradePrefix != null) {
       embeddedGrade = int.parse(gradePrefix.group(1)!);
       value = gradePrefix.group(2)!.trim();
-      value = value
-          .replaceFirst(RegExp(r'^(?:section|sec\.?)\s*'), '')
-          .trim();
+      value = value.replaceFirst(RegExp(r'^(?:section|sec\.?)\s*'), '').trim();
     }
 
     final key = value.replaceAll(RegExp(r'[^a-z0-9]+'), '');

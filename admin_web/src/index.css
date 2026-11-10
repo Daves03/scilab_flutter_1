@@ -947,6 +947,21 @@ p { color: var(--text-secondary); line-height: 1.5; }
 .teacher-search:focus-within { border-color:var(--accent-cyan); box-shadow:0 0 0 3px rgba(0,212,255,.12); }
 .teacher-search input { width:100%; padding:12px 0; border:0; outline:0; background:transparent; color:var(--text-primary); font:inherit; }
 .teacher-responsive-table { overflow-x:auto; }
+.teacher-assigned-sections-toolbar { border-bottom:1px solid var(--border-light); padding-bottom:12px; flex-wrap:wrap; }
+.teacher-assigned-sections-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr)); gap:16px; }
+.teacher-assigned-section-card { min-width:0; display:flex; align-items:center; gap:16px; padding:20px; border:1px solid var(--border-light); border-radius:12px; background:rgba(0,0,0,.2); box-shadow:var(--shadow-sm); color:var(--text-primary); font:inherit; text-align:left; cursor:pointer; transition:transform .2s,border-color .2s; }
+.teacher-assigned-section-card:hover { transform:translateY(-2px); border-color:var(--accent-cyan); }
+.teacher-assigned-section-card:focus-visible { outline:2px solid var(--accent-cyan); outline-offset:3px; }
+.teacher-assigned-section-icon { display:grid; place-items:center; flex-shrink:0; padding:10px; border-radius:10px; background:var(--accent-purple); color:#fff; }
+.teacher-assigned-section-copy { flex:1; min-width:0; }
+.teacher-assigned-section-copy strong,.teacher-assigned-section-copy > span { display:block; overflow-wrap:anywhere; }
+.teacher-assigned-section-copy strong { font-size:1.1rem; margin-bottom:4px; }
+.teacher-assigned-section-copy > span { color:var(--text-secondary); font-size:.85rem; }
+.teacher-assigned-section-count { flex-shrink:0; text-align:center; }
+.teacher-assigned-section-count strong,.teacher-assigned-section-count > span { display:block; }
+.teacher-assigned-section-count strong { color:var(--accent-cyan); font-size:1.35rem; }
+.teacher-assigned-section-count > span { margin-top:3px; color:var(--text-secondary); font-size:.72rem; }
+[data-theme="light"] .teacher-assigned-section-card { background:var(--bg-card); }
 .teacher-student-cell { display:flex; align-items:center; gap:10px; min-width:180px; }
 .teacher-action-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .teacher-empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:48px 20px; color:var(--text-secondary); text-align:center; }

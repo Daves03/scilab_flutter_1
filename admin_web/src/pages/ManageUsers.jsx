@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { collection, onSnapshot, doc, updateDoc, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc } from 'firebase/firestore';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { db, auth } from '../firebase';
 import { logAdminActivity } from '../services/adminActivityService';
+import { gradeLabelForRole, gradeNumber, normalizeSection, teacherGradeLabels } from '../services/teacherPortalUtils';
 import { CheckCircle, XCircle, Key, RefreshCcw, AlertTriangle, Search, Edit, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const timestampToMillis = (value) => {
@@ -37,15 +38,17 @@ const newestRegistrationFirst = (first, second) => {
 export default function ManageUsers() {
   const [activeTab, setActiveTab] = useState('pending'); // 'pending' | 'approved' | 'rejected'
   const [roleFilter, setRoleFilter] = useState('all');
+  const [gradeFilter, setGradeFilter] = useState('all');
+  const [sectionFilter, setSectionFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [allUsers, setAllUsers] = useState([]);
-  const [sectionsMap, setSectionsMap] = useState({});
+  const [sectionCatalog, setSectionCatalog] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeTab, roleFilter, searchQuery]);
+  }, [activeTab, roleFilter, gradeFilter, sectionFilter, searchQuery]);
   
   const [deleteConfirm, setDeleteConfirm] = useState(null); // User to reject
   const [recoverConfirm, setRecoverConfirm] = useState(null); // User to recover
@@ -70,10 +73,29 @@ export default function ManageUsers() {
     return () => unsubscribe();
   }, []);
 
-  const users = allUsers
-    .filter(user => user.status === activeTab)
-    .sort(newestRegistrationFirst);
-  const userCounts = allUsers.reduce((counts, user) => {
+  const matchesRole = (user) => roleFilter === 'all'
+    || (roleFilter === 'teacher' ? user.role === 'teacher' : user.role !== 'teacher' && user.role !== 'admin');
+  const userGrades = (user) => user.role === 'teacher'
+    ? teacherGradeLabels(user.sections || [], sectionCatalog)
+    : [gradeLabelForRole(user.role)].filter(Boolean);
+  const sectionsForGrade = (user) => (user.sections || []).filter((name) => {
+    if (gradeFilter === 'all' || user.role !== 'teacher') return true;
+    const matches = sectionCatalog.filter((section) => normalizeSection(section.name) === normalizeSection(name));
+    return matches.some((section) => gradeNumber(section.grade) === gradeNumber(gradeFilter))
+      || (matches.length === 0 && gradeNumber(name) === gradeNumber(gradeFilter));
+  });
+  const sectionOptions = [...new Set(allUsers.filter(matchesRole)
+    .filter((user) => gradeFilter === 'all' || userGrades(user).includes(gradeFilter))
+    .flatMap(sectionsForGrade))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  const matchingUsers = allUsers.filter((user) => {
+    const query = searchQuery.trim().toLowerCase();
+    return matchesRole(user)
+      && (gradeFilter === 'all' || userGrades(user).includes(gradeFilter))
+      && (sectionFilter === 'all' || sectionsForGrade(user).includes(sectionFilter))
+      && [user.name, user.email, user.studentNumber].some((value) => String(value || '').toLowerCase().includes(query));
+  });
+  const users = matchingUsers.filter(user => user.status === activeTab).sort(newestRegistrationFirst);
+  const userCounts = matchingUsers.reduce((counts, user) => {
     if (Object.hasOwn(counts, user.status)) {
       counts[user.status] += 1;
     }
@@ -81,22 +103,9 @@ export default function ManageUsers() {
   }, { pending: 0, approved: 0, rejected: 0 });
 
   useEffect(() => {
-    const fetchSections = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, 'sections'));
-        const map = {};
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          if (data.name && data.grade) {
-            map[data.name] = data.grade;
-          }
-        });
-        setSectionsMap(map);
-      } catch (e) {
-        console.error('Error fetching sections map:', e);
-      }
-    };
-    fetchSections();
+    return onSnapshot(collection(db, 'sections'), (snapshot) => {
+      setSectionCatalog(snapshot.docs.map((item) => ({ id: item.id, ...item.data() })));
+    }, (error) => console.error('Error fetching sections:', error));
   }, []);
 
   const handleApprove = async (id, currentRole) => {
@@ -209,7 +218,7 @@ export default function ManageUsers() {
       </div>
 
       <div className="glass-panel" style={{ padding: '24px' }}>
-        <div className="flex-mobile-col" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid var(--border-light)', gap: '16px' }}>
+        <div style={{ marginBottom: '24px', borderBottom: '1px solid var(--border-light)' }}>
           <div className="tabs" style={{ borderBottom: 'none', marginBottom: 0, display: 'flex', justifyContent: 'center', width: '100%', paddingBottom: '4px' }}>
             <button 
               className={`tab ${activeTab === 'pending' ? 'active' : ''}`}
@@ -234,7 +243,7 @@ export default function ManageUsers() {
             </button>
           </div>
           
-          <div className="flex-mobile-col mobile-w-full" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <div className="flex-mobile-col mobile-w-full" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center', padding: '16px 0' }}>
             <div className="input-group mobile-w-full" style={{ marginBottom: 0 }}>
               <div style={{ position: 'relative' }}>
                 <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
@@ -242,6 +251,7 @@ export default function ManageUsers() {
                   className="input-field mobile-w-full"
                   style={{ padding: '8px 12px 8px 36px', width: '220px', margin: 0 }}
                   placeholder="Search name, email, or student no..."
+                  aria-label="Search users"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -251,43 +261,52 @@ export default function ManageUsers() {
               className="input-field mobile-w-full" 
               style={{ width: '160px', padding: '8px 12px', margin: 0 }}
               value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
+              aria-label="Filter by role"
+              onChange={(e) => {
+                setRoleFilter(e.target.value);
+                setGradeFilter('all');
+                setSectionFilter('all');
+              }}
             >
               <option value="all">All Roles</option>
               <option value="student">Students</option>
               <option value="teacher">Teachers</option>
             </select>
+            {roleFilter !== 'all' && (
+              <>
+                <select className="input-field mobile-w-full" style={{ width: '170px', padding: '8px 12px', margin: 0 }}
+                  aria-label="Filter by grade level" value={gradeFilter}
+                  onChange={(e) => { setGradeFilter(e.target.value); setSectionFilter('all'); }}>
+                  <option value="all">All Grade Levels</option>
+                  <option value="Grade 9">Grade 9</option>
+                  <option value="Grade 10">Grade 10</option>
+                </select>
+                <select className="input-field mobile-w-full" style={{ width: '180px', padding: '8px 12px', margin: 0 }}
+                  aria-label="Filter by section" value={sectionFilter} onChange={(e) => setSectionFilter(e.target.value)}>
+                  <option value="all">All Sections</option>
+                  {sectionOptions.map((name) => <option key={name} value={name}>{name}</option>)}
+                </select>
+              </>
+            )}
           </div>
         </div>
 
+        <p role="status" style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          Total {roleFilter === 'student' ? 'students' : roleFilter === 'teacher' ? 'teachers' : 'users'}: <strong style={{ color: 'var(--text-primary)' }}>{users.length}</strong>
+        </p>
+
         {(() => {
-          const filteredUsers = users.filter(u => {
-            // Filter by role
-            let roleMatch = true;
-            if (roleFilter === 'teacher') roleMatch = u.role === 'teacher';
-            else if (roleFilter === 'student') roleMatch = u.role !== 'teacher' && u.role !== 'admin';
-            
-            // Filter by search query
-            let searchMatch = true;
-            if (searchQuery.trim()) {
-              const q = searchQuery.toLowerCase();
-              const name = (u.name || '').toLowerCase();
-              const email = (u.email || '').toLowerCase();
-              const studentNum = (u.studentNumber || '').toLowerCase();
-              searchMatch = name.includes(q) || email.includes(q) || studentNum.includes(q);
-            }
-            
-            return roleMatch && searchMatch;
-          });
+          const filteredUsers = users;
 
           const totalPages = Math.max(1, Math.ceil(filteredUsers.length / itemsPerPage));
-          const startIndex = (currentPage - 1) * itemsPerPage;
+          const visiblePage = Math.min(currentPage, totalPages);
+          const startIndex = (visiblePage - 1) * itemsPerPage;
           const paginatedUsers = filteredUsers.slice(startIndex, startIndex + itemsPerPage);
 
           if (users.length === 0) {
             return (
               <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                {activeTab === 'rejected' ? 'No rejected users.' : 'No users found in this category.'}
+                No users match your filters in this category.
               </div>
             );
           }
@@ -334,11 +353,7 @@ export default function ManageUsers() {
                         </td>
                         <td>
                           <span style={{ color: 'var(--text-secondary)' }}>
-                            {user.role === 'grade9' ? 'Grade 9' 
-                              : user.role === 'grade10' ? 'Grade 10' 
-                              : user.role === 'teacher' && user.sections?.length > 0
-                                ? [...new Set(user.sections.map(s => sectionsMap[s]))].filter(Boolean).join(', ') || '-'
-                              : '-'}
+                            {userGrades(user).join(', ') || '-'}
                           </span>
                         </td>
                         <td>{user.sections?.join(', ') || '-'}</td>
@@ -397,7 +412,7 @@ export default function ManageUsers() {
                   gap: '12px',
                 }}>
                   <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                    Showing <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{startIndex + 1}</span> to <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{Math.min(startIndex + itemsPerPage, filteredUsers.length)}</span> of <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{filteredUsers.length}</span> users
+                    Showing <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{startIndex + 1}</span> to <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{Math.min(startIndex + itemsPerPage, filteredUsers.length)}</span> of <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{filteredUsers.length}</span> {roleFilter === 'student' ? 'students' : roleFilter === 'teacher' ? 'teachers' : 'users'}
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -406,18 +421,18 @@ export default function ManageUsers() {
                       style={{
                         padding: '8px 16px',
                         fontSize: '0.85rem',
-                        opacity: currentPage === 1 ? 0.4 : 1,
-                        cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                        opacity: visiblePage === 1 ? 0.4 : 1,
+                        cursor: visiblePage === 1 ? 'not-allowed' : 'pointer',
                       }}
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage(Math.max(visiblePage - 1, 1))}
+                      disabled={visiblePage === 1}
                     >
                       <ChevronLeft size={16} />
                       Previous
                     </button>
 
                     <span style={{ color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: 500, padding: '0 8px' }}>
-                      Page {currentPage} of {totalPages}
+                      Page {visiblePage} of {totalPages}
                     </span>
 
                     <button
@@ -425,11 +440,11 @@ export default function ManageUsers() {
                       style={{
                         padding: '8px 16px',
                         fontSize: '0.85rem',
-                        opacity: currentPage >= totalPages ? 0.4 : 1,
-                        cursor: currentPage >= totalPages ? 'not-allowed' : 'pointer',
+                        opacity: visiblePage >= totalPages ? 0.4 : 1,
+                        cursor: visiblePage >= totalPages ? 'not-allowed' : 'pointer',
                       }}
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                      disabled={currentPage >= totalPages}
+                      onClick={() => setCurrentPage(Math.min(visiblePage + 1, totalPages))}
+                      disabled={visiblePage >= totalPages}
                     >
                       Next
                       <ChevronRight size={16} />
