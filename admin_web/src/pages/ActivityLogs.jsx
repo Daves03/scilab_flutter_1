@@ -1,19 +1,35 @@
 import { useState, useEffect } from 'react';
 import { collection, collectionGroup, getDocs, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
+import { createExperimentActivityFeed } from '../services/experimentActivityFeed';
+import { activityUserSections, matchesActivityUser } from '../services/activityLogFilters';
 import { Activity, Clock, Box, BookOpen, Search, PlusCircle, FilePlus, HelpCircle, CheckCircle, ChevronLeft, ChevronRight, ShieldCheck, Archive, RotateCcw, UserCheck, UserX, Pencil, Trash2, XCircle } from 'lucide-react';
 
 export default function ActivityLogs() {
-  const [logs, setLogs] = useState([]);
+  const [otherLogs, setLogs] = useState([]);
+  const [experimentLogs, setExperimentLogs] = useState([]);
+  const [experimentError, setExperimentError] = useState('');
+  const logs = [...otherLogs, ...experimentLogs].sort((a, b) => b.timestamp - a.timestamp);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all');
+  const [roleFilter, setRoleFilter] = useState('all');
+  const [gradeFilter, setGradeFilter] = useState('all');
+  const [sectionFilter, setSectionFilter] = useState('all');
+  const [usersById, setUsersById] = useState({});
+  const [sectionCatalog, setSectionCatalog] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, filterType]);
+  }, [searchQuery, filterType, roleFilter, gradeFilter, sectionFilter]);
+
+  useEffect(() => onSnapshot(
+    collection(db, 'sections'),
+    snapshot => setSectionCatalog(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }))),
+    error => console.error('Could not load activity filter sections:', error),
+  ), []);
 
   useEffect(() => {
     let disposed = false;
@@ -25,40 +41,6 @@ export default function ActivityLogs() {
       try {
         // Fetch activity records and resolve every display name by stable uid.
         const activities = [];
-        try {
-          const expSnap = await getDocs(collectionGroup(db, 'experiment_activity'));
-          expSnap.forEach(doc => {
-            const data = doc.data();
-            const uid = doc.ref.parent.parent?.id;
-            const user = uid ? usersMap[uid] : null;
-            
-            if (data.launchedAt) {
-              activities.push({
-                id: `${doc.id}-launch`,
-                uid,
-                userName: user?.name || user?.displayName || 'Unknown User',
-                userRole: user?.role === 'teacher' ? 'teacher' : (user?.role || 'student'),
-                type: 'experiment_launch',
-                title: doc.id,
-                timestamp: data.launchedAt?.toDate ? data.launchedAt.toDate() : (data.launchedAt ? new Date(data.launchedAt) : new Date()),
-              });
-            }
-            if (data.completedAt) {
-              activities.push({
-                id: `${doc.id}-complete`,
-                uid,
-                userName: user?.name || user?.displayName || 'Unknown User',
-                userRole: user?.role === 'teacher' ? 'teacher' : (user?.role || 'student'),
-                type: 'experiment_complete',
-                title: doc.id,
-                timestamp: data.completedAt?.toDate ? data.completedAt.toDate() : (data.completedAt ? new Date(data.completedAt) : new Date()),
-              });
-            }
-          });
-        } catch (e) {
-          console.warn("Could not fetch experiment_activity (might need index):", e);
-        }
-
         // 3. Fetch all module activities
         try {
           const modSnap = await getDocs(collectionGroup(db, 'module_activity'));
@@ -203,6 +185,27 @@ export default function ActivityLogs() {
       }
     }
 
+    const experimentFeed = createExperimentActivityFeed({
+      watchUser: (uid, onChange, onError) => onSnapshot(
+        collection(db, 'users', uid, 'experiment_activity'),
+        (snapshot) => onChange(snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }))),
+        onError,
+      ),
+      onChange: setExperimentLogs,
+      onError: (uid, error) => {
+        console.error('Could not watch AR activity for ' + uid + ':', error);
+        setExperimentError('Some AR activity could not be loaded. Please refresh to try again.');
+      },
+    });
+
+    const unsubscribeExperiments = onSnapshot(
+      collection(db, 'ar_experiments'),
+      (snapshot) => experimentFeed.setExperiments(
+        snapshot.docs.map(doc => ({ id: doc.id, title: doc.data().title })),
+      ),
+      (error) => console.warn('Could not load experiment names; using built-in names:', error),
+    );
+
     const unsubscribe = onSnapshot(
       collection(db, 'users'),
       (usersSnap) => {
@@ -210,6 +213,8 @@ export default function ActivityLogs() {
         usersSnap.forEach(doc => {
           usersMap[doc.id] = doc.data();
         });
+        experimentFeed.setUsers(usersMap);
+        setUsersById(usersMap);
         latestUsersMap = usersMap;
         hasLoadedUsers = true;
         const version = ++requestVersion;
@@ -237,6 +242,8 @@ export default function ActivityLogs() {
       disposed = true;
       unsubscribe();
       unsubscribeAdminLogs();
+      unsubscribeExperiments();
+      experimentFeed.dispose();
     };
   }, []);
 
@@ -301,7 +308,14 @@ export default function ActivityLogs() {
     }
   };
 
+  const sectionOptions = [...new Set(Object.values(usersById)
+    .filter(user => matchesActivityUser(user, { role: roleFilter, grade: gradeFilter }, sectionCatalog))
+    .flatMap(user => activityUserSections(user, gradeFilter, sectionCatalog)))]
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
   const filteredLogs = logs.filter(log => {
+    const user = { ...usersById[log.uid], role: log.isAdminActivity ? 'admin' : (usersById[log.uid]?.role || log.userRole) };
+    if (!matchesActivityUser(user, { role: roleFilter, grade: gradeFilter, section: sectionFilter }, sectionCatalog)) return false;
     const actionInfo = getActionInfo(log.type);
 
     // Filter by search query
@@ -352,7 +366,7 @@ export default function ActivityLogs() {
       <div className="glass-panel" style={{ padding: '24px' }}>
         <div className="flex-mobile-col" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', gap: '16px' }}>
           
-          <div className="flex-mobile-col mobile-w-full" style={{ display: 'flex', gap: '12px', alignItems: 'center', width: '100%' }}>
+          <div className="flex-mobile-col mobile-w-full" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center', width: '100%' }}>
             <div className="input-group mobile-w-full" style={{ marginBottom: 0, flex: 1, maxWidth: '400px' }}>
               <div style={{ position: 'relative' }}>
                 <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
@@ -368,6 +382,7 @@ export default function ActivityLogs() {
             
             <select 
               className="input-field mobile-w-full" 
+              aria-label="Filter by activity"
               style={{ width: '180px', padding: '8px 12px', margin: 0 }}
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
@@ -381,8 +396,30 @@ export default function ActivityLogs() {
               <option value="quiz_reviews">Quiz Approvals</option>
               <option value="admin">Admin Activity</option>
             </select>
+            <select className="input-field mobile-w-full" aria-label="Filter by role"
+              style={{ width: '160px', padding: '8px 12px', margin: 0 }}
+              value={roleFilter} onChange={e => { setRoleFilter(e.target.value); setGradeFilter('all'); setSectionFilter('all'); }}>
+              <option value="all">All Roles</option>
+              <option value="teacher">Teachers</option>
+              <option value="student">Students</option>
+            </select>
+            {roleFilter === 'student' && <select className="input-field mobile-w-full" aria-label="Filter by grade"
+              style={{ width: '160px', padding: '8px 12px', margin: 0 }}
+              value={gradeFilter} onChange={e => { setGradeFilter(e.target.value); setSectionFilter('all'); }}>
+              <option value="all">All Grades</option>
+              <option value="Grade 9">Grade 9</option>
+              <option value="Grade 10">Grade 10</option>
+            </select>}
+            {roleFilter === 'student' && gradeFilter !== 'all' && <select className="input-field mobile-w-full" aria-label="Filter by section"
+              style={{ width: '180px', padding: '8px 12px', margin: 0 }}
+              value={sectionFilter} onChange={e => setSectionFilter(e.target.value)}>
+              <option value="all">All Sections</option>
+              {sectionOptions.map(name => <option key={name} value={name}>{name}</option>)}
+            </select>}
           </div>
         </div>
+
+        {experimentError && <p role="alert" style={{ color: '#fb7185' }}>{experimentError}</p>}
 
         {loading ? (
           <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
